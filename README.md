@@ -8,6 +8,14 @@ Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download
 
 Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
+
+### docker usage
+
+```
+docker build --tag 'ptitpot' .
+docker run  -p 3000:3000  --env-file ./.env -d 'ptitpot'
+```
+
 ### Setup project
 
 First clone the project:
