@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  ptitpote:
+    container_name: ptitpote
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/ptitpote/Dockerfile
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    env_file: 
+      - .env
+    volumes:
+      - ./src:/app/src
+  localtunnel:
+    container_name: lt
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: docker/localtunnel/Dockerfile
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    command:
+      --local-host ptitpote --port $APP_PORT --subdomain $LOCALTUNNEL_SUBDOMAIN
+    env_file: 
+      - .env
+    links:
+      - ptitpote
+    depends_on:
+      - ptitpote

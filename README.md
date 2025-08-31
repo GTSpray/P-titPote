@@ -9,39 +9,26 @@ Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download
 Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
 
-### docker usage
-
-```
-docker build --tag 'ptitpot' .
-docker run  -p 3000:3000  --env-file ./.env -d 'ptitpot'
-```
-
 ### Setup project
 
 First clone the project:
 Then navigate to its directory and install dependencies:
 
 ```
-npm install
+docker-compose up -d --build --force-recreate --no-deps
 ```
 
-### Get app credentials
-
-Fetch the credentials from your app's settings and add them to a `.env` file (see `.env.sample` for an example). You'll need your app ID (`APP_ID`), bot token (`DISCORD_TOKEN`), and public key (`PUBLIC_KEY`).
-
-Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
-
-> 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
-
-### Install slash commands
-
-The commands for the example app are set up in `commands.js`. All of the commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
+### Docker usage
 
 ```
-npm run register
+docker-compose up -d --build --force-recreate --no-deps
+```
+or :
+```
+docker-compose up -d
 ```
 
-### Run the app
+Usefull docker-compose commands :### Run the app
 
 After your credentials are added, go ahead and run the app:
 
@@ -53,30 +40,39 @@ node app.js
 
 If you aren't following the [getting started guide](https://discord.com/developers/docs/getting-started), you can move the contents of `examples/app.js` (the finished `app.js` file) to the top-level `app.js`.
 
-### Set up interactivity
-
-The project needs a public endpoint where Discord can send requests. To develop and test locally, you can use something like [`ngrok`](https://ngrok.com/) to tunnel HTTP traffic.
-
-
 ```
-docker run --net=host -it --env-file ./.env  ngrok/ngrok:latest http 3000
-```
+docker-compose restart ptitpot
 
-You should see your connection open:
+docker-compose down --volumes
 
-```
-Tunnel Status                 online
-Version                       2.0/2.0
-Web Interface                 http://127.0.0.1:4040
-Forwarding                    https://1234-someurl.ngrok.io -> localhost:3000
+docker-compose logs -f ptitpote
 
-Connections                  ttl     opn     rt1     rt5     p50     p90
-                              0       0       0.00    0.00    0.00    0.00
+docker-compose exec ptitpote bash
 ```
 
-Copy the forwarding address that starts with `https`, in this case `https://1234-someurl.ngrok.io`, then go to your [app's settings](https://discord.com/developers/applications).
+### Get app credentials
 
-On the **General Information** tab, there will be an **Interactions Endpoint URL**. Paste your ngrok address there, and append `/interactions` to it (`https://1234-someurl.ngrok.io/interactions` in the example).
+Fetch the credentials from your app's settings and add them to a `.env` file (see `.env.sample` for an example). You'll need your app ID (`APP_ID`), bot token (`BOT_TOKEN`), and public key (`PUBLIC_KEY`).
+
+Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
+
+> 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
+
+### Install slash commands
+
+The commands for the example app are set up in `commands.js`. All of the commands in the `ALL_COMMANDS` array at the bottom of `commands.js` will be installed when you run the `register` command configured in `package.json`:
+
+```
+docker-compose exec ptitpote npm run register
+```
+
+### Local tunnel with docker environment  
+
+Try to use tunnel services like ngrok, localtunnel, etc...
+
+Copy the forwarding address that starts with `https`, in this case `https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt`, then go to your [app's settings](https://discord.com/developers/applications).
+
+On the **General Information** tab, there will be an **Interactions Endpoint URL**. Paste your ngrok address there, and append `/interactions` to it (`https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt/interactions` in the example).
 
 Click **Save Changes**, and your app should be ready to run 🚀
 

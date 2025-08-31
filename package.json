@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node src/app.js",
-    "register": "node src/commands.js",
+    "register": "node src/register.js",
     "dev": "nodemon src/app.js"
   },
   "author": "GTSpray",
