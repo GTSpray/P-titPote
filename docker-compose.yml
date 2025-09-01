@@ -2,7 +2,7 @@ version: '3.7'
 services:
   ptitpote:
     container_name: ptitpote
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
@@ -11,8 +11,6 @@ services:
         GID: ${DOCKER_GID:-1000}
     env_file: 
       - .env
-    volumes:
-      - ./src:/app/src
   localtunnel:
     container_name: lt
     restart: on-failure

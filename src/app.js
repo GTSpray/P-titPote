@@ -5,7 +5,8 @@ import {
   InteractionType,
   verifyKeyMiddleware,
 } from 'discord-interactions';
-import { commands } from './commands.js'
+
+import { slashcommands } from './slash-commands/index.js'
 
 // Create an express app
 const app = express();
@@ -19,14 +20,14 @@ const PORT = process.env.APP_PORT || 3000;
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
   // Interaction id, type and data
   const { type, data } = req.body;
-  
+
   console.log(`Interaction type: ${type}`);
 
   /**
    * Handle verification requests
    */
   if (type === InteractionType.PING) {
-    console.log(req.body)
+    console.dir(req.body, { depth: null, colors: true })
     return res.send({ type: InteractionResponseType.PONG });
   }
 
@@ -36,8 +37,8 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
    */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
-    if(commands.hasOwnProperty(name)) {
-      return commands[name].handler(req,res);
+    if (slashcommands.hasOwnProperty(name)) {
+      return slashcommands[name].handler(req, res);
     }
     console.error(`unknown command: ${name}`);
     return res.status(400).json({ error: 'unknown command' });

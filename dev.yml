@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  ptitpote:
+    command:
+      npm run dev
+    volumes:
+      - ${PWD}/src:/app/src
+      - ${PWD}/node_modules:/app/node_modules
+      - ${PWD}/package.json:/app/package.json
+      - ${PWD}/package-lock.json:/app/package-lock.json

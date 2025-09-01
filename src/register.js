@@ -1,19 +1,21 @@
 import 'dotenv/config';
-import { REST, Routes } from 'discord.js';
-import { commands } from './commands.js'
+import { Routes } from 'discord.js';
+import { discordapi } from './utils.js'
+import { slashcommands } from './slash-commands/index.js'
 
-const payload = Object.keys(commands).map((name) => {
-  const {handler, ...rest} = commands[name]; 
+
+const payload = Object.keys(slashcommands).map((name) => {
+  const {handler, ...rest} = slashcommands[name]; 
  return { name, ...rest };
 });
 
 console.log('try to register:');
 console.dir(payload, {depth: null, colors: true})
 
-const discord = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
-discord.put(Routes.applicationCommands(process.env.APP_ID), {
+
+discordapi.put(Routes.applicationCommands(process.env.APP_ID), {
   body: payload
 })
   .then(() => console.log('ok'))
-  .catch(() => console.log('fail'))
+  .catch((error) => console.error(error))
   .finally(() => console.log('done'))
