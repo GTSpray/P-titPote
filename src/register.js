@@ -1,21 +1,20 @@
 import 'dotenv/config';
 import { Routes } from 'discord.js';
 import { discordapi } from './utils.js'
-import { slashcommands } from './slash-commands/index.js'
+import { slashcommands } from './commands/slash/index.js'
+import { logger } from './logger.js';
 
 
 const payload = Object.keys(slashcommands).map((name) => {
-  const {handler, ...rest} = slashcommands[name]; 
- return { name, ...rest };
+  const { handler, ...rest } = slashcommands[name];
+  return { name, type: 1, ...rest };
 });
 
-console.log('try to register:');
-console.dir(payload, {depth: null, colors: true})
-
+logger.info('register', { payload });
 
 discordapi.put(Routes.applicationCommands(process.env.APP_ID), {
   body: payload
 })
-  .then(() => console.log('ok'))
-  .catch((error) => console.error(error))
-  .finally(() => console.log('done'))
+  .then(() => logger.info('success'))
+  .catch((error) => logger.error('register error', error))
+  .finally(() => logger.info('end process'))

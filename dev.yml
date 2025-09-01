@@ -1,6 +1,8 @@
 version: '3.7'
 services:
   ptitpote:
+    environment:
+      LOG_LEVEL: "debug"
     command:
       npm run dev
     volumes:

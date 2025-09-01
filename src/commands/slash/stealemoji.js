@@ -4,7 +4,7 @@ import {
     MessageComponentTypes,
 } from 'discord-interactions';
 import { Routes } from 'discord.js';
-import { discordapi, extractEmoji, getEmojiUrl } from '../utils.js';
+import { discordapi, extractEmoji, getEmojiUrl } from '../../utils.js';
 
 
 const emojiLimit = 3;
@@ -12,7 +12,6 @@ const msgLimit = 10;
 
 export const stealemoji = {
     description: `Récupère les ${emojiLimit} dernières emotes dans les ${msgLimit} derniers messages de ce chan`,
-    type: 1,
     integration_types: [
         0,
         1
