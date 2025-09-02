@@ -11,13 +11,13 @@ import {
 import { logger } from './logger.js';
 import { slashcommands } from './commands/slash/index.js';
 
-morgan.token('id', function (req) {
+morgan.token('requestId', function (req) {
   return req.requestId
 })
 
 // Create an express app
 const app = express();
-app.use(express.json());
+
 const PORT = process.env.APP_PORT || 3000;
 
 app.use(function (req, res, next) {
@@ -35,18 +35,17 @@ app.use(morgan(
     return JSON.stringify({
       method: tokens.method(req, res),
       url: tokens.url(req, res),
-      status: tokens.status(req, res),
-      length: tokens.res(req, res, 'content-length'),
-      time: Number.parseFloat(tokens['response-time'](req, res)),
-      reqId: tokens['id'](req, res),
-      version: process.env.npm_package_version
+      status: Number.parseInt(tokens.status(req, res)),
+      length: Number.parseInt(tokens.res(req, res, 'content-length')),
+      duration: Number.parseFloat(tokens['response-time'](req, res)),
+      reqId: tokens['requestId'](req, res)
     });
   },
   {
     stream: {
       write: (message) => {
         const data = JSON.parse(message);
-        logger.info("request", data);
+        logger.http("request", data);
       },
     },
   }
@@ -61,12 +60,13 @@ app.use(morgan(
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async function (req, res) {
   // Interaction id, type and data
   const { type, data } = req.body;
+  const reqId = req.requestId;
 
   logger.debug('request.body', {
-    reqId: req.requestId,
+    reqId,
     body: req.body
   });
-  logger.info(`interaction type`, { reqId: req.requestId, type });
+  logger.info(`interaction type`, { reqId, type });
 
   /**
    * Handle verification requests
@@ -82,21 +82,23 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
     if (slashcommands.hasOwnProperty(name)) {
-      logger.debug(`interaction handler`, { reqId: req.requestId, name });
+      logger.debug(`interaction handler`, { reqId, name });
       return slashcommands[name].handler(req, res);
     }
-    logger.error(`unknown command`, { reqId: req.requestId, name });
+    logger.error(`unknown command`, { reqId, name });
     return res.status(400).json({ error: 'unknown command' });
   }
 
-  logger.error(`unknown interaction type`, { reqId: req.requestId, type });
+  logger.error(`unknown interaction type`, { reqId, type });
   return res.status(400).json({ error: 'unknown interaction type' });
 });
+
+app.use(express.json()); // after interaction rout to prevent We recommend disabling middleware for interaction routes so that req.body is a raw buffer.
 
 app.listen(PORT, (err) => {
   if (err) {
     logger.error('startup error', err);
     return;
   }
-  logger.info(`startup success`, { port: PORT, version: process.env.npm_package_version });
+  logger.info(`startup success`, { port: PORT });
 });

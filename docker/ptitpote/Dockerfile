@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY --chown=node:node src src
-CMD ["npm","start"]
+CMD ["npm","run","--silent","start"]

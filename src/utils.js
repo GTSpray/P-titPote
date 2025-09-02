@@ -5,7 +5,7 @@ import { REST } from 'discord.js';
 export const discordapi = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN);
 
 export function getRandomEmoji() {
-  const emojiList = [ '😄', '😌', '🤓', '😎', '🤖', '😶‍🌫️', '👋', '✨'];
+  const emojiList = ['😄', '😌', '🤓', '😎', '🤖', '😶‍🌫️', '👋', '✨'];
   return emojiList[Math.floor(Math.random() * emojiList.length)];
 }
 

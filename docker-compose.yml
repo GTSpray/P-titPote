@@ -11,6 +11,8 @@ services:
         GID: ${DOCKER_GID:-1000}
     env_file: 
       - .env
+    volumes:
+      - ${PWD}/logs:/app/logs
   localtunnel:
     container_name: lt
     restart: on-failure
