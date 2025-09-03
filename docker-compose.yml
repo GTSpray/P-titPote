@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   ptitpote:
     container_name: ptitpote
