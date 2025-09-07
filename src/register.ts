@@ -1,11 +1,11 @@
-import 'dotenv/config';
-import { ApplicationCommandType, Routes } from 'discord.js';
-import { discordapi } from './utils/discordapi';
-import { slashcommands } from './commands/slash';
-import { logger } from './logger';
+import "dotenv/config";
+import { ApplicationCommandType, Routes } from "discord.js";
+import { discordapi } from "./utils/discordapi";
+import { slashcommands } from "./commands/slash";
+import { logger } from "./logger";
 
 if (!process.env.APP_ID) {
-  throw Error('no APP_ID provided in env')
+  throw Error("no APP_ID provided in env");
 }
 
 const payload = Object.keys(slashcommands).map((name) => {
@@ -14,17 +14,17 @@ const payload = Object.keys(slashcommands).map((name) => {
   return { name, type: ApplicationCommandType.ChatInput, ...rest };
 });
 
-logger.info('register', { payload });
+logger.info("register", { payload });
 
 (async () => {
   try {
     await discordapi.put(Routes.applicationCommands(process.env.APP_ID), {
-      body: payload
+      body: payload,
     });
-    logger.info('success');
+    logger.info("success");
   } catch (err) {
-    logger.error('register error', err);
+    logger.error("register error", err);
   } finally {
-    logger.info('end process');
+    logger.info("end process");
   }
 })();

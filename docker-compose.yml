@@ -9,7 +9,7 @@ services:
         UID: ${DOCKER_UID:-1000}
         GID: ${DOCKER_GID:-1000}
       target: ptitpoteprod
-    env_file: 
+    env_file:
       - .env
     volumes:
       - ${PWD}/logs:/app/logs
@@ -22,9 +22,8 @@ services:
       args:
         UID: ${DOCKER_UID:-1000}
         GID: ${DOCKER_GID:-1000}
-    command:
-      --local-host ptitpote --port $APP_PORT --subdomain $LOCALTUNNEL_SUBDOMAIN
-    env_file: 
+    command: --local-host ptitpote --port $APP_PORT --subdomain $LOCALTUNNEL_SUBDOMAIN
+    env_file:
       - .env
     links:
       - ptitpote

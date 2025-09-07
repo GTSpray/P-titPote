@@ -1,10 +1,8 @@
-
 services:
   ptitpote:
     environment:
       LOG_LEVEL: "debug"
-    command:
-      npm run --silent dev
+    command: npm run --silent dev
     volumes:
       - ${PWD}/dist:/app/dist
       - ${PWD}/node_modules:/app/node_modules

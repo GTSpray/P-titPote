@@ -9,18 +9,17 @@
 ## Running app locally
 
 Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download/), [Docker](https://www.docker.com/) (or [Podman](https://podman.io/)) and [create a Discord app](https://discord.com/developers/applications) with the proper permissions:
+
 - `applications.commands`
 - `bot` (with Send Messages enabled)
 
-And permissions: 
+And permissions:
 
 - Manage Messages
 - Send Messages
 - Use external Emojis
 
-
 Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
-
 
 ### Setup project
 
@@ -61,7 +60,7 @@ will be installed when you run the `register` command configured in `package.jso
 make register
 ```
 
-### Local tunnel with docker environment  
+### Local tunnel with docker environment
 
 Try to use tunnel services like ngrok, localtunnel, etc...
 
@@ -71,9 +70,10 @@ On the **General Information** tab, there will be an **Interactions Endpoint URL
 
 Click **Save Changes**, and your app should be ready to run 🚀
 
-> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url 
+> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url
 
 ## Other resources
+
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
 - Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
 - Check out **[community resources](https://discord.com/developers/docs/topics/community-resources#community-resources)** for language-specific tools maintained by community members.

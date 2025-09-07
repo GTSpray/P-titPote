@@ -69,7 +69,6 @@ register: os
 dev: os
 	$(DC_CMD_DEV) up -d --remove-orphans
 	
-
 ## Build with watch mode (need containers as developpement mode)
 build: os
 	$(DC_CMD_DEV) exec ptitpote npx tsc -w --pretty
@@ -81,6 +80,10 @@ test: os
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
 	$(DC_CMD_DEV) exec ptitpote npm run --silent test -- --watchAll
+
+## Format all files with Prettier (need containers as developpement mode)
+pretty: os
+	$(DC_CMD_DEV) exec ptitpote npx prettier . --write
 
 
 ## Follow bot container logs

@@ -4,3 +4,4 @@ node_modules
 logs
 docker-compose.local.yml
 dist
+.vscode

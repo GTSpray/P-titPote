@@ -2,11 +2,11 @@ export type ExtractedEmoji = {
   id: string;
   name: string;
   input: string;
-}
-const emojiRegex = /<a?\:([a-z _ 0-9]+)\:([0-9]{18,20})>/gmi;
+};
+const emojiRegex = /<a?\:([a-z _ 0-9]+)\:([0-9]{18,20})>/gim;
 export function extractEmoji(text: string): ExtractedEmoji[] {
   let m;
-  const acc: ExtractedEmoji[] = []
+  const acc: ExtractedEmoji[] = [];
   while ((m = emojiRegex.exec(text)) !== null) {
     if (m.index === emojiRegex.lastIndex) {
       emojiRegex.lastIndex++;
@@ -15,8 +15,8 @@ export function extractEmoji(text: string): ExtractedEmoji[] {
     acc.push({
       id,
       name,
-      input
+      input,
     });
   }
-  return acc
+  return acc;
 }
