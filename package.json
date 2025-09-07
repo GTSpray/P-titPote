@@ -4,14 +4,14 @@
   "version": "1.0.0",
   "description": "a discord bot",
   "main": "app.js",
-  "type": "module",
   "engines": {
     "node": ">=22.x"
   },
   "scripts": {
-    "start": "node src/app.js",
-    "register": "node src/register.js",
-    "dev": "nodemon src/app.js"
+    "start": "node dist/app.js",
+    "register": "node dist/register.js",
+    "dev": "nodemon -q dist/app.js",
+    "test": "jest"
   },
   "author": "GTSpray",
   "license": "MIT",
@@ -26,6 +26,17 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.0"
+    "@jest/globals": "^30.1.2",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.3.1",
+    "discord-api-types": "^0.38.22",
+    "jest": "^30.1.3",
+    "jest-extended": "^6.0.0",
+    "node-mocks-http": "^1.17.2",
+    "nodemon": "^3.0.0",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2"
   }
 }

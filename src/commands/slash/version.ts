@@ -3,14 +3,16 @@ import {
     InteractionResponseType,
     MessageComponentTypes,
 } from 'discord-interactions';
-import { getRandomEmoji } from '../../utils.js';
 
-export const version = {
+import { Contexts, IntegrationTypes, type SlashCommandDeclaration } from '../commands';
+import { getRandomEmoji } from '../../utils/getRandomEmoji';
+
+export const version: SlashCommandDeclaration = {
     description: 'Affiche la version de P\'titPote Bot',
-    integration_types: [0, 1],
-    contexts: [0, 1, 2],
+    contexts: [Contexts.GUILD, Contexts.BOT_DM, Contexts.PRIVATE_CHANNEL],
+    integration_types: [IntegrationTypes.GUILD_INSTALL, IntegrationTypes.USER_INSTALL],
     handler: async function (req, res) {
-        return res.send({
+        return res.json({
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
                 flags: InteractionResponseFlags.IS_COMPONENTS_V2,

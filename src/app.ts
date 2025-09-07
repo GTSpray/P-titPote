@@ -1,6 +1,7 @@
 import 'dotenv/config';
-import express from 'express';
-import morgan from 'morgan';
+import * as express from 'express';
+import { Request, Response, NextFunction } from "express";
+import * as morgan from 'morgan';
 import { v4 } from 'uuid';
 import {
   InteractionResponseType,
@@ -11,19 +12,19 @@ import {
 import { logger } from './logger.js';
 import { slashcommands } from './commands/slash/index.js';
 
-morgan.token('requestId', function (req) {
-  return req.requestId
+morgan.token('requestId',  (req) => {
+  return (<any>req).requestId
 })
 
-// Create an express app
 const app = express();
 
 const PORT = process.env.APP_PORT || 3000;
 
-app.use(function (req, res, next) {
-  req.requestId = v4()
+app.use(function (req: Request, res: Response, next: NextFunction) {
+  req.requestId = v4();
+  res.set('x-request-id', req.requestId);
   const json = res.json.bind(res);
-  res.json = (body) => {
+  (<any>res).json = (body: object) => {
     logger.debug('reponse', { reqId: req.requestId, body })
     json(body);
   }
@@ -35,9 +36,9 @@ app.use(morgan(
     return JSON.stringify({
       method: tokens.method(req, res),
       url: tokens.url(req, res),
-      status: Number.parseInt(tokens.status(req, res)),
-      length: Number.parseInt(tokens.res(req, res, 'content-length')),
-      duration: Number.parseFloat(tokens['response-time'](req, res)),
+      status: Number.parseInt(<string>tokens.status(req, res)),
+      length: Number.parseInt(<string>tokens.res(req, res, 'content-length')),
+      duration: Number.parseFloat(<string>tokens['response-time'](req, res)),
       reqId: tokens['requestId'](req, res)
     });
   },
@@ -81,7 +82,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async fun
    */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
-    if (slashcommands.hasOwnProperty(name)) {
+    if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
       logger.debug(`interaction handler`, { reqId, name });
       return slashcommands[name].handler(req, res);
     }

@@ -8,15 +8,15 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	OS := macos
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f dev.yml
+	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
 else ifeq ($(OS),Windows_NT)
     OS := windows
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f dev.yml
+	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
 else
 	OS := linux
 	DC_CMD := docker compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f dev.yml
+	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
 endif
 
 os:
@@ -59,19 +59,33 @@ stop: os
 
 ## Install slash commands on discord
 register: os
-	$(DC_CMD) exec ptitpote npm run register
+	$(DC_CMD) exec ptitpote npm run --silent register | jq
 
 ###
 # Developper
 ###
 
-## Run containers
+## Run containers as developpement mode
 dev: os
 	$(DC_CMD_DEV) up -d --remove-orphans
+	
+
+## Build with watch mode (need containers as developpement mode)
+build: os
+	$(DC_CMD_DEV) exec ptitpote npx tsc -w --pretty
+
+## Run tests (need containers as developpement mode)
+test: os
+	$(DC_CMD_DEV) exec ptitpote npm --silent test
+
+## Run tests with watch mode (need containers as developpement mode)
+testw: os
+	$(DC_CMD_DEV) exec ptitpote npm run --silent test -- --watchAll
+
 
 ## Follow bot container logs
 logs: os
-	$(DC_CMD) logs -f ptitpote
+	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq
 
 ## Restart containers
 restart: os
