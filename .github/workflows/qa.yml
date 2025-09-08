@@ -1,6 +1,7 @@
 name: QA
 
-on: [push]
+on: push
+  pull_request
 
 env:
   NODEV: "22.x"
