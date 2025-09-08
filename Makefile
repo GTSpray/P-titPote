@@ -71,7 +71,7 @@ dev: os
 	
 ## Build with watch mode (need containers as developpement mode)
 build: os
-	$(DC_CMD_DEV) exec ptitpote npx tsc -w --pretty
+	$(DC_CMD_DEV) exec ptitpote npm build
 
 ## Run tests (need containers as developpement mode)
 test: os
