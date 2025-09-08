@@ -14,4 +14,4 @@ jobs:
       - name: Build docker images
         run: cp .env.sample .env
         run: make dev
-        run make test
+        run: make test
