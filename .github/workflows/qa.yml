@@ -6,7 +6,7 @@ env:
 
 jobs:
   QA:
-    name: Run test suite
+    name: Apply Quality Gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
