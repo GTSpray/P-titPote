@@ -6,11 +6,11 @@ jobs:
     name: Run test suite
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - uses: actions/checkout@v5
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ vars.NODEV }}
+          node-version: "22.x"
       - run: npm ci
       - run: npm run build
       - run: cp .env.sample .env
