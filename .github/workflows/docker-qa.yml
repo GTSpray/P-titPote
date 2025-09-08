@@ -11,5 +11,6 @@ jobs:
       - run: cp .env.sample .env
       - run: cp docker-compose.yml docker-compose.local.yml
       - run: make dev
+      - run: docker compose logs
       - name: Execute tests in the running services
         run: make test
