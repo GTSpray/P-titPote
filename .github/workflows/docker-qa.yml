@@ -14,5 +14,5 @@ jobs:
             ./docker-compose.yml
             ./docker-compose.dev.yml
       - name: Execute tests in the running services
-      - run: cp .env.sample .env
+        run: cp .env.sample .env
       - run: docker compose exec ptitpote npm --silent test
