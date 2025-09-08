@@ -85,6 +85,10 @@ testw: os
 pretty: os
 	$(DC_CMD_DEV) exec ptitpote npx prettier . --write
 
+## Lint all files with Prettier (need containers as developpement mode)
+lint: os
+	$(DC_CMD_DEV) exec ptitpote npx prettier . --check
+
 
 ## Follow bot container logs
 logs: os

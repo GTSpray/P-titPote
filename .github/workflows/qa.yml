@@ -1,42 +1,25 @@
 name: QA
-
 on: [push]
 
 env:
   NODEV: "22.x"
 
 jobs:
-  build:
+  QA:
+    name: Run test suite
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v5
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ vars.NODEV }}
-      - run: npm ci
-      - run: npm run build
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v5
-      - name: Use Node.js
+      - name: Install Using NodeJS
         uses: actions/setup-node@v4
         with:
           node-version: ${{ vars.NODEV }}
       - run: npm ci
       - run: cp .env.sample .env
-      - run: npm test
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v5
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ vars.NODEV }}
-      - run: npm ci
-      - run: npm run lint
+      - run: cp docker-compose.yml docker-compose.local.yml
+      - name: Build using Docker
+        run: make dev
+      - name: Execute tests in the running services
+        run: make test
+      - name: Lint
+        run: make lint
