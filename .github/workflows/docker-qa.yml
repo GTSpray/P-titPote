@@ -12,6 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
       - name: Build docker images
-        run: cp .env.sample .env
-        run: make dev
-        run: make test
+      - run: cp .env.sample .env
+      - run: make dev
+      - run: make test
