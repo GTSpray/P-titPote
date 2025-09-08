@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-        run: cp .env.sample .env
+      - run: cp .env.sample .env
       - uses: hoverkraft-tech/compose-action@v1.5.1
         with:
           compose-file: |
