@@ -11,7 +11,9 @@
     "start": "node dist/app.js",
     "register": "node dist/register.js",
     "dev": "nodemon -q dist/app.js",
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc --pretty",
+    "lint": "prettier . --check"
   },
   "author": "GTSpray",
   "license": "MIT",

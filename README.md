@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-## Running app locally
+# Running app locally
 
 Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download/), [Docker](https://www.docker.com/) (or [Podman](https://podman.io/)) and [create a Discord app](https://discord.com/developers/applications) with the proper permissions:
 
@@ -21,28 +21,10 @@ And permissions:
 
 Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
-### Setup project
+## Setup project
 
 First clone the project:
-Then navigate to its directory and install dependencies:
-
-```
-make build
-```
-
-### Docker usage
-
-```
-make start
-```
-
-for development usage:
-
-```
-make dev
-```
-
-> ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
+Then navigate to its directory and install dependencies.
 
 ### Get app credentials
 
@@ -51,14 +33,6 @@ Fetch the credentials from your app's settings and add them to a `.env` file (se
 Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
 
 > 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
-
-### Install slash commands
-
-will be installed when you run the `register` command configured in `package.json`:
-
-```
-make register
-```
 
 ### Local tunnel with docker environment
 
@@ -70,10 +44,61 @@ On the **General Information** tab, there will be an **Interactions Endpoint URL
 
 Click **Save Changes**, and your app should be ready to run 🚀
 
-> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url
+> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url. See [localtunnel status page](https://status.loca.lt/)
+
+## Usage
+
+### Production mode
+
+Launch application using :
+
+```bash
+make start
+```
+
+and stop
+
+```bash
+make stop
+```
+
+Slash commands will be installed when you run the `register` command :
+
+```bash
+make register
+```
+
+### Development mode
+
+Launch development container using :
+
+```bash
+make dev
+```
+
+keep your code transpiled with :
+
+```bash
+make build
+```
+
+test your code using :
+
+```bash
+make test
+```
+
+or (in watch mode)
+
+```bash
+make testw
+```
+
+> ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
 
 ## Other resources
 
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
 - Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
 - Check out **[community resources](https://discord.com/developers/docs/topics/community-resources#community-resources)** for language-specific tools maintained by community members.
+- Read **[localtunnel](https://github.com/localtunnel/localtunnel)**

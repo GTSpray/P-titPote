@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "typeRoots": [
       "./node_modules/@types",
-                  "./node_modules/@discordjs/typings",
+      "./node_modules/@discordjs/typings",
       "./environment.d.ts"
     ]
   },

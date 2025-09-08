@@ -98,7 +98,7 @@ app.post(
   },
 );
 
-app.use(express.json()); // after interaction rout to prevent We recommend disabling middleware for interaction routes so that req.body is a raw buffer.
+app.use(express.json()); // after interaction route to prevent We recommend disabling middleware for interaction routes so that req.body is a raw buffer.
 
 app.listen(PORT, (err) => {
   if (err) {

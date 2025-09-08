@@ -71,7 +71,7 @@ dev: os
 	
 ## Build with watch mode (need containers as developpement mode)
 build: os
-	$(DC_CMD_DEV) exec ptitpote npx tsc -w --pretty
+	$(DC_CMD_DEV) exec ptitpote npm run build -- -w
 
 ## Run tests (need containers as developpement mode)
 test: os
@@ -84,6 +84,10 @@ testw: os
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os
 	$(DC_CMD_DEV) exec ptitpote npx prettier . --write
+
+## Lint all files with Prettier (need containers as developpement mode)
+lint: os
+	$(DC_CMD_DEV) exec ptitpote npx prettier . --check
 
 
 ## Follow bot container logs
