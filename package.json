@@ -12,7 +12,7 @@
     "register": "node dist/register.js",
     "dev": "nodemon -q dist/app.js",
     "test": "jest",
-    "build": "tsc -w --pretty",
+    "build": "tsc --pretty",
     "lint": "prettier . --check"
   },
   "author": "GTSpray",
