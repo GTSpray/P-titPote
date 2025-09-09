@@ -6,9 +6,9 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { Contexts, IntegrationTypes } from "../../../../src/commands/commands";
 import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
 import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
+import { ApplicationIntegrationType, InteractionContextType } from "discord.js";
 
 const mockedEmote = "🫖 🫖 🫖";
 jest.mock("../../../../src/utils/getRandomEmoji", () => ({
@@ -36,10 +36,14 @@ describe("/version", () => {
   it("should declare a slash command", () => {
     expect(version).toMatchObject({
       description: "Affiche la version de P'titPote Bot",
-      contexts: [Contexts.GUILD, Contexts.BOT_DM, Contexts.PRIVATE_CHANNEL],
+      contexts: [
+        InteractionContextType.BotDM,
+        InteractionContextType.Guild,
+        InteractionContextType.PrivateChannel,
+      ],
       integration_types: [
-        IntegrationTypes.GUILD_INSTALL,
-        IntegrationTypes.USER_INSTALL,
+        ApplicationIntegrationType.GuildInstall,
+        ApplicationIntegrationType.UserInstall,
       ],
       handler: expect.any(Function),
     });

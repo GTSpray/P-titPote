@@ -9,7 +9,7 @@ services:
       - ${PWD}/package.json:/app/package.json
       - ${PWD}/package-lock.json:/app/package-lock.json
       - ${PWD}/logs:/app/logs
-      - ${PWD}/environment.d.ts:/app/environment.d.ts
+      - ${PWD}/global.d.ts:/app/global.d.ts
       - ${PWD}/tsconfig.json:/app/tsconfig.json
       - ${PWD}/jest.config.js:/app/jest.config.js
       - ${PWD}/src:/app/src

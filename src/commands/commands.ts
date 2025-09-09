@@ -1,21 +1,27 @@
+import {
+  APIApplicationCommand,
+  ApplicationIntegrationType,
+  InteractionContextType,
+} from "discord.js";
 import { Request, Response } from "express";
 
 type CommandHandler = (req: Request, res: Response) => Promise<Response>;
 
-export type SlashCommandDeclaration = {
-  description: string;
-  integration_types: number[];
-  contexts: number[];
+export type APIApplicationCommandRegister = Omit<
+  APIApplicationCommand,
+  | "handler"
+  | "id"
+  | "type"
+  | "application_id"
+  | "default_member_permissions"
+  | "version"
+>;
+
+export type SlashCommandDeclaration = Omit<
+  APIApplicationCommandRegister,
+  "name"
+> & {
+  contexts: InteractionContextType[];
+  integration_types: ApplicationIntegrationType[];
   handler: CommandHandler;
 };
-
-export enum Contexts {
-  GUILD = 0,
-  BOT_DM = 1,
-  PRIVATE_CHANNEL = 2,
-}
-
-export enum IntegrationTypes {
-  GUILD_INSTALL = 0,
-  USER_INSTALL = 1,
-}

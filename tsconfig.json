@@ -10,9 +10,9 @@
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@discordjs/typings",
-      "./environment.d.ts"
+      "./global.d.ts"
     ]
   },
-  "files": ["environment.d.ts", "src/register.ts", "src/app.ts"],
+  "files": ["global.d.ts", "src/register.ts", "src/app.ts"],
   "exclude": ["node_modules"]
 }

@@ -4,13 +4,13 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 import { Routes } from "discord.js";
-import { RESTGetAPIChannelMessagesResult } from "discord-api-types/v10";
-
 import {
-  Contexts,
-  IntegrationTypes,
-  type SlashCommandDeclaration,
-} from "../commands";
+  ApplicationIntegrationType,
+  InteractionContextType,
+  RESTGetAPIChannelMessagesResult,
+} from "discord-api-types/v10";
+
+import { type SlashCommandDeclaration } from "../commands";
 import { logger } from "../../logger";
 import { discordapi } from "../../utils/discordapi";
 import { getEmojiUrl } from "../../utils/getEmojiUrl";
@@ -24,10 +24,14 @@ const emojiLimitPrefetch = 50;
 
 export const stealemoji: SlashCommandDeclaration = {
   description: `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
-  contexts: [Contexts.GUILD, Contexts.BOT_DM, Contexts.PRIVATE_CHANNEL],
+  contexts: [
+    InteractionContextType.BotDM,
+    InteractionContextType.Guild,
+    InteractionContextType.PrivateChannel,
+  ],
   integration_types: [
-    IntegrationTypes.GUILD_INSTALL,
-    IntegrationTypes.USER_INSTALL,
+    ApplicationIntegrationType.GuildInstall,
+    ApplicationIntegrationType.UserInstall,
   ],
   handler: async function (req, res) {
     const { channel } = req.body;

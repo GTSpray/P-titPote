@@ -26,7 +26,7 @@ declare global {
       toMeetApiResponse(
         statusCode: number,
         payload: object,
-      ): APIGatewayProxyResult;
+      ): CustomMatcherResult;
     }
   }
 }

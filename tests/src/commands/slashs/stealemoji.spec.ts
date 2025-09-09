@@ -11,9 +11,13 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { Contexts, IntegrationTypes } from "../../../../src/commands/commands";
 import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
-import { REST, Routes } from "discord.js";
+import {
+  ApplicationIntegrationType,
+  InteractionContextType,
+  REST,
+  Routes,
+} from "discord.js";
 import {
   getRandomString,
   randomDiscordId19,
@@ -42,10 +46,14 @@ describe("/stealemoji", () => {
     expect(stealemoji).toMatchObject({
       description:
         "Récupère les 3 dernières emotes dans les 10 derniers messages de ce chan",
-      contexts: [Contexts.GUILD, Contexts.BOT_DM, Contexts.PRIVATE_CHANNEL],
+      contexts: [
+        InteractionContextType.BotDM,
+        InteractionContextType.Guild,
+        InteractionContextType.PrivateChannel,
+      ],
       integration_types: [
-        IntegrationTypes.GUILD_INSTALL,
-        IntegrationTypes.USER_INSTALL,
+        ApplicationIntegrationType.GuildInstall,
+        ApplicationIntegrationType.UserInstall,
       ],
       handler: expect.any(Function),
     });

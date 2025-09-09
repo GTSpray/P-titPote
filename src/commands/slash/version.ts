@@ -4,19 +4,20 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-import {
-  Contexts,
-  IntegrationTypes,
-  type SlashCommandDeclaration,
-} from "../commands";
+import { type SlashCommandDeclaration } from "../commands";
 import { getRandomEmoji } from "../../utils/getRandomEmoji";
+import { ApplicationIntegrationType, InteractionContextType } from "discord.js";
 
 export const version: SlashCommandDeclaration = {
   description: "Affiche la version de P'titPote Bot",
-  contexts: [Contexts.GUILD, Contexts.BOT_DM, Contexts.PRIVATE_CHANNEL],
+  contexts: [
+    InteractionContextType.BotDM,
+    InteractionContextType.Guild,
+    InteractionContextType.PrivateChannel,
+  ],
   integration_types: [
-    IntegrationTypes.GUILD_INSTALL,
-    IntegrationTypes.USER_INSTALL,
+    ApplicationIntegrationType.GuildInstall,
+    ApplicationIntegrationType.UserInstall,
   ],
   handler: async function (req, res) {
     return res.json({

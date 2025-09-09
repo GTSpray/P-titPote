@@ -1,7 +1,5 @@
-import * as extendedMatchers from "jest-extended";
 import { Response } from "express";
 import { MockResponse } from "node-mocks-http";
-import { REST } from "discord.js";
 import { DiscrodRESTMock } from "./mocks/discordjs";
 
 jest.mock("../src/logger", () => ({
@@ -25,7 +23,6 @@ jest.mock("discord.js", () => {
 });
 
 expect.extend({
-  ...extendedMatchers,
   toMeetApiResponse(
     received: MockResponse<Response>,
     expectedStatusCode: number,
