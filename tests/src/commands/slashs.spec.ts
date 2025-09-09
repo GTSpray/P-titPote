@@ -1,22 +1,17 @@
-import { ApplicationIntegrationType, InteractionContextType } from "discord.js";
+import {
+  ApplicationIntegrationType,
+  InteractionContextType,
+  SlashCommandBuilder,
+} from "discord.js";
 import { slashcommands } from "../../../src/commands/slash";
 
 describe("slashcommands", () => {
   const commands = Object.keys(slashcommands);
   describe.each(commands)("/%s command", (commandname) => {
-    const commandDesc = slashcommands[commandname];
-    it("should have a desc", () => {
-      expect(commandDesc).toMatchObject({
-        description: expect.any(String),
-        contexts: [
-          InteractionContextType.BotDM,
-          InteractionContextType.Guild,
-          InteractionContextType.PrivateChannel,
-        ],
-        integration_types: [
-          ApplicationIntegrationType.GuildInstall,
-          ApplicationIntegrationType.UserInstall,
-        ],
+    const commandDefinition = slashcommands[commandname];
+    it("should have a command builder", () => {
+      expect(commandDefinition).toMatchObject({
+        builder: expect.any(SlashCommandBuilder),
         handler: expect.any(Function),
       });
     });
@@ -26,7 +21,8 @@ describe("slashcommands", () => {
     });
 
     it("should have 1-100 character description", () => {
-      expect(commandDesc.description.length).toBeWithin(1, 100);
+      const desc = commandDefinition.builder.description;
+      expect(desc.length).toBeWithin(1, 100);
     });
   });
 });

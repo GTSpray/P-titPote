@@ -8,7 +8,11 @@ import {
 } from "discord-interactions";
 import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
 import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
-import { ApplicationIntegrationType, InteractionContextType } from "discord.js";
+import {
+  ApplicationIntegrationType,
+  InteractionContextType,
+  PermissionFlagsBits,
+} from "discord.js";
 
 const mockedEmote = "🫖 🫖 🫖";
 jest.mock("../../../../src/utils/getRandomEmoji", () => ({
@@ -34,7 +38,8 @@ describe("/version", () => {
   });
 
   it("should declare a slash command", () => {
-    expect(version).toMatchObject({
+    const declaration = version.builder.setName("vesion");
+    expect(declaration.toJSON()).toMatchObject({
       description: "Affiche la version de P'titPote Bot",
       contexts: [
         InteractionContextType.BotDM,
@@ -45,7 +50,7 @@ describe("/version", () => {
         ApplicationIntegrationType.GuildInstall,
         ApplicationIntegrationType.UserInstall,
       ],
-      handler: expect.any(Function),
+      default_member_permissions: `${Number(PermissionFlagsBits.SendMessages)}`,
     });
   });
 

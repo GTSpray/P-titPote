@@ -3,10 +3,11 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { Routes } from "discord.js";
+import { Routes, SlashCommandBuilder } from "discord.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
+  PermissionFlagsBits,
   RESTGetAPIChannelMessagesResult,
 } from "discord-api-types/v10";
 
@@ -22,17 +23,23 @@ export const stealemoji_msgSizeLimit = 500;
 
 const emojiLimitPrefetch = 50;
 
-export const stealemoji: SlashCommandDeclaration = {
-  description: `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
-  contexts: [
+const builder = new SlashCommandBuilder()
+  .setDescription(
+    `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
+  )
+  .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+  .setContexts(
     InteractionContextType.BotDM,
     InteractionContextType.Guild,
     InteractionContextType.PrivateChannel,
-  ],
-  integration_types: [
+  )
+  .setIntegrationTypes(
     ApplicationIntegrationType.GuildInstall,
     ApplicationIntegrationType.UserInstall,
-  ],
+  );
+
+export const stealemoji: SlashCommandDeclaration = {
+  builder,
   handler: async function (req, res) {
     const { channel } = req.body;
     const reqId = req.requestId;

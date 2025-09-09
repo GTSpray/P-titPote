@@ -15,6 +15,7 @@ import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
+  PermissionFlagsBits,
   REST,
   Routes,
 } from "discord.js";
@@ -43,7 +44,8 @@ describe("/stealemoji", () => {
   });
 
   it("should declare a slash command", () => {
-    expect(stealemoji).toMatchObject({
+    const declaration = stealemoji.builder.setName("vesion");
+    expect(declaration.toJSON()).toMatchObject({
       description:
         "Récupère les 3 dernières emotes dans les 10 derniers messages de ce chan",
       contexts: [
@@ -55,7 +57,7 @@ describe("/stealemoji", () => {
         ApplicationIntegrationType.GuildInstall,
         ApplicationIntegrationType.UserInstall,
       ],
-      handler: expect.any(Function),
+      default_member_permissions: `${Number(PermissionFlagsBits.SendMessages)}`,
     });
   });
 

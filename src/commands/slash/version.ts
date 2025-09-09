@@ -6,19 +6,28 @@ import {
 
 import { type SlashCommandDeclaration } from "../commands";
 import { getRandomEmoji } from "../../utils/getRandomEmoji";
-import { ApplicationIntegrationType, InteractionContextType } from "discord.js";
+import {
+  ApplicationIntegrationType,
+  InteractionContextType,
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+} from "discord.js";
 
-export const version: SlashCommandDeclaration = {
-  description: "Affiche la version de P'titPote Bot",
-  contexts: [
+const builder = new SlashCommandBuilder()
+  .setDescription("Affiche la version de P'titPote Bot")
+  .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+  .setContexts(
     InteractionContextType.BotDM,
     InteractionContextType.Guild,
     InteractionContextType.PrivateChannel,
-  ],
-  integration_types: [
+  )
+  .setIntegrationTypes(
     ApplicationIntegrationType.GuildInstall,
     ApplicationIntegrationType.UserInstall,
-  ],
+  );
+
+export const version: SlashCommandDeclaration = {
+  builder,
   handler: async function (req, res) {
     return res.json({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

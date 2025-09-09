@@ -1,8 +1,4 @@
-import { ApplicationCommandType } from "discord.js";
-import type {
-  APIApplicationCommandRegister,
-  SlashCommandDeclaration,
-} from "../commands";
+import type { SlashCommandDeclaration } from "../commands";
 import { stealemoji } from "./stealemoji";
 import { version } from "./version";
 
@@ -11,13 +7,8 @@ export const slashcommands: Record<string, SlashCommandDeclaration> = {
   stealemoji,
 };
 
-export const slashcommandsRegister: APIApplicationCommandRegister[] =
-  Object.keys(slashcommands).map((name) => {
-    const slashcommand = slashcommands[name];
-    const { handler, ...rest } = slashcommand;
-    return {
-      ...rest,
-      type: ApplicationCommandType.ChatInput,
-      name,
-    };
-  });
+export const slashcommandsRegister = Object.keys(slashcommands).map((name) => {
+  const { builder } = slashcommands[name];
+  builder.setName(name);
+  return builder.toJSON();
+});
