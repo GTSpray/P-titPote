@@ -1,4 +1,4 @@
-import { version } from "../../../../src/commands/slash/version";
+import { gimmeotter } from "../../../../src/commands/slash/gimmeotter";
 import { Request, Response } from "express";
 import { MockRequest, MockResponse } from "node-mocks-http";
 import {
@@ -13,13 +13,6 @@ import {
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
-
-const mockedEmote = "🫖 🫖 🫖";
-jest.mock("../../../../src/utils/getRandomEmoji", () => ({
-  getRandomEmoji: jest.fn().mockImplementation(() => {
-    return mockedEmote;
-  }),
-}));
 
 describe("/version", () => {
   let request: MockRequest<Request>;
@@ -38,9 +31,9 @@ describe("/version", () => {
   });
 
   it("should declare a slash command", () => {
-    const declaration = version.builder.setName("version");
+    const declaration = gimmeotter.builder.setName("gimmeotter");
     expect(declaration.toJSON()).toMatchObject({
-      description: "Affiche la version de P'titPote Bot",
+      description: "Affiche une image de loutre",
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -56,7 +49,7 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
-      await version.handler(request, response);
+      await gimmeotter.handler(request, response);
 
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -65,7 +58,18 @@ describe("/version", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: `Hello here ${mockedEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
+              content: "Voilà.. ce que j'ai trouvé",
+            },
+            {
+              type: MessageComponentTypes.MEDIA_GALLERY,
+              items: [
+                {
+                  description: "otter",
+                  media: {
+                    url: "https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true",
+                  },
+                },
+              ],
             },
           ],
         },
