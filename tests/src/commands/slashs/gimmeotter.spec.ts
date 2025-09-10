@@ -1,6 +1,4 @@
 import { gimmeotter } from "../../../../src/commands/slash/gimmeotter";
-import { Request, Response } from "express";
-import { MockRequest, MockResponse } from "node-mocks-http";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
@@ -13,10 +11,10 @@ import {
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
+import { CommandHandlerOptions } from "../../../../src/commands/commands";
 
-describe("/version", () => {
-  let request: MockRequest<Request>;
-  let response: MockResponse<Response>;
+describe("/gimmeotter", () => {
+  let handlerOpts: CommandHandlerOptions;
 
   beforeEach(() => {
     const { req, res } = getInteractionHttpMock({
@@ -26,8 +24,10 @@ describe("/version", () => {
         type: 1,
       },
     });
-    request = req;
-    response = res;
+    handlerOpts = {
+      req,
+      res,
+    };
   });
 
   it("should declare a slash command", () => {
@@ -49,7 +49,7 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
-      await gimmeotter.handler(request, response);
+      const response = await gimmeotter.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

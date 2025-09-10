@@ -40,7 +40,7 @@ const builder = new SlashCommandBuilder()
 
 export const stealemoji: SlashCommandDeclaration = {
   builder,
-  handler: async function (req, res) {
+  handler: async function ({ req, res }) {
     const { channel } = req.body;
     const reqId = req.requestId;
     const channelMessages = (await discordapi.get(

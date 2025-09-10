@@ -1,6 +1,4 @@
 import { version } from "../../../../src/commands/slash/version";
-import { Request, Response } from "express";
-import { MockRequest, MockResponse } from "node-mocks-http";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
@@ -13,6 +11,7 @@ import {
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
+import { CommandHandlerOptions } from "../../../../src/commands/commands";
 
 const mockedEmote = "🫖 🫖 🫖";
 jest.mock("../../../../src/utils/getRandomEmoji", () => ({
@@ -22,8 +21,7 @@ jest.mock("../../../../src/utils/getRandomEmoji", () => ({
 }));
 
 describe("/version", () => {
-  let request: MockRequest<Request>;
-  let response: MockResponse<Response>;
+  let handlerOpts: CommandHandlerOptions;
 
   beforeEach(() => {
     const { req, res } = getInteractionHttpMock({
@@ -33,8 +31,10 @@ describe("/version", () => {
         type: 1,
       },
     });
-    request = req;
-    response = res;
+    handlerOpts = {
+      req,
+      res,
+    };
   });
 
   it("should declare a slash command", () => {
@@ -56,7 +56,7 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
-      await version.handler(request, response);
+      const response = await version.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

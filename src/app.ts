@@ -87,7 +87,7 @@ app.post(
       const { name } = data;
       if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
         logger.debug(`interaction handler`, { reqId, name });
-        return slashcommands[name].handler(req, res);
+        return slashcommands[name].handler({ req, res });
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });

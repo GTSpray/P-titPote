@@ -27,7 +27,7 @@ const builder = new SlashCommandBuilder()
 
 export const gimmeotter: SlashCommandDeclaration = {
   builder,
-  handler: async function (req, res) {
+  handler: async function ({ res }) {
     return res.json({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
