@@ -54,45 +54,15 @@ start: os
 
 ## Halt containers
 stop: os
-	$(DC_CMD) down --volumes
+	$(DC_CMD_DEV) down --volumes
 
+## Follow bot container logs
+logs: os
+	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq -n -f recover.jq 
 
 ## Install slash commands on discord
 register: os
 	$(DC_CMD) exec ptitpote npm run --silent register | jq
-
-###
-# Developper
-###
-
-## Run containers as developpement mode
-dev: os
-	$(DC_CMD_DEV) up -d --remove-orphans
-	
-## Build with watch mode (need containers as developpement mode)
-build: os
-	$(DC_CMD_DEV) exec ptitpote npm run build -- -w
-
-## Run tests (need containers as developpement mode)
-test: os
-	$(DC_CMD_DEV) exec ptitpote npm --silent test
-
-## Run tests with watch mode (need containers as developpement mode)
-testw: os
-	$(DC_CMD_DEV) exec ptitpote npm run --silent test -- --watchAll
-
-## Format all files with Prettier (need containers as developpement mode)
-pretty: os
-	$(DC_CMD_DEV) exec ptitpote npx prettier . --write
-
-## Lint all files with Prettier (need containers as developpement mode)
-lint: os
-	$(DC_CMD_DEV) exec ptitpote npx prettier . --check
-
-
-## Follow bot container logs
-logs: os
-	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq
 
 ## Restart containers
 restart: os
@@ -100,6 +70,52 @@ restart: os
 	@sleep 1
 	$(DC_CMD) up -d --remove-orphans
 
+###
+# Developper
+###
+
+## Run containers as developpement mode
+dev: os
+	$(DC_CMD_DEV) run ptitpote npm ci
+	$(DC_CMD_DEV) run ptitpote npm run build
+	$(DC_CMD_DEV) up -d --remove-orphans
+
+## Build with watch mode (need containers as developpement mode)
+build: os
+	$(DC_CMD_DEV) run ptitpote rm -Rf dist/*
+	$(DC_CMD_DEV) run ptitpote npm run build -- -w
+
+## dumps create schema SQL
+db-schema-create: os
+	$(DC_CMD_DEV) run ptitpote npx mikro-orm schema:create --run
+
+## Run tests (need containers as developpement mode)
+test: os
+	$(DC_CMD_DEV) run ptitpote npm --silent test
+
+## Run tests with watch mode (need containers as developpement mode)
+testw: os
+	$(DC_CMD_DEV) run ptitpote npx vitest dev
+
+## Format all files with Prettier (need containers as developpement mode)
+pretty: os
+	$(DC_CMD_DEV) run ptitpote npx prettier . --write
+
+## Lint all files with Prettier (need containers as developpement mode)
+lint: os
+	$(DC_CMD_DEV) run ptitpote npx prettier . --check
+
 ## Run shell inside bot container
 sh: os
 	$(DC_CMD) exec ptitpote bash
+
+
+###
+# ci
+###
+
+## Run containers as ci mode
+ci: os
+	$(DC_CMD_DEV) -f docker-compose.ci.yml run ptitpote npm ci
+	$(DC_CMD_DEV) -f docker-compose.ci.yml run ptitpote npm run build
+	$(DC_CMD_DEV) -f docker-compose.ci.yml up -d --remove-orphans

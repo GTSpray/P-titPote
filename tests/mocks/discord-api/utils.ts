@@ -1,23 +1,5 @@
 export type BitFieldFlag = any;
-
-function shuffle(arr: any[]) {
-  const arrCopy = [...arr];
-  let currentIndex = arrCopy.length;
-  // While there remain elements to shuffle...
-  while (currentIndex != 0) {
-    // Pick a remaining element...
-    let randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [arrCopy[currentIndex], arrCopy[randomIndex]] = [
-      arrCopy[randomIndex],
-      arrCopy[currentIndex],
-    ];
-  }
-
-  return arrCopy;
-}
+import { randomBytes, randomInt } from "crypto";
 
 function conditionnal(returnArr: boolean, str: string) {
   if (returnArr) {
@@ -25,6 +7,18 @@ function conditionnal(returnArr: boolean, str: string) {
   }
   return [];
 }
+
+const cryptoRandom = () =>
+  parseInt(randomBytes(4).toString("hex"), 16) / (0xffffffff + 1);
+
+const cryptoRandomString = (
+  charLength: number,
+  charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+) => {
+  return Array.apply(null, Array(charLength))
+    .map(() => charset.charAt(Math.floor(cryptoRandom() * charset.length)))
+    .join("");
+};
 
 type RandomStringOptions = {
   length?: number;
@@ -39,19 +33,14 @@ export function getRandomString({
   uppercase,
 }: RandomStringOptions) {
   const letterCharSet = "abcdefghijklmnopqrstuvwxyz";
-  const numberCharSet = "0123456789";
-  const charSet = shuffle([
+  const numberCharSet = "012345678901234567890123456789";
+  const charSet = [
     ...conditionnal(!!letter, letterCharSet),
     ...conditionnal(!!number, numberCharSet),
     ...conditionnal(!!uppercase, letterCharSet.toUpperCase()),
-  ]);
+  ].join("");
 
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charSet.length);
-    result += charSet[randomIndex];
-  }
-  return result;
+  return cryptoRandomString(length, charSet);
 }
 
 export const randomDiscordId18 = () =>

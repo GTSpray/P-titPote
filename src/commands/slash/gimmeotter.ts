@@ -4,7 +4,7 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-import { type SlashCommandDeclaration } from "../commands";
+import { type SlashCommandDeclaration } from "../commands.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
@@ -25,9 +25,10 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const gimmeotter: SlashCommandDeclaration = {
+export type GimmeotterDataOpts = {};
+export const gimmeotter: SlashCommandDeclaration<GimmeotterDataOpts> = {
   builder,
-  handler: async function (req, res) {
+  handler: async function ({ res }) {
     return res.json({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {

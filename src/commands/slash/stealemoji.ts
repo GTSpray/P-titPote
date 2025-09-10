@@ -11,11 +11,11 @@ import {
   RESTGetAPIChannelMessagesResult,
 } from "discord-api-types/v10";
 
-import { type SlashCommandDeclaration } from "../commands";
-import { logger } from "../../logger";
-import { discordapi } from "../../utils/discordapi";
-import { getEmojiUrl } from "../../utils/getEmojiUrl";
-import { ExtractedEmoji, extractEmoji } from "../../utils/extractEmoji";
+import { type SlashCommandDeclaration } from "../commands.js";
+import { logger } from "../../logger.js";
+import { discordapi } from "../../utils/discordapi.js";
+import { getEmojiUrl } from "../../utils/getEmojiUrl.js";
+import { ExtractedEmoji, extractEmoji } from "../../utils/extractEmoji.js";
 
 export const stealemoji_emojiLimit = 3;
 export const stealemoji_msgLimit = 10;
@@ -38,10 +38,15 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const stealemoji: SlashCommandDeclaration = {
+export type StealemojiDataOpts = {};
+export const stealemoji: SlashCommandDeclaration<StealemojiDataOpts> = {
   builder,
-  handler: async function (req, res) {
+  handler: async function ({ req, res }) {
     const { channel } = req.body;
+    if (!channel) {
+      return res.status(500).json({ error: "invalid" });
+    }
+
     const reqId = req.requestId;
     const channelMessages = (await discordapi.get(
       Routes.channelMessages(channel.id),

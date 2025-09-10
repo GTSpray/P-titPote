@@ -1,14 +1,16 @@
 import "dotenv/config";
 import { Routes } from "discord.js";
-import { discordapi } from "./utils/discordapi";
-import { slashcommandsRegister } from "./commands/slash";
-import { logger } from "./logger";
+import { discordapi } from "./utils/discordapi.js";
+import { slashcommandsRegister } from "./commands/slash/index.js";
+import { logger } from "./logger.js";
 
 if (!process.env.APP_ID) {
   throw Error("no APP_ID provided in env");
 }
 
-logger.info("register", { payload: slashcommandsRegister });
+logger.debug("register", { payload: slashcommandsRegister });
+
+logger.info("register", { commands: slashcommandsRegister.map((e) => e.name) });
 
 (async () => {
   try {

@@ -5,3 +5,4 @@ logs
 docker-compose.local.yml
 dist
 .vscode
+temp

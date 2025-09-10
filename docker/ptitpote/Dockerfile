@@ -5,7 +5,7 @@ RUN npm install
 COPY --chown=node:node . /app
 RUN npm run build
 
-FROM node:24-slim as ptitpoteprod
+FROM node:24-slim AS ptitpoteprod
 ENV NODE_ENV production
 WORKDIR /app
 COPY package*.json ./

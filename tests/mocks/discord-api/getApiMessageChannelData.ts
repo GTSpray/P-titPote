@@ -1,5 +1,5 @@
 import { RESTGetAPIChannelMessagesResult } from "discord.js";
-import { getApiMessageData } from "./getApiMessageData";
+import { getApiMessageData } from "./getApiMessageData.js";
 import { randomDiscordId19 } from "./utils";
 
 type ApiMessagesChannelDataOptions = {

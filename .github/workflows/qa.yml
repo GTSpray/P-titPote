@@ -1,24 +1,16 @@
 name: Quality Gate
 on: [push]
 
-env:
-  NODEV: "22.x"
-
 jobs:
   QA:
     name: Apply Quality Gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Install Using NodeJS
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ vars.NODEV }}
-      - run: npm ci
-      - run: cp .env.sample .env
-      - run: cp docker-compose.yml docker-compose.local.yml
+      - name: Prepare ci env
+        run: cp .env.sample .env
       - name: Build using Docker
-        run: make dev
+        run: make ci
       - name: Execute tests in the running services
         run: make test
       - name: Lint
