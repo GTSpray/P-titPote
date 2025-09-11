@@ -1,17 +1,17 @@
-import { gimmeotter } from "../../../../src/commands/slash/gimmeotter";
+import { gimmeotter } from "../../../../src/commands/slash/gimmeotter.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
+import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
-import { CommandHandlerOptions } from "../../../../src/commands/commands";
+import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
 
 describe("/gimmeotter", () => {
   let handlerOpts: CommandHandlerOptions;

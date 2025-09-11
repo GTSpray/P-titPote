@@ -1,5 +1,5 @@
 import { APIUser, UserFlags } from "discord.js";
-import { getRandomString, randomDiscordId18 } from "./utils";
+import { getRandomString, randomDiscordId18 } from "./utils.js";
 
 export const getApiUserData = (options: Partial<APIUser> = {}): APIUser => {
   return {

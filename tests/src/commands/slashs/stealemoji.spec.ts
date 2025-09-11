@@ -3,7 +3,7 @@ import {
   stealemoji_emojiLimit,
   stealemoji_msgLimit,
   stealemoji_msgSizeLimit,
-} from "../../../../src/commands/slash/stealemoji";
+} from "../../../../src/commands/slash/stealemoji.js";
 import { Request } from "express";
 import { MockRequest, MockResponse } from "node-mocks-http";
 import {
@@ -11,7 +11,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
+import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
@@ -22,12 +22,15 @@ import {
 import {
   getRandomString,
   randomDiscordId19,
-} from "../../../mocks/discord-api/utils";
-import { getApiMessagesChannelData } from "../../../mocks/discord-api/getApiMessageChannelData";
-import { DiscrodRESTMock, DiscrodRESTMockVerb } from "../../../mocks/discordjs";
-import { getApiMessageData } from "../../../mocks/discord-api/getApiMessageData";
-import * as getEmojiUrlModule from "../../../../src/utils/getEmojiUrl";
-import { CommandHandlerOptions } from "../../../../src/commands/commands";
+} from "../../../mocks/discord-api/utils.js";
+import { getApiMessagesChannelData } from "../../../mocks/discord-api/getApiMessageChannelData.js";
+import {
+  DiscrodRESTMock,
+  DiscrodRESTMockVerb,
+} from "../../../mocks/discordjs.js";
+import { getApiMessageData } from "../../../mocks/discord-api/getApiMessageData.js";
+import * as getEmojiUrlModule from "../../../../src/utils/getEmojiUrl.js";
+import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
 
 describe("/stealemoji", () => {
   let request: MockRequest<Request>;
@@ -83,11 +86,11 @@ describe("/stealemoji", () => {
     let channel_id: string;
     beforeEach(() => {
       channel_id = request.body.channel.id || "failed mock response";
-      jest.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue("no mock");
+      vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue("no mock");
     });
 
     it(`should use discord api to fetch last ${stealemoji_msgLimit} messages of current channel`, async () => {
-      const getSpy = jest.spyOn(REST.prototype, "get");
+      const getSpy = vi.spyOn(REST.prototype, "get");
 
       DiscrodRESTMock.register(
         {
@@ -163,7 +166,7 @@ describe("/stealemoji", () => {
         });
 
         it(`should call getEmojiUrl to determine emoji "format"`, async () => {
-          const getEmojiUrlSpy = jest.spyOn(getEmojiUrlModule, "getEmojiUrl");
+          const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, "getEmojiUrl");
           await stealemoji.handler(handlerOpts);
 
           expect(getEmojiUrlSpy).toHaveBeenCalledWith(emojiId);
@@ -172,7 +175,7 @@ describe("/stealemoji", () => {
 
         it(`should respond found message with  emoji url and ${emojiName} as desciption `, async () => {
           const url = `http://amockedurl/${emojiId}.png`;
-          jest.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue(url);
+          vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue(url);
 
           const response = await stealemoji.handler(handlerOpts);
           expect(response).toMeetApiResponse(200, {

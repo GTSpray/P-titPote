@@ -1,6 +1,6 @@
 import { APIMessage, MessageType } from "discord.js";
-import { BitFieldFlag, getRandomString, randomDiscordId19 } from "./utils";
-import { getApiUserData } from "./getApiUserData";
+import { BitFieldFlag, getRandomString, randomDiscordId19 } from "./utils.js";
+import { getApiUserData } from "./getApiUserData.js";
 
 export const getApiMessageData = (
   options: Partial<APIMessage> = {},

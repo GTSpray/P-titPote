@@ -1,24 +1,18 @@
-import { version } from "../../../../src/commands/slash/version";
+import { version } from "../../../../src/commands/slash/version.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
+import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
-import { CommandHandlerOptions } from "../../../../src/commands/commands";
-
-const mockedEmote = "🫖 🫖 🫖";
-jest.mock("../../../../src/utils/getRandomEmoji", () => ({
-  getRandomEmoji: jest.fn().mockImplementation(() => {
-    return mockedEmote;
-  }),
-}));
+import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
+import * as getRandomEmojiModule from "../../../../src/utils/getRandomEmoji.js";
 
 describe("/version", () => {
   let handlerOpts: CommandHandlerOptions;
@@ -56,6 +50,9 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
+      const anEmote = "🫖";
+      vi.spyOn(getRandomEmojiModule, "getRandomEmoji").mockReturnValue(anEmote);
+
       const response = await version.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
@@ -65,7 +62,7 @@ describe("/version", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: `Hello here ${mockedEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
+              content: `Hello here ${anEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
             },
           ],
         },

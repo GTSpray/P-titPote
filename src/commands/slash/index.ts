@@ -1,7 +1,7 @@
-import type { SlashCommandDeclaration } from "../commands";
-import { stealemoji } from "./stealemoji";
-import { version } from "./version";
-import { gimmeotter } from "./gimmeotter";
+import type { SlashCommandDeclaration } from "../commands.js";
+import { stealemoji } from "./stealemoji.js";
+import { version } from "./version.js";
+import { gimmeotter } from "./gimmeotter.js";
 
 export const slashcommands: Record<string, SlashCommandDeclaration> = {
   version,

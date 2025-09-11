@@ -1,9 +1,5 @@
-import {
-  ApplicationIntegrationType,
-  InteractionContextType,
-  SlashCommandBuilder,
-} from "discord.js";
-import { slashcommands } from "../../../src/commands/slash";
+import { SlashCommandBuilder } from "discord.js";
+import { slashcommands } from "../../../src/commands/slash/index.js";
 
 describe("slashcommands", () => {
   const commands = Object.keys(slashcommands);
@@ -22,7 +18,8 @@ describe("slashcommands", () => {
 
     it("should have 1-100 character description", () => {
       const desc = commandDefinition.builder.description;
-      expect(desc.length).toBeWithin(1, 100);
+      expect(desc.length).toBeGreaterThanOrEqual(1);
+      expect(desc.length).toBeLessThanOrEqual(100);
     });
   });
 });

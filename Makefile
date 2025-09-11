@@ -79,7 +79,7 @@ test: os
 
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
-	$(DC_CMD_DEV) exec ptitpote npm run --silent test -- --watchAll
+	$(DC_CMD_DEV) exec ptitpote npx vitest dev
 
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os

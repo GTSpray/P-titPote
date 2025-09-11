@@ -4,7 +4,7 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-import { type SlashCommandDeclaration } from "../commands";
+import { type SlashCommandDeclaration } from "../commands.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,

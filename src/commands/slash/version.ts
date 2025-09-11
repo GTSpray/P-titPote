@@ -4,8 +4,8 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-import { type SlashCommandDeclaration } from "../commands";
-import { getRandomEmoji } from "../../utils/getRandomEmoji";
+import { type SlashCommandDeclaration } from "../commands.js";
+import { getRandomEmoji } from "../../utils/getRandomEmoji.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,

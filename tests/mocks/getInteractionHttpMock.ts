@@ -4,7 +4,7 @@ import {
   randomDiscordId16,
   getRandomString,
   randomDiscordId18,
-} from "./discord-api/utils";
+} from "./discord-api/utils.js";
 
 type BasicInteractionPayload = {
   guild_id?: string;
