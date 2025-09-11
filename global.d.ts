@@ -9,6 +9,13 @@ declare global {
       BOT_TOKEN: string;
       LOCALTUNNEL_SUBDOMAIN: string;
       APP_PORT?: string;
+
+      DB_HOST: string;
+      MYSQL_DATABASE: string;
+      MYSQL_USER: string;
+      MYSQL_PASSWORD: string;
+      MYSQL_ROOT_PASSWORD: string;
+      MYSQL_TCP_PORT: string;
     }
   }
   namespace Express {

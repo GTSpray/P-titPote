@@ -8,7 +8,9 @@ if (!process.env.APP_ID) {
   throw Error("no APP_ID provided in env");
 }
 
-logger.info("register", { payload: slashcommandsRegister });
+logger.debug("register", { payload: slashcommandsRegister });
+
+logger.info("register", { commands: slashcommandsRegister.map((e) => e.name) });
 
 (async () => {
   try {

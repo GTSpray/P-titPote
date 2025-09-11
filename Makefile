@@ -71,7 +71,12 @@ dev: os
 	
 ## Build with watch mode (need containers as developpement mode)
 build: os
+	$(DC_CMD_DEV) exec ptitpote rm -Rf dist/*
 	$(DC_CMD_DEV) exec ptitpote npm run build -- -w
+
+## dumps create schema SQL
+db-schema-create: os
+	$(DC_CMD_DEV) exec ptitpote npx mikro-orm schema:create --dump
 
 ## Run tests (need containers as developpement mode)
 test: os
@@ -92,7 +97,7 @@ lint: os
 
 ## Follow bot container logs
 logs: os
-	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq
+	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq -n -f recover.jq 
 
 ## Restart containers
 restart: os

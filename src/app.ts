@@ -12,6 +12,11 @@ import {
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
 
+import { MikroORM } from "@mikro-orm/mysql"; // or any other driver package
+import config from "./mikro-orm.config.js";
+
+const orm = MikroORM.init(config);
+
 morgan.token("requestId", (req) => {
   return (<any>req).requestId;
 });
@@ -87,7 +92,8 @@ app.post(
       const { name } = data;
       if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
         logger.debug(`interaction handler`, { reqId, name });
-        return slashcommands[name].handler({ req, res });
+        const o = await orm;
+        return slashcommands[name].handler({ req, res, orm: o });
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });
