@@ -13,6 +13,9 @@ services:
     ports:
       - "3307:3306"
   ptitpote:
+    depends_on:
+      - database
+      - dbtest
     environment:
       LOG_LEVEL: "debug"
     command: npm run --silent dev
