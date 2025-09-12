@@ -23,6 +23,12 @@ services:
     restart: always
     volumes:
       - mysqldbdata:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 20
   localtunnel:
     container_name: lt
     restart: always

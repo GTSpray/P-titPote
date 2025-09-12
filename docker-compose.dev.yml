@@ -12,10 +12,18 @@ services:
       MYSQL_ROOT_PASSWORD: "ptitpotetestrootpassword"
     ports:
       - "3307:3306"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 20
   ptitpote:
     depends_on:
-      - database
-      - dbtest
+      database:
+        condition: service_healthy
+      dbtest:
+        condition: service_healthy
     environment:
       LOG_LEVEL: "debug"
     command: npm run --silent dev
