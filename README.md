@@ -96,6 +96,17 @@ make testw
 
 > ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
 
+#### Database managment
+
+See [schema-generator](https://mikro-orm.io/docs/schema-generator)
+
+```bash
+make sh
+npx mikro-orm schema:create --dump   # Dumps create schema SQL
+npx mikro-orm schema:update --dump   # Dumps update schema SQL
+npx mikro-orm schema:drop --dump     # Dumps drop schema SQL
+```
+
 ## Other resources
 
 - Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.

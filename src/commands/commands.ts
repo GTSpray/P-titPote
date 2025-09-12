@@ -7,6 +7,7 @@ import {
   SlashCommandSubcommandsOnlyBuilder,
 } from "discord.js";
 import { Request, Response } from "express";
+import { DBServices } from "../db/db.js";
 
 type DiscordInteractionBody<Data> = APIBaseInteraction<
   InteractionType.ApplicationCommand,
@@ -16,7 +17,7 @@ type DiscordInteractionBody<Data> = APIBaseInteraction<
 export type CommandHandlerOptions<Data> = {
   req: Request<any, any, DiscordInteractionBody<Data>, any, any>;
   res: Response;
-  orm?: MikroORM;
+  dbServices?: DBServices;
 };
 
 export type SlashCommandDeclaration<Data extends object> = {
