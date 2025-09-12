@@ -4,7 +4,7 @@ import { version } from "./version.js";
 import { gimmeotter } from "./gimmeotter.js";
 import { aliasmsg } from "./aliasmsg.js";
 
-export const slashcommands: Record<string, SlashCommandDeclaration> = {
+export const slashcommands: Record<string, SlashCommandDeclaration<any>> = {
   version,
   stealemoji,
   gimmeotter,

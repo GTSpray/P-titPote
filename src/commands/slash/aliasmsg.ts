@@ -1,9 +1,3 @@
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-  MessageComponentTypes,
-} from "discord-interactions";
-
 import { type SlashCommandDeclaration } from "../commands.js";
 import {
   ApplicationIntegrationType,
@@ -12,8 +6,8 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
-import { MessageAliased } from "../../db/entities/MessageAliased.entity.js";
-import { logger } from "../../logger.js";
+import { AliasMsgSetCommandData, set } from "./aliasmsg/set.js";
+import { Response } from "express";
 
 const builder = new SlashCommandBuilder()
   .setDescription("Alias un message")
@@ -56,25 +50,29 @@ const builder = new SlashCommandBuilder()
       ),
   );
 
-export const aliasmsg: SlashCommandDeclaration = {
+export type AliasmsgDataOpts = AliasMsgSetCommandData;
+
+export const aliasmsg: SlashCommandDeclaration<AliasmsgDataOpts> = {
   builder,
-  handler: async function ({ req, res, orm }) {
-    const message = await orm.em.findOne(MessageAliased, {
-      server: { serverId: req.body.guild_id },
-      alias: "toto",
-    });
-    logger.debug("alias message", { message });
-    return res.json({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-        components: [
-          {
-            type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "Voilà.. ce que j'ai trouvé",
-          },
-        ],
-      },
-    });
+  handler: async function (handlerOpts) {
+    const { req, res } = handlerOpts;
+    const { data } = req.body;
+
+    if (data) {
+      const [subcommand] = data.options;
+      let result: Response;
+      switch (subcommand.name) {
+        case "set":
+          result = await set(handlerOpts, subcommand);
+          break;
+        default:
+          result = res.status(500).json({ error: "invalid" });
+          break;
+      }
+
+      return result;
+    }
+
+    return res.status(500).json({ error: "invalid" });
   },
 };

@@ -26,7 +26,7 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const version: SlashCommandDeclaration = {
+export const version: SlashCommandDeclaration<object> = {
   builder,
   handler: async function ({ res }) {
     return res.json({

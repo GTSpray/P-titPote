@@ -38,10 +38,14 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const stealemoji: SlashCommandDeclaration = {
+export const stealemoji: SlashCommandDeclaration<object> = {
   builder,
   handler: async function ({ req, res }) {
     const { channel } = req.body;
+    if (!channel) {
+      return res.status(500).json({ error: "invalid" });
+    }
+
     const reqId = req.requestId;
     const channelMessages = (await discordapi.get(
       Routes.channelMessages(channel.id),

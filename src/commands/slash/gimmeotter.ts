@@ -25,7 +25,7 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const gimmeotter: SlashCommandDeclaration = {
+export const gimmeotter: SlashCommandDeclaration<object> = {
   builder,
   handler: async function ({ res }) {
     return res.json({
