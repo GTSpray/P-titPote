@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ["tests/vitest.setup.ts"],
     reporters: [["verbose", { summary: false }]],
+    globalSetup: ["tests/initdb.ts"],
   },
 });

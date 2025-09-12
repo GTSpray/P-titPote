@@ -11,11 +11,12 @@ import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js
 import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
 import { AliasMsgSetCommandData } from "../../../../src/commands/slash/aliasmsg/set.js";
+import { initORM } from "../../../../src/db/db.js";
 
 describe("/aliasmsg", () => {
   describe("set option", () => {
     let handlerOpts: CommandHandlerOptions<AliasMsgSetCommandData>;
-    beforeEach(() => {
+    beforeEach(async () => {
       const data: AliasMsgSetCommandData = {
         id: randomDiscordId19(),
         name: "aliasmsg",
@@ -40,9 +41,11 @@ describe("/aliasmsg", () => {
         type: 1,
       };
       const { req, res } = getInteractionHttpMock({ data });
+      const dbServices = await initORM();
       handlerOpts = {
         req,
         res,
+        dbServices,
       };
     });
 

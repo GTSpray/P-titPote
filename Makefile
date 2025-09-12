@@ -54,7 +54,7 @@ start: os
 
 ## Halt containers
 stop: os
-	$(DC_CMD) down --volumes
+	$(DC_CMD_DEV) down --volumes
 
 
 ## Install slash commands on discord

@@ -2,6 +2,16 @@ services:
   database:
     ports:
       - "${MYSQL_TCP_PORT}:3306"
+  dbtest:
+    image: mysql:8
+    container_name: dbtest
+    environment:
+      MYSQL_DATABASE: "ptitpotetest"
+      MYSQL_USER: "ptitpotetest"
+      MYSQL_PASSWORD: "ptitpotetestpassword"
+      MYSQL_ROOT_PASSWORD: "ptitpotetestrootpassword"
+    ports:
+      - "3307:3306"
   ptitpote:
     environment:
       LOG_LEVEL: "debug"

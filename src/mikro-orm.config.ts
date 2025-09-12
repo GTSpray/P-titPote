@@ -5,6 +5,7 @@ import {
   DefaultLogger,
   LogContext,
   LoggerNamespace,
+  defineConfig,
 } from "@mikro-orm/mysql";
 import { TsMorphMetadataProvider } from "@mikro-orm/reflection";
 import { logger } from "./logger.js";
@@ -33,7 +34,7 @@ class CustomLogger extends DefaultLogger {
   }
 }
 
-const config: Options = {
+const config: Options = defineConfig({
   driver: MySqlDriver,
   dbName: process.env.MYSQL_DATABASE,
   host: process.env.DB_HOST,
@@ -47,6 +48,7 @@ const config: Options = {
   metadataProvider: TsMorphMetadataProvider,
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),
-};
+  dynamicImportProvider: (id) => import(id),
+});
 
 export default config;

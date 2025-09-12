@@ -69,7 +69,7 @@ export const set = async (
       components: [
         {
           type: MessageComponentTypes.TEXT_DISPLAY,
-          content: `${alias.value} = ${msg.value}`,
+          content: "Ok! C'est noté ;)",
         },
       ],
     },
