@@ -38,5 +38,5 @@ services:
       - ${PWD}/vitest.config.ts:/app/vitest.config.ts
       - ${PWD}/src:/app/src
       - ${PWD}/tests:/app/tests
-      - ${PWD}/.prettierrc:/.prettierrc
-      - ${PWD}/.prettierignore:/.prettierignore
+      - ${PWD}/.prettierrc:/app/.prettierrc
+      - ${PWD}/.prettierignore:/app/.prettierignore
