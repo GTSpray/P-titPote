@@ -53,7 +53,6 @@ const config: Options = defineConfig({
   extensions: [Migrator],
   migrations: {
     path: "dist/src/migrations",
-    pathTs: "src/migrations",
     transactional: false,
   },
 });
