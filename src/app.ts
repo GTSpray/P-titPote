@@ -28,11 +28,6 @@ const PORT = process.env.APP_PORT || 3000;
 app.use(function (req: Request, res: Response, next: NextFunction) {
   req.requestId = v4();
   res.set("x-request-id", req.requestId);
-  const json = res.json.bind(res);
-  (<any>res).json = (body: object) => {
-    logger.debug("reponse", { reqId: req.requestId, body });
-    json(body);
-  };
   next();
 });
 
