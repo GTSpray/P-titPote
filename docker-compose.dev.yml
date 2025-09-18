@@ -1,7 +1,33 @@
 services:
+  database:
+    ports:
+      - "${MARIADB_TCP_PORT}:3306"
+  dbtest:
+    image: mariadb:12.0.2-noble
+    container_name: dbtest
+    environment:
+      MARIADB_DATABASE: "ptitpotetest"
+      MARIADB_USER: "ptitpotetest"
+      MARIADB_PASSWORD: "ptitpotetestpassword"
+      MARIADB_ROOT_PASSWORD: "ptitpotetestrootpassword"
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: on-failure
   ptitpote:
+    depends_on:
+      database:
+        condition: service_healthy
+      dbtest:
+        condition: service_healthy
     environment:
       LOG_LEVEL: "debug"
+      NODE_ENV: development
     command: npm run --silent dev
     volumes:
       - ${PWD}/dist:/app/dist
@@ -11,6 +37,8 @@ services:
       - ${PWD}/logs:/app/logs
       - ${PWD}/global.d.ts:/app/global.d.ts
       - ${PWD}/tsconfig.json:/app/tsconfig.json
-      - ${PWD}/jest.config.js:/app/jest.config.js
+      - ${PWD}/vitest.config.ts:/app/vitest.config.ts
       - ${PWD}/src:/app/src
       - ${PWD}/tests:/app/tests
+      - ${PWD}/.prettierrc:/app/.prettierrc
+      - ${PWD}/.prettierignore:/app/.prettierignore

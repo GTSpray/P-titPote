@@ -1,7 +1,7 @@
 import "dotenv/config";
-import * as express from "express";
+import express from "express";
 import { Request, Response, NextFunction } from "express";
-import * as morgan from "morgan";
+import morgan from "morgan";
 import { v4 } from "uuid";
 import {
   InteractionResponseType,
@@ -11,6 +11,11 @@ import {
 
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
+
+import config from "./mikro-orm.config.js";
+import { initORM } from "./db/db.js";
+
+const orm = initORM(config);
 
 morgan.token("requestId", (req) => {
   return (<any>req).requestId;
@@ -23,11 +28,6 @@ const PORT = process.env.APP_PORT || 3000;
 app.use(function (req: Request, res: Response, next: NextFunction) {
   req.requestId = v4();
   res.set("x-request-id", req.requestId);
-  const json = res.json.bind(res);
-  (<any>res).json = (body: object) => {
-    logger.debug("reponse", { reqId: req.requestId, body });
-    json(body);
-  };
   next();
 });
 
@@ -87,7 +87,8 @@ app.post(
       const { name } = data;
       if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
         logger.debug(`interaction handler`, { reqId, name });
-        return slashcommands[name].handler(req, res);
+        const dbServices = await orm;
+        return slashcommands[name].handler({ req, res, dbServices });
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });

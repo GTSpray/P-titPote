@@ -1,18 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["es2020"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
     "outDir": "dist",
     "noEmitOnError": true,
     "strict": true,
     "skipLibCheck": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "typeRoots": [
+      "./node_modules",
       "./node_modules/@types",
+      "./node_modules/vitest/global",
       "./node_modules/@discordjs/typings",
       "./global.d.ts"
-    ]
+    ],
+    "types": ["vitest/globals"]
   },
   "files": ["global.d.ts", "src/register.ts", "src/app.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["src/db/entities/**.ts", "src/migrations/**.ts"]
 }

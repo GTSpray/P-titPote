@@ -1,7 +1,7 @@
 services:
   ptitpote:
     container_name: ptitpote
-    restart: on-failure
+    restart: always
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
@@ -9,13 +9,29 @@ services:
         UID: ${DOCKER_UID:-1000}
         GID: ${DOCKER_GID:-1000}
       target: ptitpoteprod
+    depends_on:
+      - database
     env_file:
       - .env
     volumes:
       - ${PWD}/logs:/app/logs
+  database:
+    image: mariadb:12.0.2-noble
+    container_name: db
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - mysqldbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 20
   localtunnel:
     container_name: lt
-    restart: on-failure
+    restart: always
     build:
       context: .
       dockerfile: docker/localtunnel/Dockerfile
@@ -29,3 +45,6 @@ services:
       - ptitpote
     depends_on:
       - ptitpote
+
+volumes:
+  mysqldbdata:

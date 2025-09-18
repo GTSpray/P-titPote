@@ -4,4 +4,5 @@ coverage
 node_modules
 .env
 logs
-dist
+temp
+.snapshot-*.json

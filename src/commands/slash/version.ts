@@ -4,8 +4,8 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-import { type SlashCommandDeclaration } from "../commands";
-import { getRandomEmoji } from "../../utils/getRandomEmoji";
+import { type SlashCommandDeclaration } from "../commands.js";
+import { getRandomEmoji } from "../../utils/getRandomEmoji.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
@@ -26,9 +26,10 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   );
 
-export const version: SlashCommandDeclaration = {
+export type VersionDataOpts = {};
+export const version: SlashCommandDeclaration<VersionDataOpts> = {
   builder,
-  handler: async function (req, res) {
+  handler: async function ({ res }) {
     return res.json({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {

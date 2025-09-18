@@ -1,22 +1,23 @@
-import { gimmeotter } from "../../../../src/commands/slash/gimmeotter";
-import { Request, Response } from "express";
-import { MockRequest, MockResponse } from "node-mocks-http";
+import {
+  gimmeotter,
+  GimmeotterDataOpts,
+} from "../../../../src/commands/slash/gimmeotter.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
+import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
+import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
 
-describe("/version", () => {
-  let request: MockRequest<Request>;
-  let response: MockResponse<Response>;
+describe("/gimmeotter", () => {
+  let handlerOpts: CommandHandlerOptions<GimmeotterDataOpts>;
 
   beforeEach(() => {
     const { req, res } = getInteractionHttpMock({
@@ -26,8 +27,10 @@ describe("/version", () => {
         type: 1,
       },
     });
-    request = req;
-    response = res;
+    handlerOpts = {
+      req,
+      res,
+    };
   });
 
   it("should declare a slash command", () => {
@@ -49,7 +52,7 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
-      await gimmeotter.handler(request, response);
+      const response = await gimmeotter.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

@@ -1,0 +1,10 @@
+services:
+  ptitpote:
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: "info"
+      GITHUB_ACTIONS: 1
+      GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}
+    command: npm run --silent start
+    volumes:
+      - ${PWD}:/app/

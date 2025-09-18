@@ -1,29 +1,24 @@
-import { version } from "../../../../src/commands/slash/version";
-import { Request, Response } from "express";
-import { MockRequest, MockResponse } from "node-mocks-http";
+import {
+  version,
+  VersionDataOpts,
+} from "../../../../src/commands/slash/version.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils";
+import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
 } from "discord.js";
-
-const mockedEmote = "🫖 🫖 🫖";
-jest.mock("../../../../src/utils/getRandomEmoji", () => ({
-  getRandomEmoji: jest.fn().mockImplementation(() => {
-    return mockedEmote;
-  }),
-}));
+import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
+import * as getRandomEmojiModule from "../../../../src/utils/getRandomEmoji.js";
 
 describe("/version", () => {
-  let request: MockRequest<Request>;
-  let response: MockResponse<Response>;
+  let handlerOpts: CommandHandlerOptions<VersionDataOpts>;
 
   beforeEach(() => {
     const { req, res } = getInteractionHttpMock({
@@ -33,8 +28,10 @@ describe("/version", () => {
         type: 1,
       },
     });
-    request = req;
-    response = res;
+    handlerOpts = {
+      req,
+      res,
+    };
   });
 
   it("should declare a slash command", () => {
@@ -56,7 +53,10 @@ describe("/version", () => {
 
   describe("handler", () => {
     it("should respond to version interaction with bot version message", async () => {
-      await version.handler(request, response);
+      const anEmote = "🫖";
+      vi.spyOn(getRandomEmojiModule, "getRandomEmoji").mockReturnValue(anEmote);
+
+      const response = await version.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -65,7 +65,7 @@ describe("/version", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: `Hello here ${mockedEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
+              content: `Hello here ${anEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
             },
           ],
         },

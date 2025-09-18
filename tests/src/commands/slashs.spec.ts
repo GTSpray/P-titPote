@@ -1,9 +1,5 @@
-import {
-  ApplicationIntegrationType,
-  InteractionContextType,
-  SlashCommandBuilder,
-} from "discord.js";
-import { slashcommands } from "../../../src/commands/slash";
+import { SlashCommandBuilder } from "discord.js";
+import { slashcommands } from "../../../src/commands/slash/index.js";
 
 describe("slashcommands", () => {
   const commands = Object.keys(slashcommands);
