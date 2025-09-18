@@ -21,5 +21,5 @@
   },
   "files": ["global.d.ts", "src/register.ts", "src/app.ts"],
   "exclude": ["node_modules"],
-  "include": ["src/db/entities/**.ts"]
+  "include": ["src/db/entities/**.ts", "src/migrations/**.ts"]
 }

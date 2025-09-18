@@ -18,6 +18,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
+    restart: on-failure
   ptitpote:
     depends_on:
       database:

@@ -8,6 +8,7 @@ import {
   defineConfig,
 } from "@mikro-orm/mariadb";
 import { TsMorphMetadataProvider } from "@mikro-orm/reflection";
+import { Migrator } from "@mikro-orm/migrations";
 import { logger } from "./logger.js";
 
 class CustomLogger extends DefaultLogger {
@@ -49,6 +50,12 @@ const config: Options = defineConfig({
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),
   dynamicImportProvider: (id) => import(id),
+  extensions: [Migrator],
+  migrations: {
+    path: "dist/src/migrations",
+    pathTs: "src/migrations",
+    transactional: false,
+  },
 });
 
 export default config;

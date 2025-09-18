@@ -9,14 +9,17 @@ ifeq ($(UNAME_S),Darwin)
 	OS := macos
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
 	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
+	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 else ifeq ($(OS),Windows_NT)
     OS := windows
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
 	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
+	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 else
 	OS := linux
 	DC_CMD := docker compose -f docker-compose.yml -f docker-compose.local.yml
 	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
+	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 endif
 
 os:
@@ -81,17 +84,21 @@ dev: os
 	$(DC_CMD_DEV) up -d --remove-orphans
 
 ## Build with watch mode (need containers as developpement mode)
-build: os
+tsc: os
 	$(DC_CMD_DEV) run ptitpote rm -Rf dist/*
 	$(DC_CMD_DEV) run ptitpote npm run build -- -w
 
-## dumps create schema SQL
-db-schema-create: os
-	$(DC_CMD_DEV) run ptitpote npx mikro-orm schema:create --run
+## Migrate database up to the latest version
+db-up: os
+	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:up
 
-## Run tests (need containers as developpement mode)
-test: os
-	$(DC_CMD_DEV) run ptitpote npm --silent test
+## Migrate database one step down
+db-down: os
+	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:down
+
+## Check if database schema is up to date
+db-check: os
+	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:check
 
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
@@ -100,10 +107,6 @@ testw: os
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os
 	$(DC_CMD_DEV) run ptitpote npx prettier . --write
-
-## Lint all files with Prettier (need containers as developpement mode)
-lint: os
-	$(DC_CMD_DEV) run ptitpote npx prettier . --check
 
 ## Run shell inside bot container
 sh: os
@@ -116,6 +119,14 @@ sh: os
 
 ## Run containers as ci mode
 ci: os
-	$(DC_CMD_DEV) -f docker-compose.ci.yml run ptitpote npm ci
-	$(DC_CMD_DEV) -f docker-compose.ci.yml run ptitpote npm run build
-	$(DC_CMD_DEV) -f docker-compose.ci.yml up -d --remove-orphans
+	$(DC_CMD_CI) run ptitpote npm ci
+	$(DC_CMD_CI) run ptitpote npm run build
+	$(DC_CMD_CI) up -d --remove-orphans
+
+## Lint all files with Prettier
+lint: os
+	$(DC_CMD_CI) exec ptitpote npx prettier . --check
+
+## Run tests (need containers as developpement mode)
+test: os
+	$(DC_CMD_CI) run ptitpote npm --silent test
