@@ -73,6 +73,18 @@ restart: os
 	@sleep 1
 	$(DC_CMD) up -d --remove-orphans
 
+## Migrate database up to the latest version
+db-up: os
+	$(DC_CMD) run ptitpote npx mikro-orm migration:up
+
+## Migrate database one step down
+db-down: os
+	$(DC_CMD) run ptitpote npx mikro-orm migration:down
+
+## Check if database schema is up to date
+db-check: os
+	$(DC_CMD) run ptitpote npx mikro-orm migration:check
+
 ###
 # Developper
 ###
@@ -88,18 +100,6 @@ tsc: os
 	$(DC_CMD_DEV) run ptitpote rm -Rf dist/*
 	$(DC_CMD_DEV) run ptitpote npm run build -- -w
 
-## Migrate database up to the latest version
-db-up: os
-	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:up
-
-## Migrate database one step down
-db-down: os
-	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:down
-
-## Check if database schema is up to date
-db-check: os
-	$(DC_CMD_DEV) run ptitpote npx mikro-orm migration:check
-
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
 	$(DC_CMD_DEV) run ptitpote npx vitest dev
@@ -111,7 +111,6 @@ pretty: os
 ## Run shell inside bot container
 sh: os
 	$(DC_CMD) exec ptitpote bash
-
 
 ###
 # ci

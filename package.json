@@ -25,7 +25,8 @@
   "author": "GTSpray",
   "license": "MIT",
   "dependencies": {
-    "@mikro-orm/core": "^6.5.3",
+    "@mikro-orm/cli": "^6.5.4",
+    "@mikro-orm/core": "^6.5.4",
     "@mikro-orm/mariadb": "^6.5.4",
     "@mikro-orm/migrations": "^6.5.4",
     "@mikro-orm/reflection": "^6.5.4",
@@ -40,7 +41,6 @@
     "zod": "^4.1.9"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^6.5.4",
     "@types/express": "^5.0.3",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.5.2",
