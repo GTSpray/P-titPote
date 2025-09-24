@@ -2,7 +2,7 @@ import type { SlashCommandDeclaration } from "../commands.js";
 import { stealemoji } from "./stealemoji.js";
 import { version } from "./version.js";
 import { gimmeotter } from "./gimmeotter.js";
-import { alias } from "./alias.js";
+import { alias } from "./alias/index.js";
 
 export const slashcommands: Record<string, SlashCommandDeclaration<any>> = {
   version,

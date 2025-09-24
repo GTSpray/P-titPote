@@ -1,17 +1,17 @@
 import {
   alias,
   type aliasDataOpts,
-} from "../../../../src/commands/slash/alias.js";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
-import * as setModule from "../../../../src/commands/slash/alias/set.js";
-import * as sayModule from "../../../../src/commands/slash/alias/say.js";
-import * as lsModule from "../../../../src/commands/slash/alias/ls.js";
-import { DBServices, initORM } from "../../../../src/db/db.js";
-import { type aliasSetSubCommandData } from "../../../../src/commands/slash/alias/set.js";
-import { type aliasSaySubCommandData } from "../../../../src/commands/slash/alias/say.js";
-import { type aliasLsSubCommandData } from "../../../../src/commands/slash/alias/ls.js";
+} from "../../../../../src/commands/slash/alias/index.js";
+import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
+import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
+import * as setModule from "../../../../../src/commands/slash/alias/set.js";
+import * as sayModule from "../../../../../src/commands/slash/alias/say.js";
+import * as lsModule from "../../../../../src/commands/slash/alias/ls.js";
+import { DBServices, initORM } from "../../../../../src/db/db.js";
+import { type aliasSetSubCommandData } from "../../../../../src/commands/slash/alias/set.js";
+import { type aliasSaySubCommandData } from "../../../../../src/commands/slash/alias/say.js";
+import { type aliasLsSubCommandData } from "../../../../../src/commands/slash/alias/ls.js";
 import {
   InteractionContextType,
   ApplicationIntegrationType,

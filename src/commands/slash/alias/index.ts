@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { type SlashCommandDeclaration } from "../commands.js";
+import { type SlashCommandDeclaration } from "../../commands.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
@@ -8,11 +8,11 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
-import { aliasSetCommandData, set } from "./alias/set.js";
-import { aliasSayCommandData, say } from "./alias/say.js";
-import { aliasLsCommandData, ls } from "./alias/ls.js";
+import { aliasSetCommandData, set } from "./set.js";
+import { aliasSayCommandData, say } from "./say.js";
+import { aliasLsCommandData, ls } from "./ls.js";
 import { Response } from "express";
-import { logger } from "../../logger.js";
+import { logger } from "../../../logger.js";
 
 const builder = new SlashCommandBuilder()
   .setDescription("Alias un message")
