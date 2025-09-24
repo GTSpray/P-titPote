@@ -1,73 +1,56 @@
-import {
-  stealemoji,
-  stealemoji_emojiLimit,
-  stealemoji_msgLimit,
-  stealemoji_msgSizeLimit,
-  StealemojiDataOpts,
-} from "../../../../src/commands/slash/stealemoji.js";
 import { Request } from "express";
-import { MockRequest, MockResponse } from "node-mocks-http";
+import { MockRequest } from "node-mocks-http";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import {
-  ApplicationIntegrationType,
-  InteractionContextType,
-  PermissionFlagsBits,
-  REST,
-  Routes,
-} from "discord.js";
+import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { REST, Routes } from "discord.js";
 import {
   getRandomString,
   randomDiscordId19,
-} from "../../../mocks/discord-api/utils.js";
-import { getApiMessagesChannelData } from "../../../mocks/discord-api/getApiMessageChannelData.js";
+} from "../../../../mocks/discord-api/utils.js";
+import { getApiMessagesChannelData } from "../../../../mocks/discord-api/getApiMessageChannelData.js";
 import {
   DiscrodRESTMock,
   DiscrodRESTMockVerb,
-} from "../../../mocks/discordjs.js";
-import { getApiMessageData } from "../../../mocks/discord-api/getApiMessageData.js";
-import * as getEmojiUrlModule from "../../../../src/utils/getEmojiUrl.js";
-import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
-
-describe("/stealemoji", () => {
+} from "../../../../mocks/discordjs.js";
+import { getApiMessageData } from "../../../../mocks/discord-api/getApiMessageData.js";
+import * as getEmojiUrlModule from "../../../../../src/utils/getEmojiUrl.js";
+import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
+import {
+  emoji,
+  gimmeEmojiCommandData,
+  gimmeEmojiSubCommandData,
+  stealemoji_emojiLimit,
+  stealemoji_msgLimit,
+  stealemoji_msgSizeLimit,
+} from "../../../../../src/commands/slash/gimme/emoji.js";
+describe("/emoji", () => {
   let request: MockRequest<Request>;
-  let handlerOpts: CommandHandlerOptions<StealemojiDataOpts>;
+  let handlerOpts: CommandHandlerOptions<gimmeEmojiCommandData>;
+
+  const subcommand: gimmeEmojiSubCommandData = {
+    name: "emoji",
+    type: 1,
+  };
+  const data: gimmeEmojiCommandData = {
+    id: randomDiscordId19(),
+    name: "gimme",
+    options: [subcommand],
+    type: 1,
+  };
 
   beforeEach(() => {
     const { req, res } = getInteractionHttpMock({
-      data: {
-        id: randomDiscordId19(),
-        name: "stealemoji",
-        type: 1,
-      },
+      data,
     });
     request = req;
     handlerOpts = {
       req,
       res,
     };
-  });
-
-  it("should declare a slash command", () => {
-    const declaration = stealemoji.builder.setName("stealemoji");
-    expect(declaration.toJSON()).toMatchObject({
-      description:
-        "Récupère les 3 dernières emotes dans les 10 derniers messages de ce chan",
-      contexts: [
-        InteractionContextType.BotDM,
-        InteractionContextType.Guild,
-        InteractionContextType.PrivateChannel,
-      ],
-      integration_types: [
-        ApplicationIntegrationType.GuildInstall,
-        ApplicationIntegrationType.UserInstall,
-      ],
-      default_member_permissions: `${Number(PermissionFlagsBits.SendMessages)}`,
-    });
   });
 
   describe("handler", () => {
@@ -101,7 +84,7 @@ describe("/stealemoji", () => {
         getApiMessagesChannelData({ channel_id, length: 0 }),
       );
 
-      await stealemoji.handler(handlerOpts);
+      await emoji(handlerOpts);
 
       expect(getSpy).toHaveBeenCalledWith(Routes.channelMessages(channel_id), {
         query: new URLSearchParams({
@@ -119,7 +102,7 @@ describe("/stealemoji", () => {
         getApiMessagesChannelData({ channel_id, length: 0 }),
       );
 
-      const response = await stealemoji.handler(handlerOpts);
+      const response = await emoji(handlerOpts);
       expect(response).toMeetApiResponse(200, notFoundMessagePayload);
     });
 
@@ -132,7 +115,7 @@ describe("/stealemoji", () => {
         getApiMessagesChannelData({ channel_id, length: stealemoji_msgLimit }),
       );
 
-      const response = await stealemoji.handler(handlerOpts);
+      const response = await emoji(handlerOpts);
       expect(response).toMeetApiResponse(200, notFoundMessagePayload);
     });
 
@@ -168,7 +151,7 @@ describe("/stealemoji", () => {
 
         it(`should call getEmojiUrl to determine emoji "format"`, async () => {
           const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, "getEmojiUrl");
-          await stealemoji.handler(handlerOpts);
+          await emoji(handlerOpts);
 
           expect(getEmojiUrlSpy).toHaveBeenCalledWith(emojiId);
           expect(getEmojiUrlSpy).toHaveBeenCalledTimes(1);
@@ -178,7 +161,7 @@ describe("/stealemoji", () => {
           const url = `http://amockedurl/${emojiId}.png`;
           vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue(url);
 
-          const response = await stealemoji.handler(handlerOpts);
+          const response = await emoji(handlerOpts);
           expect(response).toMeetApiResponse(200, {
             type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
@@ -223,7 +206,7 @@ describe("/stealemoji", () => {
         result,
       );
 
-      const response = await stealemoji.handler(handlerOpts);
+      const response = await emoji(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
@@ -265,7 +248,7 @@ describe("/stealemoji", () => {
         ],
       );
 
-      const response = await stealemoji.handler(handlerOpts);
+      const response = await emoji(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
@@ -299,7 +282,7 @@ describe("/stealemoji", () => {
         ],
       );
 
-      const response = await stealemoji.handler(handlerOpts);
+      const response = await emoji(handlerOpts);
       expect(response).toMeetApiResponse(200, notFoundMessagePayload);
     });
   });
