@@ -8,14 +8,14 @@ import {
 } from "discord-interactions";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 
-export interface AliasMsgLsCommandData {
+export interface aliasLsCommandData {
   id: string;
   name: string;
-  options: [AliasMsgLsSubCommandData];
+  options: [aliasLsSubCommandData];
   type: number;
 }
 
-export type AliasMsgLsSubCommandData = {
+export type aliasLsSubCommandData = {
   name: "ls";
   options: [];
   type: number;
@@ -25,7 +25,7 @@ export const ls = async ({
   req,
   res,
   dbServices,
-}: CommandHandlerOptions<AliasMsgLsCommandData>): Promise<Response | null> => {
+}: CommandHandlerOptions<aliasLsCommandData>): Promise<Response | null> => {
   const guildId = req.body.guild_id;
 
   if (dbServices && guildId) {

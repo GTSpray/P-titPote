@@ -8,9 +8,9 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
-import { AliasMsgSetCommandData, set } from "./aliasmsg/set.js";
-import { AliasMsgSayCommandData, say } from "./aliasmsg/say.js";
-import { AliasMsgLsCommandData, ls } from "./aliasmsg/ls.js";
+import { aliasSetCommandData, set } from "./alias/set.js";
+import { aliasSayCommandData, say } from "./alias/say.js";
+import { aliasLsCommandData, ls } from "./alias/ls.js";
 import { Response } from "express";
 import { logger } from "../../logger.js";
 
@@ -72,11 +72,11 @@ const ValidCommandPayload = z.object({
     .min(1),
 });
 
-export type AliasMsgDataOpts =
-  | AliasMsgSetCommandData
-  | AliasMsgSayCommandData
-  | AliasMsgLsCommandData;
-export const aliasmsg: SlashCommandDeclaration<AliasMsgDataOpts> = {
+export type aliasDataOpts =
+  | aliasSetCommandData
+  | aliasSayCommandData
+  | aliasLsCommandData;
+export const alias: SlashCommandDeclaration<aliasDataOpts> = {
   builder,
   handler: async function (handlerOpts) {
     const { req, res } = handlerOpts;

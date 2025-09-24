@@ -1,8 +1,8 @@
 import {
-  AliasMsgSayCommandData,
-  AliasMsgSaySubCommandData,
+  aliasSayCommandData,
+  aliasSaySubCommandData,
   say,
-} from "../../../../../src/commands/slash/aliasmsg/say.js";
+} from "../../../../../src/commands/slash/alias/say.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
@@ -27,9 +27,9 @@ import {
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
 
-describe("/aliasmsg say", () => {
+describe("/alias say", () => {
   let guild_id: string;
-  let handlerOpts: CommandHandlerOptions<AliasMsgSayCommandData>;
+  let handlerOpts: CommandHandlerOptions<aliasSayCommandData>;
 
   const aliasOpts: SubCommandOption<"alias", string> = {
     name: "alias",
@@ -37,7 +37,7 @@ describe("/aliasmsg say", () => {
     value: "welcome",
   };
 
-  const subcommand: AliasMsgSaySubCommandData = {
+  const subcommand: aliasSaySubCommandData = {
     name: "say",
     options: [aliasOpts],
     type: 1,
@@ -49,9 +49,9 @@ describe("/aliasmsg say", () => {
 
   let messageAliased: MessageAliased;
   beforeEach(async () => {
-    const data: AliasMsgSayCommandData = {
+    const data: aliasSayCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [subcommand],
       type: 1,
     };
@@ -96,9 +96,9 @@ describe("/aliasmsg say", () => {
   it("should not respond with aliased message content of another guild", async () => {
     const { req, res } = getInteractionHttpMock({
       guild_id: randomDiscordId19(),
-      data: <AliasMsgSayCommandData>{
+      data: <aliasSayCommandData>{
         id: randomDiscordId19(),
-        name: "aliasmsg",
+        name: "alias",
         options: [subcommand],
         type: 1,
       },
@@ -150,7 +150,7 @@ describe("/aliasmsg say", () => {
       getRandomString({ length: 51, letter: true, number: false }),
     ],
   ])('should respond error on %s "alias"', async (code, issue, badAlias) => {
-    const badsubcommand: AliasMsgSaySubCommandData = {
+    const badsubcommand: aliasSaySubCommandData = {
       name: "say",
       options: [
         {
@@ -162,10 +162,10 @@ describe("/aliasmsg say", () => {
       type: 1,
     };
 
-    const { req, res } = getInteractionHttpMock<AliasMsgSayCommandData>({
+    const { req, res } = getInteractionHttpMock<aliasSayCommandData>({
       data: {
         id: randomDiscordId19(),
-        name: "aliasmsg",
+        name: "alias",
         options: [badsubcommand],
         type: 1,
       },

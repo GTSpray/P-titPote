@@ -9,14 +9,14 @@ import {
 import { logger } from "../../../logger.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 
-export interface AliasMsgSayCommandData {
+export interface aliasSayCommandData {
   id: string;
   name: string;
-  options: [AliasMsgSaySubCommandData];
+  options: [aliasSaySubCommandData];
   type: number;
 }
 
-export type AliasMsgSaySubCommandData = {
+export type aliasSaySubCommandData = {
   name: "say";
   options: [SubCommandOption<"alias", string>];
   type: number;
@@ -31,8 +31,8 @@ const ValidAliasMessage = z.object({
 });
 
 export const say = async (
-  { req, res, dbServices }: CommandHandlerOptions<AliasMsgSayCommandData>,
-  subcommand: AliasMsgSaySubCommandData,
+  { req, res, dbServices }: CommandHandlerOptions<aliasSayCommandData>,
+  subcommand: aliasSaySubCommandData,
 ): Promise<Response | null> => {
   const guildId = req.body.guild_id;
   const [alias] = subcommand.options;

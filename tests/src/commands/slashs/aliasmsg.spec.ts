@@ -1,28 +1,28 @@
 import {
-  aliasmsg,
-  type AliasMsgDataOpts,
-} from "../../../../src/commands/slash/aliasmsg.js";
+  alias,
+  type aliasDataOpts,
+} from "../../../../src/commands/slash/alias.js";
 import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
-import * as setModule from "../../../../src/commands/slash/aliasmsg/set.js";
-import * as sayModule from "../../../../src/commands/slash/aliasmsg/say.js";
-import * as lsModule from "../../../../src/commands/slash/aliasmsg/ls.js";
+import * as setModule from "../../../../src/commands/slash/alias/set.js";
+import * as sayModule from "../../../../src/commands/slash/alias/say.js";
+import * as lsModule from "../../../../src/commands/slash/alias/ls.js";
 import { DBServices, initORM } from "../../../../src/db/db.js";
-import { type AliasMsgSetSubCommandData } from "../../../../src/commands/slash/aliasmsg/set.js";
-import { type AliasMsgSaySubCommandData } from "../../../../src/commands/slash/aliasmsg/say.js";
-import { type AliasMsgLsSubCommandData } from "../../../../src/commands/slash/aliasmsg/ls.js";
+import { type aliasSetSubCommandData } from "../../../../src/commands/slash/alias/set.js";
+import { type aliasSaySubCommandData } from "../../../../src/commands/slash/alias/say.js";
+import { type aliasLsSubCommandData } from "../../../../src/commands/slash/alias/ls.js";
 import {
   InteractionContextType,
   ApplicationIntegrationType,
   PermissionFlagsBits,
 } from "discord.js";
 
-describe("/aliasmsg", () => {
-  let handlerOpts: CommandHandlerOptions<AliasMsgDataOpts>;
+describe("/alias", () => {
+  let handlerOpts: CommandHandlerOptions<aliasDataOpts>;
 
   it("should declare a slash command", () => {
-    const declaration = aliasmsg.builder.setName("aliasmsg");
+    const declaration = alias.builder.setName("alias");
     expect(declaration.toJSON()).toMatchObject({
       description: "Alias un message",
       contexts: [
@@ -41,7 +41,7 @@ describe("/aliasmsg", () => {
   });
 
   describe("set subcommand", () => {
-    const subcommand: AliasMsgSetSubCommandData = {
+    const subcommand: aliasSetSubCommandData = {
       name: "set",
       options: [
         {
@@ -57,9 +57,9 @@ describe("/aliasmsg", () => {
       ],
       type: 1,
     };
-    const data: setModule.AliasMsgSetCommandData = {
+    const data: setModule.aliasSetCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [subcommand],
       type: 1,
     };
@@ -75,7 +75,7 @@ describe("/aliasmsg", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
+      const declaration = alias.builder.setName("alias");
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
@@ -104,7 +104,7 @@ describe("/aliasmsg", () => {
         dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
-      await aliasmsg.handler(fakeOpts);
+      await alias.handler(fakeOpts);
 
       expect(spy).toHaveBeenCalledWith(fakeOpts, subcommand);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -117,14 +117,14 @@ describe("/aliasmsg", () => {
 
       vi.spyOn(setModule, "set").mockResolvedValue(fakeResp);
 
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await alias.handler(handlerOpts);
 
       expect(response).toStrictEqual(fakeResp);
     });
   });
 
   describe("say subcommand", () => {
-    const subcommand: AliasMsgSaySubCommandData = {
+    const subcommand: aliasSaySubCommandData = {
       name: "say",
       options: [
         {
@@ -135,9 +135,9 @@ describe("/aliasmsg", () => {
       ],
       type: 1,
     };
-    const data: sayModule.AliasMsgSayCommandData = {
+    const data: sayModule.aliasSayCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [subcommand],
       type: 1,
     };
@@ -153,7 +153,7 @@ describe("/aliasmsg", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
+      const declaration = alias.builder.setName("alias");
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
@@ -178,7 +178,7 @@ describe("/aliasmsg", () => {
         dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
-      await aliasmsg.handler(fakeOpts);
+      await alias.handler(fakeOpts);
 
       expect(spy).toHaveBeenCalledWith(fakeOpts, subcommand);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -191,21 +191,21 @@ describe("/aliasmsg", () => {
 
       vi.spyOn(sayModule, "say").mockResolvedValue(fakeResp);
 
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await alias.handler(handlerOpts);
 
       expect(response).toStrictEqual(fakeResp);
     });
   });
 
   describe("ls subcommand", () => {
-    const subcommand: AliasMsgLsSubCommandData = {
+    const subcommand: aliasLsSubCommandData = {
       name: "ls",
       options: [],
       type: 1,
     };
-    const data: lsModule.AliasMsgLsCommandData = {
+    const data: lsModule.aliasLsCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [subcommand],
       type: 1,
     };
@@ -221,7 +221,7 @@ describe("/aliasmsg", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
+      const declaration = alias.builder.setName("alias");
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
@@ -241,7 +241,7 @@ describe("/aliasmsg", () => {
         dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
-      await aliasmsg.handler(fakeOpts);
+      await alias.handler(fakeOpts);
 
       expect(spy).toHaveBeenCalledWith(fakeOpts);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -254,7 +254,7 @@ describe("/aliasmsg", () => {
 
       vi.spyOn(lsModule, "ls").mockResolvedValue(fakeResp);
 
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await alias.handler(handlerOpts);
 
       expect(response).toStrictEqual(fakeResp);
     });
@@ -263,14 +263,14 @@ describe("/aliasmsg", () => {
   describe("on invalid subcommand option", () => {
     const data = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [
         {
           name: "unexistingsubcommand",
         },
       ],
       type: 1,
-    } as unknown as setModule.AliasMsgSetCommandData;
+    } as unknown as setModule.aliasSetCommandData;
 
     beforeEach(async () => {
       const { req, res } = getInteractionHttpMock({ data });
@@ -283,7 +283,7 @@ describe("/aliasmsg", () => {
     });
 
     it("should return invalid subcommand result", async () => {
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await alias.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(400, {
         error: "invalid subcommand",
@@ -296,17 +296,17 @@ describe("/aliasmsg", () => {
 
   describe("on invalid command option", () => {
     let dbServices: DBServices;
-    aliasmsg;
+    alias;
     const validdata = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [
         {
           name: "validsubcommandname",
         },
       ],
       type: 1,
-    } as unknown as AliasMsgDataOpts;
+    } as unknown as aliasDataOpts;
 
     beforeEach(async () => {
       dbServices = await initORM();
@@ -350,7 +350,7 @@ describe("/aliasmsg", () => {
 
         let handlerOpts: any = { req, res, dbServices };
 
-        const response = await aliasmsg.handler(handlerOpts);
+        const response = await alias.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
           error: "invalid command payload",
@@ -382,7 +382,7 @@ describe("/aliasmsg", () => {
 
         let handlerOpts: any = { req, res, dbServices };
 
-        const response = await aliasmsg.handler(handlerOpts);
+        const response = await alias.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
           error: "invalid command payload",
