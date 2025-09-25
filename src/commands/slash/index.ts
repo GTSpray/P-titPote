@@ -1,10 +1,8 @@
 import type { SlashCommandDeclaration } from "../commands.js";
-import { version } from "./version.js";
 import { alias } from "./alias/index.js";
 import { gimme } from "./gimme/index.js";
 
 export const slashcommands: Record<string, SlashCommandDeclaration<any>> = {
-  version,
   alias,
   gimme,
 };

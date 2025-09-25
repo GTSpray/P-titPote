@@ -1,5 +1,6 @@
 import {
   aliasLsCommandData,
+  aliasLsSubCommandData,
   ls,
 } from "../../../../../src/commands/slash/alias/ls.js";
 import {
@@ -29,10 +30,15 @@ describe("/alias ls", () => {
   >;
 
   beforeEach(async () => {
+    const subcommand: aliasLsSubCommandData = {
+      name: "ls",
+      options: [],
+      type: 1,
+    };
     const data: aliasLsCommandData = {
       id: randomDiscordId19(),
       name: "alias",
-      options: [],
+      options: [subcommand],
       type: 1,
     };
     const { req, res } = getInteractionHttpMock({ data });

@@ -11,6 +11,7 @@ import {
 import { Response } from "express";
 import { logger } from "../../../logger.js";
 import { gimmeOtterCommandData, otter } from "./otter.js";
+import { gimmeVersionCommandData, version } from "./version.js";
 import {
   emoji,
   gimmeEmojiCommandData,
@@ -39,6 +40,11 @@ const builder = new SlashCommandBuilder()
       .setDescription(
         `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
       ),
+  )
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("version")
+      .setDescription("Affiche la version de P'titPote Bot"),
   );
 
 const ValidCommandPayload = z.object({
@@ -53,7 +59,10 @@ const ValidCommandPayload = z.object({
     .min(1),
 });
 
-export type gimmeDataOpts = gimmeOtterCommandData | gimmeEmojiCommandData;
+export type gimmeDataOpts =
+  | gimmeOtterCommandData
+  | gimmeEmojiCommandData
+  | gimmeVersionCommandData;
 
 export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
   builder,
@@ -75,6 +84,9 @@ export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
         break;
       case "emoji":
         result = await emoji(<any>handlerOpts);
+        break;
+      case "version":
+        result = await version(<any>handlerOpts);
         break;
       default:
         result = res.status(400).json({

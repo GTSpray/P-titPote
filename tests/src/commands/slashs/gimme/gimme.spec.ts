@@ -7,16 +7,13 @@ import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import * as otterModule from "../../../../../src/commands/slash/gimme/otter.js";
 import * as emojiModule from "../../../../../src/commands/slash/gimme/emoji.js";
+import * as versionModule from "../../../../../src/commands/slash/gimme/version.js";
 import { DBServices, initORM } from "../../../../../src/db/db.js";
 import {
   InteractionContextType,
   ApplicationIntegrationType,
   PermissionFlagsBits,
 } from "discord.js";
-import {
-  stealemoji_emojiLimit,
-  stealemoji_msgLimit,
-} from "../../../../../src/commands/slash/gimme/emoji.js";
 
 describe("/gimme", () => {
   let handlerOpts: CommandHandlerOptions<gimmeDataOpts>;
@@ -63,12 +60,12 @@ describe("/gimme", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = gimme.builder.setName("gimme");
+      const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
+            name: subcommand.name,
             description: "Affiche une image de loutre",
-            name: "otter",
             options: [],
           }),
         ]),
@@ -127,12 +124,12 @@ describe("/gimme", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = gimme.builder.setName("gimme");
+      const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
+            name: subcommand.name,
             description: `Récupère les ${emojiModule.stealemoji_emojiLimit} dernières emotes dans les ${emojiModule.stealemoji_msgLimit} derniers messages de ce chan`,
-            name: "emoji",
             options: [],
           }),
         ]),
@@ -161,6 +158,70 @@ describe("/gimme", () => {
       }) as typeof handlerOpts.res;
 
       vi.spyOn(emojiModule, "emoji").mockResolvedValue(fakeResp);
+
+      const response = await gimme.handler(handlerOpts);
+
+      expect(response).toStrictEqual(fakeResp);
+    });
+  });
+
+  describe("version subcommand", () => {
+    const subcommand: versionModule.gimmeVersionSubCommandData = {
+      name: "version",
+      type: 1,
+    };
+    const data: emojiModule.gimmeEmojiCommandData = {
+      id: randomDiscordId19(),
+      name: "gimme",
+      options: [subcommand],
+      type: 1,
+    };
+
+    beforeEach(async () => {
+      const { req, res } = getInteractionHttpMock({ data });
+      const dbServices = await initORM();
+      handlerOpts = {
+        req,
+        res,
+        dbServices,
+      };
+    });
+
+    it("should be declared as subcommand", () => {
+      const declaration = gimme.builder.setName(subcommand.name);
+      expect(declaration.toJSON()).toMatchObject({
+        options: expect.arrayContaining([
+          expect.objectContaining({
+            name: subcommand.name,
+            description: "Affiche la version de P'titPote Bot",
+            options: [],
+          }),
+        ]),
+      });
+    });
+
+    it('should call "version" handler', async () => {
+      using spy = vi
+        .spyOn(versionModule, "version")
+        .mockResolvedValue(handlerOpts.res);
+
+      const fakeOpts = {
+        ...handlerOpts,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      await gimme.handler(fakeOpts);
+
+      expect(spy).toHaveBeenCalledWith(fakeOpts);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return "verison" handler result', async () => {
+      const fakeResp = (<unknown>{
+        perceval: "j'aime les fruits en sirop",
+      }) as typeof handlerOpts.res;
+
+      vi.spyOn(versionModule, "version").mockResolvedValue(fakeResp);
 
       const response = await gimme.handler(handlerOpts);
 

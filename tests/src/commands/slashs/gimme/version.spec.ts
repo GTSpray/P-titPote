@@ -7,19 +7,21 @@ import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import {
-  gimmeOtterCommandData,
-  gimmeOtterSubCommandData,
-  otter,
-} from "../../../../../src/commands/slash/gimme/otter.js";
+  gimmeVersionCommandData,
+  gimmeVersionSubCommandData,
+  version,
+} from "../../../../../src/commands/slash/gimme/version.js";
 
-describe("/gimme otter", () => {
-  let handlerOpts: CommandHandlerOptions<gimmeOtterCommandData>;
+import * as getRandomEmojiModule from "../../../../../src/utils/getRandomEmoji.js";
 
-  const subcommand: gimmeOtterSubCommandData = {
-    name: "otter",
+describe("/gimme version", () => {
+  let handlerOpts: CommandHandlerOptions<gimmeVersionCommandData>;
+
+  const subcommand: gimmeVersionSubCommandData = {
+    name: "version",
     type: 1,
   };
-  const data: gimmeOtterCommandData = {
+  const data: gimmeVersionCommandData = {
     id: randomDiscordId19(),
     name: "gimme",
     options: [subcommand],
@@ -37,7 +39,10 @@ describe("/gimme otter", () => {
   });
 
   it("should respond to version interaction with bot version message", async () => {
-    const response = await otter(handlerOpts);
+    const anEmote = "🫖";
+    vi.spyOn(getRandomEmojiModule, "getRandomEmoji").mockReturnValue(anEmote);
+
+    const response = await version(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -46,18 +51,7 @@ describe("/gimme otter", () => {
         components: [
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "Voilà.. ce que j'ai trouvé",
-          },
-          {
-            type: MessageComponentTypes.MEDIA_GALLERY,
-            items: [
-              {
-                description: "otter",
-                media: {
-                  url: "https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true",
-                },
-              },
-            ],
+            content: `Hello here ${anEmote}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
           },
         ],
       },

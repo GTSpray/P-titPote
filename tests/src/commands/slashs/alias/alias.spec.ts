@@ -75,12 +75,12 @@ describe("/alias", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = alias.builder.setName("alias");
+      const declaration = alias.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
+            name: subcommand.name,
             description: "definit un alias message",
-            name: "set",
             options: [
               {
                 description: "alias du message",
@@ -153,12 +153,12 @@ describe("/alias", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = alias.builder.setName("alias");
+      const declaration = alias.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
+            name: subcommand.name,
             description: "demande a p'titpote d'envoyer le message",
-            name: "say",
             options: [
               {
                 description: "alias du message",
@@ -221,12 +221,12 @@ describe("/alias", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = alias.builder.setName("alias");
+      const declaration = alias.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
+            name: subcommand.name,
             description: "liste les alias disponnibles sur ton serveur",
-            name: "ls",
             options: [],
           }),
         ]),
