@@ -1,30 +1,27 @@
 import {
-  aliasmsg,
-  type AliasMsgDataOpts,
-} from "../../../../src/commands/slash/aliasmsg.js";
-import { getInteractionHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../src/commands/commands.js";
-import * as setModule from "../../../../src/commands/slash/aliasmsg/set.js";
-import * as sayModule from "../../../../src/commands/slash/aliasmsg/say.js";
-import * as lsModule from "../../../../src/commands/slash/aliasmsg/ls.js";
-import { DBServices, initORM } from "../../../../src/db/db.js";
-import { type AliasMsgSetSubCommandData } from "../../../../src/commands/slash/aliasmsg/set.js";
-import { type AliasMsgSaySubCommandData } from "../../../../src/commands/slash/aliasmsg/say.js";
-import { type AliasMsgLsSubCommandData } from "../../../../src/commands/slash/aliasmsg/ls.js";
+  gimme,
+  type gimmeDataOpts,
+} from "../../../../../src/commands/slash/gimme/index.js";
+import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
+import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
+import * as otterModule from "../../../../../src/commands/slash/gimme/otter.js";
+import * as emojiModule from "../../../../../src/commands/slash/gimme/emoji.js";
+import * as versionModule from "../../../../../src/commands/slash/gimme/version.js";
+import { DBServices, initORM } from "../../../../../src/db/db.js";
 import {
   InteractionContextType,
   ApplicationIntegrationType,
   PermissionFlagsBits,
 } from "discord.js";
 
-describe("/aliasmsg", () => {
-  let handlerOpts: CommandHandlerOptions<AliasMsgDataOpts>;
+describe("/gimme", () => {
+  let handlerOpts: CommandHandlerOptions<gimmeDataOpts>;
 
   it("should declare a slash command", () => {
-    const declaration = aliasmsg.builder.setName("aliasmsg");
+    const declaration = gimme.builder.setName("gimme");
     expect(declaration.toJSON()).toMatchObject({
-      description: "Alias un message",
+      description: "Récupère une image",
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -40,26 +37,14 @@ describe("/aliasmsg", () => {
     });
   });
 
-  describe("set subcommand", () => {
-    const subcommand: AliasMsgSetSubCommandData = {
-      name: "set",
-      options: [
-        {
-          name: "alias",
-          type: 3,
-          value: "welcome",
-        },
-        {
-          name: "message",
-          type: 3,
-          value: "Bienvenue sur le serveur de test de p'tit pote !!!!",
-        },
-      ],
+  describe("otter subcommand", () => {
+    const subcommand: otterModule.gimmeOtterSubCommandData = {
+      name: "otter",
       type: 1,
     };
-    const data: setModule.AliasMsgSetCommandData = {
+    const data: otterModule.gimmeOtterCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "gimme",
       options: [subcommand],
       type: 1,
     };
@@ -75,186 +60,170 @@ describe("/aliasmsg", () => {
     });
 
     it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
+      const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
-            description: "definit un alias message",
-            name: "set",
-            options: [
-              {
-                description: "alias du message",
-                name: "alias",
-              },
-              {
-                description: "contenu du message",
-                name: "message",
-              },
-            ].map((e) => expect.objectContaining(e)),
-          }),
-        ]),
-      });
-    });
-
-    it('should call "set" handler', async () => {
-      using spy = vi.spyOn(setModule, "set").mockResolvedValue(handlerOpts.res);
-
-      const fakeOpts = {
-        ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
-      } as unknown as typeof handlerOpts;
-
-      await aliasmsg.handler(fakeOpts);
-
-      expect(spy).toHaveBeenCalledWith(fakeOpts, subcommand);
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it('should return "set" handler result', async () => {
-      const fakeResp = (<unknown>{
-        perceval: "j'aime les fruits en sirop",
-      }) as typeof handlerOpts.res;
-
-      vi.spyOn(setModule, "set").mockResolvedValue(fakeResp);
-
-      const response = await aliasmsg.handler(handlerOpts);
-
-      expect(response).toStrictEqual(fakeResp);
-    });
-  });
-
-  describe("say subcommand", () => {
-    const subcommand: AliasMsgSaySubCommandData = {
-      name: "say",
-      options: [
-        {
-          name: "alias",
-          type: 3,
-          value: "welcome",
-        },
-      ],
-      type: 1,
-    };
-    const data: sayModule.AliasMsgSayCommandData = {
-      id: randomDiscordId19(),
-      name: "aliasmsg",
-      options: [subcommand],
-      type: 1,
-    };
-
-    beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
-      const dbServices = await initORM();
-      handlerOpts = {
-        req,
-        res,
-        dbServices,
-      };
-    });
-
-    it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
-      expect(declaration.toJSON()).toMatchObject({
-        options: expect.arrayContaining([
-          expect.objectContaining({
-            description: "demande a p'titpote d'envoyer le message",
-            name: "say",
-            options: [
-              {
-                description: "alias du message",
-                name: "alias",
-              },
-            ].map((e) => expect.objectContaining(e)),
-          }),
-        ]),
-      });
-    });
-
-    it('should call "say" handler', async () => {
-      using spy = vi.spyOn(sayModule, "say").mockResolvedValue(handlerOpts.res);
-
-      const fakeOpts = {
-        ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
-      } as unknown as typeof handlerOpts;
-
-      await aliasmsg.handler(fakeOpts);
-
-      expect(spy).toHaveBeenCalledWith(fakeOpts, subcommand);
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it('should return "say" handler result', async () => {
-      const fakeResp = (<unknown>{
-        perceval: "j'aime les fruits en sirop",
-      }) as typeof handlerOpts.res;
-
-      vi.spyOn(sayModule, "say").mockResolvedValue(fakeResp);
-
-      const response = await aliasmsg.handler(handlerOpts);
-
-      expect(response).toStrictEqual(fakeResp);
-    });
-  });
-
-  describe("ls subcommand", () => {
-    const subcommand: AliasMsgLsSubCommandData = {
-      name: "ls",
-      options: [],
-      type: 1,
-    };
-    const data: lsModule.AliasMsgLsCommandData = {
-      id: randomDiscordId19(),
-      name: "aliasmsg",
-      options: [subcommand],
-      type: 1,
-    };
-
-    beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
-      const dbServices = await initORM();
-      handlerOpts = {
-        req,
-        res,
-        dbServices,
-      };
-    });
-
-    it("should be declared as subcommand", () => {
-      const declaration = aliasmsg.builder.setName("aliasmsg");
-      expect(declaration.toJSON()).toMatchObject({
-        options: expect.arrayContaining([
-          expect.objectContaining({
-            description: "liste les alias disponnibles sur ton serveur",
-            name: "ls",
+            name: subcommand.name,
+            description: "Affiche une image de loutre",
             options: [],
           }),
         ]),
       });
     });
 
-    it('should call "ls" handler', async () => {
-      using spy = vi.spyOn(lsModule, "ls").mockResolvedValue(handlerOpts.res);
+    it('should call "otter" handler', async () => {
+      using spy = vi
+        .spyOn(otterModule, "otter")
+        .mockResolvedValue(handlerOpts.res);
 
       const fakeOpts = {
         ...handlerOpts,
         dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
-      await aliasmsg.handler(fakeOpts);
+      await gimme.handler(fakeOpts);
 
       expect(spy).toHaveBeenCalledWith(fakeOpts);
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should return "ls" handler result', async () => {
+    it('should return "otter" handler result', async () => {
       const fakeResp = (<unknown>{
         perceval: "j'aime les fruits en sirop",
       }) as typeof handlerOpts.res;
 
-      vi.spyOn(lsModule, "ls").mockResolvedValue(fakeResp);
+      vi.spyOn(otterModule, "otter").mockResolvedValue(fakeResp);
 
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await gimme.handler(handlerOpts);
+
+      expect(response).toStrictEqual(fakeResp);
+    });
+  });
+
+  describe("emoji subcommand", () => {
+    const subcommand: emojiModule.gimmeEmojiSubCommandData = {
+      name: "emoji",
+      type: 1,
+    };
+    const data: emojiModule.gimmeEmojiCommandData = {
+      id: randomDiscordId19(),
+      name: "gimme",
+      options: [subcommand],
+      type: 1,
+    };
+
+    beforeEach(async () => {
+      const { req, res } = getInteractionHttpMock({ data });
+      const dbServices = await initORM();
+      handlerOpts = {
+        req,
+        res,
+        dbServices,
+      };
+    });
+
+    it("should be declared as subcommand", () => {
+      const declaration = gimme.builder.setName(subcommand.name);
+      expect(declaration.toJSON()).toMatchObject({
+        options: expect.arrayContaining([
+          expect.objectContaining({
+            name: subcommand.name,
+            description: `Récupère les ${emojiModule.stealemoji_emojiLimit} dernières emotes dans les ${emojiModule.stealemoji_msgLimit} derniers messages de ce chan`,
+            options: [],
+          }),
+        ]),
+      });
+    });
+
+    it('should call "emoji" handler', async () => {
+      using spy = vi
+        .spyOn(emojiModule, "emoji")
+        .mockResolvedValue(handlerOpts.res);
+
+      const fakeOpts = {
+        ...handlerOpts,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      await gimme.handler(fakeOpts);
+
+      expect(spy).toHaveBeenCalledWith(fakeOpts);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return "emoji" handler result', async () => {
+      const fakeResp = (<unknown>{
+        perceval: "j'aime les fruits en sirop",
+      }) as typeof handlerOpts.res;
+
+      vi.spyOn(emojiModule, "emoji").mockResolvedValue(fakeResp);
+
+      const response = await gimme.handler(handlerOpts);
+
+      expect(response).toStrictEqual(fakeResp);
+    });
+  });
+
+  describe("version subcommand", () => {
+    const subcommand: versionModule.gimmeVersionSubCommandData = {
+      name: "version",
+      type: 1,
+    };
+    const data: emojiModule.gimmeEmojiCommandData = {
+      id: randomDiscordId19(),
+      name: "gimme",
+      options: [subcommand],
+      type: 1,
+    };
+
+    beforeEach(async () => {
+      const { req, res } = getInteractionHttpMock({ data });
+      const dbServices = await initORM();
+      handlerOpts = {
+        req,
+        res,
+        dbServices,
+      };
+    });
+
+    it("should be declared as subcommand", () => {
+      const declaration = gimme.builder.setName(subcommand.name);
+      expect(declaration.toJSON()).toMatchObject({
+        options: expect.arrayContaining([
+          expect.objectContaining({
+            name: subcommand.name,
+            description: "Affiche la version de P'titPote Bot",
+            options: [],
+          }),
+        ]),
+      });
+    });
+
+    it('should call "version" handler', async () => {
+      using spy = vi
+        .spyOn(versionModule, "version")
+        .mockResolvedValue(handlerOpts.res);
+
+      const fakeOpts = {
+        ...handlerOpts,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      await gimme.handler(fakeOpts);
+
+      expect(spy).toHaveBeenCalledWith(fakeOpts);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return "verison" handler result', async () => {
+      const fakeResp = (<unknown>{
+        perceval: "j'aime les fruits en sirop",
+      }) as typeof handlerOpts.res;
+
+      vi.spyOn(versionModule, "version").mockResolvedValue(fakeResp);
+
+      const response = await gimme.handler(handlerOpts);
 
       expect(response).toStrictEqual(fakeResp);
     });
@@ -263,14 +232,14 @@ describe("/aliasmsg", () => {
   describe("on invalid subcommand option", () => {
     const data = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "gimme",
       options: [
         {
           name: "unexistingsubcommand",
         },
       ],
       type: 1,
-    } as unknown as setModule.AliasMsgSetCommandData;
+    } as unknown as otterModule.gimmeOtterCommandData;
 
     beforeEach(async () => {
       const { req, res } = getInteractionHttpMock({ data });
@@ -283,7 +252,7 @@ describe("/aliasmsg", () => {
     });
 
     it("should return invalid subcommand result", async () => {
-      const response = await aliasmsg.handler(handlerOpts);
+      const response = await gimme.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(400, {
         error: "invalid subcommand",
@@ -296,17 +265,17 @@ describe("/aliasmsg", () => {
 
   describe("on invalid command option", () => {
     let dbServices: DBServices;
-    aliasmsg;
+    gimme;
     const validdata = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "gimme",
       options: [
         {
           name: "validsubcommandname",
         },
       ],
       type: 1,
-    } as unknown as AliasMsgDataOpts;
+    } as unknown as otterModule.gimmeOtterCommandData;
 
     beforeEach(async () => {
       dbServices = await initORM();
@@ -350,7 +319,7 @@ describe("/aliasmsg", () => {
 
         let handlerOpts: any = { req, res, dbServices };
 
-        const response = await aliasmsg.handler(handlerOpts);
+        const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
           error: "invalid command payload",
@@ -382,7 +351,7 @@ describe("/aliasmsg", () => {
 
         let handlerOpts: any = { req, res, dbServices };
 
-        const response = await aliasmsg.handler(handlerOpts);
+        const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
           error: "invalid command payload",

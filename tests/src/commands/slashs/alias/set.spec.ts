@@ -1,7 +1,7 @@
 import {
-  AliasMsgSetSubCommandData,
+  aliasSetSubCommandData,
   set,
-} from "../../../../../src/commands/slash/aliasmsg/set.js";
+} from "../../../../../src/commands/slash/alias/set.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
@@ -16,7 +16,7 @@ import {
   CommandHandlerOptions,
   SubCommandOption,
 } from "../../../../../src/commands/commands.js";
-import { AliasMsgSetCommandData } from "../../../../../src/commands/slash/aliasmsg/set.js";
+import { aliasSetCommandData } from "../../../../../src/commands/slash/alias/set.js";
 import { initORM } from "../../../../../src/db/db.js";
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
@@ -30,9 +30,9 @@ import {
 import { expectedDiscordGuild } from "../../../../epectedEntities/expectedDiscordGuild.js";
 import { expectedMessageAliased } from "../../../../epectedEntities/expectedMessageAliased.js";
 
-describe("/aliasmsg set", () => {
+describe("/alias set", () => {
   let guild_id: string;
-  let handlerOpts: CommandHandlerOptions<AliasMsgSetCommandData>;
+  let handlerOpts: CommandHandlerOptions<aliasSetCommandData>;
 
   const aliasOpts: SubCommandOption<"alias", string> = {
     name: "alias",
@@ -45,7 +45,7 @@ describe("/aliasmsg set", () => {
     value: "Bienvenue sur le serveur de test de p'tit pote !!!!",
   };
 
-  const subcommand: AliasMsgSetSubCommandData = {
+  const subcommand: aliasSetSubCommandData = {
     name: "set",
     options: [aliasOpts, msgOpts],
     type: 1,
@@ -55,9 +55,9 @@ describe("/aliasmsg set", () => {
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
   beforeEach(async () => {
-    const data: AliasMsgSetCommandData = {
+    const data: aliasSetCommandData = {
       id: randomDiscordId19(),
-      name: "aliasmsg",
+      name: "alias",
       options: [subcommand],
       type: 1,
     };
@@ -185,17 +185,17 @@ describe("/aliasmsg set", () => {
           type: 3,
           value: "anotheralias",
         };
-        const anotherAliasSubCommand: AliasMsgSetSubCommandData = {
+        const anotherAliasSubCommand: aliasSetSubCommandData = {
           name: "set",
           options: [anotherAliasOpts, msgOpts],
           type: 1,
         };
 
-        const { req, res } = getInteractionHttpMock<AliasMsgSetCommandData>({
+        const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
           guild_id,
           data: {
             id: randomDiscordId19(),
-            name: "aliasmsg",
+            name: "alias",
             options: [anotherAliasSubCommand],
             type: 1,
           },
@@ -261,7 +261,7 @@ describe("/aliasmsg set", () => {
       getRandomString({ length: 51, letter: true, number: false }),
     ],
   ])('should respond error on %s "alias"', async (code, issue, badAlias) => {
-    const badsubcommand: AliasMsgSetSubCommandData = {
+    const badsubcommand: aliasSetSubCommandData = {
       name: "set",
       options: [
         {
@@ -274,10 +274,10 @@ describe("/aliasmsg set", () => {
       type: 1,
     };
 
-    const { req, res } = getInteractionHttpMock<AliasMsgSetCommandData>({
+    const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
       data: {
         id: randomDiscordId19(),
-        name: "aliasmsg",
+        name: "alias",
         options: [badsubcommand],
         type: 1,
       },
@@ -324,7 +324,7 @@ describe("/aliasmsg set", () => {
   ])(
     'should respond error on %s "message"',
     async (code, issue, badMessage) => {
-      const badsubcommand: AliasMsgSetSubCommandData = {
+      const badsubcommand: aliasSetSubCommandData = {
         name: "set",
         options: [
           aliasOpts,
@@ -337,10 +337,10 @@ describe("/aliasmsg set", () => {
         type: 1,
       };
 
-      const { req, res } = getInteractionHttpMock<AliasMsgSetCommandData>({
+      const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
         data: {
           id: randomDiscordId19(),
-          name: "aliasmsg",
+          name: "alias",
           options: [badsubcommand],
           type: 1,
         },

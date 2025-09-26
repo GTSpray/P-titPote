@@ -10,14 +10,14 @@ import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 import { logger } from "../../../logger.js";
 
-export interface AliasMsgSetCommandData {
+export interface aliasSetCommandData {
   id: string;
   name: string;
-  options: [AliasMsgSetSubCommandData];
+  options: [aliasSetSubCommandData];
   type: number;
 }
 
-export type AliasMsgSetSubCommandData = {
+export type aliasSetSubCommandData = {
   name: "set";
   options: [
     SubCommandOption<"alias", string>,
@@ -36,8 +36,8 @@ const ValidAliasMessage = z.object({
 });
 
 export const set = async (
-  { req, res, dbServices }: CommandHandlerOptions<AliasMsgSetCommandData>,
-  subcommand: AliasMsgSetSubCommandData,
+  { req, res, dbServices }: CommandHandlerOptions<aliasSetCommandData>,
+  subcommand: aliasSetSubCommandData,
 ): Promise<Response | null> => {
   const guildId = req.body.guild_id;
   const [alias, msg] = subcommand.options;

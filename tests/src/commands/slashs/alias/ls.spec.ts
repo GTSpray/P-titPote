@@ -1,7 +1,8 @@
 import {
-  AliasMsgLsCommandData,
+  aliasLsCommandData,
+  aliasLsSubCommandData,
   ls,
-} from "../../../../../src/commands/slash/aliasmsg/ls.js";
+} from "../../../../../src/commands/slash/alias/ls.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
@@ -20,19 +21,24 @@ import {
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
 
-describe("/aliasmsg ls", () => {
+describe("/alias ls", () => {
   let guild_id: string;
-  let handlerOpts: CommandHandlerOptions<AliasMsgLsCommandData>;
+  let handlerOpts: CommandHandlerOptions<aliasLsCommandData>;
 
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
 
   beforeEach(async () => {
-    const data: AliasMsgLsCommandData = {
-      id: randomDiscordId19(),
-      name: "aliasmsg",
+    const subcommand: aliasLsSubCommandData = {
+      name: "ls",
       options: [],
+      type: 1,
+    };
+    const data: aliasLsCommandData = {
+      id: randomDiscordId19(),
+      name: "alias",
+      options: [subcommand],
       type: 1,
     };
     const { req, res } = getInteractionHttpMock({ data });

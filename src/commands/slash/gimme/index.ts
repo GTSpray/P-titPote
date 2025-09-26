@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { type SlashCommandDeclaration } from "../commands.js";
+import { type SlashCommandDeclaration } from "../../commands.js";
 import {
   ApplicationIntegrationType,
   InteractionContextType,
@@ -8,14 +8,19 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
-import { AliasMsgSetCommandData, set } from "./aliasmsg/set.js";
-import { AliasMsgSayCommandData, say } from "./aliasmsg/say.js";
-import { AliasMsgLsCommandData, ls } from "./aliasmsg/ls.js";
 import { Response } from "express";
-import { logger } from "../../logger.js";
+import { logger } from "../../../logger.js";
+import { gimmeOtterCommandData, otter } from "./otter.js";
+import { gimmeVersionCommandData, version } from "./version.js";
+import {
+  emoji,
+  gimmeEmojiCommandData,
+  stealemoji_emojiLimit,
+  stealemoji_msgLimit,
+} from "./emoji.js";
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Alias un message")
+  .setDescription("Récupère une image")
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -27,37 +32,19 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   )
   .addSubcommand((subcommand) =>
+    subcommand.setName("otter").setDescription("Affiche une image de loutre"),
+  )
+  .addSubcommand((subcommand) =>
     subcommand
-      .setName("set")
-      .setDescription("definit un alias message")
-      .addStringOption((opt) =>
-        opt
-          .setName("alias")
-          .setDescription("alias du message")
-          .setRequired(true),
-      )
-      .addStringOption((opt) =>
-        opt
-          .setName("message")
-          .setDescription("contenu du message")
-          .setRequired(true),
+      .setName("emoji")
+      .setDescription(
+        `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
       ),
   )
   .addSubcommand((subcommand) =>
     subcommand
-      .setName("say")
-      .setDescription("demande a p'titpote d'envoyer le message")
-      .addStringOption((opt) =>
-        opt
-          .setName("alias")
-          .setDescription("alias du message")
-          .setRequired(true),
-      ),
-  )
-  .addSubcommand((subcommand) =>
-    subcommand
-      .setName("ls")
-      .setDescription("liste les alias disponnibles sur ton serveur"),
+      .setName("version")
+      .setDescription("Affiche la version de P'titPote Bot"),
   );
 
 const ValidCommandPayload = z.object({
@@ -72,11 +59,12 @@ const ValidCommandPayload = z.object({
     .min(1),
 });
 
-export type AliasMsgDataOpts =
-  | AliasMsgSetCommandData
-  | AliasMsgSayCommandData
-  | AliasMsgLsCommandData;
-export const aliasmsg: SlashCommandDeclaration<AliasMsgDataOpts> = {
+export type gimmeDataOpts =
+  | gimmeOtterCommandData
+  | gimmeEmojiCommandData
+  | gimmeVersionCommandData;
+
+export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
   builder,
   handler: async function (handlerOpts) {
     const { req, res } = handlerOpts;
@@ -91,14 +79,14 @@ export const aliasmsg: SlashCommandDeclaration<AliasMsgDataOpts> = {
     const [subcommand] = command.data.options;
     let result: Response | null;
     switch (subcommand.name) {
-      case "set":
-        result = await set(<any>handlerOpts, <any>req.body.data?.options[0]);
+      case "otter":
+        result = await otter(<any>handlerOpts);
         break;
-      case "say":
-        result = await say(<any>handlerOpts, <any>req.body.data?.options[0]);
+      case "emoji":
+        result = await emoji(<any>handlerOpts);
         break;
-      case "ls":
-        result = await ls(<any>handlerOpts);
+      case "version":
+        result = await version(<any>handlerOpts);
         break;
       default:
         result = res.status(400).json({
