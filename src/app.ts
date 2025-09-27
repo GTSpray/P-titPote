@@ -122,7 +122,8 @@ gateway.on(GWSEvent.Payload, (shard, meta) => {
 });
 
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, (_s, p) => {
-  logger.info("emoji recat", { p });
+  const { emoji, user_id } = p;
+  logger.info("emoji recat", { user_id, emoji });
 });
 
 gateway
