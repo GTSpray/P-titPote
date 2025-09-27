@@ -13,13 +13,11 @@ import { logger } from "./logger.js";
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
-    return;
     logger.info("new sql query", {
       context,
     });
   }
   log(namespace: LoggerNamespace, message: string, context?: LogContext) {
-    return;
     switch (context?.level) {
       case "error":
         logger.error(message, { context });
@@ -49,7 +47,7 @@ const config: Options = defineConfig({
   // we will use the ts-morph reflection, an alternative to the default reflect-metadata provider
   // check the documentation for their differences: https://mikro-orm.io/docs/metadata-providers
   metadataProvider: TsMorphMetadataProvider,
-  debug: false,
+  debug: true,
   loggerFactory: (options) => new CustomLogger(options),
   dynamicImportProvider: (id) => import(id),
   extensions: [Migrator],
