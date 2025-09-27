@@ -62,14 +62,14 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
     for (let i = start; i < end; i++) {
       const oldSocket = this.sockets.get(i);
       if (oldSocket) {
+        logger.debug("GatewaySocket.connect close", { i });
         await oldSocket.close();
       }
 
       const co = new Connection(this, i);
       this.sockets.set(i, co);
-      logger.debug("GatewaySocket.connect connect");
       const { timeReady } = await co.connect();
-      logger.debug("GatewaySocket.connect", { timeReady });
+      logger.debug("GatewaySocket.connect", { i, timeReady });
       this.lastReady = timeReady;
     }
   }
