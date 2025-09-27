@@ -7,4 +7,3 @@ if (!process.env.BOT_TOKEN) {
 }
 
 export const gateway = new GatewaySocket(process.env.BOT_TOKEN, 4);
-

@@ -102,12 +102,9 @@ export class Connection {
         this.socket?.once(
           "message",
           parse((payload: { d: { heartbeat_interval: number } }) => {
-            this.main.emit(
-              "DEBUG",
-              this.shard,
-              "recieved heartbeat info",
-              {payload},
-            );
+            this.main.emit("DEBUG", this.shard, "recieved heartbeat info", {
+              payload,
+            });
             this.hbinterval = payload.d.heartbeat_interval;
             this.hbfunc = this.beat;
             if (this.hbtimer) {
@@ -127,22 +124,14 @@ export class Connection {
         );
       });
       this.socket?.once("close", (code: string, reason: string) => {
-        this.main.emit(
-          "DEBUG",
-          this.shard,
-          "server closed connection. code",
-          {code, reason}
-          
-        );
+        this.main.emit("DEBUG", this.shard, "server closed connection. code", {
+          code,
+          reason,
+        });
         setTimeout(() => this.close().then(() => this.connect()), 10000);
       });
       this.socket?.once("error", (e) => {
-        this.main.emit(
-          "DEBUG",
-          this.shard,
-          "recieved error",
-          e
-        );
+        this.main.emit("DEBUG", this.shard, "recieved error", e);
         setTimeout(() => this.close().then(() => this.connect()), 5000);
       });
     });

@@ -2,7 +2,7 @@ import EventEmitter from "node:events";
 import { Connection } from "./Connection.js";
 import { discordapi } from "../utils/discordapi.js";
 import { APIGatewayBotInfo, Routes } from "discord.js";
-import { logger } from '../logger.js'
+import { logger } from "../logger.js";
 
 export class GatewaySocket extends EventEmitter {
   public token: string;
@@ -16,7 +16,7 @@ export class GatewaySocket extends EventEmitter {
     this.shards = shards ? shards : null;
     this.sockets = new Map();
     this.lastReady = 0;
-    this.url = ''
+    this.url = "";
   }
 
   async connect(start = 0, end?: number) {
@@ -24,7 +24,7 @@ export class GatewaySocket extends EventEmitter {
       Routes.gatewayBot(),
     )) as APIGatewayBotInfo;
 
-    logger.debug('GatewaySocket.connect', { url, shards })
+    logger.debug("GatewaySocket.connect", { url, shards });
 
     this.url = url;
     if (isNaN(<number>this.shards)) {
@@ -40,9 +40,9 @@ export class GatewaySocket extends EventEmitter {
 
       const co = new Connection(this, i);
       this.sockets.set(i, co);
-      logger.debug('GatewaySocket.connect connect');
+      logger.debug("GatewaySocket.connect connect");
       const { timeReady } = await co.connect();
-      logger.debug('GatewaySocket.connect',  { timeReady })
+      logger.debug("GatewaySocket.connect", { timeReady });
       this.lastReady = timeReady;
     }
   }

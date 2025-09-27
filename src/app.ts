@@ -14,7 +14,7 @@ import { slashcommands } from "./commands/slash/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
-import { gateway } from "./gateway/index.js"
+import { gateway } from "./gateway/index.js";
 
 const orm = initORM(config);
 
@@ -26,25 +26,28 @@ const app = express();
 
 const PORT = process.env.APP_PORT || 3000;
 
-gateway.on('DEBUG', (shard: number, debugmsg: string, meta?: any) => {
-    logger.debug('gateway', { shard, debugmsg, meta });
+gateway.on("DEBUG", (shard: number, debugmsg: string, meta?: any) => {
+  logger.debug("gateway", { shard, debugmsg, meta });
 });
-gateway.connect().then(()=> {
-  logger.debug('gateway connected');
-})
-.catch((err)=> { logger.error('gateway', {err})}) 
-.finally(()=> {
-   logger.debug('gateway');
-})
+gateway
+  .connect()
+  .then(() => {
+    logger.debug("gateway connected");
+  })
+  .catch((err) => {
+    logger.error("gateway", { err });
+  })
+  .finally(() => {
+    logger.debug("gateway");
+  });
 
-gateway.on('MESSAGE_CREATE', (shard, data) => {
-  logger.debug('gateway msg', {shard, data});
+gateway.on("MESSAGE_CREATE", (shard, data) => {
+  logger.debug("gateway msg", { shard, data });
 });
 
-gateway.on('PAYLOAD', (shard, meta) => {
-  logger.debug('gateway payload', {shard, meta});
+gateway.on("PAYLOAD", (shard, meta) => {
+  logger.debug("gateway payload", { shard, meta });
 });
-
 
 app.use(function (req: Request, res: Response, next: NextFunction) {
   req.requestId = v4();
