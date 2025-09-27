@@ -1,9 +1,10 @@
-import { GatewaySocket } from "./GatewaySocket";
+import "dotenv/config";
 
-const socket = new GatewaySocket(process.env.BOT_TOKEN);
+import { GatewaySocket } from "./GatewaySocket.js";
 
-socket.connect(0);
+if (!process.env.BOT_TOKEN) {
+  throw Error("no APP_ID provided in env");
+}
 
-socket.on("MESSAGE_CREATE", (shard: any, data: { content: any }) => {
-  console.log(shard, data.content);
-});
+export const gateway = new GatewaySocket(process.env.BOT_TOKEN, 4);
+
