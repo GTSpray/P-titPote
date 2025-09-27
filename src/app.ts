@@ -113,14 +113,6 @@ app.listen(PORT, (err) => {
   logger.info(`startup success`, { port: PORT });
 });
 
-gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
-  //logger.debug("gateway", { shard, debugmsg, meta });
-});
-
-gateway.on(GWSEvent.Payload, (shard, meta) => {
-  //logger.debug("gateway payload", { shard, meta });
-});
-
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, (_s, p) => {
   const { emoji, user_id } = p;
   logger.info("emoji recat", { user_id, emoji });
