@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { GatewaySocket } from "./GatewaySocket";
+import { GatewaySocket } from "./GatewaySocket.js";
 
 let parse = (func: {
   (payload: any): void;
@@ -21,8 +21,8 @@ export class Connection {
   hbtimer: null | ReturnType<typeof setTimeout>;
   s: number;
   session: number;
-  shard: any;
-  main: any;
+  shard: number;
+  main: GatewaySocket;
 
   constructor(main: GatewaySocket, shard: number) {
     this.socket = null;
@@ -79,7 +79,7 @@ export class Connection {
     if (this.hbtimer) {
       clearInterval(this.hbtimer);
     }
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (this.socket?.readyState !== 3) {
         this.socket?.close(1001, "cya later alligator");
         this.socket?.removeAllListeners("close");
@@ -105,7 +105,8 @@ export class Connection {
             this.main.emit(
               "DEBUG",
               this.shard,
-              "recieved heartbeat info " + JSON.stringify(payload.d),
+              "recieved heartbeat info",
+              {payload},
             );
             this.hbinterval = payload.d.heartbeat_interval;
             this.hbfunc = this.beat;
@@ -129,11 +130,9 @@ export class Connection {
         this.main.emit(
           "DEBUG",
           this.shard,
-          "server closed connection. code: " +
-            code +
-            ", reason: " +
-            reason +
-            " reconnecting in 10",
+          "server closed connection. code",
+          {code, reason}
+          
         );
         setTimeout(() => this.close().then(() => this.connect()), 10000);
       });
@@ -141,7 +140,8 @@ export class Connection {
         this.main.emit(
           "DEBUG",
           this.shard,
-          "recieved error " + e.message + ", reconnecting in 5",
+          "recieved error",
+          e
         );
         setTimeout(() => this.close().then(() => this.connect()), 5000);
       });
