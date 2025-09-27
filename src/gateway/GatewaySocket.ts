@@ -1,15 +1,42 @@
 import EventEmitter from "node:events";
 import { Connection } from "./Connection.js";
 import { discordapi } from "../utils/discordapi.js";
-import { APIGatewayBotInfo, Routes } from "discord.js";
+import { type APIGatewayBotInfo, Routes } from "discord.js";
 import { logger } from "../logger.js";
+import { type GatewayEvent } from "./gatewaytypes.js";
 
-export class GatewaySocket extends EventEmitter {
+class TypedEventEmitter<TEvents extends Record<string, any>> {
+  private emitter = new EventEmitter();
+
+  emit<TEventName extends keyof TEvents & string>(
+    eventName: TEventName,
+    ...eventArg: TEvents[TEventName]
+  ) {
+    this.emitter.emit(eventName, ...(eventArg as []));
+  }
+
+  on<TEventName extends keyof TEvents & string>(
+    eventName: TEventName,
+    handler: (...eventArg: TEvents[TEventName]) => void,
+  ) {
+    this.emitter.on(eventName, handler as any);
+  }
+
+  off<TEventName extends keyof TEvents & string>(
+    eventName: TEventName,
+    handler: (...eventArg: TEvents[TEventName]) => void,
+  ) {
+    this.emitter.off(eventName, handler as any);
+  }
+}
+
+export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
   public shards: number | null;
   public sockets: Map<number, Connection>;
   public lastReady: number;
   public url: string;
+
   constructor(token: string, shards?: number) {
     super();
     this.token = token;
