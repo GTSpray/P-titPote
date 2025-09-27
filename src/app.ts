@@ -9,6 +9,10 @@ import {
   verifyKeyMiddleware,
 } from "discord-interactions";
 
+import { gateway } from "./gateway/index.js";
+import { GWSEvent } from "./gateway/gatewaytypes.js";
+import { GatewayDispatchEvents } from "discord.js";
+
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
 
@@ -108,3 +112,28 @@ app.listen(PORT, (err) => {
   }
   logger.info(`startup success`, { port: PORT });
 });
+
+gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
+  //logger.debug("gateway", { shard, debugmsg, meta });
+});
+
+gateway.on(GWSEvent.Payload, (shard, meta) => {
+  //logger.debug("gateway payload", { shard, meta });
+});
+
+gateway.on(GatewayDispatchEvents.MessageReactionAdd, (_s, p) => {
+  const { emoji, user_id } = p;
+  logger.info("emoji recat", { user_id, emoji });
+});
+
+gateway
+  .connect()
+  .then(() => {
+    logger.debug("gateway connected");
+  })
+  .catch((err) => {
+    logger.error("gateway", { err });
+  })
+  .finally(() => {
+    logger.debug("gateway");
+  });
