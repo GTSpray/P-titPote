@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 
 import { Response } from "express";
+import { foundItComponnents } from "../../commonMessages.js";
 
 const builder = new SlashCommandBuilder()
   .setDescription("Affiche une image de loutre")
@@ -47,10 +48,7 @@ export const otter = async ({
     data: {
       flags: InteractionResponseFlags.IS_COMPONENTS_V2,
       components: [
-        {
-          type: MessageComponentTypes.TEXT_DISPLAY,
-          content: "Voilà.. ce que j'ai trouvé",
-        },
+        ...foundItComponnents(),
         {
           type: MessageComponentTypes.MEDIA_GALLERY,
           items: [

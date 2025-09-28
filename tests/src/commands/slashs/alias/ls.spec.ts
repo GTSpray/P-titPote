@@ -29,6 +29,14 @@ describe("/alias ls", () => {
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
 
+  const notFoundMessagePayload = {
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      flags: InteractionResponseFlags.EPHEMERAL,
+      content: "ahem... j'ai rien trouvé... 🤷",
+    },
+  };
+
   beforeEach(async () => {
     const subcommand: aliasLsSubCommandData = {
       name: "ls",
@@ -84,7 +92,7 @@ describe("/alias ls", () => {
               content: "Voilà.. ce que j'ai trouvé",
             },
             {
-              type: MessageComponentTypes.SEPARATOR, // ComponentType.SEPARATOR
+              type: MessageComponentTypes.SEPARATOR,
               divider: true,
               spacing: 1,
             },
@@ -115,7 +123,7 @@ describe("/alias ls", () => {
               content: "Voilà.. ce que j'ai trouvé",
             },
             {
-              type: MessageComponentTypes.SEPARATOR, // ComponentType.SEPARATOR
+              type: MessageComponentTypes.SEPARATOR,
               divider: true,
               spacing: 1,
             },
@@ -138,18 +146,7 @@ describe("/alias ls", () => {
 
       const response = await ls(handlerOpts);
 
-      expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-          components: [
-            {
-              type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "ahem... j'ai rien trouvé... 🤷",
-            },
-          ],
-        },
-      });
+      expect(response).toMeetApiResponse(200, notFoundMessagePayload);
     });
 
     it("should not display other guild's alias", async () => {
@@ -174,7 +171,7 @@ describe("/alias ls", () => {
               content: "Voilà.. ce que j'ai trouvé",
             },
             {
-              type: MessageComponentTypes.SEPARATOR, // ComponentType.SEPARATOR
+              type: MessageComponentTypes.SEPARATOR,
               divider: true,
               spacing: 1,
             },
@@ -191,17 +188,6 @@ describe("/alias ls", () => {
   it("should display not found message when no alias", async () => {
     const response = await ls(handlerOpts);
 
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-        components: [
-          {
-            type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "ahem... j'ai rien trouvé... 🤷",
-          },
-        ],
-      },
-    });
+    expect(response).toMeetApiResponse(200, notFoundMessagePayload);
   });
 });

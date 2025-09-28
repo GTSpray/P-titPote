@@ -49,6 +49,11 @@ describe("/gimme otter", () => {
             content: "Voilà.. ce que j'ai trouvé",
           },
           {
+            type: MessageComponentTypes.SEPARATOR,
+            divider: true,
+            spacing: 1,
+          },
+          {
             type: MessageComponentTypes.MEDIA_GALLERY,
             items: [
               {
