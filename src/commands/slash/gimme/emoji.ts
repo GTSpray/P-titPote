@@ -17,6 +17,7 @@ import {
 import { discordapi } from "../../../utils/discordapi.js";
 import { getEmojiUrl } from "../../../utils/getEmojiUrl.js";
 import { ExtractedEmoji, extractEmoji } from "../../../utils/extractEmoji.js";
+import { foundItComponnents, notFoundPayload } from "../../commonMessages.js";
 
 export const stealemoji_emojiLimit = 3;
 export const stealemoji_msgLimit = 10;
@@ -100,47 +101,35 @@ export const emoji = async ({
     nbEmotes: extractedEmotes.length,
   });
 
-  let components = [];
   if (extractedEmotes.length === 0) {
-    components = [
-      {
-        type: MessageComponentTypes.TEXT_DISPLAY,
-        content: `ahem... j'ai rien trouvé... 🤷`,
-      },
-    ];
-  } else {
-    const emojies = await Promise.all(
-      extractedEmotes.map(async (e) => {
-        const url = await getEmojiUrl(e.id);
-        return {
-          ...e,
-          url,
-        };
-      }),
-    );
-
-    logger.debug("extracted emojies", { reqId, emojies });
-
-    components = [
-      {
-        type: MessageComponentTypes.TEXT_DISPLAY,
-        content: "Voilà.. ce que j'ai trouvé",
-      },
-      {
-        type: MessageComponentTypes.MEDIA_GALLERY,
-        items: emojies.map(({ url, name }) => ({
-          description: name,
-          media: { url },
-        })),
-      },
-    ];
+    return res.json(notFoundPayload());
   }
+  const emojies = await Promise.all(
+    extractedEmotes.map(async (e) => {
+      const url = await getEmojiUrl(e.id);
+      return {
+        ...e,
+        url,
+      };
+    }),
+  );
+
+  logger.debug("extracted emojies", { reqId, emojies });
 
   return res.json({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-      components,
+      components: [
+        ...foundItComponnents(),
+        {
+          type: MessageComponentTypes.MEDIA_GALLERY,
+          items: emojies.map(({ url, name }) => ({
+            description: name,
+            media: { url },
+          })),
+        },
+      ],
     },
   });
 };

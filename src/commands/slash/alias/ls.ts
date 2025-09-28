@@ -1,12 +1,12 @@
-import * as z from "zod";
 import { Response } from "express";
-import { CommandHandlerOptions, SubCommandOption } from "../../commands.js";
+import { CommandHandlerOptions } from "../../commands.js";
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
+import { foundItComponnents, notFoundPayload } from "../../commonMessages.js";
 
 export interface aliasLsCommandData {
   id: string;
@@ -38,23 +38,10 @@ export const ls = async ({
 
     let components = [];
     if (messageAliaseds.length == 0) {
-      components = [
-        {
-          type: MessageComponentTypes.TEXT_DISPLAY,
-          content: `ahem... j'ai rien trouvé... 🤷`,
-        },
-      ];
+      return res.json(notFoundPayload());
     } else {
       components = [
-        {
-          type: MessageComponentTypes.TEXT_DISPLAY,
-          content: "Voilà.. ce que j'ai trouvé",
-        },
-        {
-          type: MessageComponentTypes.SEPARATOR, // ComponentType.SEPARATOR
-          divider: true,
-          spacing: 1,
-        },
+        ...foundItComponnents(),
         {
           type: MessageComponentTypes.TEXT_DISPLAY,
           content: messageAliaseds.map((e) => `* ${e.alias}`).join("\n"),

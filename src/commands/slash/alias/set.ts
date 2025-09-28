@@ -9,6 +9,7 @@ import {
 import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 import { logger } from "../../../logger.js";
+import { okComponnents } from "../../commonMessages.js";
 
 export interface aliasSetCommandData {
   id: string;
@@ -87,12 +88,7 @@ export const set = async (
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-        components: [
-          {
-            type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "Ok! C'est noté ;)",
-          },
-        ],
+        components: [...okComponnents()],
       },
     });
   }

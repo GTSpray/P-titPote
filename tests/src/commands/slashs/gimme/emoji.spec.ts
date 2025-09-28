@@ -44,13 +44,8 @@ describe("/gimme emoji", () => {
   const notFoundMessagePayload = {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      flags: InteractionResponseFlags.IS_COMPONENTS_V2,
-      components: [
-        {
-          type: MessageComponentTypes.TEXT_DISPLAY,
-          content: `ahem... j'ai rien trouvé... 🤷`,
-        },
-      ],
+      flags: InteractionResponseFlags.EPHEMERAL,
+      content: "ahem... j'ai rien trouvé... 🤷",
     },
   };
 
@@ -169,6 +164,11 @@ describe("/gimme emoji", () => {
                 content: "Voilà.. ce que j'ai trouvé",
               },
               {
+                type: MessageComponentTypes.SEPARATOR,
+                divider: true,
+                spacing: 1,
+              },
+              {
                 type: MessageComponentTypes.MEDIA_GALLERY,
                 items: [
                   {
@@ -214,6 +214,11 @@ describe("/gimme emoji", () => {
             content: expect.any(String),
           },
           {
+            type: MessageComponentTypes.SEPARATOR,
+            divider: true,
+            spacing: 1,
+          },
+          {
             type: MessageComponentTypes.MEDIA_GALLERY,
             items: expect.toBeArrayOfSize(stealemoji_emojiLimit),
           },
@@ -254,6 +259,11 @@ describe("/gimme emoji", () => {
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
             content: expect.any(String),
+          },
+          {
+            type: MessageComponentTypes.SEPARATOR,
+            divider: true,
+            spacing: 1,
           },
           {
             type: MessageComponentTypes.MEDIA_GALLERY,

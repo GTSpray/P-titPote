@@ -8,6 +8,7 @@ import {
 } from "discord-interactions";
 import { logger } from "../../../logger.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
+import { errorPayload } from "../../commonMessages.js";
 
 export interface aliasSayCommandData {
   id: string;
@@ -71,10 +72,11 @@ export const say = async (
         },
       });
     } else {
-      return res.status(404).json({
-        error: "alias not found",
-        context: { alias: AliasMessageInput.data.alias },
-      });
+      return res.json(
+        errorPayload(
+          `ahem... il n'y pas d'alias "${AliasMessageInput.data.alias}" 🤷`,
+        ),
+      );
     }
   }
 

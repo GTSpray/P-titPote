@@ -105,11 +105,12 @@ describe("/alias say", () => {
     });
     const response = await say({ ...handlerOpts, req, res }, subcommand);
 
-    expect(response).toMeetApiResponse(404, {
-      context: {
-        alias: aliasOpts.value,
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        flags: InteractionResponseFlags.EPHEMERAL,
+        content: `ahem... il n'y pas d'alias "${aliasOpts.value}" 🤷`,
       },
-      error: "alias not found",
     });
   });
 
