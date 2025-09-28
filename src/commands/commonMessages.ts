@@ -4,7 +4,7 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-const errorPayload = (content: string) => ({
+export const errorPayload = (content: string) => ({
   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
   data: {
     flags: InteractionResponseFlags.EPHEMERAL,
@@ -21,8 +21,15 @@ export const foundItComponnents = () => [
     content: "Voilà.. ce que j'ai trouvé",
   },
   {
-    type: MessageComponentTypes.SEPARATOR, // ComponentType.SEPARATOR
+    type: MessageComponentTypes.SEPARATOR,
     divider: true,
     spacing: 1,
+  },
+];
+
+export const okComponnents = () => [
+  {
+    type: MessageComponentTypes.TEXT_DISPLAY,
+    content: "Ok! C'est noté ;)",
   },
 ];
