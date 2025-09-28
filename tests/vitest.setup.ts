@@ -22,3 +22,7 @@ afterAll(async () => {
   const { orm } = await initORM();
   await orm.close(true);
 });
+
+afterEach(() => {
+  DiscrodRESTMock.clear();
+});

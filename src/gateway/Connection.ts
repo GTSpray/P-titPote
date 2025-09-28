@@ -46,7 +46,7 @@ export class Connection {
   resume() {
     this.main.emit(GWSEvent.Debug, this.shard, "attempting resume");
     this.close()
-      .then(() => this.connect())
+      .then(() => this.open())
       .then(() => {
         this.main.emit(GWSEvent.Debug, this.shard, "sent resume packet");
         this.wss?.send(
@@ -95,7 +95,7 @@ export class Connection {
     });
   }
 
-  connect(): Promise<{ timeReady: number; socket: Connection }> {
+  open(): Promise<{ timeReady: number; socket: Connection }> {
     this.main.emit(GWSEvent.Debug, this.shard, "starting connection packet");
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -143,11 +143,11 @@ export class Connection {
           code,
           reason,
         });
-        setTimeout(() => this.close().then(() => this.connect()), 10000);
+        setTimeout(() => this.close().then(() => this.open()), 10000);
       });
       this.wss?.once("error", (e) => {
         this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
-        setTimeout(() => this.close().then(() => this.connect()), 5000);
+        setTimeout(() => this.close().then(() => this.open()), 5000);
       });
     });
   }
@@ -207,7 +207,7 @@ export class Connection {
             this.shard,
             "invalid session, reconnecting in 5",
           );
-          setTimeout(() => this.close().then(() => this.connect()), 5000);
+          setTimeout(() => this.close().then(() => this.open()), 5000);
         }
       });
     });

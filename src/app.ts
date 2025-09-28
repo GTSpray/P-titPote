@@ -10,7 +10,6 @@ import {
 } from "discord-interactions";
 
 import { gateway } from "./gateway/index.js";
-import { GWSEvent } from "./gateway/gatewaytypes.js";
 import { GatewayDispatchEvents } from "discord.js";
 
 import { logger } from "./logger.js";

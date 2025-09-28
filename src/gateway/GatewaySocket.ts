@@ -4,36 +4,12 @@ import { discordapi } from "../utils/discordapi.js";
 import { type APIGatewayBotInfo, Routes } from "discord.js";
 import { logger } from "../logger.js";
 import { type GatewayEvent } from "./gatewaytypes.js";
-
-class TypedEventEmitter<TEvents extends Record<string, any>> {
-  private emitter = new EventEmitter();
-
-  emit<TEventName extends keyof TEvents & string>(
-    eventName: TEventName,
-    ...eventArg: TEvents[TEventName]
-  ) {
-    this.emitter.emit(eventName, ...(eventArg as []));
-  }
-
-  on<TEventName extends keyof TEvents & string>(
-    eventName: TEventName,
-    handler: (...eventArg: TEvents[TEventName]) => void,
-  ) {
-    this.emitter.on(eventName, handler as any);
-  }
-
-  off<TEventName extends keyof TEvents & string>(
-    eventName: TEventName,
-    handler: (...eventArg: TEvents[TEventName]) => void,
-  ) {
-    this.emitter.off(eventName, handler as any);
-  }
-}
+import { TypedEventEmitter } from "./TypedEventEmitter.js";
 
 export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
   public shards: number | null;
-  public sockets: Map<number, Connection>;
+  private sockets: Map<number, Connection>;
   public lastReady: number;
   public url: string;
 
@@ -46,32 +22,41 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
     this.url = "";
   }
 
+  private async setSocket(socketId: number) {
+    const oldSocket = this.sockets.get(socketId);
+    if (oldSocket) {
+      logger.debug("GatewaySocket.setConection close", { sockId: socketId });
+      await oldSocket.close();
+    }
+
+    const newSocket = new Connection(this, socketId);
+    this.sockets.set(socketId, newSocket);
+    const { timeReady } = await newSocket.open();
+    logger.debug("GatewaySocket.setConection", { sockId: socketId, timeReady });
+    this.lastReady = timeReady;
+  }
+
   async connect(start = 0, end?: number) {
-    const { url, shards } = (await discordapi.get(
+    const apigatewayInfosBot: APIGatewayBotInfo = (await discordapi.get(
       Routes.gatewayBot(),
     )) as APIGatewayBotInfo;
 
-    logger.debug("GatewaySocket.connect", { url, shards });
+    const { url, shards } = apigatewayInfosBot;
+
+    logger.debug("GatewaySocket.connect", { apigatewayInfosBot });
 
     this.url = url;
-    if (isNaN(<number>this.shards)) {
+    if (this.shards === null) {
       this.shards = shards;
     }
-    end = end || <number>this.shards;
 
+    end = end || this.shards;
+
+    const promises = [];
     for (let i = start; i < end; i++) {
-      const oldSocket = this.sockets.get(i);
-      if (oldSocket) {
-        logger.debug("GatewaySocket.connect close", { i });
-        await oldSocket.close();
-      }
-
-      const co = new Connection(this, i);
-      this.sockets.set(i, co);
-      const { timeReady } = await co.connect();
-      logger.debug("GatewaySocket.connect", { i, timeReady });
-      this.lastReady = timeReady;
+      promises.push(this.setSocket(i));
     }
+    await Promise.all(promises);
   }
 
   send(data: object, shard = 0) {
