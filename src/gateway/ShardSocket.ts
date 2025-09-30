@@ -110,7 +110,7 @@ export class ShardSocket {
         reject,
       );
 
-      this.ws = new WebSocket(this.main.url + "?v=10&encoding=" + encoding);
+      this.ws = new WebSocket(this.main.url + "?encoding=" + encoding);
       this.ws?.once("open", () => {
         this.main.emit(GWSEvent.Debug, this.shard, "opened connection");
         this.ws?.once("message", (data) => {
