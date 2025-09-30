@@ -45,11 +45,11 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
     logger.debug("GatewaySocket.connect", { apigatewayInfosBot });
 
     this.url = url;
-    if (isNaN(<number>this.shards)) {
+    if (this.shards === null) {
       this.shards = shards;
     }
 
-    end = end || <number>this.shards;
+    end = end || this.shards;
 
     const promises = [];
     for (let i = start; i < end; i++) {
