@@ -1,11 +1,11 @@
 import { REST, Routes } from "discord.js";
 import { GatewaySocket } from "../../../src/gateway/GatewaySocket.js";
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from "../../mocks/discordjs.js";
-import { Connection } from "../../../src/gateway/Connection.js";
-import * as connectionModule from "../../../src/gateway/Connection.js";
+import { ShardSocket } from "../../../src/gateway/ShardSocket.js";
+import * as ShardSocketModule from "../../../src/gateway/ShardSocket.js";
 import { MockInstance } from "vitest";
 
-vi.mock("../../../src/gateway/Connection.js");
+vi.mock("../../../src/gateway/ShardSocket.js");
 
 describe("GatewaySocket", () => {
   const fakeToken = "fake token";
@@ -22,21 +22,21 @@ describe("GatewaySocket", () => {
     const fakeUrl = "wss://gateway.discord.gg";
     const fakeshards = 1;
 
-    let connectionOpenSpy: MockInstance<
-      () => Promise<{ timeReady: number; socket: Connection }>
+    let shardSocketOpenSpy: MockInstance<
+      () => Promise<{ timeReady: number; socket: ShardSocket }>
     >;
-    let connectionCloseSpy: MockInstance<() => Promise<void>>;
+    let shardSocketCloseSpy: MockInstance<() => Promise<void>>;
 
     beforeEach(() => {
-      connectionOpenSpy = vi
-        .spyOn(Connection.prototype, "open")
+      shardSocketOpenSpy = vi
+        .spyOn(ShardSocket.prototype, "open")
         .mockResolvedValue({
           timeReady: 1,
-          socket: vi.fn() as unknown as Connection,
+          socket: vi.fn() as unknown as ShardSocket,
         });
 
-      connectionCloseSpy = vi
-        .spyOn(Connection.prototype, "close")
+      shardSocketCloseSpy = vi
+        .spyOn(ShardSocket.prototype, "close")
         .mockResolvedValue();
 
       DiscrodRESTMock.register(
@@ -66,42 +66,42 @@ describe("GatewaySocket", () => {
       expect(gateway.shards).toBe(fakeshards);
     });
 
-    it("should create one connection for each shard", async () => {
-      const ConnectionConstructor = vi
-        .spyOn(connectionModule, "Connection")
+    it("should create one ShardSocket for each shard", async () => {
+      const ShardSocketConstructor = vi
+        .spyOn(ShardSocketModule, "ShardSocket")
         .mockImplementationOnce(
           () =>
             ({
               open: vi
                 .fn()
                 .mockResolvedValue({ timeReady: 1, socket: vi.fn() }),
-            }) as unknown as Connection,
+            }) as unknown as ShardSocket,
         );
       await gateway.connect();
-      expect(ConnectionConstructor).toHaveBeenCalledWith(gateway, 0);
+      expect(ShardSocketConstructor).toHaveBeenCalledWith(gateway, 0);
     });
 
-    it("should open created connection", async () => {
+    it("should open created ShardSocket", async () => {
       await gateway.connect();
-      expect(connectionOpenSpy).toHaveBeenCalledWith();
+      expect(shardSocketOpenSpy).toHaveBeenCalledWith();
     });
 
-    it("should close previous created connection", async () => {
+    it("should close previous created ShardSocket", async () => {
       await gateway.connect();
       await gateway.connect();
-      expect(connectionCloseSpy).toHaveBeenCalledWith();
+      expect(shardSocketCloseSpy).toHaveBeenCalledWith();
     });
   });
 
   describe("send", () => {
-    let connectionOpenSpy: MockInstance<(data: object) => void>;
+    let shardSocketOpenSpy: MockInstance<(data: object) => void>;
     beforeEach(async () => {
-      vi.spyOn(Connection.prototype, "open").mockResolvedValue({
+      vi.spyOn(ShardSocket.prototype, "open").mockResolvedValue({
         timeReady: 1,
-        socket: vi.fn() as unknown as Connection,
+        socket: vi.fn() as unknown as ShardSocket,
       });
 
-      connectionOpenSpy = vi.spyOn(Connection.prototype, "send");
+      shardSocketOpenSpy = vi.spyOn(ShardSocket.prototype, "send");
 
       DiscrodRESTMock.register(
         {
@@ -123,11 +123,11 @@ describe("GatewaySocket", () => {
       await gateway.connect();
     });
 
-    it("should call connection.send", () => {
+    it("should call ShardSocket.send", () => {
       const d = { data: "fake payload " };
       gateway.send(d);
 
-      expect(connectionOpenSpy).toHaveBeenCalledWith(d);
+      expect(shardSocketOpenSpy).toHaveBeenCalledWith(d);
     });
   });
 });

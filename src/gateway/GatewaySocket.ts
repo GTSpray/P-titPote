@@ -1,5 +1,4 @@
-import EventEmitter from "node:events";
-import { Connection } from "./Connection.js";
+import { ShardSocket } from "./ShardSocket.js";
 import { discordapi } from "../utils/discordapi.js";
 import { type APIGatewayBotInfo, Routes } from "discord.js";
 import { logger } from "../logger.js";
@@ -9,7 +8,7 @@ import { TypedEventEmitter } from "./TypedEventEmitter.js";
 export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
   public shards: number | null;
-  private sockets: Map<number, Connection>;
+  private sockets: Map<number, ShardSocket>;
   public lastReady: number;
   public url: string;
 
@@ -29,7 +28,7 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
       await oldSocket.close();
     }
 
-    const newSocket = new Connection(this, socketId);
+    const newSocket = new ShardSocket(this, socketId);
     this.sockets.set(socketId, newSocket);
     const { timeReady } = await newSocket.open();
     logger.debug("GatewaySocket.setConection", { sockId: socketId, timeReady });

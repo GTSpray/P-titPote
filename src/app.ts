@@ -123,8 +123,5 @@ gateway
     logger.debug("gateway connected");
   })
   .catch((err) => {
-    logger.error("gateway", { err });
-  })
-  .finally(() => {
-    logger.debug("gateway");
+    logger.error("gateway error", { err });
   });

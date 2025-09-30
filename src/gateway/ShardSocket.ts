@@ -2,12 +2,14 @@ import WebSocket from "ws";
 import { GatewaySocket } from "./GatewaySocket.js";
 import { GatewayOpcodes } from "discord.js";
 import { GWSEvent } from "./gatewaytypes.js";
+import { getTimeoutReject } from "../utils/getTimeoutReject.js";
 
 const encoding = "json";
-const maxTimeout = 5000;
 
-export class Connection {
-  wss: null | WebSocket;
+// todo: implement erlpack https://github.com/discord/erlpack
+
+export class ShardSocket {
+  ws: null | WebSocket;
   heartbitInterval: null | number;
   heartbitHandler: () => void;
   heartbitTimer: null | ReturnType<typeof setTimeout>;
@@ -16,8 +18,10 @@ export class Connection {
   shard: number;
   main: GatewaySocket;
 
+  static maxTimeout = 5000;
+
   constructor(main: GatewaySocket, shard: number) {
-    this.wss = null;
+    this.ws = null;
     this.heartbitInterval = null;
     this.heartbitHandler = () => {};
     this.heartbitTimer = null;
@@ -34,9 +38,9 @@ export class Connection {
 
   beat() {
     this.main.emit(GWSEvent.Debug, this.shard, "sending heartbit");
-    this.wss?.send(
+    this.ws?.send(
       JSON.stringify({
-        op: 1,
+        op: GatewayOpcodes.Heartbeat,
         d: this.s,
       }),
     );
@@ -49,9 +53,9 @@ export class Connection {
       .then(() => this.open())
       .then(() => {
         this.main.emit(GWSEvent.Debug, this.shard, "sent resume packet");
-        this.wss?.send(
+        this.ws?.send(
           JSON.stringify({
-            op: 6,
+            op: GatewayOpcodes.Resume,
             d: {
               token: this.main.token,
               session_id: this.session,
@@ -72,14 +76,16 @@ export class Connection {
       clearInterval(this.heartbitTimer);
     }
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`Connection.close timed out after ${maxTimeout}ms`));
-      }, maxTimeout);
+      const timer = getTimeoutReject(
+        ShardSocket.maxTimeout,
+        "ShardSocket.close",
+        reject,
+      );
 
-      if (this.wss?.readyState !== 3) {
-        this.wss?.close(1001, "cya later alligator");
-        this.wss?.removeAllListeners("close");
-        this.wss?.once("close", () => {
+      if (this.ws?.readyState !== WebSocket.CLOSED) {
+        this.ws?.close(1001, "cya later alligator");
+        this.ws?.removeAllListeners("close");
+        this.ws?.once("close", () => {
           this.main.emit(
             GWSEvent.Debug,
             this.shard,
@@ -95,17 +101,19 @@ export class Connection {
     });
   }
 
-  open(): Promise<{ timeReady: number; socket: Connection }> {
+  open(): Promise<{ timeReady: number; socket: ShardSocket }> {
     this.main.emit(GWSEvent.Debug, this.shard, "starting connection packet");
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error(`Connection.connect timed out after ${maxTimeout}ms`));
-      }, maxTimeout);
+      const timer = getTimeoutReject(
+        ShardSocket.maxTimeout,
+        "ShardSocket.open",
+        reject,
+      );
 
-      this.wss = new WebSocket(this.main.url + "?encoding=" + encoding);
-      this.wss?.once("open", () => {
+      this.ws = new WebSocket(this.main.url + "?v=10&encoding=" + encoding);
+      this.ws?.once("open", () => {
         this.main.emit(GWSEvent.Debug, this.shard, "opened connection");
-        this.wss?.once("message", (data) => {
+        this.ws?.once("message", (data) => {
           const payload: { d: { heartbeat_interval: number } } = JSON.parse(
             data.toString(),
           );
@@ -138,14 +146,14 @@ export class Connection {
           );
         });
       });
-      this.wss?.once("close", (code: string, reason: string) => {
+      this.ws?.once("close", (code: string, reason: string) => {
         this.main.emit(GWSEvent.Debug, this.shard, "server closed connection", {
           code,
           reason,
         });
         setTimeout(() => this.close().then(() => this.open()), 10000);
       });
-      this.wss?.once("error", (e) => {
+      this.ws?.once("error", (e) => {
         this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
         setTimeout(() => this.close().then(() => this.open()), 5000);
       });
@@ -153,21 +161,20 @@ export class Connection {
   }
 
   send(data: object) {
-    this.wss?.send(JSON.stringify(data));
+    this.ws?.send(JSON.stringify(data));
   }
 
-  identify(): Promise<{ timeReady: number; socket: Connection }> {
+  identify(): Promise<{ timeReady: number; socket: ShardSocket }> {
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(
-          new Error(`Connection.identify timed out after ${maxTimeout}ms`),
-        );
-      }, maxTimeout);
-
+      const timer = getTimeoutReject(
+        ShardSocket.maxTimeout,
+        "ShardSocket.identify",
+        reject,
+      );
       this.main.emit(GWSEvent.Debug, this.shard, "sent identify packet");
-      this.wss?.send(
+      this.ws?.send(
         JSON.stringify({
-          op: 2,
+          op: GatewayOpcodes.Identify,
           d: {
             token: this.main.token,
             properties: {},
@@ -178,8 +185,9 @@ export class Connection {
           },
         }),
       );
-      this.wss?.on("message", (data) => {
-        const payload: { s: number; op: number; t: string; d: any } =
+
+      this.ws?.on("message", (data) => {
+        const payload: { s: number; op: GatewayOpcodes; t: string; d: any } =
           JSON.parse(data.toString());
         this.s = payload.s;
         this.main.emit(GWSEvent.Payload, this.shard, payload);
@@ -192,9 +200,12 @@ export class Connection {
           this.main.emit(<any>t, this.shard, d);
         }
       });
-      this.wss?.once("message", (data) => {
-        const payload: { t: string; d: { session_id: number }; op: number } =
-          JSON.parse(data.toString());
+      this.ws?.once("message", (data) => {
+        const payload: {
+          t: string;
+          d: { session_id: number };
+          op: GatewayOpcodes;
+        } = JSON.parse(data.toString());
 
         if (payload.t === "READY") {
           this.session = payload.d.session_id;
