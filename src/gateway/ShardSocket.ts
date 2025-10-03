@@ -30,6 +30,7 @@ export class ShardSocket {
   jitter: number;
   maxTimeout: number;
   resumeGatewayUrl: string | null;
+  destroyed: boolean = false;
 
   static maxTimeout = 15000;
 
@@ -56,6 +57,11 @@ export class ShardSocket {
 
     if (this.heartbitTimer) {
       clearInterval(this.heartbitTimer);
+      this.heartbitTimer = null;
+    }
+    if (this.heartbitTimeOut) {
+      clearTimeout(this.heartbitTimeOut);
+      this.heartbitTimeOut = null;
     }
 
     return new Promise((resolve, reject) => {
@@ -78,12 +84,14 @@ export class ShardSocket {
           );
           this.ws?.removeAllListeners("close");
           clearTimeout(timer);
+          this.ws = null;
           resolve();
         });
 
         this.ws?.close(1001, "cya later alligator");
       } else {
         clearTimeout(timer);
+        this.ws = null;
         resolve();
       }
     });
@@ -198,6 +206,11 @@ export class ShardSocket {
   }
 
   open(): Promise<{ timeReady: number; socket: ShardSocket }> {
+    if (this.destroyed) {
+      return Promise.reject(
+        new Error("destroyed ShardSocket should be removed"),
+      );
+    }
     this.main.emit(GWSEvent.Debug, this.shard, "starting connection packet");
 
     this.ws = new WebSocket(
@@ -233,5 +246,10 @@ export class ShardSocket {
         resolve({ timeReady: Date.now(), socket: this });
       });
     });
+  }
+
+  destroy(): Promise<void> {
+    this.destroyed = true;
+    return this.close();
   }
 }

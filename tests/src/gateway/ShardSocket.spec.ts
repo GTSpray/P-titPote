@@ -119,7 +119,7 @@ describe("ShardSocket", () => {
       const heartbeat_interval = 7500;
 
       beforeEach(() => {
-        shardSocket.open().catch(() => {});
+        shardSocket.open();
         vi.advanceTimersByTime(100);
         server.send(
           s(
@@ -150,12 +150,12 @@ describe("ShardSocket", () => {
       });
 
       it("should close connection when an app doesn't receive a Heartbeat ACK", async () => {
+        const closeEventSpy = vi.fn();
+        server.on("wsclose", closeEventSpy);
+
         vi.advanceTimersByTime(heartbeat_interval);
         server.send(s(heartbeatAckMsg()));
         vi.advanceTimersByTime(heartbeat_interval - 1);
-
-        const closeEventSpy = vi.fn();
-        server.on("wsclose", closeEventSpy);
 
         server.getSpy().mockClear();
 
