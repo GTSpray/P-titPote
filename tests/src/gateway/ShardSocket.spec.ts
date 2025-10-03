@@ -1,8 +1,13 @@
 import { ShardSocket } from "../../../src/gateway/ShardSocket.js";
 import { GatewaySocket } from "../../../src/gateway/GatewaySocket.js";
-import { helloMsg, readyMsg } from "../../mocks/discordGatewayMsg.js";
+import {
+  heartbeatAckMsg,
+  helloMsg,
+  readyMsg,
+} from "../../mocks/discordGatewayMsg.js";
 import { GatewayIntentBits, GatewayOpcodes } from "discord.js";
 import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
+import { GWSEvent } from "../../../src/gateway/gatewaytypes.js";
 const s = JSON.stringify;
 
 describe("ShardSocket", () => {
@@ -79,7 +84,7 @@ describe("ShardSocket", () => {
 
       vi.advanceTimersByTime(10);
       expect(server.getSpy().mock.calls).toEqual([
-        [s({ op: GatewayOpcodes.Heartbeat, d: null })],
+        [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
       ]);
     });
 
@@ -111,7 +116,7 @@ describe("ShardSocket", () => {
     });
 
     describe("after ready event", () => {
-      const heartbeat_interval = 2500;
+      const heartbeat_interval = 7500;
 
       beforeEach(() => {
         shardSocket.open().catch(() => {});
@@ -125,21 +130,44 @@ describe("ShardSocket", () => {
         );
         vi.advanceTimersByTime(100);
         server.send(s(readyMsg({})));
+        vi.advanceTimersByTime(50);
         server.getSpy().mockClear();
       });
 
       it("should keep heartbit interval using hello reponse interval", async () => {
         vi.advanceTimersByTime(heartbeat_interval);
+        server.send(s(heartbeatAckMsg()));
         server.getSpy().mockClear();
 
         const heartbeat_interval_wait = 3;
+        const expectedCalls = [];
+        for (let i = 0; i < heartbeat_interval_wait; i++) {
+          vi.advanceTimersByTime(heartbeat_interval);
+          server.send(s(heartbeatAckMsg()));
+          expectedCalls.push([s({ op: GatewayOpcodes.Heartbeat, d: 1 })]);
+        }
+        expect(server.getSpy().mock.calls).toEqual(expectedCalls);
+      });
 
-        vi.advanceTimersByTime(heartbeat_interval * heartbeat_interval_wait);
-        expect(server.getSpy()).toHaveBeenNthCalledWith(
-          heartbeat_interval_wait,
-          s({ op: GatewayOpcodes.Heartbeat, d: null }),
+      it("should close connection when an app doesn't receive a Heartbeat ACK", async () => {
+        vi.advanceTimersByTime(heartbeat_interval);
+        server.send(s(heartbeatAckMsg()));
+        vi.advanceTimersByTime(heartbeat_interval - 1);
+
+        const closeEventSpy = vi.fn();
+        server.on("wsclose", closeEventSpy);
+
+        server.getSpy().mockClear();
+
+        vi.advanceTimersByTime(heartbeat_interval * 9);
+
+        expect(closeEventSpy).toHaveBeenCalledExactlyOnceWith(
+          1001,
+          "cya later alligator",
         );
-        expect(server.getSpy()).toHaveBeenCalledTimes(heartbeat_interval_wait);
+        expect(server.getSpy().mock.calls).toEqual([
+          [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
+        ]);
       });
     });
   });

@@ -29,6 +29,14 @@ export class WebSocketServerMock {
     this.on("wsmessage", (d) => {
       this.spy(d);
     });
+
+    this.on("wsconnection", (ws) => {
+      ws.readyState = 1; // WebSocket.OPEN;
+    });
+
+    this.on("wsclose", () => {
+      this.emit("close", "co close", "close");
+    });
   }
 
   public getUrl() {
@@ -58,6 +66,7 @@ export class WebSocketServerMock {
 
 export class WebSocketMock {
   public mockedServer: WebSocketServerMock;
+  public readyState = 0; // WebSocket.CONNECTING;
 
   constructor(private url: string) {
     const [domain] = url.split("?");
@@ -66,6 +75,10 @@ export class WebSocketMock {
     setTimeout(() => {
       this.mockedServer.emit("wsconnection", this);
     }, 20);
+
+    this.on("close", () => {
+      this.readyState = 3; // WebSocket.CLOSED
+    });
   }
 
   on(eventName: any, handler: () => void) {
@@ -79,4 +92,11 @@ export class WebSocketMock {
   send(d: string) {
     this.mockedServer.emit("wsmessage", d);
   }
+
+  close(...args: any[]) {
+    this.mockedServer.emit("wsclose", ...args);
+    this.readyState = 2; // WebSocket.CLOSING
+  }
+
+  removeAllListeners() {}
 }

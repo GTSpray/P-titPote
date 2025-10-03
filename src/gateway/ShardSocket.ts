@@ -22,6 +22,7 @@ export class ShardSocket {
   ws: null | WebSocket;
   heartbitInterval: number;
   heartbitTimer: null | ReturnType<typeof setInterval>;
+  heartbitTimeOut: null | ReturnType<typeof setTimeout>;
   s: number | null;
   session: string | null;
   shard: number;
@@ -43,9 +44,50 @@ export class ShardSocket {
     this.jitter = Math.random();
     this.maxTimeout = ShardSocket.maxTimeout;
     this.resumeGatewayUrl = null;
+    this.heartbitTimeOut = null;
   }
 
-  close() {}
+  close(): Promise<void> {
+    this.main.emit(
+      GWSEvent.Debug,
+      this.shard,
+      "client attempting to close connection",
+    );
+
+    if (this.heartbitTimer) {
+      clearInterval(this.heartbitTimer);
+    }
+
+    return new Promise((resolve, reject) => {
+      const timer = getTimeoutReject(
+        ShardSocket.maxTimeout,
+        "ShardSocket.close",
+        reject,
+      );
+
+      if (
+        ![WebSocket.CLOSED, WebSocket.CLOSING].includes(
+          <any>this.ws?.readyState,
+        )
+      ) {
+        this.ws?.once("close", () => {
+          this.main.emit(
+            GWSEvent.Debug,
+            this.shard,
+            "client closed connection",
+          );
+          this.ws?.removeAllListeners("close");
+          clearTimeout(timer);
+          resolve();
+        });
+
+        this.ws?.close(1001, "cya later alligator");
+      } else {
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+  }
 
   hello(e: GatewayHello) {
     this.main.emit(GWSEvent.Debug, this.shard, "recieved hello info", {
@@ -79,11 +121,21 @@ export class ShardSocket {
     };
     this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit", { e });
     this.send(e);
+
+    if (!this.heartbitTimeOut) {
+      this.heartbitTimeOut = setTimeout(() => {
+        this.close();
+        this.heartbitTimeOut = null;
+      }, this.heartbitInterval);
+    }
   }
 
   beatAck(e: GatewayHeartbeatAck) {
     this.main.emit(GWSEvent.Debug, this.shard, "heartbit acknowledged");
-    this.s = e.s;
+    if (this.heartbitTimeOut) {
+      clearTimeout(this.heartbitTimeOut);
+      this.heartbitTimeOut = null;
+    }
   }
 
   dispatch(e: any) {
@@ -99,6 +151,9 @@ export class ShardSocket {
   onMessage(d: WebSocket.RawData) {
     const e = JSON.parse(d.toString());
     this.main.emit(GWSEvent.Debug, this.shard, "ShardSocket.dispatch", { e });
+    if (e && !!e.s) {
+      this.s = e.s;
+    }
     switch (e.op) {
       case GatewayOpcodes.Dispatch:
         this.dispatch(e);

@@ -1,5 +1,6 @@
 import {
   GatewayDispatchEvents,
+  GatewayHeartbeatAck,
   GatewayHello,
   GatewayOpcodes,
   GatewayReadyDispatch,
@@ -78,3 +79,11 @@ export const readyMsg = (d: any): GatewayReadyDispatch => ({
     ...d,
   },
 });
+
+export const heartbeatAckMsg = (): GatewayHeartbeatAck =>
+  <GatewayHeartbeatAck>{
+    t: null,
+    s: null,
+    op: GatewayOpcodes.HeartbeatAck,
+    d: null, // never but in fact null
+  };
