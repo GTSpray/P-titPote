@@ -134,6 +134,7 @@ export class ShardSocket {
       this.heartbitTimeOut = setTimeout(() => {
         this.close();
         this.heartbitTimeOut = null;
+        this.main.emit(GWSEvent.Debug, this.shard, "no heartbit event timeout");
       }, this.heartbitInterval);
     }
   }

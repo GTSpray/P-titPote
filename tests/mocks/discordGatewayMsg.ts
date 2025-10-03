@@ -87,3 +87,8 @@ export const heartbeatAckMsg = (): GatewayHeartbeatAck =>
     op: GatewayOpcodes.HeartbeatAck,
     d: null, // never but in fact null
   };
+
+export const serverClosedCo = () => ({
+  code: 1006, //Connection reset by peer (its websocket error not discord code )
+  reason: "",
+});
