@@ -36,7 +36,7 @@ describe("ShardSocket", () => {
 
       server.send(s(readyMsg({}))); // to late
       await expect(openPromise).rejects.toThrow(
-        Error(`ShardSocket.open timed out after ${ShardSocket.maxTimeout}ms`),
+        Error(`ShardSocket.open timed out after ${ShardSocket.maxTimeout} ms`),
       );
     });
 

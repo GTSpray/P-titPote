@@ -9,13 +9,12 @@ import {
   GatewayReadyDispatch,
 } from "discord.js";
 import { GWSEvent } from "./gatewaytypes.js";
-import { getTimeoutReject } from "../utils/getTimeoutReject.js";
+import { getPromiseWithTimeout } from "../utils/getPromiseWithTimeout.js";
 
 const encoding = "json";
 const apiVerison = "10";
 
 // todo: implement erlpack https://github.com/discord/erlpack
-
 const s = JSON.stringify;
 
 export class ShardSocket {
@@ -64,37 +63,33 @@ export class ShardSocket {
       this.heartbitTimeOut = null;
     }
 
-    return new Promise((resolve, reject) => {
-      const timer = getTimeoutReject(
-        ShardSocket.maxTimeout,
-        "ShardSocket.close",
-        reject,
-      );
+    return getPromiseWithTimeout(
+      ShardSocket.maxTimeout,
+      "ShardSocket.close timed out after %t ms",
+      (resolve) => {
+        if (
+          ![WebSocket.CLOSED, WebSocket.CLOSING].includes(
+            <any>this.ws?.readyState,
+          )
+        ) {
+          this.ws?.once("close", () => {
+            this.main.emit(
+              GWSEvent.Debug,
+              this.shard,
+              "client closed connection",
+            );
+            this.ws?.removeAllListeners("close");
+            this.ws = null;
+            resolve();
+          });
 
-      if (
-        ![WebSocket.CLOSED, WebSocket.CLOSING].includes(
-          <any>this.ws?.readyState,
-        )
-      ) {
-        this.ws?.once("close", () => {
-          this.main.emit(
-            GWSEvent.Debug,
-            this.shard,
-            "client closed connection",
-          );
-          this.ws?.removeAllListeners("close");
-          clearTimeout(timer);
+          this.ws?.close(1001, "cya later alligator");
+        } else {
           this.ws = null;
           resolve();
-        });
-
-        this.ws?.close(1001, "cya later alligator");
-      } else {
-        clearTimeout(timer);
-        this.ws = null;
-        resolve();
-      }
-    });
+        }
+      },
+    );
   }
 
   hello(e: GatewayHello) {
@@ -178,6 +173,7 @@ export class ShardSocket {
         this.beat();
         break;
       case GatewayDispatchEvents.Ready:
+        this.ready(<any>e);
         break;
       default:
         break;
@@ -234,19 +230,16 @@ export class ShardSocket {
       this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
     });
 
-    return new Promise((resolve, reject) => {
-      const timer = getTimeoutReject(
-        this.maxTimeout,
-        "ShardSocket.open",
-        reject,
-      );
-
-      this.main.on(GatewayDispatchEvents.Ready, (s, d) => {
-        clearTimeout(timer);
-        this.session = d.session_id;
-        resolve({ timeReady: Date.now(), socket: this });
-      });
-    });
+    return getPromiseWithTimeout(
+      this.maxTimeout,
+      "ShardSocket.open timed out after %t ms",
+      (resolve) => {
+        this.main.on(GatewayDispatchEvents.Ready, (s, d) => {
+          this.session = d.session_id;
+          resolve({ timeReady: Date.now(), socket: this });
+        });
+      },
+    );
   }
 
   destroy(): Promise<void> {
