@@ -80,6 +80,13 @@ export enum GWSEvent {
   Payload = "PAYLOAD",
 }
 
+export enum WsClosedCode {
+  NormalClosure = 1000, // indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
+  GoingAway = 1001, // indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
+  ProtocolError = 1002, // indicates that an endpoint is terminating the connection due to a protocol error.
+  UnsupportedData = 1003, // indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).
+}
+
 export type GatewayEvent = {
   [GWSEvent.Debug]: [shard: number, debugmsg: string, meta?: any];
   [GWSEvent.Payload]: [

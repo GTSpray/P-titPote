@@ -5,9 +5,13 @@ import {
   helloMsg,
   readyMsg,
 } from "../../mocks/discordGatewayMsg.js";
-import { GatewayIntentBits, GatewayOpcodes } from "discord.js";
+import {
+  GatewayIntentBits,
+  GatewayOpcodes,
+  GatewayReadyDispatch,
+} from "discord.js";
 import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
-import { GWSEvent } from "../../../src/gateway/gatewaytypes.js";
+import { WsClosedCode, GWSEvent } from "../../../src/gateway/gatewaytypes.js";
 const s = JSON.stringify;
 
 describe("ShardSocket", () => {
@@ -27,12 +31,26 @@ describe("ShardSocket", () => {
   });
 
   describe("open", () => {
+    it("should open new connection on Discord Gateway API version 10 using json encoding", async () => {
+      const wsCoSpy = vi.fn();
+      server.on("wsconnection", wsCoSpy);
+
+      shardSocket.open().catch(() => {});
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+        shardSocket.ws,
+        `${server.getUrl()}?v=10&encoding=json`,
+      );
+    });
+
     it("should reject with timeout (ShardSocket.maxTimeout) when Discord does not send a welcome message", async () => {
       const helloDelay = 100;
       const openPromise = shardSocket.open();
       vi.advanceTimersByTime(helloDelay);
       server.send(s(helloMsg({})));
-      vi.advanceTimersByTime(ShardSocket.maxTimeout - helloDelay);
+      await vi.advanceTimersByTime(ShardSocket.maxTimeout - helloDelay);
 
       server.send(s(readyMsg({}))); // to late
       await expect(openPromise).rejects.toThrow(
@@ -43,12 +61,12 @@ describe("ShardSocket", () => {
     it("should resolve connection if server send welcome message earlier than timeout", async () => {
       const openPromise = shardSocket.open();
 
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       server.send(s(helloMsg({})));
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       server.send(s(readyMsg({})));
 
-      vi.advanceTimersByTime(ShardSocket.maxTimeout);
+      await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout);
 
       const result = await openPromise;
 
@@ -66,7 +84,7 @@ describe("ShardSocket", () => {
 
       shardSocket.open();
 
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       server.send(
         s(
           helloMsg({
@@ -74,15 +92,15 @@ describe("ShardSocket", () => {
           }),
         ),
       );
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       server.send(s(readyMsg({})));
       server.getSpy().mockClear();
 
-      vi.advanceTimersByTime(heartbeat_interval * fakejitter - 102);
+      await vi.advanceTimersByTimeAsync(heartbeat_interval * fakejitter - 102);
 
       expect(server.getSpy()).toHaveBeenCalledTimes(0);
 
-      vi.advanceTimersByTime(10);
+      await vi.advanceTimersByTimeAsync(10);
       expect(server.getSpy().mock.calls).toEqual([
         [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
       ]);
@@ -90,9 +108,9 @@ describe("ShardSocket", () => {
 
     it("should send identify with intents", async () => {
       shardSocket.open().catch(() => {});
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
       server.send(s(helloMsg({})));
-      vi.advanceTimersByTime(100);
+      await vi.advanceTimersByTimeAsync(100);
 
       const identityPayload = {
         op: GatewayOpcodes.Identify,
@@ -117,10 +135,16 @@ describe("ShardSocket", () => {
 
     describe("after ready event", () => {
       const heartbeat_interval = 7500;
+      let resumeServer: WebSocketServerMock;
+      let readyPayload: GatewayReadyDispatch;
+      beforeEach(async () => {
+        resumeServer = WebSocketServerMock.createInstance();
+        readyPayload = readyMsg({
+          resume_gateway_url: resumeServer.getUrl(),
+        });
 
-      beforeEach(() => {
         shardSocket.open();
-        vi.advanceTimersByTime(100);
+        await vi.advanceTimersByTimeAsync(100);
         server.send(
           s(
             helloMsg({
@@ -128,21 +152,21 @@ describe("ShardSocket", () => {
             }),
           ),
         );
-        vi.advanceTimersByTime(100);
-        server.send(s(readyMsg({})));
-        vi.advanceTimersByTime(50);
+        await vi.advanceTimersByTimeAsync(100);
+        server.send(s(readyPayload));
+        await vi.advanceTimersByTimeAsync(50);
         server.getSpy().mockClear();
       });
 
       it("should keep heartbit interval using hello reponse interval", async () => {
-        vi.advanceTimersByTime(heartbeat_interval);
+        await vi.advanceTimersByTimeAsync(heartbeat_interval);
         server.send(s(heartbeatAckMsg()));
         server.getSpy().mockClear();
 
         const heartbeat_interval_wait = 3;
         const expectedCalls = [];
         for (let i = 0; i < heartbeat_interval_wait; i++) {
-          vi.advanceTimersByTime(heartbeat_interval);
+          await vi.advanceTimersByTimeAsync(heartbeat_interval);
           server.send(s(heartbeatAckMsg()));
           expectedCalls.push([s({ op: GatewayOpcodes.Heartbeat, d: 1 })]);
         }
@@ -153,13 +177,13 @@ describe("ShardSocket", () => {
         const closeEventSpy = vi.fn();
         server.on("wsclose", closeEventSpy);
 
-        vi.advanceTimersByTime(heartbeat_interval);
+        await vi.advanceTimersByTimeAsync(heartbeat_interval);
         server.send(s(heartbeatAckMsg()));
-        vi.advanceTimersByTime(heartbeat_interval - 1);
+        await vi.advanceTimersByTimeAsync(heartbeat_interval - 1);
 
         server.getSpy().mockClear();
 
-        vi.advanceTimersByTime(heartbeat_interval * 9);
+        await vi.advanceTimersByTimeAsync(heartbeat_interval * 9);
 
         expect(closeEventSpy).toHaveBeenCalledExactlyOnceWith(
           1001,
@@ -168,6 +192,48 @@ describe("ShardSocket", () => {
         expect(server.getSpy().mock.calls).toEqual([
           [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
         ]);
+      });
+
+      describe("when discord close active connection", () => {
+        beforeEach(async () => {
+          await vi.advanceTimersByTimeAsync(20);
+          server.emit(
+            "close",
+            WsClosedCode.GoingAway,
+            "Discord WebSocket requesting client reconnect.",
+          );
+        });
+
+        it("should open new connection on resume server version 10 using json encoding", async () => {
+          const wsCoSpy = vi.fn();
+          resumeServer.on("wsconnection", wsCoSpy);
+
+          await vi.advanceTimersByTimeAsync(100);
+
+          expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+            shardSocket.ws,
+            `${resumeServer.getUrl()}?v=10&encoding=json`,
+          );
+        });
+
+        it("should send resume event to replay missed events when a disconnected client resumes", async () => {
+          const serverSp = resumeServer.getSpy();
+
+          await vi.advanceTimersByTimeAsync(101);
+
+          expect(serverSp.mock.calls).toEqual([
+            [
+              s({
+                op: GatewayOpcodes.Resume,
+                d: {
+                  token: gateway.token,
+                  session_id: readyPayload.d.session_id,
+                  seq: 1,
+                },
+              }),
+            ],
+          ]);
+        });
       });
     });
   });

@@ -8,11 +8,11 @@ import {
   GatewayOpcodes,
   GatewayReadyDispatch,
 } from "discord.js";
-import { GWSEvent } from "./gatewaytypes.js";
+import { WsClosedCode, GWSEvent } from "./gatewaytypes.js";
 import { getPromiseWithTimeout } from "../utils/getPromiseWithTimeout.js";
 
 const encoding = "json";
-const apiVerison = "10";
+const apiVersion = "10";
 
 // todo: implement erlpack https://github.com/discord/erlpack
 const s = JSON.stringify;
@@ -23,7 +23,7 @@ export class ShardSocket {
   heartbitTimer: null | ReturnType<typeof setInterval>;
   heartbitTimeOut: null | ReturnType<typeof setTimeout>;
   s: number | null;
-  session: string | null;
+  session_id: string | null;
   shard: number;
   main: GatewaySocket;
   jitter: number;
@@ -38,7 +38,7 @@ export class ShardSocket {
     this.heartbitInterval = 0;
     this.heartbitTimer = null;
     this.s = null;
-    this.session = null;
+    this.session_id = null;
     this.shard = shard;
     this.main = main;
     this.jitter = Math.random();
@@ -147,11 +147,6 @@ export class ShardSocket {
     this.main.emit(<any>t, this.shard, d);
   }
 
-  ready(e: GatewayReadyDispatch) {
-    this.main.emit(GWSEvent.Debug, this.shard, "recieved ready info");
-    this.resumeGatewayUrl = e.d.resume_gateway_url;
-  }
-
   onMessage(d: WebSocket.RawData) {
     const e = JSON.parse(d.toString());
     this.main.emit(GWSEvent.Debug, this.shard, "ShardSocket.dispatch", { e });
@@ -171,9 +166,6 @@ export class ShardSocket {
       case GatewayOpcodes.Heartbeat:
         this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit response");
         this.beat();
-        break;
-      case GatewayDispatchEvents.Ready:
-        this.ready(<any>e);
         break;
       default:
         break;
@@ -202,40 +194,82 @@ export class ShardSocket {
     });
   }
 
+  private configureSocket(ws: WebSocket) {
+    ws.on("message", (data: WebSocket.RawData) => {
+      this.onMessage(data);
+    });
+    ws.once("close", async (code: WsClosedCode, reason: string) => {
+      this.main.emit(GWSEvent.Debug, this.shard, "server closed connection", {
+        code,
+        reason: reason.toString(),
+      });
+
+      if (code === WsClosedCode.GoingAway) {
+        this.resume();
+      }
+    });
+    ws.once("error", (e) => {
+      this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
+    });
+  }
+
+  private async resume() {
+    if (this.ws) {
+      this.main.emit(GWSEvent.Debug, this.shard, "close connection");
+      await this.close();
+    }
+
+    this.main.emit(GWSEvent.Debug, this.shard, "try to resume connection");
+    const ws = new WebSocket(
+      `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
+    );
+
+    ws.once("open", () => {
+      this.main.emit(GWSEvent.Debug, this.shard, "resumed connection");
+      const firstBitTimeOut = Math.floor(100 * this.jitter); // avoid traffic jam using jitter method
+      setTimeout(() => {
+        this.send({
+          op: GatewayOpcodes.Resume,
+          d: {
+            token: this.main.token,
+            session_id: this.session_id,
+            seq: this.s,
+          },
+        });
+      }, firstBitTimeOut);
+    });
+    this.configureSocket(ws);
+    this.ws = ws;
+  }
+
   open(): Promise<{ timeReady: number; socket: ShardSocket }> {
     if (this.destroyed) {
       return Promise.reject(
         new Error("destroyed ShardSocket should be removed"),
       );
     }
-    this.main.emit(GWSEvent.Debug, this.shard, "starting connection packet");
+    this.main.emit(GWSEvent.Debug, this.shard, "starting connection");
 
-    this.ws = new WebSocket(
-      `${this.main.url}?v=${apiVerison}&encoding=${encoding}`,
+    const ws = new WebSocket(
+      `${this.main.url}?v=${apiVersion}&encoding=${encoding}`,
     );
 
-    this.ws?.once("open", () => {
+    ws.once("open", () => {
       this.main.emit(GWSEvent.Debug, this.shard, "opened connection");
     });
-    this.ws?.on("message", (data: WebSocket.RawData) => {
-      this.onMessage(data);
-    });
-    this.ws?.once("close", (code: string, reason: string) => {
-      this.main.emit(GWSEvent.Debug, this.shard, "server closed connection", {
-        code,
-        reason: reason.toString(),
-      });
-    });
-    this.ws?.once("error", (e) => {
-      this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
-    });
+
+    this.configureSocket(ws);
+
+    this.ws = ws;
 
     return getPromiseWithTimeout(
       this.maxTimeout,
       "ShardSocket.open timed out after %t ms",
       (resolve) => {
         this.main.on(GatewayDispatchEvents.Ready, (s, d) => {
-          this.session = d.session_id;
+          this.main.emit(GWSEvent.Debug, this.shard, "recieved ready info");
+          this.session_id = d.session_id;
+          this.resumeGatewayUrl = d.resume_gateway_url;
           resolve({ timeReady: Date.now(), socket: this });
         });
       },

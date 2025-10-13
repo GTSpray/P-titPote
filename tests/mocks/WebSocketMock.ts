@@ -30,12 +30,13 @@ export class WebSocketServerMock {
       this.spy(d);
     });
 
-    this.on("wsconnection", (ws) => {
+    this.on("wsconnection", (ws, url) => {
       ws.readyState = 1; // WebSocket.OPEN;
+      this.emit("open");
     });
 
     this.on("wsclose", () => {
-      this.emit("close", "co close", "close");
+      this.emit("close", 1000, "client close close");
     });
   }
 
@@ -73,7 +74,7 @@ export class WebSocketMock {
     this.mockedServer = WebSocketServerMock.getInstance(domain);
 
     setTimeout(() => {
-      this.mockedServer.emit("wsconnection", this);
+      this.mockedServer.emit("wsconnection", this, url);
     }, 20);
 
     this.on("close", () => {
