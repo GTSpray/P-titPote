@@ -5,8 +5,9 @@ import {
   GatewayHeartbeatAck,
   GatewayHello,
   GatewayIntentBits,
+  GatewayInvalidSession,
   GatewayOpcodes,
-  GatewayReadyDispatch,
+  GatewayResume,
 } from "discord.js";
 import { WsClosedCode, GWSEvent } from "./gatewaytypes.js";
 import { getPromiseWithTimeout } from "../utils/getPromiseWithTimeout.js";
@@ -113,6 +114,19 @@ export class ShardSocket {
     }, 10);
   }
 
+  async invalidSession(e: GatewayInvalidSession) {
+    this.main.emit(GWSEvent.Debug, this.shard, "receive invalid session", {
+      e,
+    });
+    if (e.d) {
+      this.resume();
+    } else {
+      await this.close();
+      this.session_id = null;
+      this.resumeGatewayUrl = null;
+      await this.open();
+    }
+  }
   send(d: object) {
     this.ws?.send(s(d));
   }
@@ -166,6 +180,12 @@ export class ShardSocket {
       case GatewayOpcodes.Heartbeat:
         this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit response");
         this.beat();
+        break;
+      case GatewayOpcodes.Reconnect:
+        this.resume();
+        break;
+      case GatewayOpcodes.InvalidSession:
+        this.invalidSession(<any>e);
         break;
       default:
         break;

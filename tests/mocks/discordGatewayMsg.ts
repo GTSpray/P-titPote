@@ -2,8 +2,10 @@ import {
   GatewayDispatchEvents,
   GatewayHeartbeatAck,
   GatewayHello,
+  GatewayInvalidSession,
   GatewayOpcodes,
   GatewayReadyDispatch,
+  GatewayReconnect,
 } from "discord.js";
 import { getRandomString, randomDiscordId19 } from "./discord-api/utils.js";
 
@@ -88,7 +90,22 @@ export const heartbeatAckMsg = (): GatewayHeartbeatAck =>
     d: null, // never but in fact null
   };
 
+export const reconnectMsg = (): GatewayReconnect =>
+  <GatewayReconnect>{
+    t: null,
+    s: null,
+    op: GatewayOpcodes.Reconnect,
+    d: null, // never but in fact null
+  };
+
+export const invalidSessionMsg = (d: boolean = false): GatewayInvalidSession =>
+  <GatewayInvalidSession>{
+    t: null,
+    s: null,
+    op: GatewayOpcodes.InvalidSession,
+    d,
+  };
 export const serverClosedCo = () => ({
-  code: 1006, //Connection reset by peer (its websocket error not discord code )
+  code: 1006, // Connection reset by peer (its websocket error not discord code )
   reason: "",
 });
