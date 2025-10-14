@@ -67,7 +67,7 @@ export class ShardSocket {
   resumeGatewayUrl: string | null;
   destroyed: boolean = false;
 
-  static maxTimeout = 15000;
+  static maxTimeout = 5000;
 
   constructor(main: GatewaySocket, shard: number) {
     this.ws = null;
@@ -108,7 +108,7 @@ export class ShardSocket {
             <any>this.ws?.readyState,
           )
         ) {
-          this.ws?.once("close", () => {
+          this.ws?.once("close", async () => {
             this.main.emit(
               GWSEvent.Debug,
               this.shard,
@@ -169,20 +169,23 @@ export class ShardSocket {
   }
 
   private beat() {
+    if (!this.heartbitTimeOut) {
+      this.heartbitTimeOut = setTimeout(async () => {
+        this.heartbitTimeOut = null;
+        this.main.emit(
+          GWSEvent.Debug,
+          this.shard,
+          "no heartbit ack event timeout",
+        );
+        await this.resume();
+      }, ShardSocket.maxTimeout);
+    }
     const e = {
       op: GatewayOpcodes.Heartbeat,
       d: this.s,
     };
     this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit", { e });
     this.send(e);
-
-    if (!this.heartbitTimeOut) {
-      this.heartbitTimeOut = setTimeout(() => {
-        this.close();
-        this.heartbitTimeOut = null;
-        this.main.emit(GWSEvent.Debug, this.shard, "no heartbit event timeout");
-      }, this.heartbitInterval);
-    }
   }
 
   private beatAck(e: GatewayHeartbeatAck) {

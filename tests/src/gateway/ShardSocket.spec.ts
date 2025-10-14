@@ -164,39 +164,70 @@ describe("ShardSocket", () => {
       });
 
       it("should keep heartbit interval using hello reponse interval", async () => {
-        await vi.advanceTimersByTimeAsync(heartbeat_interval);
-        server.send(s(heartbeatAckMsg()));
         server.getSpy().mockClear();
+        server.on("wsmessage", (d) => {
+          const m = JSON.parse(d);
+          if (m.op === GatewayOpcodes.Heartbeat) {
+            server.send(s(heartbeatAckMsg()));
+          }
+        });
 
-        const heartbeat_interval_wait = 3;
-        const expectedCalls = [];
-        for (let i = 0; i < heartbeat_interval_wait; i++) {
-          await vi.advanceTimersByTimeAsync(heartbeat_interval);
-          server.send(s(heartbeatAckMsg()));
-          expectedCalls.push([s({ op: GatewayOpcodes.Heartbeat, d: 1 })]);
-        }
-        expect(server.getSpy().mock.calls).toEqual(expectedCalls);
-      });
+        await vi.advanceTimersByTimeAsync(heartbeat_interval * 3);
 
-      it("should close connection when an app doesn't receive a Heartbeat ACK", async () => {
-        const closeEventSpy = vi.fn();
-        server.on("wsclose", closeEventSpy);
-
-        await vi.advanceTimersByTimeAsync(heartbeat_interval);
-        server.send(s(heartbeatAckMsg()));
-        await vi.advanceTimersByTimeAsync(heartbeat_interval - 1);
-
-        server.getSpy().mockClear();
-
-        await vi.advanceTimersByTimeAsync(heartbeat_interval * 9);
-
-        expect(closeEventSpy).toHaveBeenCalledExactlyOnceWith(
-          1001,
-          "cya later alligator",
-        );
         expect(server.getSpy().mock.calls).toEqual([
           [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
+          [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
+          [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
         ]);
+      });
+
+      describe("when app doesn't receive a heartbeat ACK", () => {
+        beforeEach(() => {
+          server.once("wsmessage", async (d) => {
+            const m = JSON.parse(d);
+            if (m.op === GatewayOpcodes.Heartbeat) {
+              await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout);
+            }
+          });
+        });
+        it("should close connection", async (done) => {
+          const closeEventSpy = vi.fn();
+          server.on("wsclose", closeEventSpy);
+          await vi.advanceTimersByTimeAsync(heartbeat_interval);
+          expect(closeEventSpy).toHaveBeenCalledExactlyOnceWith(
+            1001,
+            "cya later alligator",
+          );
+        });
+
+        it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
+          const wsCoSpy = vi.fn();
+          resumeServer.on("wsconnection", wsCoSpy);
+
+          await vi.advanceTimersByTimeAsync(heartbeat_interval);
+
+          expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+            shardSocket.ws,
+            `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+          );
+        });
+
+        it("should send resume event to replay missed events when a disconnected client resumes", async () => {
+          const serverSp = resumeServer.getSpy();
+
+          await vi.advanceTimersByTimeAsync(heartbeat_interval);
+
+          expect(serverSp).toHaveBeenCalledWith(
+            s({
+              op: GatewayOpcodes.Resume,
+              d: {
+                token: gateway.token,
+                session_id: readyPayload.d.session_id,
+                seq: 1,
+              },
+            }),
+          );
+        });
       });
 
       describe("when discord close active connection", () => {
@@ -209,7 +240,7 @@ describe("ShardSocket", () => {
           );
         });
 
-        it("should open new connection on resume server version 10 using json encoding", async () => {
+        it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
           const wsCoSpy = vi.fn();
           resumeServer.on("wsconnection", wsCoSpy);
 
@@ -239,13 +270,13 @@ describe("ShardSocket", () => {
         });
       });
 
-      describe("when websocket connection close with bbnormal closure", () => {
+      describe("when websocket connection close with abnormal closure", () => {
         beforeEach(async () => {
           await vi.advanceTimersByTimeAsync(20);
           server.emit("close", WsClosedCode.AbnormalClosure, Buffer.from(""));
         });
 
-        it("should open new connection on resume server version 10 using json encoding", async () => {
+        it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
           const wsCoSpy = vi.fn();
           resumeServer.on("wsconnection", wsCoSpy);
 
@@ -281,7 +312,7 @@ describe("ShardSocket", () => {
           server.send(s(reconnectMsg()));
         });
 
-        it("should open new connection on resume server version 10 using json encoding", async () => {
+        it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
           const wsCoSpy = vi.fn();
           resumeServer.on("wsconnection", wsCoSpy);
 
@@ -319,7 +350,7 @@ describe("ShardSocket", () => {
           server.send(s(invalidSessionMsg(true)));
         });
 
-        it("should open new connection on resume server version 10 using json encoding", async () => {
+        it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
           const wsCoSpy = vi.fn();
           resumeServer.on("wsconnection", wsCoSpy);
 
