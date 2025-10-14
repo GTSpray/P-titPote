@@ -80,11 +80,15 @@ export enum GWSEvent {
   Payload = "PAYLOAD",
 }
 
+// https://www.rfc-editor.org/rfc/rfc6455
 export enum WsClosedCode {
   NormalClosure = 1000, // indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
   GoingAway = 1001, // indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
   ProtocolError = 1002, // indicates that an endpoint is terminating the connection due to a protocol error.
   UnsupportedData = 1003, // indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).
+
+  NoStatusReceived = 1005, // It is designated for use in applications expecting a status code to indicate that no status code was actually present.
+  AbnormalClosure = 1006, // It is designated for use in applications expecting a status code to indicate that the connection was closed abnormally, e.g., without sending or receiving a Close control frame.
 }
 
 export type GatewayEvent = {

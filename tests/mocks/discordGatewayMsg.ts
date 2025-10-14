@@ -105,7 +105,3 @@ export const invalidSessionMsg = (d: boolean = false): GatewayInvalidSession =>
     op: GatewayOpcodes.InvalidSession,
     d,
   };
-export const serverClosedCo = () => ({
-  code: 1006, // Connection reset by peer (its websocket error not discord code )
-  reason: "",
-});

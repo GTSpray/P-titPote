@@ -7,7 +7,6 @@ import {
   GatewayIntentBits,
   GatewayInvalidSession,
   GatewayOpcodes,
-  GatewayResume,
 } from "discord.js";
 import { WsClosedCode, GWSEvent } from "./gatewaytypes.js";
 import { getPromiseWithTimeout } from "../utils/getPromiseWithTimeout.js";
@@ -17,6 +16,42 @@ const apiVersion = "10";
 
 // todo: implement erlpack https://github.com/discord/erlpack
 const s = JSON.stringify;
+
+const specificStatusCodeMappings = new Map([
+  [1000, "Normal Closure"],
+  [1001, "Going Away"],
+  [1002, "Protocol Error"],
+  [1003, "Unsupported Data"],
+  [1004, "(For future)"],
+  [1005, "No Status Received"],
+  [1006, "Abnormal Closure"],
+  [1007, "Invalid frame payload data"],
+  [1008, "Policy Violation"],
+  [1009, "Message too big"],
+  [1010, "Missing Extension"],
+  [1011, "Internal Error"],
+  [1012, "Service Restart"],
+  [1013, "Try Again Later"],
+  [1014, "Bad Gateway"],
+  [1015, "TLS Handshake"],
+]);
+
+function getStatusCodeString(code: number): string {
+  if (code >= 0 && code <= 999) {
+    return "(Unused)";
+  } else if (code >= 1016) {
+    if (code <= 1999) {
+      return "(For WebSocket standard)";
+    } else if (code <= 2999) {
+      return "(For WebSocket extensions)";
+    } else if (code <= 3999) {
+      return "(For libraries and frameworks)";
+    } else if (code <= 4999) {
+      return "(For applications)";
+    }
+  }
+  return specificStatusCodeMappings.get(code) || "(Unknown)";
+}
 
 export class ShardSocket {
   ws: null | WebSocket;
@@ -93,7 +128,7 @@ export class ShardSocket {
     );
   }
 
-  hello(e: GatewayHello) {
+  private hello(e: GatewayHello) {
     this.main.emit(GWSEvent.Debug, this.shard, "recieved hello info", {
       payload: e,
     });
@@ -121,17 +156,19 @@ export class ShardSocket {
     if (e.d) {
       this.resume();
     } else {
+      this.main.emit(GWSEvent.Debug, this.shard, "try to reconnect gateway");
       await this.close();
       this.session_id = null;
       this.resumeGatewayUrl = null;
       await this.open();
     }
   }
+
   send(d: object) {
     this.ws?.send(s(d));
   }
 
-  beat() {
+  private beat() {
     const e = {
       op: GatewayOpcodes.Heartbeat,
       d: this.s,
@@ -148,7 +185,7 @@ export class ShardSocket {
     }
   }
 
-  beatAck(e: GatewayHeartbeatAck) {
+  private beatAck(e: GatewayHeartbeatAck) {
     this.main.emit(GWSEvent.Debug, this.shard, "heartbit acknowledged");
     if (this.heartbitTimeOut) {
       clearTimeout(this.heartbitTimeOut);
@@ -156,12 +193,12 @@ export class ShardSocket {
     }
   }
 
-  dispatch(e: any) {
+  private dispatch(e: any) {
     const { t, d } = e;
     this.main.emit(<any>t, this.shard, d);
   }
 
-  onMessage(d: WebSocket.RawData) {
+  private onMessage(d: WebSocket.RawData) {
     const e = JSON.parse(d.toString());
     this.main.emit(GWSEvent.Debug, this.shard, "ShardSocket.dispatch", { e });
     if (e && !!e.s) {
@@ -192,7 +229,7 @@ export class ShardSocket {
     }
   }
 
-  identify() {
+  private identify() {
     this.main.emit(GWSEvent.Debug, this.shard, "sent identify packet");
     this.send({
       op: GatewayOpcodes.Identify,
@@ -221,10 +258,13 @@ export class ShardSocket {
     ws.once("close", async (code: WsClosedCode, reason: string) => {
       this.main.emit(GWSEvent.Debug, this.shard, "server closed connection", {
         code,
+        codeString: getStatusCodeString(code),
         reason: reason.toString(),
       });
 
-      if (code === WsClosedCode.GoingAway) {
+      if (
+        [WsClosedCode.GoingAway, WsClosedCode.AbnormalClosure].includes(code)
+      ) {
         this.resume();
       }
     });

@@ -16,6 +16,9 @@ import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
 import { WsClosedCode, GWSEvent } from "../../../src/gateway/gatewaytypes.js";
 const s = JSON.stringify;
 
+const encoding = "json";
+const apiVersion = "10";
+
 describe("ShardSocket", () => {
   let shardSocket: ShardSocket;
   let gateway: GatewaySocket;
@@ -43,7 +46,7 @@ describe("ShardSocket", () => {
 
       expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
         shardSocket.ws,
-        `${server.getUrl()}?v=10&encoding=json`,
+        `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
       );
     });
 
@@ -214,7 +217,7 @@ describe("ShardSocket", () => {
 
           expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
             shardSocket.ws,
-            `${resumeServer.getUrl()}?v=10&encoding=json`,
+            `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
           );
         });
 
@@ -223,18 +226,52 @@ describe("ShardSocket", () => {
 
           await vi.advanceTimersByTimeAsync(200);
 
-          expect(serverSp.mock.calls).toEqual([
-            [
-              s({
-                op: GatewayOpcodes.Resume,
-                d: {
-                  token: gateway.token,
-                  session_id: readyPayload.d.session_id,
-                  seq: 1,
-                },
-              }),
-            ],
-          ]);
+          expect(serverSp).toHaveBeenCalledWith(
+            s({
+              op: GatewayOpcodes.Resume,
+              d: {
+                token: gateway.token,
+                session_id: readyPayload.d.session_id,
+                seq: 1,
+              },
+            }),
+          );
+        });
+      });
+
+      describe("when websocket connection close with bbnormal closure", () => {
+        beforeEach(async () => {
+          await vi.advanceTimersByTimeAsync(20);
+          server.emit("close", WsClosedCode.AbnormalClosure, Buffer.from(""));
+        });
+
+        it("should open new connection on resume server version 10 using json encoding", async () => {
+          const wsCoSpy = vi.fn();
+          resumeServer.on("wsconnection", wsCoSpy);
+
+          await vi.advanceTimersByTimeAsync(200);
+
+          expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+            shardSocket.ws,
+            `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+          );
+        });
+
+        it("should send resume event to replay missed events when a disconnected client resumes", async () => {
+          const serverSp = resumeServer.getSpy();
+
+          await vi.advanceTimersByTimeAsync(200);
+
+          expect(serverSp).toHaveBeenCalledWith(
+            s({
+              op: GatewayOpcodes.Resume,
+              d: {
+                token: gateway.token,
+                session_id: readyPayload.d.session_id,
+                seq: 1,
+              },
+            }),
+          );
         });
       });
 
@@ -252,7 +289,7 @@ describe("ShardSocket", () => {
 
           expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
             shardSocket.ws,
-            `${resumeServer.getUrl()}?v=10&encoding=json`,
+            `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
           );
         });
 
@@ -290,7 +327,7 @@ describe("ShardSocket", () => {
 
           expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
             shardSocket.ws,
-            `${resumeServer.getUrl()}?v=10&encoding=json`,
+            `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
           );
         });
 
@@ -299,18 +336,16 @@ describe("ShardSocket", () => {
 
           await vi.advanceTimersByTimeAsync(200);
 
-          expect(serverSp.mock.calls).toEqual([
-            [
-              s({
-                op: GatewayOpcodes.Resume,
-                d: {
-                  token: gateway.token,
-                  session_id: readyPayload.d.session_id,
-                  seq: 1,
-                },
-              }),
-            ],
-          ]);
+          expect(serverSp).toHaveBeenCalledWith(
+            s({
+              op: GatewayOpcodes.Resume,
+              d: {
+                token: gateway.token,
+                session_id: readyPayload.d.session_id,
+                seq: 1,
+              },
+            }),
+          );
         });
       });
 
@@ -328,7 +363,7 @@ describe("ShardSocket", () => {
 
           expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
             shardSocket.ws,
-            `${server.getUrl()}?v=10&encoding=json`,
+            `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
           );
         });
 
