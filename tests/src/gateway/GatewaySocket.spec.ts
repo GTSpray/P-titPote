@@ -22,18 +22,13 @@ describe("GatewaySocket", () => {
     const fakeUrl = "wss://gateway.discord.gg";
     const fakeshards = 1;
 
-    let shardSocketOpenSpy: MockInstance<
-      () => Promise<{ timeReady: number; socket: ShardSocket }>
-    >;
+    let shardSocketOpenSpy: MockInstance<() => Promise<void>>;
     let shardSocketCloseSpy: MockInstance<() => Promise<void>>;
 
     beforeEach(() => {
       shardSocketOpenSpy = vi
         .spyOn(ShardSocket.prototype, "open")
-        .mockResolvedValue({
-          timeReady: 1,
-          socket: vi.fn() as unknown as ShardSocket,
-        });
+        .mockResolvedValue();
 
       shardSocketCloseSpy = vi
         .spyOn(ShardSocket.prototype, "close")
@@ -72,9 +67,7 @@ describe("GatewaySocket", () => {
         .mockImplementationOnce(
           () =>
             ({
-              open: vi
-                .fn()
-                .mockResolvedValue({ timeReady: 1, socket: vi.fn() }),
+              open: vi.fn().mockResolvedValue(undefined),
             }) as unknown as ShardSocket,
         );
       await gateway.connect();
@@ -96,10 +89,7 @@ describe("GatewaySocket", () => {
   describe("send", () => {
     let shardSocketOpenSpy: MockInstance<(data: object) => void>;
     beforeEach(async () => {
-      vi.spyOn(ShardSocket.prototype, "open").mockResolvedValue({
-        timeReady: 1,
-        socket: vi.fn() as unknown as ShardSocket,
-      });
+      vi.spyOn(ShardSocket.prototype, "open").mockResolvedValue();
 
       shardSocketOpenSpy = vi.spyOn(ShardSocket.prototype, "send");
 

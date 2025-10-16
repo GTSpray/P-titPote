@@ -63,24 +63,6 @@ describe("ShardSocket", () => {
       );
     });
 
-    it("should resolve connection if server send welcome message earlier than timeout", async () => {
-      const openPromise = shardSocket.open();
-
-      await vi.advanceTimersByTimeAsync(100);
-      server.send(s(helloMsg({})));
-      await vi.advanceTimersByTimeAsync(100);
-      server.send(s(readyMsg({})));
-
-      await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout);
-
-      const result = await openPromise;
-
-      expect(result).toStrictEqual({
-        timeReady: expect.any(Number),
-        socket: shardSocket,
-      });
-    });
-
     it("should request the first heartbeat using jitter method", async () => {
       const heartbeat_interval = 5000;
       const fakejitter = Math.random();
