@@ -57,7 +57,7 @@ function getStatusCodeString(code: number): string {
 export class ShardSocket {
   ws: null | WebSocket;
   heartbitInterval: number;
-  heartbitTimer: null | ReturnType<typeof setInterval>;
+  heartbitTimer: null | ReturnType<typeof setTimeout>;
   heartbitTimeOut: null | ReturnType<typeof setTimeout>;
   s: number | null;
   session_id: string | null;
@@ -105,7 +105,7 @@ export class ShardSocket {
           );
 
           if (this.heartbitTimer) {
-            clearInterval(this.heartbitTimer);
+            clearTimeout(this.heartbitTimer);
             this.heartbitTimer = null;
           }
           if (this.heartbitTimeOut) {
@@ -146,16 +146,21 @@ export class ShardSocket {
     }
   }
 
-  private setHeartbeat() {
+  private continueHeartbeat() {
+    this.heartbitTimer = setTimeout(() => {
+      this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit interval");
+      this.beat();
+      this.continueHeartbeat();
+    }, this.heartbitInterval);
+  }
+
+  private startHeartbeat() {
     if (!this.heartbitTimer) {
       const firstBitTimeOut = Math.floor(this.heartbitInterval * this.jitter);
-      setTimeout(() => {
+      this.heartbitTimer = setTimeout(() => {
         this.main.emit(GWSEvent.Debug, this.shard, "emit first heartbit");
         this.beat();
-        this.heartbitTimer = setInterval(() => {
-          this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit interval");
-          this.beat();
-        }, this.heartbitInterval);
+        this.continueHeartbeat();
       }, firstBitTimeOut);
     }
   }
@@ -253,7 +258,7 @@ export class ShardSocket {
         break;
     }
 
-    this.setHeartbeat();
+    this.startHeartbeat();
   }
 
   private configureSocket(ws: WebSocket) {
