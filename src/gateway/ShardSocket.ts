@@ -165,7 +165,6 @@ export class ShardSocket {
       payload: e,
     });
     this.heartbitInterval = e.d.heartbeat_interval;
-    this.setHeartbeat();
   }
 
   async invalidSession(e: GatewayInvalidSession) {
@@ -253,6 +252,8 @@ export class ShardSocket {
       default:
         break;
     }
+
+    this.setHeartbeat();
   }
 
   private configureSocket(ws: WebSocket) {
@@ -301,6 +302,10 @@ export class ShardSocket {
           const ws = new WebSocket(
             `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
           );
+
+          this.main.once(GatewayDispatchEvents.Resumed, () => {
+            resolve(undefined);
+          });
           ws.once("open", () => {
             this.main.emit(GWSEvent.Debug, this.shard, "resumed connection");
             setTimeout(() => {
@@ -313,8 +318,6 @@ export class ShardSocket {
                   seq: this.s,
                 },
               });
-              this.setHeartbeat();
-              resolve(undefined);
             }, onConnectionDelay);
           });
 
