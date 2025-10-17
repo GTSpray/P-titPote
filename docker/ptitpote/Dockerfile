@@ -1,5 +1,6 @@
 FROM node:24-slim AS ptitpotebuilder
 WORKDIR /app
+RUN apt update && apt install -y python3 make g++
 COPY package*.json ./
 RUN npm install
 COPY --chown=node:node . /app
