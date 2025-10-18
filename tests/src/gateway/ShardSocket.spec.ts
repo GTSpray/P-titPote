@@ -293,7 +293,7 @@ describe("ShardSocket", () => {
     });
   });
 
-  describe.only("heartbit mechanism", () => {
+  describe("heartbit mechanism", () => {
     const heartbeat_interval = 7500;
     let resumeServer: WebSocketServerMock;
     let readyPayload: GatewayReadyDispatch;
