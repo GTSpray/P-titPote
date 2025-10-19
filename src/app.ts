@@ -112,8 +112,8 @@ app.listen(PORT, (err) => {
   logger.info(`startup success`, { port: PORT });
 });
 
-gateway.on(GatewayDispatchEvents.MessageReactionAdd, (_s, p) => {
-  const { emoji, user_id } = p;
+gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
+  const { emoji, user_id } = event;
   logger.info("emoji recat", { user_id, emoji });
 });
 

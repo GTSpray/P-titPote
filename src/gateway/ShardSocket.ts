@@ -219,7 +219,10 @@ export class ShardSocket {
 
   private dispatch(e: any) {
     const { t, d } = e;
-    this.main.emit(<any>t, this.shard, d);
+    this.main.emit(<any>t, {
+      shard: this.shard,
+      event: d,
+    });
   }
 
   private async onMessage(d: WebSocket.RawData) {
@@ -392,10 +395,10 @@ export class ShardSocket {
 
           this.ws = ws;
 
-          this.main.once(GatewayDispatchEvents.Ready, (s, d) => {
+          this.main.once(GatewayDispatchEvents.Ready, ({ event }) => {
             this.main.emit(GWSEvent.Debug, this.shard, "recieved ready info");
-            this.session_id = d.session_id;
-            this.resumeGatewayUrl = d.resume_gateway_url;
+            this.session_id = event.session_id;
+            this.resumeGatewayUrl = event.resume_gateway_url;
             resolve();
           });
         },

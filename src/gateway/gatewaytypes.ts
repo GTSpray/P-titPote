@@ -97,301 +97,267 @@ export type GatewayEvent = {
     payload: { s: number; op: number; t: string; d: any },
   ];
   [GatewayDispatchEvents.ApplicationCommandPermissionsUpdate]: [
-    shard: number,
-    GatewayApplicationCommandPermissionsUpdateDispatchData,
+    {
+      shard: number;
+      event: GatewayApplicationCommandPermissionsUpdateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.AutoModerationActionExecution]: [
-    shard: number,
-    GatewayAutoModerationActionExecutionDispatchData,
+    {
+      shard: number;
+      event: GatewayAutoModerationActionExecutionDispatchData;
+    },
   ];
   [GatewayDispatchEvents.AutoModerationRuleCreate]: [
-    shard: number,
-    GatewayAutoModerationRuleCreateDispatchData,
+    { shard: number; event: GatewayAutoModerationRuleCreateDispatchData },
   ];
   [GatewayDispatchEvents.AutoModerationRuleDelete]: [
-    shard: number,
-    GatewayAutoModerationRuleDeleteDispatchData,
+    { shard: number; event: GatewayAutoModerationRuleDeleteDispatchData },
   ];
   [GatewayDispatchEvents.AutoModerationRuleUpdate]: [
-    shard: number,
-    GatewayAutoModerationRuleUpdateDispatchData,
+    { shard: number; event: GatewayAutoModerationRuleUpdateDispatchData },
   ];
   [GatewayDispatchEvents.ChannelCreate]: [
-    shard: number,
-    GatewayChannelCreateDispatchData,
+    { shard: number; event: GatewayChannelCreateDispatchData },
   ];
   [GatewayDispatchEvents.ChannelDelete]: [
-    shard: number,
-    GatewayChannelDeleteDispatchData,
+    { shard: number; event: GatewayChannelDeleteDispatchData },
   ];
   [GatewayDispatchEvents.ChannelPinsUpdate]: [
-    shard: number,
-    GatewayChannelPinsUpdateDispatchData,
+    { shard: number; event: GatewayChannelPinsUpdateDispatchData },
   ];
   [GatewayDispatchEvents.ChannelUpdate]: [
-    shard: number,
-    GatewayChannelUpdateDispatchData,
+    { shard: number; event: GatewayChannelUpdateDispatchData },
   ];
   [GatewayDispatchEvents.EntitlementCreate]: [
-    shard: number,
-    GatewayEntitlementCreateDispatchData,
+    { shard: number; event: GatewayEntitlementCreateDispatchData },
   ];
   [GatewayDispatchEvents.EntitlementDelete]: [
-    shard: number,
-    GatewayEntitlementDeleteDispatchData,
+    { shard: number; event: GatewayEntitlementDeleteDispatchData },
   ];
   [GatewayDispatchEvents.EntitlementUpdate]: [
-    shard: number,
-    GatewayEntitlementUpdateDispatchData,
+    { shard: number; event: GatewayEntitlementUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildAuditLogEntryCreate]: [
-    shard: number,
-    GatewayGuildAuditLogEntryCreateDispatchData,
+    { shard: number; event: GatewayGuildAuditLogEntryCreateDispatchData },
   ];
   [GatewayDispatchEvents.GuildBanAdd]: [
-    shard: number,
-    GatewayGuildBanAddDispatchData,
+    { shard: number; event: GatewayGuildBanAddDispatchData },
   ];
   [GatewayDispatchEvents.GuildBanRemove]: [
-    shard: number,
-    GatewayGuildBanRemoveDispatchData,
+    { shard: number; event: GatewayGuildBanRemoveDispatchData },
   ];
   [GatewayDispatchEvents.GuildCreate]: [
-    shard: number,
-    GatewayGuildCreateDispatchData,
+    { shard: number; event: GatewayGuildCreateDispatchData },
   ];
   [GatewayDispatchEvents.GuildDelete]: [
-    shard: number,
-    GatewayGuildDeleteDispatchData,
+    { shard: number; event: GatewayGuildDeleteDispatchData },
   ];
   [GatewayDispatchEvents.GuildEmojisUpdate]: [
-    shard: number,
-    GatewayGuildEmojisUpdateDispatchData,
+    { shard: number; event: GatewayGuildEmojisUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildIntegrationsUpdate]: [
-    shard: number,
-    GatewayGuildIntegrationsUpdateDispatchData,
+    { shard: number; event: GatewayGuildIntegrationsUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildMemberAdd]: [
-    shard: number,
-    GatewayGuildMemberAddDispatchData,
+    { shard: number; event: GatewayGuildMemberAddDispatchData },
   ];
   [GatewayDispatchEvents.GuildMemberRemove]: [
-    shard: number,
-    GatewayGuildMemberRemoveDispatchData,
+    { shard: number; event: GatewayGuildMemberRemoveDispatchData },
   ];
   [GatewayDispatchEvents.GuildMembersChunk]: [
-    shard: number,
-    GatewayGuildMembersChunkDispatchData,
+    { shard: number; event: GatewayGuildMembersChunkDispatchData },
   ];
   [GatewayDispatchEvents.GuildMemberUpdate]: [
-    shard: number,
-    GatewayGuildMemberUpdateDispatchData,
+    { shard: number; event: GatewayGuildMemberUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildRoleCreate]: [
-    shard: number,
-    GatewayGuildRoleCreateDispatchData,
+    { shard: number; event: GatewayGuildRoleCreateDispatchData },
   ];
   [GatewayDispatchEvents.GuildRoleDelete]: [
-    shard: number,
-    GatewayGuildRoleDeleteDispatchData,
+    { shard: number; event: GatewayGuildRoleDeleteDispatchData },
   ];
   [GatewayDispatchEvents.GuildRoleUpdate]: [
-    shard: number,
-    GatewayGuildRoleUpdateDispatchData,
+    { shard: number; event: GatewayGuildRoleUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildScheduledEventCreate]: [
-    shard: number,
-    GatewayGuildScheduledEventCreateDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildScheduledEventCreateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildScheduledEventDelete]: [
-    shard: number,
-    GatewayGuildScheduledEventDeleteDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildScheduledEventDeleteDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildScheduledEventUpdate]: [
-    shard: number,
-    GatewayGuildScheduledEventUpdateDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildScheduledEventUpdateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildScheduledEventUserAdd]: [
-    shard: number,
-    GatewayGuildScheduledEventUserAddDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildScheduledEventUserAddDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildScheduledEventUserRemove]: [
-    shard: number,
-    GatewayGuildScheduledEventUserRemoveDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildScheduledEventUserRemoveDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildSoundboardSoundCreate]: [
-    shard: number,
-    GatewayGuildSoundboardSoundCreateDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildSoundboardSoundCreateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildSoundboardSoundDelete]: [
-    shard: number,
-    GatewayGuildSoundboardSoundDeleteDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildSoundboardSoundDeleteDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildSoundboardSoundsUpdate]: [
-    shard: number,
-    GatewayGuildSoundboardSoundsUpdateDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildSoundboardSoundsUpdateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.GuildSoundboardSoundUpdate]: [
-    shard: number,
-    GatewayGuildSoundboardSoundUpdateDispatchData,
+    {
+      shard: number;
+      event: GatewayGuildSoundboardSoundUpdateDispatchData;
+    },
   ];
   [GatewayDispatchEvents.SoundboardSounds]: [
-    shard: number,
-    GatewaySoundboardSoundsDispatchData,
+    { shard: number; event: GatewaySoundboardSoundsDispatchData },
   ];
   [GatewayDispatchEvents.GuildStickersUpdate]: [
-    shard: number,
-    GatewayGuildStickersUpdateDispatchData,
+    { shard: number; event: GatewayGuildStickersUpdateDispatchData },
   ];
   [GatewayDispatchEvents.GuildUpdate]: [
-    shard: number,
-    GatewayGuildUpdateDispatchData,
+    { shard: number; event: GatewayGuildUpdateDispatchData },
   ];
   [GatewayDispatchEvents.IntegrationCreate]: [
-    shard: number,
-    GatewayIntegrationCreateDispatchData,
+    { shard: number; event: GatewayIntegrationCreateDispatchData },
   ];
   [GatewayDispatchEvents.IntegrationDelete]: [
-    shard: number,
-    GatewayIntegrationDeleteDispatchData,
+    { shard: number; event: GatewayIntegrationDeleteDispatchData },
   ];
   [GatewayDispatchEvents.IntegrationUpdate]: [
-    shard: number,
-    GatewayIntegrationUpdateDispatchData,
+    { shard: number; event: GatewayIntegrationUpdateDispatchData },
   ];
   [GatewayDispatchEvents.InteractionCreate]: [
-    shard: number,
-    GatewayInteractionCreateDispatchData,
+    { shard: number; event: GatewayInteractionCreateDispatchData },
   ];
   [GatewayDispatchEvents.InviteCreate]: [
-    shard: number,
-    GatewayInviteCreateDispatchData,
+    { shard: number; event: GatewayInviteCreateDispatchData },
   ];
   [GatewayDispatchEvents.InviteDelete]: [
-    shard: number,
-    GatewayInviteDeleteDispatchData,
+    { shard: number; event: GatewayInviteDeleteDispatchData },
   ];
   [GatewayDispatchEvents.MessageCreate]: [
-    shard: number,
-    GatewayMessageCreateDispatchData,
+    { shard: number; event: GatewayMessageCreateDispatchData },
   ];
   [GatewayDispatchEvents.MessageDelete]: [
-    shard: number,
-    GatewayMessageDeleteDispatchData,
+    { shard: number; event: GatewayMessageDeleteDispatchData },
   ];
   [GatewayDispatchEvents.MessageDeleteBulk]: [
-    shard: number,
-    GatewayMessageDeleteBulkDispatchData,
+    { shard: number; event: GatewayMessageDeleteBulkDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteAdd]: [
-    shard: number,
-    GatewayMessageDeleteDispatchData,
+    { shard: number; event: GatewayMessageDeleteDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteRemove]: [
-    shard: number,
-    GatewayMessageDeleteDispatchData,
+    { shard: number; event: GatewayMessageDeleteDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionAdd]: [
-    shard: number,
-    GatewayMessageReactionAddDispatchData,
+    { shard: number; event: GatewayMessageReactionAddDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionRemove]: [
-    shard: number,
-    GatewayMessageReactionRemoveDispatchData,
+    { shard: number; event: GatewayMessageReactionRemoveDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionRemoveAll]: [
-    shard: number,
-    GatewayMessageReactionRemoveAllDispatchData,
+    { shard: number; event: GatewayMessageReactionRemoveAllDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionRemoveEmoji]: [
-    shard: number,
-    GatewayMessageReactionRemoveEmojiDispatchData,
+    {
+      shard: number;
+      event: GatewayMessageReactionRemoveEmojiDispatchData;
+    },
   ];
   [GatewayDispatchEvents.MessageUpdate]: [
-    shard: number,
-    GatewayMessageUpdateDispatchData,
+    { shard: number; event: GatewayMessageUpdateDispatchData },
   ];
   [GatewayDispatchEvents.PresenceUpdate]: [
-    shard: number,
-    GatewayPresenceUpdateDispatchData,
+    { shard: number; event: GatewayPresenceUpdateDispatchData },
   ];
   [GatewayDispatchEvents.RateLimited]: [
-    shard: number,
-    GatewayRateLimitedDispatchData,
+    { shard: number; event: GatewayRateLimitedDispatchData },
   ];
-  [GatewayDispatchEvents.Ready]: [shard: number, GatewayReadyDispatchData];
-  [GatewayDispatchEvents.Resumed]: [shard: number, GatewayReadyDispatchData];
+  [GatewayDispatchEvents.Ready]: [
+    { shard: number; event: GatewayReadyDispatchData },
+  ];
+  [GatewayDispatchEvents.Resumed]: [
+    { shard: number; event: GatewayReadyDispatchData },
+  ];
   [GatewayDispatchEvents.StageInstanceCreate]: [
-    shard: number,
-    GatewayStageInstanceCreateDispatchData,
+    { shard: number; event: GatewayStageInstanceCreateDispatchData },
   ];
   [GatewayDispatchEvents.StageInstanceDelete]: [
-    shard: number,
-    GatewayStageInstanceDeleteDispatchData,
+    { shard: number; event: GatewayStageInstanceDeleteDispatchData },
   ];
   [GatewayDispatchEvents.StageInstanceUpdate]: [
-    shard: number,
-    GatewayStageInstanceUpdateDispatchData,
+    { shard: number; event: GatewayStageInstanceUpdateDispatchData },
   ];
   [GatewayDispatchEvents.SubscriptionCreate]: [
-    shard: number,
-    GatewaySubscriptionCreateDispatchData,
+    { shard: number; event: GatewaySubscriptionCreateDispatchData },
   ];
   [GatewayDispatchEvents.SubscriptionDelete]: [
-    shard: number,
-    GatewaySubscriptionDeleteDispatchData,
+    { shard: number; event: GatewaySubscriptionDeleteDispatchData },
   ];
   [GatewayDispatchEvents.SubscriptionUpdate]: [
-    shard: number,
-    GatewaySubscriptionUpdateDispatchData,
+    { shard: number; event: GatewaySubscriptionUpdateDispatchData },
   ];
   [GatewayDispatchEvents.ThreadCreate]: [
-    shard: number,
-    GatewayThreadCreateDispatchData,
+    { shard: number; event: GatewayThreadCreateDispatchData },
   ];
   [GatewayDispatchEvents.ThreadDelete]: [
-    shard: number,
-    GatewayThreadDeleteDispatchData,
+    { shard: number; event: GatewayThreadDeleteDispatchData },
   ];
   [GatewayDispatchEvents.ThreadListSync]: [
-    shard: number,
-    GatewayThreadListSyncDispatchData,
+    { shard: number; event: GatewayThreadListSyncDispatchData },
   ];
   [GatewayDispatchEvents.ThreadMembersUpdate]: [
-    shard: number,
-    GatewayThreadMembersUpdateDispatchData,
+    { shard: number; event: GatewayThreadMembersUpdateDispatchData },
   ];
   [GatewayDispatchEvents.ThreadMemberUpdate]: [
-    shard: number,
-    GatewayThreadMemberUpdateDispatchData,
+    { shard: number; event: GatewayThreadMemberUpdateDispatchData },
   ];
   [GatewayDispatchEvents.ThreadUpdate]: [
-    shard: number,
-    GatewayThreadUpdateDispatchData,
+    { shard: number; event: GatewayThreadUpdateDispatchData },
   ];
   [GatewayDispatchEvents.TypingStart]: [
-    shard: number,
-    GatewayTypingStartDispatchData,
+    { shard: number; event: GatewayTypingStartDispatchData },
   ];
   [GatewayDispatchEvents.UserUpdate]: [
-    shard: number,
-    GatewayUserUpdateDispatchData,
+    { shard: number; event: GatewayUserUpdateDispatchData },
   ];
   [GatewayDispatchEvents.VoiceChannelEffectSend]: [
-    shard: number,
-    GatewayVoiceChannelEffectSendDispatchData,
+    { shard: number; event: GatewayVoiceChannelEffectSendDispatchData },
   ];
   [GatewayDispatchEvents.VoiceServerUpdate]: [
-    shard: number,
-    GatewayVoiceServerUpdateDispatchData,
+    { shard: number; event: GatewayVoiceServerUpdateDispatchData },
   ];
   [GatewayDispatchEvents.VoiceStateUpdate]: [
-    shard: number,
-    GatewayVoiceStateUpdateDispatchData,
+    { shard: number; event: GatewayVoiceStateUpdateDispatchData },
   ];
   [GatewayDispatchEvents.WebhooksUpdate]: [
-    shard: number,
-    GatewayWebhooksUpdateDispatchData,
+    { shard: number; event: GatewayWebhooksUpdateDispatchData },
   ];
 };

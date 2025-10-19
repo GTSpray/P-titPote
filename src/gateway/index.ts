@@ -19,10 +19,10 @@ gateway.on(GWSEvent.Payload, (shard, meta) => {
   logger.debug("gateway payload", { shard, meta });
 });
 
-gateway.on(GatewayDispatchEvents.GuildCreate, (shard, meta) => {
-  logger.info("gateway guild_create", { shard, meta });
+gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
+  logger.info("gateway guild_create", { shard, event });
 });
 
-gateway.on(GatewayDispatchEvents.GuildDelete, (shard, meta) => {
-  logger.info("gateway guild_delete", { shard, meta });
+gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
+  logger.info("gateway guild_delete", { shard, event });
 });
