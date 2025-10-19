@@ -385,7 +385,8 @@ export class ShardSocket {
                   },
                   intents:
                     GatewayIntentBits.GuildMessageReactions |
-                    GatewayIntentBits.GuildMessages,
+                    GatewayIntentBits.GuildMessages |
+                    GatewayIntentBits.DirectMessages,
                 },
               });
             }, onConnectionDelay);

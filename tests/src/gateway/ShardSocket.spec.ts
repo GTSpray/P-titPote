@@ -9,13 +9,13 @@ import {
   resumedMsg,
 } from "../../mocks/discordGatewayMsg.js";
 import {
+  GatewayDispatchEvents,
   GatewayIntentBits,
   GatewayOpcodes,
   GatewayReadyDispatch,
 } from "discord.js";
 import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
 import { WsClosedCode, GWSEvent } from "../../../src/gateway/gatewaytypes.js";
-import { time } from "console";
 
 const s = JSON.stringify;
 const p = JSON.parse;
@@ -27,6 +27,11 @@ const fakeLatency = async (min: number, max: number) => {
   const latency = Math.random() * (max - min) + min;
   await vi.advanceTimersByTimeAsync(latency);
 };
+
+const intents =
+  GatewayIntentBits.GuildMessageReactions |
+  GatewayIntentBits.GuildMessages |
+  GatewayIntentBits.DirectMessages;
 
 describe("ShardSocket", () => {
   let shardSocket: ShardSocket;
@@ -91,7 +96,8 @@ describe("ShardSocket", () => {
         },
         intents:
           GatewayIntentBits.GuildMessageReactions |
-          GatewayIntentBits.GuildMessages,
+          GatewayIntentBits.GuildMessages |
+          GatewayIntentBits.DirectMessages,
       },
     };
     expect(server.getSpy()).toBeCalledWith(s(identityPayload));
@@ -239,7 +245,8 @@ describe("ShardSocket", () => {
             },
             intents:
               GatewayIntentBits.GuildMessageReactions |
-              GatewayIntentBits.GuildMessages,
+              GatewayIntentBits.GuildMessages |
+              GatewayIntentBits.DirectMessages,
           },
         };
         expect(server.getSpy()).toBeCalledWith(s(identityPayload));
@@ -309,4 +316,38 @@ describe("ShardSocket", () => {
       expect(server.getSpy().mock.calls).toEqual(expectedBeats);
     });
   });
+
+  it.each(Object.keys(GatewayDispatchEvents))(
+    "should emit gateway event on dispatch %s message",
+    async (e: unknown) => {
+      shardSocket.open().catch(() => {});
+      await vi.advanceTimersByTimeAsync(100);
+      server.send(s(helloMsg({})));
+      await vi.advanceTimersByTimeAsync(100);
+
+      const spy = vi.fn();
+      const event = <GatewayDispatchEvents>(
+        GatewayDispatchEvents[<keyof typeof GatewayDispatchEvents>e]
+      );
+      gateway.on(event, spy);
+
+      const expectedEvent = { aPayload: "expected" };
+
+      server.send(
+        s({
+          t: event,
+          s: 1,
+          op: GatewayOpcodes.Dispatch,
+          d: expectedEvent,
+        }),
+      );
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(spy).toHaveBeenCalledExactlyOnceWith({
+        event: expectedEvent,
+        shard: 0,
+      });
+    },
+  );
 });
