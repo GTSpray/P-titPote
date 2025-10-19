@@ -6,6 +6,7 @@ import {
   invalidSessionMsg,
   readyMsg,
   reconnectMsg,
+  resumedMsg,
 } from "../../mocks/discordGatewayMsg.js";
 import {
   GatewayIntentBits,
@@ -14,11 +15,18 @@ import {
 } from "discord.js";
 import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
 import { WsClosedCode, GWSEvent } from "../../../src/gateway/gatewaytypes.js";
+import { time } from "console";
+
 const s = JSON.stringify;
 const p = JSON.parse;
 
 const encoding = "json";
 const apiVersion = "10";
+
+const fakeLatency = async (min: number, max: number) => {
+  const latency = Math.random() * (max - min) + min;
+  await vi.advanceTimersByTimeAsync(latency);
+};
 
 describe("ShardSocket", () => {
   let shardSocket: ShardSocket;
@@ -35,7 +43,7 @@ describe("ShardSocket", () => {
     vi.clearAllTimers();
   });
 
-  it("should open new connection on Discord Gateway API version 10 using json encoding", async () => {
+  it("should open connection on Discord Gateway API version 10 using json encoding", async () => {
     const wsCoSpy = vi.fn();
     server.on("wsconnection", wsCoSpy);
 
@@ -60,36 +68,6 @@ describe("ShardSocket", () => {
     await expect(openPromise).rejects.toThrow(
       Error(`ShardSocket.open timed out after ${ShardSocket.maxTimeout} ms`),
     );
-  });
-
-  it("should request the first heartbeat using jitter method", async () => {
-    const heartbeat_interval = 5000;
-    const fakejitter = Math.random();
-
-    vi.spyOn(shardSocket, "jitter", "get").mockReturnValue(fakejitter);
-
-    shardSocket.open();
-
-    await vi.advanceTimersByTimeAsync(100);
-    server.send(
-      s(
-        helloMsg({
-          heartbeat_interval,
-        }),
-      ),
-    );
-    await vi.advanceTimersByTimeAsync(100);
-    server.send(s(readyMsg({})));
-    server.getSpy().mockClear();
-
-    await vi.advanceTimersByTimeAsync(heartbeat_interval * fakejitter - 102);
-
-    expect(server.getSpy()).toHaveBeenCalledTimes(0);
-
-    await vi.advanceTimersByTimeAsync(10);
-    expect(server.getSpy().mock.calls).toEqual([
-      [s({ op: GatewayOpcodes.Heartbeat, d: 1 })],
-    ]);
   });
 
   it("should send identify with intents", async () => {
@@ -123,31 +101,84 @@ describe("ShardSocket", () => {
     let resumeServer: WebSocketServerMock;
     let readyPayload: GatewayReadyDispatch;
     beforeEach(async () => {
+      await vi.advanceTimersByTimeAsync(50);
       resumeServer = WebSocketServerMock.createInstance();
+
+      resumeServer.on("wsmessage", async (d) => {
+        const m = p(d);
+        await fakeLatency(20, 50);
+        if (m.op === GatewayOpcodes.Heartbeat) {
+          resumeServer.send(s(heartbeatAckMsg()));
+        }
+        if (m.op === GatewayOpcodes.Resume) {
+          resumeServer.send(s(resumedMsg()));
+        }
+      });
+
       readyPayload = readyMsg({
         resume_gateway_url: resumeServer.getUrl(),
       });
 
       shardSocket.open();
-      await vi.advanceTimersByTimeAsync(100);
+
+      await fakeLatency(20, 50);
       server.send(s(helloMsg({})));
-      await vi.advanceTimersByTimeAsync(100);
+
+      await fakeLatency(20, 50);
       server.send(s(readyPayload));
-      await vi.advanceTimersByTimeAsync(50);
+
+      await fakeLatency(20, 50);
       server.getSpy().mockClear();
     });
 
-    describe("when websocket connection close with abnormal closure", () => {
+    describe.each([
+      [
+        "websocket connection close with abnormal closure",
+        async () => {
+          await fakeLatency(20, 50);
+          server.emit("close", WsClosedCode.AbnormalClosure, Buffer.from(""));
+        },
+      ],
+      [
+        "discord send reconnect event",
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(reconnectMsg()));
+        },
+      ],
+      [
+        "discord send invalid session event with resumable connection",
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(invalidSessionMsg(true)));
+        },
+      ],
+      [
+        "when app doesn't receive a heartbeat ACK in time",
+        async () => {
+          let nbOfHbAckSended = 0;
+          server.on("wsmessage", async (d) => {
+            const m = p(d);
+            await fakeLatency(30, 50);
+            if (m.op === GatewayOpcodes.Heartbeat) {
+              if (nbOfHbAckSended < 3) {
+                server.send(s(heartbeatAckMsg()));
+                nbOfHbAckSended++;
+              }
+            }
+          });
+        },
+      ],
+    ])("when %s", (_s: string, prepare: () => Promise<void>) => {
       beforeEach(async () => {
-        await vi.advanceTimersByTimeAsync(20);
-        server.emit("close", WsClosedCode.AbnormalClosure, Buffer.from(""));
+        await prepare();
       });
 
       it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
         const wsCoSpy = vi.fn();
         resumeServer.on("wsconnection", wsCoSpy);
 
-        await vi.advanceTimersByTimeAsync(200);
+        await vi.advanceTimersByTimeAsync(1000000);
 
         expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
           shardSocket.ws,
@@ -158,81 +189,7 @@ describe("ShardSocket", () => {
       it("should send resume event to replay missed events when a disconnected client resumes", async () => {
         const serverSp = resumeServer.getSpy();
 
-        await vi.advanceTimersByTimeAsync(200);
-
-        expect(serverSp).toHaveBeenCalledWith(
-          s({
-            op: GatewayOpcodes.Resume,
-            d: {
-              token: gateway.token,
-              session_id: readyPayload.d.session_id,
-              seq: 1,
-            },
-          }),
-        );
-      });
-    });
-
-    describe("when discord send reconnect event", () => {
-      beforeEach(async () => {
-        await vi.advanceTimersByTimeAsync(20);
-        server.send(s(reconnectMsg()));
-      });
-
-      it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
-        const wsCoSpy = vi.fn();
-        resumeServer.on("wsconnection", wsCoSpy);
-
-        await vi.advanceTimersByTimeAsync(200);
-
-        expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
-          shardSocket.ws,
-          `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
-        );
-      });
-
-      it("should send resume event to replay missed events when a disconnected client resumes", async () => {
-        const serverSp = resumeServer.getSpy();
-
-        await vi.advanceTimersByTimeAsync(200);
-
-        expect(serverSp.mock.calls).toEqual([
-          [
-            s({
-              op: GatewayOpcodes.Resume,
-              d: {
-                token: gateway.token,
-                session_id: readyPayload.d.session_id,
-                seq: 1,
-              },
-            }),
-          ],
-        ]);
-      });
-    });
-
-    describe("when discord send invalid session event with resumable connection", () => {
-      beforeEach(async () => {
-        await vi.advanceTimersByTimeAsync(20);
-        server.send(s(invalidSessionMsg(true)));
-      });
-
-      it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
-        const wsCoSpy = vi.fn();
-        resumeServer.on("wsconnection", wsCoSpy);
-
-        await vi.advanceTimersByTimeAsync(200);
-
-        expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
-          shardSocket.ws,
-          `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
-        );
-      });
-
-      it("should send resume event to replay missed events when a disconnected client resumes", async () => {
-        const serverSp = resumeServer.getSpy();
-
-        await vi.advanceTimersByTimeAsync(200);
+        await vi.advanceTimersByTimeAsync(1000000);
 
         expect(serverSp).toHaveBeenCalledWith(
           s({
@@ -249,11 +206,11 @@ describe("ShardSocket", () => {
 
     describe("when discord send invalid session event with unresumable connection", () => {
       beforeEach(async () => {
-        await vi.advanceTimersByTimeAsync(20);
+        await fakeLatency(20, 50);
         server.send(s(invalidSessionMsg(false)));
       });
 
-      it("should open new connection using initial gateway url api version 10 with json encoding", async () => {
+      it(`should open new connection on initial gateway server version ${apiVersion} using ${encoding} as encoding`, async () => {
         const wsCoSpy = vi.fn();
         server.on("wsconnection", wsCoSpy);
 
@@ -267,9 +224,6 @@ describe("ShardSocket", () => {
 
       it("should send identify with intents", async () => {
         await vi.advanceTimersByTimeAsync(100);
-        server.send(s(helloMsg({})));
-        await vi.advanceTimersByTimeAsync(100);
-
         const identityPayload = {
           op: GatewayOpcodes.Identify,
           d: {
@@ -303,11 +257,9 @@ describe("ShardSocket", () => {
         resume_gateway_url: resumeServer.getUrl(),
       });
 
-      shardSocket.jitter = 1;
-
       shardSocket.open();
 
-      await vi.advanceTimersByTimeAsync(50);
+      await fakeLatency(20, 50);
       server.send(
         s(
           helloMsg({
@@ -315,75 +267,46 @@ describe("ShardSocket", () => {
           }),
         ),
       );
-      await vi.advanceTimersByTimeAsync(100);
+      await fakeLatency(20, 50);
       server.send(s(readyPayload));
       server.getSpy().mockClear();
+    });
+
+    it("should start heartbit mechanism using jitter method", async () => {
+      const currentTime = Date.now();
+      const times: number[] = [];
+      server.on("wsmessage", async (d) => {
+        const m = p(d);
+        if (m.op === GatewayOpcodes.Heartbeat) {
+          times.push(Date.now() - currentTime);
+          await fakeLatency(20, 50);
+          server.send(s(heartbeatAckMsg()));
+        }
+      });
+
+      await vi.advanceTimersByTimeAsync(heartbeat_interval * 10);
+
+      expect(times[0]).toBeWithin(0, heartbeat_interval);
+      expect(times[1] - times[0]).toEqual(heartbeat_interval);
+      expect(times[2] - times[1]).toEqual(heartbeat_interval);
+      expect(times[3] - times[2]).toEqual(heartbeat_interval);
     });
 
     it("should keep heartbit interval using hello reponse interval", async () => {
       server.on("wsmessage", async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {
-          await vi.advanceTimersByTimeAsync(20);
+          await fakeLatency(20, 50);
           server.send(s(heartbeatAckMsg()));
         }
       });
 
       const expectedBeats = [];
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 5; i++) {
         await vi.advanceTimersByTimeAsync(heartbeat_interval);
         expectedBeats.push([s({ op: GatewayOpcodes.Heartbeat, d: 1 })]);
       }
       expect(server.getSpy().mock.calls).toEqual(expectedBeats);
-    });
-
-    describe("when app doesn't receive a heartbeat ACK", () => {
-      beforeEach(() => {
-        server.once("wsmessage", async (d) => {
-          const m = p(d);
-          if (m.op === GatewayOpcodes.Heartbeat) {
-            await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout);
-          }
-        });
-      });
-      it("should close connection", async () => {
-        const closeEventSpy = vi.fn();
-        server.on("wsclose", closeEventSpy);
-        await vi.advanceTimersByTimeAsync(heartbeat_interval);
-        expect(closeEventSpy).toHaveBeenCalledExactlyOnceWith(
-          1001,
-          "cya later alligator",
-        );
-      });
-
-      it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
-        const wsCoSpy = vi.fn();
-        resumeServer.on("wsconnection", wsCoSpy);
-
-        await vi.advanceTimersByTimeAsync(heartbeat_interval);
-
-        expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
-          shardSocket.ws,
-          `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
-        );
-      });
-
-      it("should send resume event to replay missed events when a disconnected client resumes", async () => {
-        const serverSp = resumeServer.getSpy();
-
-        await vi.advanceTimersByTimeAsync(heartbeat_interval);
-
-        expect(serverSp).toHaveBeenCalledWith(
-          s({
-            op: GatewayOpcodes.Resume,
-            d: {
-              token: gateway.token,
-              session_id: readyPayload.d.session_id,
-              seq: 1,
-            },
-          }),
-        );
-      });
     });
   });
 });

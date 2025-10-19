@@ -6,6 +6,8 @@ import {
   GatewayOpcodes,
   GatewayReadyDispatch,
   GatewayReconnect,
+  GatewayResume,
+  GatewayResumedDispatch,
 } from "discord.js";
 import { getRandomString, randomDiscordId19 } from "./discord-api/utils.js";
 
@@ -104,4 +106,15 @@ export const invalidSessionMsg = (d: boolean = false): GatewayInvalidSession =>
     s: null,
     op: GatewayOpcodes.InvalidSession,
     d,
+  };
+
+export const resumedMsg = (): GatewayResumedDispatch =>
+  <GatewayResumedDispatch>{
+    t: GatewayDispatchEvents.Resumed,
+    op: GatewayOpcodes.Dispatch,
+    d: {
+      _trace: [
+        '["gateway-prd-arm-us-east1-b-6k49",{"micros":907,"calls":["id_created",{"micros":0,"calls":[]},"session_lookup_time",{"micros":626,"calls":[]},"session_lookup_finished",{"micros":10,"calls":[]},"discord-sessions-prd-2-97",{"micros":12}]}]',
+      ],
+    },
   };

@@ -181,8 +181,6 @@ export class ShardSocket {
     } else {
       this.main.emit(GWSEvent.Debug, this.shard, "try to reconnect gateway");
       await this.close();
-      // this.session_id = null;
-      // this.resumeGatewayUrl = null;
       await this.open();
     }
   }
@@ -248,9 +246,6 @@ export class ShardSocket {
         this.main.emit(GWSEvent.Debug, this.shard, "recieved reconnect");
         await this.resume();
         break;
-      case GatewayDispatchEvents.Resumed:
-        this.main.emit(GWSEvent.Debug, this.shard, "recieved resumed");
-        break;
       case GatewayOpcodes.InvalidSession:
         await this.invalidSession(<any>e);
         break;
@@ -309,6 +304,11 @@ export class ShardSocket {
           );
 
           this.main.once(GatewayDispatchEvents.Resumed, () => {
+            this.main.emit(
+              GWSEvent.Debug,
+              this.shard,
+              "recieved resumed packet",
+            );
             resolve(undefined);
           });
           ws.once("open", () => {
