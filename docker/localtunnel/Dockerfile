@@ -1,3 +1,3 @@
-FROM node:24-slim
+FROM node:25-slim
 RUN npm install -g localtunnel
 ENTRYPOINT ["node", "/usr/local/bin/lt"]
