@@ -118,9 +118,9 @@ sh: os
 
 ## Run containers as ci mode
 ci: os
+	$(DC_CMD_CI) up -d --remove-orphans
 	$(DC_CMD_CI) exec api npm ci
 	$(DC_CMD_CI) exec api npm run build
-	$(DC_CMD_CI) up -d --remove-orphans
 
 ## Lint all files with Prettier
 lint: os
