@@ -14,4 +14,9 @@ WORKDIR /app
 COPY --from=ptitpotebuilder --chown=node:node  /app/package*.json /app/
 COPY --from=ptitpotebuilder --chown=node:node  /app/dist /app/dist
 COPY --from=ptitpotebuilder --chown=node:node  /app/node_modules /app/node_modules
-CMD ["npm","run","--silent","start"]
+
+FROM ptitpoteprod AS gateway
+CMD ["npm","run","--silent","start:gateway"]
+
+FROM ptitpoteprod AS api
+CMD ["npm","run","--silent","start:api"]

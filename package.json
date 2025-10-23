@@ -3,15 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "description": "a discord bot",
-  "main": "app.js",
+  "main": "api.js",
   "type": "module",
   "engines": {
     "node": ">=22.x"
   },
   "scripts": {
-    "start": "node dist/src/app.js",
+    "start:api": "node dist/src/api.js",
+    "start:gateway": "node dist/src/gateway.js",
     "register": "node dist/src/register.js",
-    "dev": "nodemon -q dist/src/app.js",
+    "dev:api": "nodemon -q dist/src/api.js",
+    "dev:gateway": "nodemon -q dist/src/gateway.js",
     "test": "vitest --config ./vitest.config.ts run",
     "build": "tsc --pretty",
     "lint": "prettier . --check"

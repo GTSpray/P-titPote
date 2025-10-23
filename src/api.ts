@@ -9,9 +9,6 @@ import {
   verifyKeyMiddleware,
 } from "discord-interactions";
 
-import { gateway } from "./gateway/index.js";
-import { GatewayDispatchEvents } from "discord.js";
-
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
 
@@ -111,17 +108,3 @@ app.listen(PORT, (err) => {
   }
   logger.info(`startup success`, { port: PORT });
 });
-
-gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
-  const { emoji, user_id } = event;
-  logger.info("emoji recat", { user_id, emoji });
-});
-
-gateway
-  .connect()
-  .then(() => {
-    logger.debug("gateway connected");
-  })
-  .catch((err) => {
-    logger.error("gateway error", { err });
-  });

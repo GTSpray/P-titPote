@@ -1,6 +1,6 @@
 services:
-  ptitpote:
-    container_name: ptitpote
+  api:
+    container_name: ptitpote-api
     restart: always
     build:
       context: .
@@ -8,7 +8,23 @@ services:
       args:
         UID: ${DOCKER_UID:-1000}
         GID: ${DOCKER_GID:-1000}
-      target: ptitpoteprod
+      target: api
+    depends_on:
+      - database
+    env_file:
+      - .env
+    volumes:
+      - ${PWD}/logs:/app/logs
+  gateway:
+    container_name: ptitpote-gateway
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/ptitpote/Dockerfile
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+      target: gateway
     depends_on:
       - database
     env_file:
@@ -17,7 +33,7 @@ services:
       - ${PWD}/logs:/app/logs
   database:
     image: mariadb:12.0.2-noble
-    container_name: db
+    container_name: ptitpote-database
     env_file:
       - .env
     restart: always
@@ -30,7 +46,7 @@ services:
       timeout: 5s
       retries: 20
   localtunnel:
-    container_name: lt
+    container_name: ptitpote-lt
     restart: always
     build:
       context: .
@@ -42,9 +58,9 @@ services:
     env_file:
       - .env
     links:
-      - ptitpote
+      - api
     depends_on:
-      - ptitpote
+      - api
 
 volumes:
   mysqldbdata:

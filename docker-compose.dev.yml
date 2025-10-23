@@ -4,7 +4,7 @@ services:
       - "${MARIADB_TCP_PORT}:3306"
   dbtest:
     image: mariadb:12.0.2-noble
-    container_name: dbtest
+    container_name: ptitpote-database-test
     environment:
       MARIADB_DATABASE: "ptitpotetest"
       MARIADB_USER: "ptitpotetest"
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 20
     restart: on-failure
-  ptitpote:
+  api:
     depends_on:
       database:
         condition: service_healthy
@@ -28,7 +28,30 @@ services:
     environment:
       LOG_LEVEL: "debug"
       NODE_ENV: development
-    command: npm run --silent dev
+    command: npm run --silent dev:api
+    volumes:
+      - ${PWD}/dist:/app/dist
+      - ${PWD}/node_modules:/app/node_modules
+      - ${PWD}/package.json:/app/package.json
+      - ${PWD}/package-lock.json:/app/package-lock.json
+      - ${PWD}/logs:/app/logs
+      - ${PWD}/global.d.ts:/app/global.d.ts
+      - ${PWD}/tsconfig.json:/app/tsconfig.json
+      - ${PWD}/vitest.config.ts:/app/vitest.config.ts
+      - ${PWD}/src:/app/src
+      - ${PWD}/tests:/app/tests
+      - ${PWD}/.prettierrc:/app/.prettierrc
+      - ${PWD}/.prettierignore:/app/.prettierignore
+  gateway:
+    depends_on:
+      database:
+        condition: service_healthy
+      dbtest:
+        condition: service_healthy
+    environment:
+      LOG_LEVEL: "debug"
+      NODE_ENV: development
+    command: npm run --silent dev:gateway
     volumes:
       - ${PWD}/dist:/app/dist
       - ${PWD}/node_modules:/app/node_modules
