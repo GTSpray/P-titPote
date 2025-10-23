@@ -1,3 +1,4 @@
+import "dotenv/config";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
 

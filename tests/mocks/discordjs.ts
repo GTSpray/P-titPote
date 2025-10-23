@@ -30,6 +30,10 @@ export class DiscrodRESTMock {
     this.results.set(key, result);
   }
 
+  public static clear() {
+    this.results.clear();
+  }
+
   public static unregister({ verb, fullRoute }: RESTMockRegisterOPtions) {
     const key = DiscrodRESTMock.resultkey(verb, fullRoute);
     this.results.delete(key);

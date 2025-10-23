@@ -3,15 +3,17 @@
   "private": true,
   "version": "1.0.0",
   "description": "a discord bot",
-  "main": "app.js",
+  "main": "api.js",
   "type": "module",
   "engines": {
     "node": ">=22.x"
   },
   "scripts": {
-    "start": "node dist/src/app.js",
+    "start:api": "node dist/src/api.js",
+    "start:gateway": "node dist/src/gateway.js",
     "register": "node dist/src/register.js",
-    "dev": "nodemon -q dist/src/app.js",
+    "dev:api": "nodemon -q dist/src/api.js",
+    "dev:gateway": "nodemon -q dist/src/gateway.js",
     "test": "vitest --config ./vitest.config.ts run",
     "build": "tsc --pretty",
     "lint": "prettier . --check"
@@ -30,14 +32,17 @@
     "@mikro-orm/mariadb": "^6.5.6",
     "@mikro-orm/migrations": "^6.5.6",
     "@mikro-orm/reflection": "^6.5.6",
+    "bufferutil": "^4.0.9",
     "discord-interactions": "^4.3.0",
     "discord.js": "^14.22.1",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "morgan": "^1.10.1",
+    "utf-8-validate": "^6.0.5",
     "uuid": "^13.0.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
+    "ws": "^8.18.3",
     "zod": "^4.1.11"
   },
   "devDependencies": {

@@ -61,11 +61,11 @@ stop: os
 
 ## Follow bot container logs
 logs: os
-	$(DC_CMD) logs -f  --no-log-prefix ptitpote | jq -n -f recover.jq 
+	$(DC_CMD) logs -f  --no-log-prefix api gateway | jq -n -f recover.jq 
 
 ## Install slash commands on discord
 register: os
-	$(DC_CMD) exec ptitpote npm run --silent register | jq
+	$(DC_CMD) run api npm run --silent register | jq
 
 ## Restart containers
 restart: os
@@ -75,15 +75,15 @@ restart: os
 
 ## Migrate database up to the latest version
 db-up: os
-	$(DC_CMD) run ptitpote npx mikro-orm migration:up
+	$(DC_CMD) run api npx mikro-orm migration:up
 
 ## Migrate database one step down
 db-down: os
-	$(DC_CMD) run ptitpote npx mikro-orm migration:down
+	$(DC_CMD) run api npx mikro-orm migration:down
 
 ## Check if database schema is up to date
 db-check: os
-	$(DC_CMD) run ptitpote npx mikro-orm migration:check
+	$(DC_CMD) run api npx mikro-orm migration:check
 
 ###
 # Developper
@@ -91,26 +91,26 @@ db-check: os
 
 ## Run containers as developpement mode
 dev: os
-	$(DC_CMD_DEV) run ptitpote npm ci
-	$(DC_CMD_DEV) run ptitpote npm run build
+	$(DC_CMD_DEV) run api npm ci
+	$(DC_CMD_DEV) run api npm run build
 	$(DC_CMD_DEV) up -d --remove-orphans
 
 ## Build with watch mode (need containers as developpement mode)
 tsc: os
-	$(DC_CMD_DEV) run ptitpote rm -Rf dist/*
-	$(DC_CMD_DEV) run ptitpote npm run build -- -w
+	$(DC_CMD_DEV) run api rm -Rf dist/*
+	$(DC_CMD_DEV) run api npm run build -- -w
 
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
-	$(DC_CMD_DEV) run ptitpote npx vitest dev
+	$(DC_CMD_DEV) run api npx vitest dev
 
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os
-	$(DC_CMD_DEV) run ptitpote npx prettier . --write
+	$(DC_CMD_DEV) run api npx prettier . --write
 
 ## Run shell inside bot container
 sh: os
-	$(DC_CMD) exec ptitpote bash
+	$(DC_CMD) exec api bash
 
 ###
 # ci
@@ -118,14 +118,14 @@ sh: os
 
 ## Run containers as ci mode
 ci: os
-	$(DC_CMD_CI) run ptitpote npm ci
-	$(DC_CMD_CI) run ptitpote npm run build
+	$(DC_CMD_CI) run api npm ci
+	$(DC_CMD_CI) run api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
 
 ## Lint all files with Prettier
 lint: os
-	$(DC_CMD_CI) exec ptitpote npx prettier . --check
+	$(DC_CMD_CI) run api npx prettier . --check
 
 ## Run tests (need containers as developpement mode)
 test: os
-	$(DC_CMD_CI) run ptitpote npm --silent test
+	$(DC_CMD_CI) run api npm --silent test
