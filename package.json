@@ -33,7 +33,7 @@
     "@mikro-orm/migrations": "^6.5.9",
     "@mikro-orm/reflection": "^6.5.9",
     "bufferutil": "^4.0.9",
-    "discord-interactions": "^4.3.0",
+    "discord-interactions": "^4.4.0",
     "discord.js": "^14.24.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
