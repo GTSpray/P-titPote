@@ -57,7 +57,7 @@ start: os
 
 ## Halt containers
 stop: os
-	$(DC_CMD_DEV) down --volumes
+	$(DC_CMD_DEV) down
 
 ## Follow bot container logs
 logs: os
@@ -65,7 +65,7 @@ logs: os
 
 ## Install slash commands on discord
 register: os
-	$(DC_CMD) run api npm run --silent register | jq
+	$(DC_CMD) exec api npm run --silent register | jq
 
 ## Restart containers
 restart: os
@@ -75,23 +75,26 @@ restart: os
 
 ## Migrate database up to the latest version
 db-up: os
-	$(DC_CMD) run api npx mikro-orm migration:up
+	$(DC_CMD) run api npx mikro-orm migration:up | jq
 
 ## Migrate database one step down
 db-down: os
-	$(DC_CMD) run api npx mikro-orm migration:down
+	$(DC_CMD) run api npx mikro-orm migration:down | jq
 
 ## Check if database schema is up to date
 db-check: os
-	$(DC_CMD) run api npx mikro-orm migration:check
+	$(DC_CMD) run api npx mikro-orm migration:check | jq
 
 ###
 # Developper
 ###
 
+## Intall dev dependecies
+install: os
+	$(DC_CMD_DEV) run api npm ci
+
 ## Run containers as developpement mode
 dev: os
-	$(DC_CMD_DEV) run api npm ci
 	$(DC_CMD_DEV) run api npm run build
 	$(DC_CMD_DEV) up -d --remove-orphans
 
