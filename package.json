@@ -46,7 +46,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "@types/express": "^5.0.4",
+    "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.9.2",
     "discord-api-types": "^0.38.30",
