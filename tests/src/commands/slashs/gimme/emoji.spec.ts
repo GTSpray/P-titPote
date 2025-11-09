@@ -65,6 +65,11 @@ describe("/gimme emoji", () => {
     vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue("no mock");
   });
 
+  afterEach(() => {
+    const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, "getEmojiUrl");
+    getEmojiUrlSpy.mockClear();
+  });
+
   it(`should use discord api to fetch last ${stealemoji_msgLimit} messages of current channel`, async () => {
     const getSpy = vi.spyOn(REST.prototype, "get");
 
