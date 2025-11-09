@@ -6,3 +6,4 @@ docker-compose.local.yml
 dist
 .vscode
 temp
+docker/database/dumps

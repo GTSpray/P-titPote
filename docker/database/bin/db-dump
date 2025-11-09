@@ -1,0 +1,3 @@
+mkdir -p /database/dumps
+mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" $MARIADB_DATABASE > /database/dumps/last.sql
+cp /database/dumps/last.sql /database/dumps/db_`date +%d-%m-%Y"_"%H_%M_%S`.sql

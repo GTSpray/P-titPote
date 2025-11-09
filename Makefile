@@ -31,7 +31,7 @@ help: os
 	@echo "\n $(tB)​Usage:$(tR)"
 	@echo "\n  make $(cG)target$(tR)"
 	@echo "\n $(tB)Available targets:$(tR)"
-	@awk '/^[a-zA-Z\-\_0-9\.@]+:/ { \
+	@awk '/^[a-zA-Z\-\\_0-9\.@]+:/ { \
 		returnMessage = match(n4line, /^# (.*)/); \
 		if (returnMessage) { \
 			titleMessage = substr(n4line, 2, RLENGTH);\
@@ -41,7 +41,7 @@ help: os
 		if (helpMessage) { \
 			helpCommand = substr($$1, 0, index($$1, ":")-1); \
 			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
-			printf "\n     $(cG)%-10s$(tR)%s", helpCommand, helpMessage; \
+			printf "\n     $(cG)%-12s$(tR)%s", helpCommand, helpMessage; \
 		} \
 	} \
 	{ n5line = n4line; n4line = n3line; n3line = n2line; n2line = lastLine; lastLine = $$0;}' $(MAKEFILE_LIST)
@@ -124,6 +124,16 @@ ci: os
 	$(DC_CMD_CI) run api npm ci
 	$(DC_CMD_CI) run api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
+
+
+## Create a database dump
+db-dump: os
+	$(DC_CMD) exec -t database sh /database/bin/db-dump
+
+## Restore last database dump
+db-restore: os
+	$(DC_CMD) exec -t database sh /database/bin/db-restore
+
 
 ## Lint all files with Prettier
 lint: os
