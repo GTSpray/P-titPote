@@ -39,6 +39,7 @@ services:
     restart: always
     volumes:
       - mysqldbdata:/var/lib/mysql
+      - ./docker/database:/database
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 10s
