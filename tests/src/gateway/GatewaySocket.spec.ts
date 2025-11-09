@@ -5,6 +5,7 @@ import { ShardSocket } from "../../../src/gateway/ShardSocket.js";
 import * as ShardSocketModule from "../../../src/gateway/ShardSocket.js";
 import { MockInstance } from "vitest";
 
+class FakeShardSocket extends ShardSocket {}
 vi.mock("../../../src/gateway/ShardSocket.js");
 
 describe("GatewaySocket", () => {
@@ -64,12 +65,7 @@ describe("GatewaySocket", () => {
     it("should create one ShardSocket for each shard", async () => {
       const ShardSocketConstructor = vi
         .spyOn(ShardSocketModule, "ShardSocket")
-        .mockImplementationOnce(
-          () =>
-            ({
-              open: vi.fn().mockResolvedValue(undefined),
-            }) as unknown as ShardSocket,
-        );
+        .mockImplementationOnce(FakeShardSocket);
       await gateway.connect();
       expect(ShardSocketConstructor).toHaveBeenCalledWith(gateway, 0);
     });
