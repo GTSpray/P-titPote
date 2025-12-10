@@ -51,7 +51,7 @@
     "@types/node": "^24.10.0",
     "discord-api-types": "^0.38.34",
     "node-mocks-http": "^1.17.2",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "prettier": "3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.8"
