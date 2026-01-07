@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import { v4 } from "uuid";
 import {
+  InteractionResponseFlags,
   InteractionResponseType,
   InteractionType,
   verifyKeyMiddleware,
@@ -14,6 +15,7 @@ import { slashcommands } from "./commands/slash/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
+import { okComponnents } from "./commands/commonMessages.js";
 
 const orm = initORM(config);
 
@@ -92,6 +94,75 @@ app.post(
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });
+    }
+
+    if (type === InteractionType.MESSAGE_COMPONENT) {
+      return res.json({
+        type: 9,
+        data: {
+          custom_id: "bug_modal",
+          title: "Bug Report",
+          components: [
+            {
+              type: 18,
+              label: "What's your favorite bug?",
+              component: {
+                type: 3,
+                custom_id: "bug_string_select",
+                placeholder: "Choose...",
+                options: [
+                  {
+                    label: "Ant",
+                    value: "ant",
+                    description: "(best option)",
+                    emoji: {
+                      name: "🐜",
+                    },
+                  },
+                  {
+                    label: "Butterfly",
+                    value: "butterfly",
+                    emoji: {
+                      name: "🦋",
+                    },
+                  },
+                  {
+                    label: "Caterpillar",
+                    value: "caterpillar",
+                    emoji: {
+                      name: "🐛",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              type: 18,
+              label: "Why is it your favorite?",
+              description: "Please provide as much detail as possible!",
+              component: {
+                type: 4,
+                custom_id: "bug_explanation",
+                style: 2,
+                min_length: 10,
+                max_length: 4000,
+                placeholder: "Write your explanation here...",
+                required: true,
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    if (type === InteractionType.MODAL_SUBMIT) {
+      return res.json({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: InteractionResponseFlags.EPHEMERAL,
+          content: "A voté!",
+        },
+      });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
