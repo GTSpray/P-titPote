@@ -5,7 +5,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { REST, Routes } from "discord.js";
 import {
   getRandomString,
@@ -52,7 +52,7 @@ describe("/gimme emoji", () => {
   let channel_id: string;
 
   beforeEach(() => {
-    const { req, res } = getInteractionHttpMock({
+    const { req, res } = getInteractionCommandHttpMock({
       data,
     });
     request = req;

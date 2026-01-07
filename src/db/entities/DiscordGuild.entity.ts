@@ -7,6 +7,7 @@ import {
   Unique,
 } from "@mikro-orm/mariadb";
 import { MessageAliased } from "./MessageAliased.entity.js";
+import { Poll } from "./Poll.entity.js";
 
 @Entity()
 @Unique({
@@ -25,4 +26,7 @@ export class DiscordGuild extends EntityBase {
   messageAliaseds: Collection<MessageAliased> = new Collection<MessageAliased>(
     this,
   );
+
+  @OneToMany(() => Poll, (poll) => poll.server)
+  polls: Collection<Poll> = new Collection<Poll>(this);
 }

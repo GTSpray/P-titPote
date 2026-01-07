@@ -2,7 +2,7 @@ import {
   gimme,
   type gimmeDataOpts,
 } from "../../../../../src/commands/slash/gimme/index.js";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import * as otterModule from "../../../../../src/commands/slash/gimme/otter.js";
@@ -50,7 +50,7 @@ describe("/gimme", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionCommandHttpMock({ data });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -114,7 +114,7 @@ describe("/gimme", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionCommandHttpMock({ data });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -178,7 +178,7 @@ describe("/gimme", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionCommandHttpMock({ data });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -242,7 +242,7 @@ describe("/gimme", () => {
     } as unknown as otterModule.gimmeOtterCommandData;
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionCommandHttpMock({ data });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -313,7 +313,7 @@ describe("/gimme", () => {
     ])(
       "should return invalid command result when %s options",
       async (_code, issue, data) => {
-        const { req, res } = getInteractionHttpMock({
+        const { req, res } = getInteractionCommandHttpMock({
           data,
         });
 
@@ -345,7 +345,7 @@ describe("/gimme", () => {
     ])(
       "should return invalid command result when %s name",
       async (_code, issue, data) => {
-        const { req, res } = getInteractionHttpMock({
+        const { req, res } = getInteractionCommandHttpMock({
           data,
         });
 
