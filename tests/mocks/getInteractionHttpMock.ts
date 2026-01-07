@@ -31,6 +31,7 @@ type BasicInteractionPayloadOpts<
   data?: Data;
   permissions?: string;
   type?: T;
+  roles?: string[];
 };
 
 const getBasicInteractionPayload = <
@@ -42,6 +43,7 @@ const getBasicInteractionPayload = <
   channel_id = randomDiscordId19(),
   type = InteractionType.ApplicationCommand as T,
   permissions = "2248473465835073",
+  roles = [],
 }: BasicInteractionPayloadOpts<T, D>): DiscordInteractionBody<T, D> => {
   return {
     app_permissions: randomDiscordId16(),
@@ -72,6 +74,7 @@ const getBasicInteractionPayload = <
         username: "a random user name",
         global_name: "a random global name",
       }),
+      roles,
       permissions,
     }),
     token: getRandomString({
@@ -89,6 +92,7 @@ type InteractionHttpMockOptions<Data> = {
   guild_id?: string;
   data: Data;
   permissions?: string;
+  roles?: string[];
 };
 export const getInteractionCommandHttpMock = <D extends object>(
   opts: InteractionHttpMockOptions<D>,
@@ -111,6 +115,31 @@ export const getInteractionCommandHttpMock = <D extends object>(
     body: <D>getBasicInteractionPayload({
       ...opts,
       type: InteractionType.ApplicationCommand,
+    }),
+  }),
+});
+
+export const getInteractionModalHttpMock = <D extends object>(
+  opts: InteractionHttpMockOptions<D>,
+): {
+  res: MockResponse<Response>;
+  req: MockRequest<
+    Request<
+      any,
+      any,
+      DiscordInteractionBody<InteractionType.ModalSubmit, D>,
+      any,
+      any
+    >
+  >;
+} => ({
+  res: createResponse(),
+  req: createRequest({
+    method: "POST",
+    url: "/interactions",
+    body: <D>getBasicInteractionPayload({
+      ...opts,
+      type: InteractionType.ModalSubmit,
     }),
   }),
 });
