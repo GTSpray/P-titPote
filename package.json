@@ -38,7 +38,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "morgan": "^1.10.1",
-    "utf-8-validate": "^6.0.5",
+    "utf-8-validate": "^6.0.6",
     "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
