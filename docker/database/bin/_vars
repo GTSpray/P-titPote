@@ -1,0 +1,19 @@
+#!/bin/bash
+
+usr="root"
+pass="$MARIADB_ROOT_PASSWORD"
+dbhost="$DB_HOST"
+dbname="$MARIADB_DATABASE"
+
+dumppath="/database/dumps"
+structure_dump_name="1_$(echo $dbname)_structure.sql"
+data_dump_name="2_$(echo $dbname)_data.sql"
+tar_file="$(date +%Y-%d-%m"_"%H:%M:%S)-dump.tar.gz"
+
+
+customlog () {
+  now="$(date +%F) $(date +"%T")"
+  echo "$now: $1"
+}
+
+mkdir -p  "$dumppath"
