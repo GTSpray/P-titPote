@@ -11,6 +11,7 @@ import {
 
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
+import { cta } from "./commands/cta/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
@@ -54,6 +55,10 @@ app.use(
   ),
 );
 
+app.get("/health", (_req, res) => {
+  res.json({});
+});
+
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
  * Parse request body and verifies incoming requests using discord-interactions package
@@ -92,6 +97,38 @@ app.post(
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });
+    }
+
+    if (
+      [
+        InteractionType.MESSAGE_COMPONENT,
+        InteractionType.MODAL_SUBMIT,
+      ].includes(type)
+    ) {
+      const { custom_id } = data;
+      if (custom_id.startsWith('{"t":"cta","d":{"a":"')) {
+        try {
+          const additionalData = JSON.parse(custom_id);
+          if (
+            cta.hasOwnProperty(additionalData.d.a) &&
+            cta[additionalData.d.a]
+          ) {
+            logger.debug(`interaction handler`, { reqId, additionalData });
+            const dbServices = await orm;
+            return cta[additionalData.d.a].handler({
+              req,
+              res,
+              dbServices,
+              additionalData,
+            });
+          }
+        } catch (error) {
+          logger.error(`unknown error`, { reqId, custom_id });
+          return res.status(500).json({ error: "unknown error" });
+        }
+      }
+      logger.error(`unknown modal`, { reqId, custom_id });
+      return res.status(400).json({ error: "unknown modal" });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
