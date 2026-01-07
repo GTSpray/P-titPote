@@ -114,3 +114,28 @@ export const getInteractionCommandHttpMock = <D extends object>(
     }),
   }),
 });
+
+export const getInteractionModalHttpMock = <D extends object>(
+  opts: InteractionHttpMockOptions<D>,
+): {
+  res: MockResponse<Response>;
+  req: MockRequest<
+    Request<
+      any,
+      any,
+      DiscordInteractionBody<InteractionType.ModalSubmit, D>,
+      any,
+      any
+    >
+  >;
+} => ({
+  res: createResponse(),
+  req: createRequest({
+    method: "POST",
+    url: "/interactions",
+    body: <D>getBasicInteractionPayload({
+      ...opts,
+      type: InteractionType.ModalSubmit,
+    }),
+  }),
+});
