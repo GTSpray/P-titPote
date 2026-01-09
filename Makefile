@@ -5,6 +5,7 @@ tB=\033[1m
 	
 # OS detection
 UNAME_S := $(shell uname -s)
+JQC :=  jq -R '. as $$line | try (fromjson) catch $$line'
 ifeq ($(UNAME_S),Darwin)
 	OS := macos
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
@@ -61,11 +62,11 @@ stop: os
 
 ## Follow bot container logs
 logs: os
-	$(DC_CMD) logs -f  --no-log-prefix api gateway | jq -n -f recover.jq 
+	$(DC_CMD) logs -f  --no-log-prefix api gateway | $(JQC)
 
 ## Install slash commands on discord
 register: os
-	$(DC_CMD) exec api npm run --silent register | jq
+	$(DC_CMD) exec api npm run --silent register | $(JQC)
 
 ## Restart containers
 restart: os
@@ -75,15 +76,15 @@ restart: os
 
 ## Migrate database up to the latest version
 db-up: os
-	$(DC_CMD) run api npx mikro-orm migration:up | jq
+	$(DC_CMD) run api npx mikro-orm migration:up | $(JQC)
 
 ## Migrate database one step down
 db-down: os
-	$(DC_CMD) run api npx mikro-orm migration:down | jq
+	$(DC_CMD) run api npx mikro-orm migration:down | $(JQC)
 
 ## Check if database schema is up to date
 db-check: os
-	$(DC_CMD) run api npx mikro-orm migration:check | jq
+	$(DC_CMD) run api npx mikro-orm migration:check | $(JQC)
 
 ###
 # Developper

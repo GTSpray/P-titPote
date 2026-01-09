@@ -11,6 +11,7 @@ RUN npm ci
 FROM node:25-slim AS ptitpoteprod
 ENV NODE_ENV production
 WORKDIR /app
+RUN npm config set update-notifier false
 COPY --from=ptitpotebuilder --chown=node:node  /app/package*.json /app/
 COPY --from=ptitpotebuilder --chown=node:node  /app/dist /app/dist
 COPY --from=ptitpotebuilder --chown=node:node  /app/node_modules /app/node_modules
