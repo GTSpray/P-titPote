@@ -9,19 +9,16 @@ JQC :=  jq -R '. as $$line | try (fromjson) catch $$line'
 ifeq ($(UNAME_S),Darwin)
 	OS := macos
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
-	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 else ifeq ($(OS),Windows_NT)
     OS := windows
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
-	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 else
 	OS := linux
 	DC_CMD := docker compose -f docker-compose.yml -f docker-compose.local.yml
-	DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
-	DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 endif
+
+DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
+DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
 
 os:
 	@echo "🫖 $(tB)P'titpote $(OS)$(tR)"
