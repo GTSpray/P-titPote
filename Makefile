@@ -57,7 +57,7 @@ start: os
 
 ## Halt containers
 stop: os
-	$(DC_CMD_DEV) down
+	$(DC_CMD_DEV) down --remove-orphans
 
 ## Follow bot container logs
 logs: os
@@ -69,7 +69,7 @@ register: os
 
 ## Restart containers
 restart: os
-	$(DC_CMD) down --volumes
+	$(DC_CMD) down
 	@sleep 1
 	$(DC_CMD) up -d --remove-orphans
 
@@ -129,10 +129,6 @@ ci: os
 ## Create a database dump
 db-dump: os
 	$(DC_CMD) exec -t database sh /database/bin/db-dump
-
-## Restore last database dump
-db-restore: os
-	$(DC_CMD) exec -t database sh /database/bin/db-restore
 
 
 ## Lint all files with Prettier

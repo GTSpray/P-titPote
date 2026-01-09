@@ -6,6 +6,7 @@ dbhost="$DB_HOST"
 dbname="$MARIADB_DATABASE"
 
 dumppath="/database/dumps"
+sqldumppath="$dumppath/sql"
 structure_dump_name="1_$(echo $dbname)_structure.sql"
 data_dump_name="2_$(echo $dbname)_data.sql"
 tar_file="$(date +%Y-%d-%m"_"%H:%M:%S)-dump.tar.gz"
@@ -16,4 +17,4 @@ customlog () {
   echo "$now: $1"
 }
 
-mkdir -p  "$dumppath"
+mkdir -p  "$sqldumppath"

@@ -1,1 +1,0 @@
-mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" $MARIADB_DATABASE  < /database/dumps/last.sql
