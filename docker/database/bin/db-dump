@@ -1,3 +1,18 @@
-mkdir -p /database/dumps
-mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" $MARIADB_DATABASE > /database/dumps/last.sql
-cp /database/dumps/last.sql /database/dumps/`date +%Y-%d-%m"_"%H:%M:%S`.sql
+. $(dirname "$0")/_vars
+
+customlog "creation of $structure_dump_name"
+# Structure only
+mariadb-dump -u$usr -p$pass -h $dbhost --no-data  $dbname > $sqldumppath/$structure_dump_name
+customlog "end of creation of $structure_dump_name"
+
+customlog "creation of $data_dump_name"
+# separate each insert
+echo "SET FOREIGN_KEY_CHECKS=0;" > $sqldumppath/$data_dump_name
+mariadb-dump -u$usr -p$pass -h $dbhost $dbname --skip-triggers --compact --no-create-info --extended-insert=FALSE  >> $sqldumppath/$data_dump_name
+echo "SET FOREIGN_KEY_CHECKS=1;" >> $sqldumppath/$data_dump_name
+customlog "end of creation of $data_dump_name"
+
+
+customlog "creation of $tar_file"
+tar czf  $dumppath/$tar_file -C $sqldumppath `ls $sqldumppath | grep '\.sql$'`
+customlog "end of creation of $tar_file"

@@ -5,9 +5,6 @@ services:
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
-      args:
-        UID: ${DOCKER_UID:-1000}
-        GID: ${DOCKER_GID:-1000}
       target: api
     depends_on:
       - database
@@ -21,9 +18,6 @@ services:
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
-      args:
-        UID: ${DOCKER_UID:-1000}
-        GID: ${DOCKER_GID:-1000}
       target: gateway
     depends_on:
       - database
@@ -38,8 +32,10 @@ services:
       - .env
     restart: always
     volumes:
+      - ./docker/database/dumps/sql:/docker-entrypoint-initdb.d:ro
+      - ./docker/database/bin:/database/bin:ro
+      - ./docker/database/dumps://database/dumps:rw
       - mysqldbdata:/var/lib/mysql
-      - ./docker/database:/database
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 10s
@@ -52,9 +48,6 @@ services:
     build:
       context: .
       dockerfile: docker/localtunnel/Dockerfile
-      args:
-        UID: ${DOCKER_UID:-1000}
-        GID: ${DOCKER_GID:-1000}
     command: --local-host api --port $APP_PORT --subdomain $LOCALTUNNEL_SUBDOMAIN
     env_file:
       - .env
