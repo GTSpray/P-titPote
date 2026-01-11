@@ -1,7 +1,7 @@
 import "dotenv/config";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
-
+import { v4 } from "uuid";
 const { combine, timestamp, json, errors } = winston.format;
 const { Console, DailyRotateFile } = winston.transports;
 
@@ -20,10 +20,10 @@ export const logger = winston.createLogger({
     timestamp(),
     winston.format((info: any) => {
       const { timestamp: ts, level: lvl, message: msg, ...rest } = info;
-
       return {
         ts,
         lvl,
+        logid: v4(),
         v,
         msg,
         ...rest,
