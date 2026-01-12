@@ -49,7 +49,7 @@
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.0.3",
-    "discord-api-types": "^0.38.34",
+    "discord-api-types": "^0.38.37",
     "node-mocks-http": "^1.17.2",
     "nodemon": "^3.1.11",
     "prettier": "3.7.4",
