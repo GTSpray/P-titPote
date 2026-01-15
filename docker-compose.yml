@@ -48,7 +48,6 @@ services:
     build:
       context: .
       dockerfile: docker/localtunnel/Dockerfile
-    command: --local-host api --port $APP_PORT --subdomain $LOCALTUNNEL_SUBDOMAIN
     env_file:
       - .env
     links:
