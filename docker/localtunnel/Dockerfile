@@ -1,3 +1,3 @@
 FROM node:25-slim
 RUN npm install -g localtunnel
-ENTRYPOINT ["node", "/usr/local/bin/lt"]
+CMD ["sh", "-c", "node /usr/local/bin/lt --local-host api --port ${APP_PORT} --subdomain ${LOCALTUNNEL_SUBDOMAIN}"]

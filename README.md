@@ -46,6 +46,21 @@ Click **Save Changes**, and your app should be ready to run 🚀
 
 > 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url. See [localtunnel status page](https://status.loca.lt/)
 
+You can override the localtunnel service to use another system such as ngrok by editing the docker-compose.local.yml file as follows:
+
+```yaml
+services:      
+  localtunnel:
+    image: ngrok/ngrok:alpine
+    environment:
+      NGROK_AUTHTOKEN: '...'
+    command: 'http api:3000'        
+    ports:
+      - '4040:4040'
+    expose:
+      - '4040'
+```
+
 ## Usage
 
 ### Production mode
