@@ -60,9 +60,6 @@ export const c = async (
       .json({ error: "invalid subcommand payload", issues });
   }
 
-  const a = "pollresp";
-  const t = "cta";
-
   if (dbServices && guildId) {
     let guild: DiscordGuild;
     const em = dbServices.orm.em.fork();
@@ -114,7 +111,10 @@ export const c = async (
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
                 label: "Je vote!",
-                custom_id: JSON.stringify({ t, d: { a, pId: aPoll.id } }),
+                custom_id: JSON.stringify({
+                  t: "cta",
+                  d: { a: "pollresp", pId: aPoll.id },
+                }),
               },
             ],
           },

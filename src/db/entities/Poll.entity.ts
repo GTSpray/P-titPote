@@ -5,9 +5,10 @@ import { Rel } from "@mikro-orm/core";
 
 @Entity()
 export class Poll extends EntityBase {
-  constructor(question: string) {
+  constructor(question: string, role?: string) {
     super();
     this.question = question;
+    this.role = role || null;
   }
 
   @ManyToOne()

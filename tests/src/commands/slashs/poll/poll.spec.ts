@@ -3,7 +3,7 @@ import {
   type pollDataOpts,
 } from "../../../../../src/commands/slash/poll/index.js";
 import * as setModule from "../../../../../src/commands/slash/poll/c.js";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import { initORM } from "../../../../../src/db/db.js";
@@ -60,7 +60,7 @@ describe("/poll", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionCommandHttpMock({ data });
       const dbServices = await initORM();
       handlerOpts = {
         req,

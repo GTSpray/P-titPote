@@ -1,4 +1,4 @@
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import {
   CommandHandlerOptions,
@@ -64,7 +64,7 @@ describe("/poll c", () => {
       options: [subcommand],
       type: 1,
     };
-    const { req, res } = getInteractionHttpMock({ data });
+    const { req, res } = getInteractionCommandHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
       req,
@@ -118,7 +118,7 @@ describe("/poll c", () => {
       options: [subcommand],
       type: 1,
     };
-    const { req, res } = getInteractionHttpMock({ guild_id, data });
+    const { req, res } = getInteractionCommandHttpMock({ guild_id, data });
     await c(
       {
         ...handlerOpts,

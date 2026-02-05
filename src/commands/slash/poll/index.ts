@@ -9,6 +9,7 @@ import {
 } from "discord.js";
 
 import { pollCCommandData, c } from "./c.js";
+import { create } from "./create.js";
 import { Response } from "express";
 import { logger } from "../../../logger.js";
 
@@ -40,6 +41,25 @@ const builder = new SlashCommandBuilder()
           .setDescription("rôle des sondées")
           .setRequired(false),
       ),
+  )
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("create")
+      .setDescription("créer un sondage")
+      .addNumberOption((opt) =>
+        opt
+          .setName("choice")
+          .setDescription("nombre de choix")
+          .setMinValue(2)
+          .setMaxValue(4)
+          .setRequired(false),
+      )
+      .addRoleOption((opt) =>
+        opt
+          .setName("role")
+          .setDescription("rôle des sondées")
+          .setRequired(false),
+      ),
   );
 
 const ValidCommandPayload = z.object({
@@ -51,7 +71,7 @@ const ValidCommandPayload = z.object({
         name: z.string(),
       }),
     )
-    .min(1),
+    .min(0),
 });
 
 export type pollDataOpts = pollCCommandData;
@@ -72,6 +92,9 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
     switch (subcommand.name) {
       case "c":
         result = await c(<any>handlerOpts, <any>req.body.data?.options[0]);
+        break;
+      case "create":
+        result = await create(<any>handlerOpts, <any>req.body.data?.options[0]);
         break;
       default:
         result = res.status(400).json({

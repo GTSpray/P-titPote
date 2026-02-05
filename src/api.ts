@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import { v4 } from "uuid";
 import {
-  InteractionResponseFlags,
   InteractionResponseType,
   InteractionType,
   verifyKeyMiddleware,
@@ -12,10 +11,10 @@ import {
 
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
+import { cta } from "./commands/cta/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
-import { okComponnents } from "./commands/commonMessages.js";
 
 const orm = initORM(config);
 
@@ -156,13 +155,30 @@ app.post(
     }
 
     if (type === InteractionType.MODAL_SUBMIT) {
-      return res.json({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
-          content: "A voté!",
-        },
-      });
+      const { custom_id } = data;
+      if (custom_id.startsWith('{"t":"cta","d":{"a":"')) {
+        try {
+          const additionalData = JSON.parse(custom_id);
+          if (
+            cta.hasOwnProperty(additionalData.d.a) &&
+            cta[additionalData.d.a]
+          ) {
+            logger.debug(`interaction handler`, { reqId, additionalData });
+            const dbServices = await orm;
+            return cta[additionalData.d.a].handler({
+              req,
+              res,
+              dbServices,
+              additionalData,
+            });
+          }
+        } catch (error) {
+          logger.error(`unknown error`, { reqId, custom_id });
+          return res.status(500).json({ error: "unknown error" });
+        }
+      }
+      logger.error(`unknown modal`, { reqId, custom_id });
+      return res.status(400).json({ error: "unknown modal" });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
