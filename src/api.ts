@@ -11,6 +11,7 @@ import {
 
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
+import { cta } from "./commands/cta/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
@@ -92,6 +93,92 @@ app.post(
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: "unknown command" });
+    }
+
+    if (type === InteractionType.MESSAGE_COMPONENT) {
+      return res.json({
+        type: 9,
+        data: {
+          custom_id: "bug_modal",
+          title: "Bug Report",
+          components: [
+            {
+              type: 18,
+              label: "What's your favorite bug?",
+              component: {
+                type: 3,
+                custom_id: "bug_string_select",
+                placeholder: "Choose...",
+                options: [
+                  {
+                    label: "Ant",
+                    value: "ant",
+                    description: "(best option)",
+                    emoji: {
+                      name: "🐜",
+                    },
+                  },
+                  {
+                    label: "Butterfly",
+                    value: "butterfly",
+                    emoji: {
+                      name: "🦋",
+                    },
+                  },
+                  {
+                    label: "Caterpillar",
+                    value: "caterpillar",
+                    emoji: {
+                      name: "🐛",
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              type: 18,
+              label: "Why is it your favorite?",
+              description: "Please provide as much detail as possible!",
+              component: {
+                type: 4,
+                custom_id: "bug_explanation",
+                style: 2,
+                min_length: 10,
+                max_length: 4000,
+                placeholder: "Write your explanation here...",
+                required: true,
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    if (type === InteractionType.MODAL_SUBMIT) {
+      const { custom_id } = data;
+      if (custom_id.startsWith('{"t":"cta","d":{"a":"')) {
+        try {
+          const additionalData = JSON.parse(custom_id);
+          if (
+            cta.hasOwnProperty(additionalData.d.a) &&
+            cta[additionalData.d.a]
+          ) {
+            logger.debug(`interaction handler`, { reqId, additionalData });
+            const dbServices = await orm;
+            return cta[additionalData.d.a].handler({
+              req,
+              res,
+              dbServices,
+              additionalData,
+            });
+          }
+        } catch (error) {
+          logger.error(`unknown error`, { reqId, custom_id });
+          return res.status(500).json({ error: "unknown error" });
+        }
+      }
+      logger.error(`unknown modal`, { reqId, custom_id });
+      return res.status(400).json({ error: "unknown modal" });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
