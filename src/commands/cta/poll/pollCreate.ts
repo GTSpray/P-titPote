@@ -88,7 +88,13 @@ export const pollCreate: ModalHandlerDelcaration<D> = {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
                   label: "Je vote!",
-                  custom_id: "toto",
+                  custom_id: JSON.stringify({
+                    t: "cta",
+                    d: {
+                      a: "pollresp",
+                      pId: aPoll.id,
+                    },
+                  }),
                 },
               ],
             },
