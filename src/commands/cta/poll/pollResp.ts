@@ -76,7 +76,6 @@ export const pollResp: ModalHandlerDelcaration<D> = {
                 options: step.choices.map(({ label, id }) => ({
                   label,
                   value: id,
-                  description: "(best option)",
                   emoji: {
                     name: "▪️",
                   },

@@ -181,7 +181,7 @@ describe("cta/pollCreate", () => {
       const expectedSummary = [
         `## ${poll.title}`,
         "",
-        `**1. ${firstStep.question}**`,
+        `1. ${firstStep.question}`,
       ].join("\n");
 
       expect(response).toMeetApiResponse(200, {
@@ -349,8 +349,8 @@ describe("cta/pollCreate", () => {
       const expectedSummary = [
         `## ${poll.title}`,
         "",
-        `**1. ${poll.steps[0].question}**`,
-        `**2. ${poll.steps[1].question}**`,
+        `1. ${poll.steps[0].question}`,
+        `2. ${poll.steps[1].question}`,
       ].join("\n");
 
       expect(response).toMeetApiResponse(200, {
@@ -524,9 +524,9 @@ describe("cta/pollCreate", () => {
       const expectedSummary = [
         `## ${poll.title}`,
         "",
-        `**1. ${poll.steps[0].question}**`,
-        `- ${aFirstChoiceCmp.value}`,
-        `- ${aSecondChoiceCmp.value}`,
+        `1. ${poll.steps[0].question}`,
+        `    - ${aFirstChoiceCmp.value}`,
+        `    - ${aSecondChoiceCmp.value}`,
       ].join("\n");
 
       expect(response).toMeetApiResponse(200, {

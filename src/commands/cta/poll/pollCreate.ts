@@ -72,8 +72,8 @@ const getSummary = (aPoll: Poll) => {
     ...aPoll.steps.reduce(
       (acc: string[], aStep) => [
         ...acc,
-        `**${aStep.order + 1}. ${aStep.question}**`,
-        ...aStep.choices.map((aChoice) => `- ${aChoice.label}`),
+        `${aStep.order + 1}. ${aStep.question}`,
+        ...aStep.choices.map((aChoice) => `    - ${aChoice.label}`),
       ],
       [],
     ),
