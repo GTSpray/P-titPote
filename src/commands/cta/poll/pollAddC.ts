@@ -3,36 +3,11 @@ import {
   InteractionResponseType,
   TextInputStyle,
 } from "discord-api-types/v10";
-import { ModalHandlerDelcaration } from "../../modals.js";
+import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
 
-interface D {
-  components: Component<toto>[];
-  custom_id: string;
-}
-
-type toto = ComponentSimple | ComponentSelect;
-
-interface Component<T extends toto> {
-  component: T;
-  id: number;
-  type: number;
-}
-
-interface ComponentSimple {
-  custom_id: string;
-  id: number;
-  type: number;
-  value: string | number;
-}
-
-interface ComponentSelect {
-  custom_id: string;
-  id: number;
-  type: number;
-  values: string[];
-}
-export const pollAddC: ModalHandlerDelcaration<D> = {
+export const STEP_CHOICE_LIMIT = 25;
+export const pollAddC: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     const guildId = req.body.guild_id;
     if (dbServices && guildId) {

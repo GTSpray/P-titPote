@@ -3,29 +3,11 @@ import {
   InteractionResponseType,
   TextInputStyle,
 } from "discord-api-types/v10";
-import { ModalHandlerDelcaration } from "../../modals.js";
+import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
 
-interface D {
-  components: Component[];
-  custom_id: string;
-}
-
-interface Component {
-  component: Component2;
-  id: number;
-  type: number;
-}
-
-interface Component2 {
-  custom_id: string;
-  id: number;
-  type: number;
-  value: string;
-}
-
-export const pollResp: ModalHandlerDelcaration<D> = {
+export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     const guildId = req.body.guild_id;
     const pollId = (<any>additionalData).d.pId;

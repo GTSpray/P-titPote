@@ -3,67 +3,12 @@ import {
   ComponentType,
   InteractionResponseType,
 } from "discord-api-types/v10";
-import { ModalHandlerDelcaration } from "../../modals.js";
+import { ComponentSelect, ComponentSimple, CTAData, getInputComponnentById, getInputComponnentsByPrefix, ModalHandlerDelcaration } from "../../modals.js";
 import { InteractionResponseFlags } from "discord-interactions";
 import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
 import { PollChoice } from "../../../db/entities/PollChoice.entity.js";
-
-interface CTAData {
-  components: Component<CTAComponnent>[];
-  custom_id: string;
-}
-
-type CTAComponnent = ComponentSimple | ComponentSelect;
-
-interface Component<T extends CTAComponnent> {
-  component: T;
-  id: number;
-  type: number;
-}
-
-interface ComponentSimple {
-  custom_id: string;
-  id: number;
-  type: number;
-  value: string | number;
-}
-
-interface ComponentSelect {
-  custom_id: string;
-  id: number;
-  type: number;
-  values: string[];
-}
-
-type getInputComponnentByIdDeclaration<T extends CTAComponnent> =
-  | Component<T>
-  | undefined;
-function getInputComponnentById<T extends CTAComponnent>(
-  data: CTAData | undefined,
-  componentId: string,
-): getInputComponnentByIdDeclaration<T> {
-  const cmp: unknown = data?.components.find(
-    (e: any) => `${e.component?.custom_id}` === componentId,
-  );
-
-  if (cmp) {
-    return <getInputComponnentByIdDeclaration<T>>cmp;
-  }
-  return undefined;
-}
-
-type getInputComponnentsByPrefixDeclaration<T extends CTAComponnent> =
-  Component<T>[];
-function getInputComponnentsByPrefix<T extends CTAComponnent>(
-  data: CTAData | undefined,
-  componentId: string,
-): getInputComponnentsByPrefixDeclaration<T> {
-  return data?.components.filter((e: any) =>
-    `${e.component?.custom_id}`.startsWith(componentId),
-  ) as getInputComponnentsByPrefixDeclaration<T>;
-}
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
