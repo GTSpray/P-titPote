@@ -53,7 +53,7 @@ describe("cta/pollAddC", () => {
     };
   });
 
-  it("should respond a modal with a question componnent", async () => {
+  it("should respond a modal", async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
@@ -63,13 +63,42 @@ describe("cta/pollAddC", () => {
           d: { a: "pollCreate", pId: existingPoll.id },
         }),
         title: "Ajouter des choix",
+        components: expect.any(Array)
+      },
+    });
+  });
+
+  it("should respond a modal with a text display componnent as question summary", async () => {
+    const response = await pollAddC.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: expect.any(String),
+        components: expect.arrayContaining([
+          {
+            type: ComponentType.TextDisplay,
+            content: `# ${existingPoll.steps[0].question}\n`
+          }
+        ])
+      },
+    });
+  });
+
+  it("should respond a modal with 4 labels due to discord limit", async () => {
+    const response = await pollAddC.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: expect.any(String),
         components: [
           {
             type: ComponentType.TextDisplay,
-            content:  "# A first question?\n"
+            content: expect.any(String)
           },
           ...Array.from({ length: 4 }).map((_e, i) => {
-            const choiceOrder = 0 + i + 1;
+            const choiceOrder = i + 1;
             return {
               type: ComponentType.Label,
               label: `Choix n°${choiceOrder}`,
@@ -79,12 +108,41 @@ describe("cta/pollAddC", () => {
                 style: TextInputStyle.Short,
                 min_length: 1,
                 max_length: 100,
-                required: choiceOrder <= 2,
+                required: expect.any(Boolean),
               },
             };
           }),
         ],
       },
+    });
+  });
+
+  it("should respond a modal with 2 required input text because a select input need 2 choices minimumn", async () => {
+    const response = await pollAddC.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: expect.objectContaining({
+        components: [
+          {
+            type: ComponentType.TextDisplay,
+            content: expect.any(String)
+          },
+         ...Array.from({ length: 2 }).map(() => {
+            return expect.objectContaining({
+              component: expect.objectContaining({
+                required: true,
+              })
+            })
+          }),
+          ...Array.from({ length: 2 }).map(() => {
+            return expect.objectContaining({
+              component: expect.objectContaining({
+                required: false,
+              })
+            })
+          }),
+        ],
+      }),
     });
   });
 });
