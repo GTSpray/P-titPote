@@ -1,130 +1,43 @@
-<h1 align="center">
-  <br>
-  <a href="https://github.com/GTSpray/P-titPote"><img src="https://github.com/GTSpray/P-titPote/blob/main/assets/ptitpote.png?raw=true" width="150px" alt="P'tit Pote Discord Bot"></a>
-  <br>
-  P'tit Pote Discord Bot
-  <br>
-</h1>
+# P-titPote
 
-# Running app locally
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg) ![License](https://img.shields.io/badge/license-MIT-yellow.svg)
 
-Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download/), [Docker](https://www.docker.com/) (or [Podman](https://podman.io/)) and [create a Discord app](https://discord.com/developers/applications) with the proper permissions:
+## Overview
+P-titPote is an open-source [project description or purpose here]. This repository contains the implementation, documentation, and various resources related to the project.
 
-- `applications.commands`
-- `bot` (with Send Messages enabled)
+## Table of Contents
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [Stack Information](#stack-information)
+4. [Contributing](#contributing)
+5. [License](#license)
 
-And permissions:
-
-- Manage Messages
-- Send Messages
-- Use external Emojis
-
-Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
-
-## Setup project
-
-First clone the project:
-Then navigate to its directory and install dependencies.
-
-### Get app credentials
-
-Fetch the credentials from your app's settings and add them to a `.env` file (see `.env.sample` for an example). You'll need your app ID (`APP_ID`), bot token (`BOT_TOKEN`), and public key (`PUBLIC_KEY`).
-
-Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
-
-> 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
-
-### Local tunnel with docker environment
-
-Try to use tunnel services like ngrok, localtunnel, etc...
-
-Copy the forwarding address that starts with `https`, in this case `https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt`, then go to your [app's settings](https://discord.com/developers/applications).
-
-On the **General Information** tab, there will be an **Interactions Endpoint URL**. Paste your localtunnel address there, and append `/interactions` to it (`https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt/interactions` in the example).
-
-Click **Save Changes**, and your app should be ready to run 🚀
-
-> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url. See [localtunnel status page](https://status.loca.lt/)
-
-You can override the localtunnel service to use another system such as ngrok by editing the docker-compose.local.yml file as follows:
-
-```yaml
-services:
-  localtunnel:
-    image: ngrok/ngrok:alpine
-    environment:
-      NGROK_AUTHTOKEN: "..."
-    command: "http api:3000"
-    ports:
-      - "4040:4040"
-    expose:
-      - "4040"
-```
+## Installation
+To setup P-titPote, follow these steps:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/GTSpray/P-titPote.git
+   cd P-titPote
+   ```
+2. Install the required dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the application:
+   ```bash
+   npm start
+   ```
 
 ## Usage
+Provide examples or instructions for using the project here. You may include code snippets or screenshots.
 
-### Production mode
+## Stack Information
+- **Frontend:** [React](https://reactjs.org/)
+- **Backend:** [Node.js](https://nodejs.org/)
+- **Database:** [MongoDB](https://www.mongodb.com/)
 
-Launch application using :
+## Contributing
+We welcome contributions! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to contribute.
 
-```bash
-make start
-```
-
-and stop
-
-```bash
-make stop
-```
-
-Slash commands will be installed when you run the `register` command :
-
-```bash
-make register
-```
-
-### Development mode
-
-Launch development container using :
-
-```bash
-make dev
-```
-
-keep your code transpiled with :
-
-```bash
-make build
-```
-
-test your code using :
-
-```bash
-make test
-```
-
-or (in watch mode)
-
-```bash
-make testw
-```
-
-> ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
-
-#### Database managment
-
-See [schema-generator](https://mikro-orm.io/docs/schema-generator)
-
-```bash
-make sh
-npx mikro-orm schema:create --dump   # Dumps create schema SQL
-npx mikro-orm schema:update --dump   # Dumps update schema SQL
-npx mikro-orm schema:drop --dump     # Dumps drop schema SQL
-```
-
-## Other resources
-
-- Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
-- Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
-- Check out **[community resources](https://discord.com/developers/docs/topics/community-resources#community-resources)** for language-specific tools maintained by community members.
-- Read **[localtunnel](https://github.com/localtunnel/localtunnel)**
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
