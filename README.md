@@ -1,1 +1,182 @@
-<h1 align="center"><br><a href="https://github.com/GTSpray/P-titPote"><img src="https://github.com/GTSpray/P-titPote/blob/main/assets/ptitpote.png?raw=true" width="150px" alt="P'tit Pote Discord Bot"></a><br>P'tit Pote Discord Bot<br></h1><p align="center"><a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a><a href="#prerequisites"><img src="https://img.shields.io/badge/node-≥22.x-green.svg" alt="Node.js: ≥22.x"></a><a href="#prerequisites"><img src="https://img.shields.io/badge/docker-required-blue.svg" alt="Docker"></a></p>---## AboutP'tit Pote is a modern Discord bot built with **TypeScript**, **Express**, and **Discord.js**. It provides a scalable architecture with **MariaDB** database integration and a robust logging system using **Winston**.## Table of Contents- [Prerequisites](#prerequisites)- [Quick Start](#quick-start)- [Discord App Configuration](#discord-app-configuration)- [Local Development with Tunnel](#local-development-with-tunnel)- [Usage](#usage)- [Project Structure](#project-structure)- [Tech Stack](#tech-stack)- [Database Management](#database-management)- [Resources](#resources)- [License](#license)## Prerequisites- [Node.js](https://nodejs.org/en/download/) v22 or higher- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)- A Discord account and a [created Discord application](https://discord.com/developers/applications)## Quick Start### 1. Clone the Repositorygit clone https://github.com/GTSpray/P-titPote.gitcd P-titPote### 2. Install Dependenciesnpm install### 3. Configure Environment VariablesCreate a `.env` file in the root directory (see `.env.sample` for reference):APP_ID=your_app_idBOT_TOKEN=your_bot_tokenPUBLIC_KEY=your_public_keyLOCALTUNNEL_SUBDOMAIN=your_subdomain  # optional for developmentFetch your credentials from your app's settings on the [Discord Developer Portal](https://discord.com/developers/applications).For detailed information, see the [Discord Getting Started Guide](https://discord.com/developers/docs/getting-started).> 🔑 Environment variables can be added to the `.env` file for local development, or in the Secrets tab in Replit/Glitch.## Discord App ConfigurationGo to your [Discord application settings](https://discord.com/developers/applications) and add these scopes:- `applications.commands`- `bot` (with "Send Messages" enabled)### Required Permissions- Manage Messages- Send Messages- Use external EmojisFor more details, check the [Discord Getting Started Guide](https://discord.com/developers/docs/getting-started).## Local Development with TunnelTo test your bot locally, you need to expose your local server to the internet. Use a tunnel service like **localtunnel**, **ngrok**, etc.### Using Localtunnel1. Start your local tunnel:npx localtunnel --port 3000 --subdomain my-bot-subdomainYou'll get a forwarding address like: `https://my-bot-subdomain.loca.lt`2. Go to your [app's settings](https://discord.com/developers/applications)3. On the **General Information** tab, find **Interactions Endpoint URL**4. Paste your tunnel address with `/interactions` appended:https://my-bot-subdomain.loca.lt/interactions5. Click **Save Changes** ✅> 🔑 Set the `LOCALTUNNEL_SUBDOMAIN` variable in your `.env` file to ensure a static subdomain. See [localtunnel status page](https://status.loca.lt/) for more info.### Using ngrokYou can replace localtunnel with ngrok. Edit `docker-compose.dev.yml`:services:  localtunnel:    image: ngrok/ngrok:alpine    environment:      NGROK_AUTHTOKEN: "your_authtoken"    command: "http api:3000"    ports:      - "4040:4040"    expose:      - "4040"Get your tunnel URL from the ngrok dashboard and follow the same steps as above.## Usage### Production ModeLaunch the application:make startRegister slash commands:make registerStop the application:make stop### Development ModeLaunch development containers:make devKeep your code compiled with:make buildRun tests:make testRun tests in watch mode:make testw> ⚙️ A package like [nodemon](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.## Project Structureimporting src/    ���── api.ts                 # Express server    ├── gateway.ts             # Discord WebSocket gateway    ├── register.ts            # Slash command registration    ├── logger.ts              # Winston logger configuration    ├── mikro-orm.config.ts    # MikroORM & MariaDB config    ├── commands/              # Slash commands    ├── gateway/               # WebSocket event handlers    ├── db/                    # Database entities    ├── utils/                 # Utility functions    └── migrations/            # Database migrations├── tests/                     # Unit tests (Vitest)├── docker/                    # Docker configurations├── docker-compose.yml         # Production compose├── docker-compose.dev.yml     # Development compose├── Makefile                   # Project commands├── package.json               # Dependencies└── tsconfig.json              # TypeScript config## Tech Stack| Component | Technology |-----------|-----------|  **Language** | TypeScript |  **Runtime** | Node.js ≥22.x |  **API Server** | Express 5.x |  **Discord** | discord.js 14.x, discord-interactions |  **Database** | MariaDB + MikroORM 6.x |  **Logging** | Winston |  **Testing** | Vitest |  **Code Quality** | Prettier, TypeScript |  **Containerization** | Docker, Docker Compose |## Database ManagementUse [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator) to manage your database:# Access the container shellmake sh# Dump create schema SQLnpx mikro-orm schema:create --dump# Dump update schema SQLnpx mikro-orm schema:update --dump# Dump drop schema SQLnpx mikro-orm schema:drop --dump## Resources- 📖 **[Discord API Documentation](https://discord.com/developers/docs/intro)** - In-depth information about API features- 💬 **[Discord Developers Server](https://discord.gg/discord-developers)** - Ask questions and interact with other devs- 🔗 **[Community Resources](https://discord.com/developers/docs/topics/community-resources)** - Community-maintained tools- 🚀 **[Localtunnel](https://github.com/localtunnel/localtunnel)** - Tunnel documentation- 📦 **[MikroORM Documentation](https://mikro-orm.io/)** - ORM documentation- 📘 **[discord.js Documentation](https://discord.js.org/)** - Library documentation## LicenseMIT - See the [LICENSE](LICENSE) file for details.---Created by [GTSpray](https://github.com/GTSpray)
+<h1 align="center">
+  <br>
+  <a href="https://github.com/GTSpray/P-titPote"><img src="https://github.com/GTSpray/P-titPote/blob/main/assets/ptitpote.png?raw=true" width="150px" alt="P'tit Pote Discord Bot"></a>
+  <br>
+  P'tit Pote Discord Bot
+  <br>
+</h1>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-≥22.x-green.svg"></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-ready-blue.svg"></a>
+</p>
+
+---
+
+## 🌟 About
+
+**P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
+It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
+
+---
+
+## 🔧 Prerequisites
+
+- [Node.js](https://nodejs.org/en/download/) (v22 or newer)
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
+- A [Discord application](https://discord.com/developers/applications) (with bot + commands enabled)
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/GTSpray/P-titPote.git
+cd P-titPote
+npm install
+```
+
+### 2. App Credentials
+
+- Get your application credentials (from the Discord Developer Portal):  
+  - **APP_ID**, **BOT_TOKEN**, **PUBLIC_KEY**
+
+- Copy `.env.sample` to `.env` and fill in your values:
+
+```env
+APP_ID=your_app_id
+BOT_TOKEN=your_bot_token
+PUBLIC_KEY=your_public_key
+LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
+```
+
+### 3. Discord Scopes & Permissions
+
+- Required scopes:
+  - `applications.commands`
+  - `bot` (with Send Messages enabled)
+- Required permissions:
+  - Manage Messages
+  - Send Messages
+  - Use external Emojis
+
+_For more details, see [Discord's getting started guide](https://discord.com/developers/docs/getting-started)._
+
+---
+
+## 🌐 Local Development (Tunnel)
+
+If developing locally, you must expose your dev environment to the internet for Discord events to work. Two main tunnel options:
+
+### Using Localtunnel
+
+> 💡 Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
+
+For exemple if you set:  LOCALTUNNEL_SUBDOMAIN=my-bot
+
+- You will get a url like `https://my-bot.loca.lt`
+- Go to your Discord app "General Information" > **Interactions Endpoint URL**  
+  Paste the tunnel url with `/interactions` appended, e.g.:
+  ```
+  https://my-bot.loca.lt/interactions
+  ```
+- Click **Save Changes**.
+
+### Using ngrok
+
+Alternatively, update your `docker-compose.local.yml` for ngrok:
+
+```yaml
+services:
+  localtunnel:
+    image: ngrok/ngrok:alpine
+    environment:
+      NGROK_AUTHTOKEN: "..."
+    command: "http api:3000"
+    ports:
+      - "4040:4040"
+    expose:
+      - "4040"
+```
+- Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.
+
+---
+
+## ⚙️ Usage
+
+### Production
+
+```bash
+make start      # Start the bot (prod)
+make register   # Register slash commands
+make stop       # Stop the bot
+```
+
+### Development
+
+```bash
+make dev        # Run in dev container
+make build      # Transpile TypeScript (dev mode)
+make test       # Run test suite
+make testw      # Run test suite in watch mode
+```
+
+> 💡 For auto-reload during dev, use [nodemon](https://github.com/remy/nodemon).
+
+---
+
+## 🗂 Project Structure
+
+```
+P-titPote/
+├── src/
+│   ├── api.ts                   # Express server
+│   ├── gateway.ts               # Discord WS gateway entrypoint
+│   ├── register.ts              # Register commands
+│   ├── logger.ts                # Winston logging setup
+│   ├── mikro-orm.config.ts      # MikroORM/MariaDB config
+│   ├── commands/                # Discord slash commands
+│   ├── gateway/                 # WS handlers
+│   ├── db/                      # Database entities
+│   ├── utils/                   # Helper utils
+│   └── migrations/              # Database migrations
+├── tests/                       # Vitest tests
+├── docker/                      # Docker config/scripts
+├── Makefile                     # Automation
+├── docker-compose.yml           # Production Compose setup
+├── docker-compose.dev.yml       # Dev Compose setup
+├── package.json                 # Dependencies & scripts
+└── tsconfig.json                # TypeScript config
+```
+
+## 🗄 Database Management
+
+Powered by [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator):
+
+```bash
+make sh
+# Inside the shell:
+npx mikro-orm schema:create --dump   # Show SQL to create schema
+npx mikro-orm schema:update --dump   # Show SQL for incremental update
+npx mikro-orm schema:drop --dump     # Show SQL to drop schema
+```
+
+---
+
+## 📚 Resources
+
+- [Discord API Docs](https://discord.com/developers/docs/intro)
+- [Discord Developers server (support)](https://discord.gg/discord-developers)
+- [Community resources](https://discord.com/developers/docs/topics/community-resources)
+- [Localtunnel](https://github.com/localtunnel/localtunnel)
+- [MikroORM Documentation](https://mikro-orm.io/)
+- [discord.js Documentation](https://discord.js.org/)
+
+---
+
+## 📝 License
+
+MIT – see [LICENSE](LICENSE)
