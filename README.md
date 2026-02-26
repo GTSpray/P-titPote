@@ -1,30 +1,51 @@
-# Improved README
+# Project Title
 
-## Introduction
-This is an updated README in improved English. It includes details on localtunnel and ngrok configurations.
+## Overview
+This project is designed to...
 
-## localtunnel Configuration
-To expose your local server to the Internet, you can use localtunnel. Follow the steps below:
+## Tech Stack
+- JavaScript
+- Node.js
+- Express
 
-1. Install localtunnel globally using npm:
+## Project Structure
+```
+/
+├── src/
+│   ├── components/
+│   ├── services/
+├── public/
+│   ├── assets/
+└── README.md
+```
+
+## Localtunnel Configuration
+1. Install localtunnel globally:
    ```bash
    npm install -g localtunnel
    ```
-2. Run localtunnel to expose your desired port:
+2. Start localtunnel:
    ```bash
    lt --port 8000
    ```
-   You will receive a URL that can be shared to access your local server.
+   This will provide you with a public URL to your local server.
 
-## ngrok Configuration
-ngrok is another option for exposing your local server. Here’s how to set it up:
-
-1. Download ngrok from its [official website](https://ngrok.com/download).
-2. Unzip the downloaded file and run the following command:
+## Ngrok Configuration
+1. Download and install ngrok from [ngrok.com](https://ngrok.com).
+2. Authenticate your ngrok account:
    ```bash
-   ./ngrok http 8000
+   ngrok authtoken YOUR_AUTH_TOKEN
    ```
-   This will provide you with a public URL to access your local server.
+3. Start ngrok:
+   ```bash
+   ngrok http 8000
+   ```
+   This will expose your local server to the internet.
 
-## Conclusion
-These tools can greatly simplify sharing your local development environment with others. Happy coding!
+## Discord App Setup
+1. Visit the [Discord Developer Portal](https://discord.com/developers/applications) to create a new application.
+2. Add a bot to your application and copy its token.
+3. Invite your bot to your server using the generated OAuth2 URL.
+
+## Additional Information
+For more information, check the official documentation.
