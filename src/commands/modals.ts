@@ -44,7 +44,6 @@ export interface ComponentSelect {
   values: string[];
 }
 
-
 type getInputComponnentByIdDeclaration<T extends CTAComponnent> =
   | Component<T>
   | undefined;

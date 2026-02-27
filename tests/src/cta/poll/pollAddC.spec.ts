@@ -4,7 +4,10 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from "@mikro-orm/mariadb";
-import { pollAddC, STEP_CHOICE_LIMIT } from "../../../../src/commands/cta/poll/pollAddC.js";
+import {
+  pollAddC,
+  STEP_CHOICE_LIMIT,
+} from "../../../../src/commands/cta/poll/pollAddC.js";
 import { ModalHandlerOptions } from "../../../../src/commands/modals.js";
 import { initORM } from "../../../../src/db/db.js";
 import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
@@ -65,7 +68,7 @@ describe("cta/pollAddC", () => {
           d: { a: "pollCreate", pId: existingPoll.id },
         }),
         title: "Ajouter des choix",
-        components: expect.any(Array)
+        components: expect.any(Array),
       },
     });
   });
@@ -80,9 +83,9 @@ describe("cta/pollAddC", () => {
         components: expect.arrayContaining([
           {
             type: ComponentType.TextDisplay,
-            content: `# ${existingPoll.steps[0].question}\n`
-          }
-        ])
+            content: `# ${existingPoll.steps[0].question}\n`,
+          },
+        ]),
       },
     });
   });
@@ -97,7 +100,7 @@ describe("cta/pollAddC", () => {
         components: [
           {
             type: ComponentType.TextDisplay,
-            content: expect.any(String)
+            content: expect.any(String),
           },
           ...Array.from({ length: 4 }).map((_e, i) => {
             const choiceOrder = i + 1;
@@ -127,21 +130,21 @@ describe("cta/pollAddC", () => {
         components: [
           {
             type: ComponentType.TextDisplay,
-            content: expect.any(String)
+            content: expect.any(String),
           },
           ...Array.from({ length: 2 }).map(() => {
             return expect.objectContaining({
               component: expect.objectContaining({
                 required: true,
-              })
-            })
+              }),
+            });
           }),
           ...Array.from({ length: 2 }).map(() => {
             return expect.objectContaining({
               component: expect.objectContaining({
                 required: false,
-              })
-            })
+              }),
+            });
           }),
         ],
       }),
@@ -150,8 +153,8 @@ describe("cta/pollAddC", () => {
 
   it("should respond a modal with no required input text when step had already 2 choices", async () => {
     firstStep.choices.add([
-      new PollChoice('A first choice', 0),
-      new PollChoice('A second choice', 1),
+      new PollChoice("A first choice", 0),
+      new PollChoice("A second choice", 1),
     ]);
     await em.persist(firstStep).flush();
 
@@ -162,24 +165,26 @@ describe("cta/pollAddC", () => {
         components: [
           {
             type: ComponentType.TextDisplay,
-            content: expect.any(String)
+            content: expect.any(String),
           },
           ...Array.from({ length: 4 }).map(() => {
             return expect.objectContaining({
               component: expect.objectContaining({
                 required: false,
-              })
-            })
-          })
+              }),
+            });
+          }),
         ],
       }),
     });
   });
 
   it("should support step with long list of choices", async () => {
-    const stepSize = 20
+    const stepSize = 20;
     firstStep.choices.add(
-      Array.from({ length: stepSize }).map((e, i) => new PollChoice(`choice n°${i}`, i))
+      Array.from({ length: stepSize }).map(
+        (e, i) => new PollChoice(`choice n°${i}`, i),
+      ),
     );
     await em.persist(firstStep).flush();
 
@@ -190,22 +195,23 @@ describe("cta/pollAddC", () => {
         components: [
           {
             type: ComponentType.TextDisplay,
-            content: expect.any(String)
+            content: expect.any(String),
           },
           ...Array.from({ length: 4 }).map((e, i) => {
-            const choiceOrder = stepSize + i + 1
+            const choiceOrder = stepSize + i + 1;
             return expect.objectContaining({
               label: `Choix n°${choiceOrder}`,
               component: expect.objectContaining({
                 custom_id: `choice${choiceOrder}`,
-              })
-            })
-          })
+              }),
+            });
+          }),
         ],
       }),
     });
   });
 
-  it.todo(`should respond an ephemeral message when step has ${STEP_CHOICE_LIMIT} choice`)
-
+  it.todo(
+    `should respond an ephemeral message when step has ${STEP_CHOICE_LIMIT} choice`,
+  );
 });

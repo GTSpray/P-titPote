@@ -33,7 +33,6 @@ describe("cta/pollAddQ", () => {
     existingPoll = new Poll(`aTitre`);
     guild_id = randomDiscordId19();
 
-
     const data = {
       components: [],
       custom_id: `{"t":"cta","d":{"a":"pollAddQ", "pId": "${existingPoll.id}"}}`,

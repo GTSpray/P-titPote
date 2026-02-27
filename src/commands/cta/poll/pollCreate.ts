@@ -3,7 +3,14 @@ import {
   ComponentType,
   InteractionResponseType,
 } from "discord-api-types/v10";
-import { ComponentSelect, ComponentSimple, CTAData, getInputComponnentById, getInputComponnentsByPrefix, ModalHandlerDelcaration } from "../../modals.js";
+import {
+  ComponentSelect,
+  ComponentSimple,
+  CTAData,
+  getInputComponnentById,
+  getInputComponnentsByPrefix,
+  ModalHandlerDelcaration,
+} from "../../modals.js";
 import { InteractionResponseFlags } from "discord-interactions";
 import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
