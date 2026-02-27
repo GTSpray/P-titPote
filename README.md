@@ -129,7 +129,33 @@ make test       # Run test suite
 make testw      # Run test suite in watch mode
 ```
 
-> 💡 For auto-reload during dev, use [nodemon](https://github.com/remy/nodemon).
+> 💡 When developing, after running `make dev`, you should also execute `make install` inside the development container to install all dev dependencies before running the tests or starting development.
+
+## ✅ Testing
+
+All tests for this project are located in the `tests/` directory.  
+The test suite uses [Vitest](https://vitest.dev/) to ensure code quality and correct bot functionality.
+
+### Running tests
+
+To execute all tests:
+
+```bash
+make test
+```
+
+- This command will run all unit and integration tests found in the `tests/` directory.
+- To run tests in watch mode (auto-reload on code changes):
+
+```bash
+make testw
+```
+
+### Guidelines
+
+- When adding new features or fixing bugs, create corresponding test files in the `tests/` directory.
+- Name your test files with the `.test.ts` suffix for consistency.
+- Always make sure the test suite passes before proposing major changes.
 
 ---
 
