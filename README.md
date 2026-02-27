@@ -41,10 +41,12 @@ npm install
 
 ### 2. App Credentials
 
-- Get your application credentials (from the Discord Developer Portal):  
-  - **APP_ID**, **BOT_TOKEN**, **PUBLIC_KEY**
+Get your application credentials (from the Discord Developer Portal):  
+  - **APP_ID**
+  - **BOT_TOKEN**
+  - **PUBLIC_KEY**
 
-- Copy `.env.sample` to `.env` and fill in your values:
+Copy `.env.sample` to `.env` and fill in your values:
 
 ```env
 APP_ID=your_app_id
@@ -55,13 +57,13 @@ LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
 
 ### 3. Discord Scopes & Permissions
 
-- Required scopes:
+Required scopes:
   - `applications.commands`
   - `bot` (with Send Messages enabled)
-- Required permissions:
-  - Manage Messages
-  - Send Messages
-  - Use external Emojis
+Required permissions:
+ - Manage Messages
+ - Send Messages
+ - Use external Emojis
 
 _For more details, see [Discord's getting started guide](https://discord.com/developers/docs/getting-started)._
 
@@ -77,13 +79,16 @@ If developing locally, you must expose your dev environment to the internet for 
 
 For exemple if you set:  LOCALTUNNEL_SUBDOMAIN=my-bot
 
-- You will get a url like `https://my-bot.loca.lt`
-- Go to your Discord app "General Information" > **Interactions Endpoint URL**  
-  Paste the tunnel url with `/interactions` appended, e.g.:
-  ```
-  https://my-bot.loca.lt/interactions
-  ```
-- Click **Save Changes**.
+
+You will get a url like `https://my-bot.loca.lt`
+
+Go to your Discord app "General Information" > **Interactions Endpoint URL**  
+Paste the tunnel url with `/interactions` appended, e.g.:
+```
+https://my-bot.loca.lt/interactions
+```
+
+Click **Save Changes**.
 
 ### Using ngrok
 
@@ -152,7 +157,7 @@ P-titPote/
 └── tsconfig.json                # TypeScript config
 ```
 
-## 🗄 Database Management
+## Database Management
 
 Powered by [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator):
 
