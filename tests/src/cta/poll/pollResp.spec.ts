@@ -4,7 +4,7 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from "@mikro-orm/mariadb";
-import { pollPub } from "../../../../src/commands/cta/poll/pollPub.js";
+import { pollResp } from "../../../../src/commands/cta/poll/pollResp.js";
 import { ModalHandlerOptions } from "../../../../src/commands/modals.js";
 import { initORM } from "../../../../src/db/db.js";
 import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
@@ -14,6 +14,7 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
+  TextInputStyle,
 } from "discord-api-types/v10";
 import { Poll } from "../../../../src/db/entities/Poll.entity.js";
 import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
@@ -22,14 +23,14 @@ import {
   MessageComponentTypes,
 } from "discord-interactions";
 
-describe("cta/pollPub", () => {
+describe("cta/pollResp", () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
   let handlerOpts: ModalHandlerOptions<any>;
   let aPoll: Poll;
-
+  let firstStep: PollStep;
   beforeEach(async () => {
     const { orm } = await initORM();
     em = orm.em.fork();
@@ -39,7 +40,7 @@ describe("cta/pollPub", () => {
 
     const data = {
       components: [],
-      custom_id: `{"t":"cta","d":{"a":"pollPub", "pId": "${aPoll.id}"}}`,
+      custom_id: `{"t":"cta","d":{"a":"pollResp", "pId": "${aPoll.id}"}}`,
     };
     const { req, res } = getInteractionModalHttpMock({ data, guild_id });
     const dbServices = await initORM();
@@ -52,59 +53,36 @@ describe("cta/pollPub", () => {
 
     const aGuild = new DiscordGuild(guild_id);
     aGuild.polls.add(aPoll);
-    const firstStep = new PollStep(`A first question?`, 0);
+    firstStep = new PollStep(`A first question?`, 0);
     aPoll.steps.add(firstStep);
     await em.persist(aGuild).flush();
   });
 
   it("should respond a message with description", async () => {
-    const response = await pollPub.handler(handlerOpts);
+    const response = await pollResp.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
+      type: InteractionResponseType.Modal,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        custom_id: JSON.stringify({
+          t: "cta",
+          d: {
+            a: "pollvote",
+            pId: aPoll.id,
+          },
+        }),
+        title: aPoll.title,
         components: [
           {
-            type: MessageComponentTypes.SECTION,
-            components: [
-              {
-                type: MessageComponentTypes.TEXT_DISPLAY,
-                content:
-                  "# Oyé Oyé!\n-# Le staff réclame votre attention pour un sondage!",
-              },
-              {
-                type: MessageComponentTypes.TEXT_DISPLAY,
-                content: aPoll.title,
-              },
-            ],
-            accessory: {
-              type: MessageComponentTypes.THUMBNAIL,
-              media: {
-                url: `https://raw.githubusercontent.com/GTSpray/P-titPote/poll/assets/ptitpote-sam.png?salt=${aPoll.id}`,
-              },
+            type: ComponentType.Label,
+            label: firstStep.question,
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: firstStep.id,
+              style: TextInputStyle.Short,
+              min_length: 1,
+              max_length: 100,
+              required: true,
             },
-          },
-          {
-            type: MessageComponentTypes.SEPARATOR,
-            divider: true,
-            spacing: 1,
-          },
-          {
-            type: ComponentType.ActionRow,
-            components: [
-              {
-                type: ComponentType.Button,
-                style: ButtonStyle.Primary,
-                label: "Je vote!",
-                custom_id: JSON.stringify({
-                  t: "cta",
-                  d: {
-                    a: "pollResp",
-                    pId: aPoll.id,
-                  },
-                }),
-              },
-            ],
           },
         ],
       },
