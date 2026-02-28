@@ -71,6 +71,18 @@ describe("cta/pollResp", () => {
           },
         }),
         title: aPoll.title,
+        components: expect.any(Array),
+      },
+    });
+  });
+
+  it("should handle non-multiple-choice questions", async () => {
+    const response = await pollResp.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: aPoll.title,
         components: [
           {
             type: ComponentType.Label,
@@ -87,5 +99,13 @@ describe("cta/pollResp", () => {
         ],
       },
     });
+  });
+
+  it.todo("should handle a multiple-choice question");
+
+  describe("when the voting form contains more than 10 questions", () => {
+    it.todo("should respond message with the first 5 steps of the poll");
+    it.todo("should respond message with the first 5 steps of the poll");
+    it.todo("should complete a form with the following 5 questions");
   });
 });
