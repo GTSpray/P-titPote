@@ -37,10 +37,11 @@ npm install
 
 ### 2. App Credentials
 
-Get your application credentials (from the Discord Developer Portal):  
-  - **APP_ID**
-  - **BOT_TOKEN**
-  - **PUBLIC_KEY**
+Get your application credentials (from the Discord Developer Portal):
+
+- **APP_ID**
+- **BOT_TOKEN**
+- **PUBLIC_KEY**
 
 Copy `.env.sample` to `.env` and fill in your values:
 
@@ -54,12 +55,13 @@ LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
 ### 3. Discord Scopes & Permissions
 
 Required scopes:
-  - `applications.commands`
-  - `bot` (with Send Messages enabled)
-Required permissions:
- - Manage Messages
- - Send Messages
- - Use external Emojis
+
+- `applications.commands`
+- `bot` (with Send Messages enabled)
+  Required permissions:
+- Manage Messages
+- Send Messages
+- Use external Emojis
 
 _For more details, see [Discord's getting started guide](https://discord.com/developers/docs/getting-started)._
 
@@ -71,13 +73,13 @@ If developing locally, you must expose your dev environment to the internet for 
 
 > 💡 Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
 
-For exemple if you set:  **LOCALTUNNEL_SUBDOMAIN**=*my-bot*
-
+For exemple if you set: **LOCALTUNNEL_SUBDOMAIN**=_my-bot_
 
 You will get a url like `https://my-bot.loca.lt`
 
 Go to your Discord app "General Information" > **Interactions Endpoint URL**  
 Paste the tunnel url with `/interactions` appended, e.g.:
+
 ```
 https://my-bot.loca.lt/interactions
 ```
@@ -100,6 +102,7 @@ services:
     expose:
       - "4040"
 ```
+
 - Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.
 
 ## ⚙️ Usage
