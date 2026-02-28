@@ -19,15 +19,11 @@
 **P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
 It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
 
----
-
 ## 🔧 Prerequisites
 
 - [Node.js](https://nodejs.org/en/download/) (v22 or newer)
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - A [Discord application](https://discord.com/developers/applications) (with bot + commands enabled)
-
----
 
 ## 🚀 Quick Start
 
@@ -67,8 +63,6 @@ Required permissions:
 
 _For more details, see [Discord's getting started guide](https://discord.com/developers/docs/getting-started)._
 
----
-
 ## 🌐 Local Development (Tunnel)
 
 If developing locally, you must expose your dev environment to the internet for Discord events to work. Two main tunnel options:
@@ -107,8 +101,6 @@ services:
       - "4040"
 ```
 - Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.
-
----
 
 ## ⚙️ Usage
 
@@ -157,8 +149,6 @@ make testw
 - Name your test files with the `.test.ts` suffix for consistency.
 - Always make sure the test suite passes before proposing major changes.
 
----
-
 ## 🗂 Project Structure
 
 ```
@@ -195,8 +185,6 @@ npx mikro-orm schema:update --dump   # Show SQL for incremental update
 npx mikro-orm schema:drop --dump     # Show SQL to drop schema
 ```
 
----
-
 ## 📚 Resources
 
 - [Discord API Docs](https://discord.com/developers/docs/intro)
@@ -205,8 +193,6 @@ npx mikro-orm schema:drop --dump     # Show SQL to drop schema
 - [Localtunnel](https://github.com/localtunnel/localtunnel)
 - [MikroORM Documentation](https://mikro-orm.io/)
 - [discord.js Documentation](https://discord.js.org/)
-
----
 
 ## 📝 License
 
