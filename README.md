@@ -6,47 +6,89 @@
   <br>
 </h1>
 
-# Running app locally
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-≥22.x-green.svg"></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-ready-blue.svg"></a>
+</p>
 
-Before you start, you'll need to install [NodeJS](https://nodejs.org/en/download/), [Docker](https://www.docker.com/) (or [Podman](https://podman.io/)) and [create a Discord app](https://discord.com/developers/applications) with the proper permissions:
+---
+
+## 🌟 About
+
+**P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
+It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
+
+## 🔧 Prerequisites
+
+- [Node.js](https://nodejs.org/en/download/) (v22 or newer)
+- [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
+- A [Discord application](https://discord.com/developers/applications) (with bot + commands enabled)
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/GTSpray/P-titPote.git
+cd P-titPote
+npm install
+```
+
+### 2. App Credentials
+
+Get your application credentials (from the Discord Developer Portal):
+
+- **APP_ID**
+- **BOT_TOKEN**
+- **PUBLIC_KEY**
+
+Copy `.env.sample` to `.env` and fill in your values:
+
+```env
+APP_ID=your_app_id
+BOT_TOKEN=your_bot_token
+PUBLIC_KEY=your_public_key
+LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
+```
+
+### 3. Discord Scopes & Permissions
+
+Required scopes:
 
 - `applications.commands`
 - `bot` (with Send Messages enabled)
-
-And permissions:
-
+  Required permissions:
 - Manage Messages
 - Send Messages
 - Use external Emojis
 
-Configuring the app is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
+_For more details, see [Discord's getting started guide](https://docs.discord.com/developers/quick-start/getting-started)._
 
-## Setup project
+## 🌐 Local Development (Tunnel)
 
-First clone the project:
-Then navigate to its directory and install dependencies.
+If developing locally, you must expose your dev environment to the internet for Discord events to work. Two main tunnel options:
 
-### Get app credentials
+### Using Localtunnel
 
-Fetch the credentials from your app's settings and add them to a `.env` file (see `.env.sample` for an example). You'll need your app ID (`APP_ID`), bot token (`BOT_TOKEN`), and public key (`PUBLIC_KEY`).
+> 💡 Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
 
-Fetching credentials is covered in detail in the [getting started guide](https://discord.com/developers/docs/getting-started).
+For exemple if you set: **LOCALTUNNEL_SUBDOMAIN**=_my-bot_
 
-> 🔑 Environment variables can be added to the `.env` file in Glitch or when developing locally, and in the Secrets tab in Replit (the lock icon on the left).
+You will get a url like `https://my-bot.loca.lt`
 
-### Local tunnel with docker environment
+Go to your Discord app "General Information" > **Interactions Endpoint URL**  
+Paste the tunnel url with `/interactions` appended, e.g.:
 
-Try to use tunnel services like ngrok, localtunnel, etc...
+```
+https://my-bot.loca.lt/interactions
+```
 
-Copy the forwarding address that starts with `https`, in this case `https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt`, then go to your [app's settings](https://discord.com/developers/applications).
+Click **Save Changes**.
 
-On the **General Information** tab, there will be an **Interactions Endpoint URL**. Paste your localtunnel address there, and append `/interactions` to it (`https://<LOCALTUNNEL_SUBDOMAIN>.loca.lt/interactions` in the example).
+### Using ngrok
 
-Click **Save Changes**, and your app should be ready to run 🚀
-
-> 🔑 LOCALTUNNEL_SUBDOMAIN variable can be added to the `.env` file to ensure static subdomain localtunnel and permanent interaction url. See [localtunnel status page](https://status.loca.lt/)
-
-You can override the localtunnel service to use another system such as ngrok by editing the docker-compose.local.yml file as follows:
+Alternatively, update your `docker-compose.local.yml` for ngrok:
 
 ```yaml
 services:
@@ -61,70 +103,100 @@ services:
       - "4040"
 ```
 
-## Usage
+- Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.
 
-### Production mode
+## ⚙️ Usage
 
-Launch application using :
-
-```bash
-make start
-```
-
-and stop
+### Production
 
 ```bash
-make stop
+make start      # Start the bot (prod)
+make register   # Register slash commands
+make stop       # Stop the bot
 ```
 
-Slash commands will be installed when you run the `register` command :
+### Development
 
 ```bash
-make register
+make dev        # Run in dev container
+make build      # Transpile TypeScript (dev mode)
+make test       # Run test suite
+make testw      # Run test suite in watch mode
 ```
 
-### Development mode
+> 💡 When developing, after running `make dev`, you should also execute `make install` inside the development container to install all dev dependencies before running the tests or starting development.
 
-Launch development container using :
+## ✅ Testing
 
-```bash
-make dev
-```
+All tests for this project are located in the `tests/` directory.  
+The test suite uses [Vitest](https://vitest.dev/) to ensure code quality and correct bot functionality.
 
-keep your code transpiled with :
+### Running tests
 
-```bash
-make build
-```
-
-test your code using :
+To execute all tests:
 
 ```bash
 make test
 ```
 
-or (in watch mode)
+- This command will run all unit and integration tests found in the `tests/` directory.
+- To run tests in watch mode (auto-reload on code changes):
 
 ```bash
 make testw
 ```
 
-> ⚙️ A package [like `nodemon`](https://github.com/remy/nodemon), which watches for local changes and restarts your app, may be helpful while locally developing.
+### Guidelines
 
-#### Database managment
+- When adding new features or fixing bugs, create corresponding test files in the `tests/` directory.
+- Name your test files with the `.test.ts` suffix for consistency.
+- Always make sure the test suite passes before proposing major changes.
 
-See [schema-generator](https://mikro-orm.io/docs/schema-generator)
+## 🗂 Project Structure
+
+```
+P-titPote/
+├── src/
+│   ├── api.ts                   # Express server
+│   ├── gateway.ts               # Discord WS gateway entrypoint
+│   ├── register.ts              # Register commands
+│   ├── logger.ts                # Winston logging setup
+│   ├── mikro-orm.config.ts      # MikroORM/MariaDB config
+│   ├── commands/                # Discord slash commands
+│   ├── gateway/                 # WS handlers
+│   ├── db/                      # Database entities
+│   ├── utils/                   # Helper utils
+│   └── migrations/              # Database migrations
+├── tests/                       # Vitest tests
+├── docker/                      # Docker config/scripts
+├── Makefile                     # Automation
+├── docker-compose.yml           # Production Compose setup
+├── docker-compose.dev.yml       # Dev Compose setup
+├── package.json                 # Dependencies & scripts
+└── tsconfig.json                # TypeScript config
+```
+
+## Database Management
+
+Powered by [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator):
 
 ```bash
 make sh
-npx mikro-orm schema:create --dump   # Dumps create schema SQL
-npx mikro-orm schema:update --dump   # Dumps update schema SQL
-npx mikro-orm schema:drop --dump     # Dumps drop schema SQL
+# Inside the shell:
+npx mikro-orm schema:create --dump   # Show SQL to create schema
+npx mikro-orm schema:update --dump   # Show SQL for incremental update
+npx mikro-orm schema:drop --dump     # Show SQL to drop schema
 ```
 
-## Other resources
+## 📚 Resources
 
-- Read **[the documentation](https://discord.com/developers/docs/intro)** for in-depth information about API features.
-- Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
-- Check out **[community resources](https://discord.com/developers/docs/topics/community-resources#community-resources)** for language-specific tools maintained by community members.
-- Read **[localtunnel](https://github.com/localtunnel/localtunnel)**
+- [Discord API Docs](https://discord.com/developers/docs/intro)
+- [Discord Developers server (support)](https://discord.gg/discord-developers)
+- [Community resources](https://discord.com/developers/docs/topics/community-resources)
+- [Localtunnel](https://github.com/localtunnel/localtunnel)
+- [MikroORM Documentation](https://mikro-orm.io/)
+- [discord.js Documentation](https://discord.js.org/)
+
+## 📝 License
+
+MIT – see [LICENSE](LICENSE)
