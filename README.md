@@ -63,7 +63,7 @@ Required scopes:
 - Send Messages
 - Use external Emojis
 
-_For more details, see [Discord's getting started guide](https://discord.com/developers/docs/getting-started)._
+_For more details, see [Discord's getting started guide](https://docs.discord.com/developers/quick-start/getting-started)._
 
 ## 🌐 Local Development (Tunnel)
 
