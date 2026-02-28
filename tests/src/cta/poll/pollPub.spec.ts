@@ -57,7 +57,7 @@ describe("cta/pollPub", () => {
     await em.persist(aGuild).flush();
   });
 
-  it("should respond a message with description", async () => {
+  it("should send a message in the channel inviting members to vote", async () => {
     const response = await pollPub.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
