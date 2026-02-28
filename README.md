@@ -71,7 +71,7 @@ If developing locally, you must expose your dev environment to the internet for 
 
 > 💡 Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
 
-For exemple if you set:  LOCALTUNNEL_SUBDOMAIN=my-bot
+For exemple if you set:  **LOCALTUNNEL_SUBDOMAIN**=*my-bot*
 
 
 You will get a url like `https://my-bot.loca.lt`
