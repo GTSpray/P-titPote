@@ -8,7 +8,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import { initORM } from "../../../../../src/db/db.js";
@@ -49,7 +49,7 @@ describe("/alias ls", () => {
       options: [subcommand],
       type: 1,
     };
-    const { req, res } = getInteractionHttpMock({ data });
+    const { req, res } = getInteractionCommandHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
       req,

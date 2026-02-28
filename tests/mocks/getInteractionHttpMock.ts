@@ -17,22 +17,30 @@ import { getAPIInteractionGuildMemberData } from "./discord-api/getAPIInteractio
 import { getApiUserData } from "./discord-api/getApiUserData.js";
 import { getApiChannelData } from "./discord-api/getApiChannelData.js";
 
-type DiscordInteractionBody<Data> = APIBaseInteraction<
-  InteractionType.ApplicationCommand,
-  Data
->;
+type DiscordInteractionBody<
+  T extends InteractionType,
+  Data,
+> = APIBaseInteraction<T, Data>;
 
-type BasicInteractionPayloadOpts<Data extends object> = {
+type BasicInteractionPayloadOpts<
+  T extends InteractionType,
+  Data extends object,
+> = {
   guild_id?: string;
   channel_id?: string;
   data?: Data;
+  type?: T;
 };
 
-const getBasicInteractionPayload = <D extends object>({
+const getBasicInteractionPayload = <
+  T extends InteractionType,
+  D extends object,
+>({
   data = {} as D,
   guild_id = randomDiscordId19(),
   channel_id = randomDiscordId19(),
-}: BasicInteractionPayloadOpts<D>): DiscordInteractionBody<D> => {
+  type = InteractionType.ApplicationCommand as T,
+}: BasicInteractionPayloadOpts<T, D>): DiscordInteractionBody<T, D> => {
   return {
     app_permissions: randomDiscordId16(),
     application_id: randomDiscordId19(),
@@ -69,22 +77,58 @@ const getBasicInteractionPayload = <D extends object>({
       letter: true,
       uppercase: true,
     }),
-    type: InteractionType.ApplicationCommand,
+    type,
     version: 1,
   };
 };
 
 type InteractionHttpMockOptions<Data> = { guild_id?: string; data: Data };
-export const getInteractionHttpMock = <D extends object>(
+export const getInteractionCommandHttpMock = <D extends object>(
   opts: InteractionHttpMockOptions<D>,
 ): {
   res: MockResponse<Response>;
-  req: MockRequest<Request<any, any, DiscordInteractionBody<D>, any, any>>;
+  req: MockRequest<
+    Request<
+      any,
+      any,
+      DiscordInteractionBody<InteractionType.ApplicationCommand, D>,
+      any,
+      any
+    >
+  >;
 } => ({
   res: createResponse(),
   req: createRequest({
     method: "POST",
     url: "/interactions",
-    body: <D>getBasicInteractionPayload(opts),
+    body: <D>getBasicInteractionPayload({
+      ...opts,
+      type: InteractionType.ApplicationCommand,
+    }),
+  }),
+});
+
+export const getInteractionModalHttpMock = <D extends object>(
+  opts: InteractionHttpMockOptions<D>,
+): {
+  res: MockResponse<Response>;
+  req: MockRequest<
+    Request<
+      any,
+      any,
+      DiscordInteractionBody<InteractionType.ModalSubmit, D>,
+      any,
+      any
+    >
+  >;
+} => ({
+  res: createResponse(),
+  req: createRequest({
+    method: "POST",
+    url: "/interactions",
+    body: <D>getBasicInteractionPayload({
+      ...opts,
+      type: InteractionType.ModalSubmit,
+    }),
   }),
 });

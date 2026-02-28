@@ -8,7 +8,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import {
   getRandomString,
   randomDiscordId19,
@@ -55,7 +55,7 @@ describe("/alias say", () => {
       options: [subcommand],
       type: 1,
     };
-    const { req, res } = getInteractionHttpMock({ data });
+    const { req, res } = getInteractionCommandHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
       req,
@@ -94,7 +94,7 @@ describe("/alias say", () => {
   });
 
   it("should not respond with aliased message content of another guild", async () => {
-    const { req, res } = getInteractionHttpMock({
+    const { req, res } = getInteractionCommandHttpMock({
       guild_id: randomDiscordId19(),
       data: <aliasSayCommandData>{
         id: randomDiscordId19(),
@@ -163,7 +163,7 @@ describe("/alias say", () => {
       type: 1,
     };
 
-    const { req, res } = getInteractionHttpMock<aliasSayCommandData>({
+    const { req, res } = getInteractionCommandHttpMock<aliasSayCommandData>({
       data: {
         id: randomDiscordId19(),
         name: "alias",
