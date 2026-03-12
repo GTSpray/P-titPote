@@ -300,7 +300,7 @@ describe("ShardSocket", () => {
     });
 
     it("should keep heartbit interval using hello reponse interval", async () => {
-      shardSocket.jitter = 0.1; // force jitter cause random is painfull to test
+      shardSocket.jitter = 1 / 10000; // force jitter cause random is painfull to test
       server.on("wsmessage", async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {
