@@ -1,13 +1,12 @@
-import { defineConfig, DefaultLogger, MariaDbDriver } from "@mikro-orm/mariadb";
-import { DiscordGuild } from "../src/db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../src/db/entities/MessageAliased.entity.js";
+import { DefaultLogger, Options } from "@mikro-orm/mariadb";
+import config from "../src/mikro-orm.config.js";
 
 class ShutUpLogger extends DefaultLogger {
   log() {}
 }
 
-export default defineConfig({
-  driver: MariaDbDriver,
+const c: Options = {
+  ...config,
   dbName: "ptitpotetest",
   host: "dbtest",
   user: "ptitpotetest",
@@ -15,5 +14,6 @@ export default defineConfig({
   port: 3306,
   debug: false,
   loggerFactory: (options) => new ShutUpLogger(options),
-  entities: [DiscordGuild, MessageAliased],
-});
+};
+
+export default c;
