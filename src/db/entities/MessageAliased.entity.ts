@@ -1,7 +1,7 @@
 import { EntityBase } from "../EntityBase.js";
 import { Entity, ManyToOne, Property, types } from "@mikro-orm/mariadb";
 import { DiscordGuild } from "./DiscordGuild.entity.js";
-import { Rel, Unique } from "@mikro-orm/core";
+import { type Rel, Unique } from "@mikro-orm/core";
 
 @Entity()
 @Unique({
@@ -14,7 +14,7 @@ export class MessageAliased extends EntityBase {
     this.message = message;
   }
 
-  @ManyToOne()
+  @ManyToOne(() => DiscordGuild)
   server!: Rel<DiscordGuild>;
 
   @Property({ type: "varchar", length: 50 })
