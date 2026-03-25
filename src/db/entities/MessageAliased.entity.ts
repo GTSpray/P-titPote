@@ -14,7 +14,7 @@ export class MessageAliased extends EntityBase {
     this.message = message;
   }
 
-  @ManyToOne()
+  @ManyToOne(() => DiscordGuild)
   server!: Rel<DiscordGuild>;
 
   @Property({ type: "varchar", length: 50 })
