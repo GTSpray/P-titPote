@@ -131,7 +131,7 @@ db-dump: os
 
 ## Lint all files with Prettier
 lint: os
-	$(DC_CMD_CI) run api npx prettier . --check
+	$(DC_CMD_CI) run api npx prettier . --check --list-different
 
 ## Run tests (need containers as developpement mode)
 test: os
