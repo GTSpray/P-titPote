@@ -1,5 +1,7 @@
-import { Filter, PrimaryKey, Property, types } from "@mikro-orm/mariadb";
+import { Entity, PrimaryKey, Property, Filter } from "@mikro-orm/decorators/legacy";
+import { types } from "@mikro-orm/mariadb";
 import { v4 } from "uuid";
+
 
 @Filter({
   name: "excludeDeleted",

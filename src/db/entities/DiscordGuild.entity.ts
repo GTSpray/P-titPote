@@ -5,7 +5,8 @@ import {
   OneToMany,
   Property,
   Unique,
-} from "@mikro-orm/mariadb";
+} from "@mikro-orm/decorators/legacy";
+
 import { MessageAliased } from "./MessageAliased.entity.js";
 
 @Entity()
