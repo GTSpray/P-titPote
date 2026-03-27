@@ -29,9 +29,9 @@
   "dependencies": {
     "@mikro-orm/cli": "^7.0.5",
     "@mikro-orm/core": "^7.0.5",
+    "@mikro-orm/decorators": "^7.0.6",
     "@mikro-orm/mariadb": "^7.0.5",
     "@mikro-orm/migrations": "^7.0.5",
-    "@mikro-orm/decorators": "^7.0.5",
     "bufferutil": "^4.1.0",
     "discord-interactions": "^4.4.0",
     "discord.js": "^14.25.1",
