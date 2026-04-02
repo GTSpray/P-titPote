@@ -1,12 +1,11 @@
 import { EntityBase } from "../EntityBase.js";
 import {
-  Collection,
   Entity,
   OneToMany,
   Property,
   Unique,
 } from "@mikro-orm/decorators/legacy";
-
+import { Collection } from "@mikro-orm/core";
 import { MessageAliased } from "./MessageAliased.entity.js";
 
 @Entity()
