@@ -5,7 +5,7 @@ export default async function setup() {
   process.env.LOG_LEVEL = "";
   const { orm } = await initORM(config);
   const generator = orm.schema;
-  await generator.dropSchema();
-  await generator.createSchema();
+  await generator.drop();
+  await generator.create();
   await orm.close(true);
 }
