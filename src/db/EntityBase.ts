@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, Filter } from "@mikro-orm/decorators/legacy";
+import { PrimaryKey, Property, Filter } from "@mikro-orm/decorators/legacy";
 import { types } from "@mikro-orm/mariadb";
 import { v4 } from "uuid";
 

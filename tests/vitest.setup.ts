@@ -1,8 +1,7 @@
 import { DiscrodRESTMock } from "./mocks/discordjs.js";
 import { vi } from "vitest";
 import "./customMatchers/customMatchers.js";
-import config from "./mkro-orm-test.config.js";
-import { initORM } from "../src/db/db.js";
+import { initORM } from "./initORM.js";
 import { WebSocketMock } from "./mocks/WebSocketMock.js";
 
 vi.mock("../src/logger.js");
@@ -20,7 +19,7 @@ vi.mock("discord.js", async (importOriginal) => {
 });
 
 beforeAll(async () => {
-  await initORM(config);
+  await initORM();
 });
 
 afterAll(async () => {
