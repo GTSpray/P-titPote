@@ -5,7 +5,7 @@ export interface DBServices {
 }
 
 let cache: DBServices;
-export async function initORM(options?: Options): Promise<DBServices> {
+export async function initORM(options: Options): Promise<DBServices> {
   if (cache) {
     return cache;
   }

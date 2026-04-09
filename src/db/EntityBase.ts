@@ -1,9 +1,10 @@
-import { Filter, PrimaryKey, Property, types } from "@mikro-orm/mariadb";
+import { PrimaryKey, Property, Filter } from "@mikro-orm/decorators/legacy";
+import { types } from "@mikro-orm/mariadb";
 import { v4 } from "uuid";
 
 @Filter({
   name: "excludeDeleted",
-  cond: { deletedAt: "1970-01-01 01:00:00.000" },
+  cond: { deletedAt: "1970-01-01 00:00:00.000" },
   default: true,
 })
 export abstract class EntityBase {

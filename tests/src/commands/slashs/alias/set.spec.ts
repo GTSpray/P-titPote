@@ -17,7 +17,7 @@ import {
   SubCommandOption,
 } from "../../../../../src/commands/commands.js";
 import { aliasSetCommandData } from "../../../../../src/commands/slash/alias/set.js";
-import { initORM } from "../../../../../src/db/db.js";
+import { initORM } from "../../../../initORM.js";
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
 import {
