@@ -1,6 +1,11 @@
 import { EntityBase } from "../EntityBase.js";
 import { types } from "@mikro-orm/mariadb";
-import { Entity, ManyToOne, Property, Unique } from "@mikro-orm/decorators/legacy";
+import {
+  Entity,
+  ManyToOne,
+  Property,
+  Unique,
+} from "@mikro-orm/decorators/legacy";
 import { DiscordGuild } from "./DiscordGuild.entity.js";
 import { type Rel } from "@mikro-orm/core";
 

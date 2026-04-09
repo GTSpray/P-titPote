@@ -69,7 +69,8 @@ export const set = async (
       )) || new DiscordGuild(guildId);
 
     let messageAliased = guild.messageAliaseds.find(
-      (aliasedMsg: MessageAliased) => aliasedMsg.alias === AliasMessageInput.data.alias,
+      (aliasedMsg: MessageAliased) =>
+        aliasedMsg.alias === AliasMessageInput.data.alias,
     );
 
     if (!messageAliased) {

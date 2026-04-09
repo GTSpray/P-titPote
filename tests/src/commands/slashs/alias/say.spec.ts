@@ -25,7 +25,7 @@ import {
 } from "@mikro-orm/mariadb";
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
-import { initORM } from '../../../../initORM.js';
+import { initORM } from "../../../../initORM.js";
 
 describe("/alias say", () => {
   let guild_id: string;
