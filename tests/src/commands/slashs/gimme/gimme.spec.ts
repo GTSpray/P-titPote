@@ -8,7 +8,8 @@ import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import * as otterModule from "../../../../../src/commands/slash/gimme/otter.js";
 import * as emojiModule from "../../../../../src/commands/slash/gimme/emoji.js";
 import * as versionModule from "../../../../../src/commands/slash/gimme/version.js";
-import { DBServices, initORM } from "../../../../../src/db/db.js";
+import { DBServices } from "../../../../../src/db/db.js";
+import { initORM } from "../../../../initORM.js";
 import {
   InteractionContextType,
   ApplicationIntegrationType,
