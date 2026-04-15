@@ -50,7 +50,7 @@
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.6.0",
-    "discord-api-types": "^0.38.45",
+    "discord-api-types": "^0.38.46",
     "node-mocks-http": "^1.17.2",
     "nodemon": "^3.1.14",
     "prettier": "3.8.3",
