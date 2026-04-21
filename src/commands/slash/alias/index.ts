@@ -1,5 +1,5 @@
 import * as z from "zod";
-import {assertInteractionUserisModerator} from '../../assert/assertInteractionUserisModerator.js'
+import { assertInteractionUserisModerator } from "../../assert/assertInteractionUserisModerator.js";
 import { type SlashCommandDeclaration } from "../../commands.js";
 import {
   ApplicationIntegrationType,
@@ -83,10 +83,10 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
     const { req, res } = handlerOpts;
 
     try {
-      assertInteractionUserisModerator(req.body)
+      assertInteractionUserisModerator(req.body);
     } catch (error) {
-      logger.error(error)
-      return res.json(notAllowed())
+      logger.error(error);
+      return res.json(notAllowed());
     }
 
     const command = ValidCommandPayload.safeParse(req.body.data);
@@ -97,7 +97,7 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
       return res.status(400).json({ error: "invalid command payload", issues });
     }
 
-    const [subcommand] = command.data.options;assertUserIsModerator
+    const [subcommand] = command.data.options;
     let result: Response | null;
     switch (subcommand.name) {
       case "set":
