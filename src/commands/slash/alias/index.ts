@@ -1,5 +1,5 @@
 import * as z from "zod";
-
+import {assertInteractionUserisModerator} from '../../assert/assertInteractionUserisModerator.js'
 import { type SlashCommandDeclaration } from "../../commands.js";
 import {
   ApplicationIntegrationType,
@@ -13,6 +13,7 @@ import { aliasSayCommandData, say } from "./say.js";
 import { aliasLsCommandData, ls } from "./ls.js";
 import { Response } from "express";
 import { logger } from "../../../logger.js";
+import { notAllowed } from "../../commonMessages.js";
 
 const builder = new SlashCommandBuilder()
   .setDescription("Alias un message")
@@ -80,6 +81,14 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
   builder,
   handler: async function (handlerOpts) {
     const { req, res } = handlerOpts;
+
+    try {
+      assertInteractionUserisModerator(req.body)
+    } catch (error) {
+      logger.error(error)
+      return res.json(notAllowed())
+    }
+
     const command = ValidCommandPayload.safeParse(req.body.data);
 
     if (!command.success) {
@@ -88,7 +97,7 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
       return res.status(400).json({ error: "invalid command payload", issues });
     }
 
-    const [subcommand] = command.data.options;
+    const [subcommand] = command.data.options;assertUserIsModerator
     let result: Response | null;
     switch (subcommand.name) {
       case "set":

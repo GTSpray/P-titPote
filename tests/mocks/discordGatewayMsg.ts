@@ -6,7 +6,6 @@ import {
   GatewayOpcodes,
   GatewayReadyDispatch,
   GatewayReconnect,
-  GatewayResume,
   GatewayResumedDispatch,
 } from "discord.js";
 import { getRandomString, randomDiscordId19 } from "./discord-api/utils.js";

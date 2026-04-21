@@ -5,7 +5,7 @@ tB=\033[1m
 	
 # OS detection
 UNAME_S := $(shell uname -s)
-JQC :=  jq -R '. as $$line | try (fromjson) catch $$line'
+JQC :=  jq --indent 0 -R '. as $$line | try (fromjson) catch $$line'
 ifeq ($(UNAME_S),Darwin)
 	OS := macos
 	DC_CMD := docker-compose -f docker-compose.yml -f docker-compose.local.yml
