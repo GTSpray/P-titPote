@@ -76,6 +76,8 @@ describe("/alias say", () => {
     await em.persist(guild).persist(messageAliased).flush();
   });
 
+  it.todo('should display a temporary message indicating that the command cannot be executed if the user is not a moderator')
+
   it("should respond with aliased message content", async () => {
     const response = await say(handlerOpts, subcommand);
 

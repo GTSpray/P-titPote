@@ -62,6 +62,8 @@ describe("/alias ls", () => {
     em = orm.em.fork();
   });
 
+  it.todo('should display a temporary message indicating that the command cannot be executed if the user is not a moderator')
+
   describe("when guild has aliased messages", () => {
     let messageAliaseds: MessageAliased[];
     beforeEach(async () => {

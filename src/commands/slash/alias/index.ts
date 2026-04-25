@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { assertInteractionUserisModerator } from "../../assert/assertInteractionUserisModerator.js";
+import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
 import { type SlashCommandDeclaration } from "../../commands.js";
 import {
   ApplicationIntegrationType,
@@ -83,7 +83,7 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
     const { req, res } = handlerOpts;
 
     try {
-      assertInteractionUserisModerator(req.body);
+      assertInteractionUserIsModerator(req.body);
     } catch (error) {
       logger.error(error);
       return res.json(notAllowed());
