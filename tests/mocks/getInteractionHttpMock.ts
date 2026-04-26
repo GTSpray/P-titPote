@@ -26,12 +26,14 @@ type BasicInteractionPayloadOpts<Data extends object> = {
   guild_id?: string;
   channel_id?: string;
   data?: Data;
+  permissions?: string;
 };
 
 const getBasicInteractionPayload = <D extends object>({
   data = {} as D,
   guild_id = randomDiscordId19(),
   channel_id = randomDiscordId19(),
+  permissions = "2248473465835073",
 }: BasicInteractionPayloadOpts<D>): DiscordInteractionBody<D> => {
   return {
     app_permissions: randomDiscordId16(),
@@ -62,6 +64,7 @@ const getBasicInteractionPayload = <D extends object>({
         username: "a random user name",
         global_name: "a random global name",
       }),
+      permissions,
     }),
     token: getRandomString({
       length: 214,
@@ -74,7 +77,11 @@ const getBasicInteractionPayload = <D extends object>({
   };
 };
 
-type InteractionHttpMockOptions<Data> = { guild_id?: string; data: Data };
+type InteractionHttpMockOptions<Data> = {
+  guild_id?: string;
+  data: Data;
+  permissions?: string;
+};
 export const getInteractionHttpMock = <D extends object>(
   opts: InteractionHttpMockOptions<D>,
 ): {

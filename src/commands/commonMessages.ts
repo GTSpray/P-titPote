@@ -15,6 +15,9 @@ export const errorPayload = (content: string) => ({
 export const notFoundPayload = () =>
   errorPayload(`ahem... j'ai rien trouvé... 🤷`);
 
+export const notAllowed = () =>
+  errorPayload(`ahem... je ne suis pas habilitée à le faire 🤷`);
+
 export const foundItComponnents = () => [
   {
     type: MessageComponentTypes.TEXT_DISPLAY,

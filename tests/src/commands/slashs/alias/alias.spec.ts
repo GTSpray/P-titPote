@@ -19,7 +19,14 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 
+import {
+  InteractionResponseFlags,
+  InteractionResponseType,
+} from "discord-interactions";
+
 describe("/alias", () => {
+  const admin_permissions = "18014398509481983";
+  const default_member_permissions = "2248473465835073";
   let handlerOpts: CommandHandlerOptions<aliasDataOpts>;
 
   it("should declare a slash command", () => {
@@ -66,7 +73,10 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: admin_permissions,
+      });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -95,6 +105,33 @@ describe("/alias", () => {
           }),
         ]),
       });
+    });
+
+    it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+      using spy = vi.spyOn(setModule, "set").mockResolvedValue(handlerOpts.res);
+
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: default_member_permissions,
+      });
+
+      const fakeOpts = {
+        ...handlerOpts,
+        req,
+        res,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      const response = await alias.handler(fakeOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: InteractionResponseFlags.EPHEMERAL,
+          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        },
+      });
+      expect(spy).toHaveBeenCalledTimes(0);
     });
 
     it('should call "set" handler', async () => {
@@ -144,7 +181,10 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: admin_permissions,
+      });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -169,6 +209,33 @@ describe("/alias", () => {
           }),
         ]),
       });
+    });
+
+    it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+      using spy = vi.spyOn(sayModule, "say").mockResolvedValue(handlerOpts.res);
+
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: default_member_permissions,
+      });
+
+      const fakeOpts = {
+        ...handlerOpts,
+        req,
+        res,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      const response = await alias.handler(fakeOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: InteractionResponseFlags.EPHEMERAL,
+          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        },
+      });
+      expect(spy).toHaveBeenCalledTimes(0);
     });
 
     it('should call "say" handler', async () => {
@@ -212,7 +279,10 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: admin_permissions,
+      });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -232,6 +302,33 @@ describe("/alias", () => {
           }),
         ]),
       });
+    });
+
+    it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+      using spy = vi.spyOn(lsModule, "ls").mockResolvedValue(handlerOpts.res);
+
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: default_member_permissions,
+      });
+
+      const fakeOpts = {
+        ...handlerOpts,
+        req,
+        res,
+        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      const response = await alias.handler(fakeOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          flags: InteractionResponseFlags.EPHEMERAL,
+          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        },
+      });
+      expect(spy).toHaveBeenCalledTimes(0);
     });
 
     it('should call "ls" handler', async () => {
@@ -274,7 +371,10 @@ describe("/alias", () => {
     } as unknown as setModule.aliasSetCommandData;
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({ data });
+      const { req, res } = getInteractionHttpMock({
+        data,
+        permissions: admin_permissions,
+      });
       const dbServices = await initORM();
       handlerOpts = {
         req,
@@ -347,6 +447,7 @@ describe("/alias", () => {
       async (_code, issue, data) => {
         const { req, res } = getInteractionHttpMock({
           data,
+          permissions: admin_permissions,
         });
 
         let handlerOpts: any = { req, res, dbServices };
@@ -379,6 +480,7 @@ describe("/alias", () => {
       async (_code, issue, data) => {
         const { req, res } = getInteractionHttpMock({
           data,
+          permissions: admin_permissions,
         });
 
         let handlerOpts: any = { req, res, dbServices };
