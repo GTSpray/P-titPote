@@ -73,7 +73,7 @@ describe("/alias set", () => {
     const { orm } = await initORM();
     em = orm.em.fork();
   });
-  
+
   it("should respond success message", async () => {
     const response = await set(handlerOpts, subcommand);
 

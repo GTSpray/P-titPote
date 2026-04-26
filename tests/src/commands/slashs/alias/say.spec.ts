@@ -75,7 +75,7 @@ describe("/alias say", () => {
     guild.messageAliaseds.add(messageAliased);
     await em.persist(guild).persist(messageAliased).flush();
   });
-  
+
   it("should respond with aliased message content", async () => {
     const response = await say(handlerOpts, subcommand);
 
