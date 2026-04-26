@@ -36,19 +36,18 @@ describe("/alias ls", () => {
       content: "ahem... j'ai rien trouvé... 🤷",
     },
   };
-
+  const subcommand: aliasLsSubCommandData = {
+    name: "ls",
+    options: [],
+    type: 1,
+  };
+  const data: aliasLsCommandData = {
+    id: randomDiscordId19(),
+    name: "alias",
+    options: [subcommand],
+    type: 1,
+  };
   beforeEach(async () => {
-    const subcommand: aliasLsSubCommandData = {
-      name: "ls",
-      options: [],
-      type: 1,
-    };
-    const data: aliasLsCommandData = {
-      id: randomDiscordId19(),
-      name: "alias",
-      options: [subcommand],
-      type: 1,
-    };
     const { req, res } = getInteractionHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
@@ -61,10 +60,6 @@ describe("/alias ls", () => {
     const { orm } = await initORM();
     em = orm.em.fork();
   });
-
-  it.todo(
-    "should display a temporary message indicating that the command cannot be executed if the user is not a moderator",
-  );
 
   describe("when guild has aliased messages", () => {
     let messageAliaseds: MessageAliased[];

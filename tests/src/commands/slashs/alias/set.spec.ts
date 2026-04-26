@@ -73,11 +73,7 @@ describe("/alias set", () => {
     const { orm } = await initORM();
     em = orm.em.fork();
   });
-
-  it.todo(
-    "should display a temporary message indicating that the command cannot be executed if the user is not a moderator",
-  );
-
+  
   it("should respond success message", async () => {
     const response = await set(handlerOpts, subcommand);
 
