@@ -12,7 +12,7 @@ These instructions apply to the whole repository unless a more specific `AGENTS.
 
 - Make small, focused changes that match the existing architecture.
 - Prefer the Makefile targets documented below over ad-hoc shell commands, especially when Docker services are required.
-- Do not commit generated output from `dist/`, local environment files, logs, database dumps, or temporary artifacts.
+- Do not commit generated output from `dist/`, `logs/`,`temp/`, local environment files, logs, database dumps, or temporary artifacts.
 - Do not introduce new dependencies unless the task clearly requires them. Update `package-lock.json` whenever `package.json` dependencies change.
 - Never commit secrets, Discord tokens, app IDs, public/private keys, local tunnel URLs, database passwords, or real `.env` values.
 - Do not run commands that mutate external Discord state, such as slash-command registration, unless explicitly requested.
