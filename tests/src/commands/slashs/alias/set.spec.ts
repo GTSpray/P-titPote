@@ -7,7 +7,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import {
   getRandomString,
   randomDiscordId19,
@@ -61,7 +61,7 @@ describe("/alias set", () => {
       options: [subcommand],
       type: 1,
     };
-    const { req, res } = getInteractionHttpMock({ data });
+    const { req, res } = getInteractionCommandHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
       req,
@@ -191,15 +191,17 @@ describe("/alias set", () => {
           type: 1,
         };
 
-        const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
-          guild_id,
-          data: {
-            id: randomDiscordId19(),
-            name: "alias",
-            options: [anotherAliasSubCommand],
-            type: 1,
+        const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>(
+          {
+            guild_id,
+            data: {
+              id: randomDiscordId19(),
+              name: "alias",
+              options: [anotherAliasSubCommand],
+              type: 1,
+            },
           },
-        });
+        );
 
         await set({ ...handlerOpts, req, res }, anotherAliasSubCommand);
 
@@ -274,7 +276,7 @@ describe("/alias set", () => {
       type: 1,
     };
 
-    const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
+    const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
       data: {
         id: randomDiscordId19(),
         name: "alias",
@@ -337,7 +339,7 @@ describe("/alias set", () => {
         type: 1,
       };
 
-      const { req, res } = getInteractionHttpMock<aliasSetCommandData>({
+      const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
         data: {
           id: randomDiscordId19(),
           name: "alias",

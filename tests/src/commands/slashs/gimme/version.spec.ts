@@ -3,7 +3,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import {
@@ -29,7 +29,7 @@ describe("/gimme version", () => {
   };
 
   beforeEach(() => {
-    const { req, res } = getInteractionHttpMock({
+    const { req, res } = getInteractionCommandHttpMock({
       data,
     });
     handlerOpts = {

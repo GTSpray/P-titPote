@@ -2,7 +2,7 @@ import {
   alias,
   type aliasDataOpts,
 } from "../../../../../src/commands/slash/alias/index.js";
-import { getInteractionHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
 import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
 import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
 import * as setModule from "../../../../../src/commands/slash/alias/set.js";
@@ -73,7 +73,7 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: admin_permissions,
       });
@@ -110,7 +110,7 @@ describe("/alias", () => {
     it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
       using spy = vi.spyOn(setModule, "set").mockResolvedValue(handlerOpts.res);
 
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: default_member_permissions,
       });
@@ -181,7 +181,7 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: admin_permissions,
       });
@@ -214,7 +214,7 @@ describe("/alias", () => {
     it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
       using spy = vi.spyOn(sayModule, "say").mockResolvedValue(handlerOpts.res);
 
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: default_member_permissions,
       });
@@ -279,7 +279,7 @@ describe("/alias", () => {
     };
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: admin_permissions,
       });
@@ -307,7 +307,7 @@ describe("/alias", () => {
     it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
       using spy = vi.spyOn(lsModule, "ls").mockResolvedValue(handlerOpts.res);
 
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: default_member_permissions,
       });
@@ -371,7 +371,7 @@ describe("/alias", () => {
     } as unknown as setModule.aliasSetCommandData;
 
     beforeEach(async () => {
-      const { req, res } = getInteractionHttpMock({
+      const { req, res } = getInteractionCommandHttpMock({
         data,
         permissions: admin_permissions,
       });
@@ -445,7 +445,7 @@ describe("/alias", () => {
     ])(
       "should return invalid command result when %s options",
       async (_code, issue, data) => {
-        const { req, res } = getInteractionHttpMock({
+        const { req, res } = getInteractionCommandHttpMock({
           data,
           permissions: admin_permissions,
         });
@@ -478,7 +478,7 @@ describe("/alias", () => {
     ])(
       "should return invalid command result when %s name",
       async (_code, issue, data) => {
-        const { req, res } = getInteractionHttpMock({
+        const { req, res } = getInteractionCommandHttpMock({
           data,
           permissions: admin_permissions,
         });
