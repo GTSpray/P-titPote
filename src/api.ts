@@ -54,6 +54,10 @@ app.use(
   ),
 );
 
+app.get("/health", (_req, res) => {
+  res.json({});
+});
+
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
  * Parse request body and verifies incoming requests using discord-interactions package
