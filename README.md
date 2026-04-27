@@ -97,6 +97,7 @@ services:
     environment:
       NGROK_AUTHTOKEN: "..."
     command: "http api:3000"
+    build: !reset null
     ports:
       - "4040:4040"
     expose:
