@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/GTSpray/P-titPote/compare/v1.12.0...v1.13.0) (2026-05-07)
+
+
+### Features
+
+* please release 3 ! ([18e1ce9](https://github.com/GTSpray/P-titPote/commit/18e1ce92617bdcddda4f0a9beff92b2095026b7a))
+
 # [1.12.0](https://github.com/GTSpray/P-titPote/compare/v1.11.0...v1.12.0) (2026-05-07)
 
 
