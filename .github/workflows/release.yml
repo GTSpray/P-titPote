@@ -20,15 +20,12 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      - name: Compress action step
-        uses: a7ul/tar-action@v1.1.0
-        id: compress
+      - uses: sibiraj-s/action-archiver@v1
         with:
-          command: c
-          cwd: ./dist
-          files: |
-            ./src
-          outPath: src.tar.gz
+          path: "dist/src/**/*.js"
+          format: tar
+          gzip: true
+          output: src.tar.gz
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
