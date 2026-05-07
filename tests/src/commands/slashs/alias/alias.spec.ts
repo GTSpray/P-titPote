@@ -23,12 +23,10 @@ import {
   InteractionResponseFlags,
   InteractionResponseType,
 } from "discord-interactions";
+import { admin_permissions, default_member_permissions } from "../../../../mocks/discord-api/rolePermission.js";
 
 describe("/alias", () => {
-  const admin_permissions = "18014398509481983";
-  const default_member_permissions = "2248473465835073";
   let handlerOpts: CommandHandlerOptions<aliasDataOpts>;
-
   it("should declare a slash command", () => {
     const declaration = alias.builder.setName("alias");
     expect(declaration.toJSON()).toMatchObject({
