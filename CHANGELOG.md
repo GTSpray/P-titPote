@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/GTSpray/P-titPote/compare/v1.8.0...v1.9.0) (2026-05-07)
+
+
+### Features
+
+*  using tar.gz src? ([caa196c](https://github.com/GTSpray/P-titPote/commit/caa196c42c6cd1ad2ca95fee40b67d9c0d6e3a53))
+
 # [1.8.0](https://github.com/GTSpray/P-titPote/compare/v1.7.0...v1.8.0) (2026-05-07)
 
 
