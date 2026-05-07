@@ -26,7 +26,7 @@
     [
       "@semantic-release/github",
       {
-        "assets": [{ "path": "src.tar.gz", "label": "JS distribution" }]
+        "assets": [{ "path": "dist/src.tar.gz", "label": "JS distribution" }]
       }
     ]
   ]
