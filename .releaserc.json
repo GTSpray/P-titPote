@@ -9,48 +9,6 @@
       "@semantic-release/commit-analyzer"
     ],
     [
-      "@semantic-release/release-notes-generator",
-      {
-        "preset": "conventionalcommits",
-        "presetConfig": {
-          "types": [
-            {
-              "type": "feat",
-              "section": "✨ Features"
-            },
-            {
-              "type": "fix",
-              "section": "🐛 Fixes"
-            },
-            {
-              "type": "perf",
-              "section": "⚡ Performance"
-            },
-            {
-              "type": "refactor",
-              "section": "♻️ Refactor"
-            },
-            {
-              "type": "docs",
-              "section": "📝 Documentation"
-            },
-            {
-              "type": "chore",
-              "hidden": true
-            },
-            {
-              "type": "style",
-              "hidden": true
-            },
-            {
-              "type": "test",
-              "hidden": true
-            }
-          ]
-        }
-      }
-    ],
-    [
       "@semantic-release/changelog",
       {
         "changelogFile": "CHANGELOG.md"
