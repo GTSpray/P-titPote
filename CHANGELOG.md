@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/GTSpray/P-titPote/compare/v1.15.0...v1.16.0) (2026-05-07)
+
+
+### Features
+
+* mv src ([c246ac9](https://github.com/GTSpray/P-titPote/commit/c246ac97438a21811a6943f53183031e20e62209))
+
 # [1.15.0](https://github.com/GTSpray/P-titPote/compare/v1.14.0...v1.15.0) (2026-05-07)
 
 
