@@ -1,3 +1,15 @@
+# [1.15.0](https://github.com/GTSpray/P-titPote/compare/v1.14.0...v1.15.0) (2026-05-07)
+
+
+### Features
+
+* add package.json and lock in js distrib ([73959fe](https://github.com/GTSpray/P-titPote/commit/73959fea0462070a32da99431f7d87268d7bcc0b))
+* add package.json and lock in js distrib ([962ee63](https://github.com/GTSpray/P-titPote/commit/962ee63b3aac8ae22bd8d21a2833c7a1687f9639))
+* add package.json and lock in js distrib 1 ([9bcd365](https://github.com/GTSpray/P-titPote/commit/9bcd365e5e0bbec81649a8a7b55e31ad680ac512))
+* add package.json and lock in js distrib 12121 ([3faaae8](https://github.com/GTSpray/P-titPote/commit/3faaae831a34aa1f4e019a110f8bab13a298427d))
+* add package.json and lock in js distrib 15954959 ([d231b5d](https://github.com/GTSpray/P-titPote/commit/d231b5d9efa0a36cc9af1e2abd4d8cf58f2b7e63))
+* add package.json in js distrib ([85ae69f](https://github.com/GTSpray/P-titPote/commit/85ae69fe8570bc1149672de587cf2d411132123b))
+
 # [1.14.0](https://github.com/GTSpray/P-titPote/compare/v1.13.0...v1.14.0) (2026-05-07)
 
 
