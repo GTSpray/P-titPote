@@ -20,7 +20,10 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      - run: tar -czf ptitpote.tar.gz -C dist/src/ . -C package.json . -C package-lock.json .
+      - run: tar -czf ptitpote.tar.gz 
+              -C dist/src/ . \
+              -C . package.json . \ 
+              -C . package-lock.json .
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
