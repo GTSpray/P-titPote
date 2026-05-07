@@ -29,6 +29,14 @@
         ],
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
       }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          { "path": "dist/src", "label": "JS distribution" }
+        ]
+      }
     ]
   ]
 }
