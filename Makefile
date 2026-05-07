@@ -107,7 +107,7 @@ testw: os
 
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os
-	$(DC_CMD_DEV) run api npx prettier . --write
+	$(DC_CMD_CI) run api npx prettier . --write
 
 ## Run shell inside bot container
 sh: os

@@ -1,8 +1,5 @@
 {
-  "branches": [
-    "main",
-    "semantic-release"
-  ],
+  "branches": ["main", "semantic-release"],
   "tagFormat": "v${version}",
   "plugins": [
     "@semantic-release/commit-analyzer",
@@ -22,20 +19,14 @@
     [
       "@semantic-release/git",
       {
-        "assets": [
-          "package.json",
-          "package-lock.json",
-          "CHANGELOG.md"
-        ],
+        "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
       }
     ],
     [
       "@semantic-release/github",
       {
-        "assets": [
-          { "path": ["dist/src"], "label": "JS distribution" }
-        ]
+        "assets": [{ "path": ["dist/src/**"], "label": "JS distribution" }]
       }
     ]
   ]
