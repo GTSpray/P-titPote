@@ -22,8 +22,8 @@ jobs:
       - run: npm run build
       - run: tar -czf ptitpote.tar.gz 
               -C dist/src/ . \
-              -C . package.json . \ 
-              -C . package-lock.json .
+              -C $PWD/ package.json . \ 
+              -C $PWD/ package-lock.json .
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
