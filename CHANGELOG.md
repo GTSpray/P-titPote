@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/GTSpray/P-titPote/compare/v1.5.0...v1.6.0) (2026-05-07)
+
+
+### Features
+
+*  i said! can i have a release please? ([7425edd](https://github.com/GTSpray/P-titPote/commit/7425edd5f97de390c0add89444362b865e00273c))
+
 # [1.5.0](https://github.com/GTSpray/P-titPote/compare/v1.4.0...v1.5.0) (2026-05-07)
 
 
