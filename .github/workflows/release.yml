@@ -20,12 +20,7 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build
-      - uses: sibiraj-s/action-archiver@v1
-        with:
-          path: "./dist/**/*"
-          format: tar
-          gzip: true
-          output: src.tar.gz
+      - run: tar -czf src.tar.gz -C dist/src/ .
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
