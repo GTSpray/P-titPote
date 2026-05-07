@@ -17,8 +17,7 @@
     [
       "@semantic-release/npm",
       {
-        "npmPublish": false,
-        "tarballDir": "dist"
+        "npmPublish": false
       }
     ],
     [
@@ -37,8 +36,8 @@
       {
         "assets": [
           {
-            "path": "dist/**/*.tgz",
-            "label": "NPM package"
+            "path": "./dist/**/*",
+            "label": "Compiled Sources"
           }
         ]
       }
