@@ -10,14 +10,33 @@
       {
         "preset": "conventionalcommits",
         "releaseRules": [
-          { "type": "docs", "scope": "README", "release": "patch" },
-          { "type": "refactor", "release": "patch" },
-          { "type": "style", "release": false },
-          { "type": "test", "release": false },
-          { "type": "chore", "release": false }
+          {
+            "type": "docs",
+            "scope": "README",
+            "release": "patch"
+          },
+          {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "style",
+            "release": false
+          },
+          {
+            "type": "test",
+            "release": false
+          },
+          {
+            "type": "chore",
+            "release": false
+          }
         ],
         "parserOpts": {
-          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+          "noteKeywords": [
+            "BREAKING CHANGE",
+            "BREAKING CHANGES"
+          ]
         }
       }
     ],
@@ -27,14 +46,38 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "✨ Features" },
-            { "type": "fix", "section": "🐛 Fixes" },
-            { "type": "perf", "section": "⚡ Performance" },
-            { "type": "refactor", "section": "♻️ Refactor" },
-            { "type": "docs", "section": "📝 Documentation" },
-            { "type": "chore", "hidden": true },
-            { "type": "style", "hidden": true },
-            { "type": "test", "hidden": true }
+            {
+              "type": "feat",
+              "section": "✨ Features"
+            },
+            {
+              "type": "fix",
+              "section": "🐛 Fixes"
+            },
+            {
+              "type": "perf",
+              "section": "⚡ Performance"
+            },
+            {
+              "type": "refactor",
+              "section": "♻️ Refactor"
+            },
+            {
+              "type": "docs",
+              "section": "📝 Documentation"
+            },
+            {
+              "type": "chore",
+              "hidden": true
+            },
+            {
+              "type": "style",
+              "hidden": true
+            },
+            {
+              "type": "test",
+              "hidden": true
+            }
           ]
         }
       }
@@ -53,17 +96,6 @@
       }
     ],
     [
-      "@semantic-release/github",
-      {
-        "assets": [
-          {
-            "path": "dist/**/*.tgz",
-            "label": "NPM package"
-          }
-        ]
-      }
-    ],
-    [
       "@semantic-release/git",
       {
         "assets": [
@@ -72,6 +104,17 @@
           "CHANGELOG.md"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "dist/**/*.tgz",
+            "label": "NPM package"
+          }
+        ]
       }
     ]
   ]
