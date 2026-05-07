@@ -22,7 +22,7 @@ jobs:
       - run: npm run build
       - uses: sibiraj-s/action-archiver@v1
         with:
-          path: "dist/src/**/*.js"
+          path: "dist/src"
           format: tar
           gzip: true
           output: src.tar.gz
