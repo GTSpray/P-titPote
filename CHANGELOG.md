@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/GTSpray/P-titPote/compare/v1.0.0...v1.0.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* semantic-release run on push ([5cea22b](https://github.com/GTSpray/P-titPote/commit/5cea22bc17c8f8d37149b14fec9104d21a37407d))
+
 # 1.0.0 (2026-05-18)
 
 
