@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/GTSpray/P-titPote/compare/v1.0.1...v1.0.2) (2026-05-18)
+
+
+### Bug Fixes
+
+* **semantic-release:** consider chore as patch ([3ecc39f](https://github.com/GTSpray/P-titPote/commit/3ecc39f933ce486495591ffd3f5da52f91093673))
+* **semantic-release:** consider chore as patch ([b6eab75](https://github.com/GTSpray/P-titPote/commit/b6eab75fb2046ee4ee312546801025e82daca630))
+
 ## [1.0.1](https://github.com/GTSpray/P-titPote/compare/v1.0.0...v1.0.1) (2026-05-18)
 
 
