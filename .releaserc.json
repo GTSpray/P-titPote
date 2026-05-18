@@ -7,18 +7,38 @@
       {
         "preset": "conventionalcommits",
         "releaseRules": [
-          { "type": "chore", "release": "patch" },
-          { "type": "refactor", "release": "patch" },
-          { "type": "fix", "release": "patch" },
-          { "type": "test", "release": "patch" },
-          { "type": "feat", "release": "minor" }
+          {
+            "type": "chore",
+            "release": "patch"
+          },
+          {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "fix",
+            "release": "patch"
+          },
+          {
+            "type": "test",
+            "release": "patch"
+          },
+          {
+            "type": "feat",
+            "release": "minor"
+          }
         ],
         "parserOpts": {
           "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
         }
       }
     ],
-    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
     [
       "@semantic-release/changelog",
       {
@@ -41,7 +61,12 @@
     [
       "@semantic-release/github",
       {
-        "assets": [{ "path": "ptitpote.tar.gz", "label": "JS distribution" }]
+        "assets": [
+          {
+            "path": "ptitpote.tar.gz",
+            "label": "JS distribution"
+          }
+        ]
       }
     ]
   ]
