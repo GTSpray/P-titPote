@@ -1,4 +1,4 @@
-FROM node:25-slim AS ptitpotebuilder
+FROM node:26-slim AS ptitpotebuilder
 WORKDIR /app
 RUN apt update && apt install -y python3 make g++
 COPY package*.json ./
@@ -8,7 +8,7 @@ RUN npm run build
 ENV NODE_ENV production
 RUN npm ci
 
-FROM node:25-slim AS ptitpoteprod
+FROM node:26-slim AS ptitpoteprod
 ENV NODE_ENV production
 WORKDIR /app
 RUN npm config set update-notifier false
