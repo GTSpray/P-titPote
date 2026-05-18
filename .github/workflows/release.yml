@@ -1,9 +1,5 @@
 name: Release
-on:
-  push:
-    branches:
-      - main
-      - semantic-release
+on: [push]
 jobs:
   release:
     permissions:
