@@ -6,3 +6,4 @@ node_modules
 logs
 temp
 .snapshot-*.json
+CHANGELOG.md
