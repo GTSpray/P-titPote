@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/GTSpray/P-titPote/compare/v1.0.5...v1.1.0) (2026-05-19)
+
+### :sparkles: Features
+
+* **semantic-release:** improve the release notes generation ([#151](https://github.com/GTSpray/P-titPote/issues/151)) ([d8513ae](https://github.com/GTSpray/P-titPote/commit/d8513ae099de031acbcad3a8d1dcfb237f4a120d))
+
 ## [1.0.5](https://github.com/GTSpray/P-titPote/compare/v1.0.4...v1.0.5) (2026-05-18)
 
 ## [1.0.4](https://github.com/GTSpray/P-titPote/compare/v1.0.3...v1.0.4) (2026-05-18)
