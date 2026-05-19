@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/GTSpray/P-titPote/compare/v1.1.1...v1.1.2) (2026-05-19)
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/github from 12.0.6 to 12.0.8 ([#155](https://github.com/GTSpray/P-titPote/issues/155)) ([ab59570](https://github.com/GTSpray/P-titPote/commit/ab59570a6cb8909c94bb840829adae1baecc1ead))
+
 ## [1.1.1](https://github.com/GTSpray/P-titPote/compare/v1.1.0...v1.1.1) (2026-05-19)
 
 ### :repeat: Chore
