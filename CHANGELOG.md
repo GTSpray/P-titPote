@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/GTSpray/P-titPote/compare/v1.1.0...v1.1.1) (2026-05-19)
+
+### :repeat: Chore
+
+* **deps:** bump @types/node from 25.8.0 to 25.9.0 ([#153](https://github.com/GTSpray/P-titPote/issues/153)) ([71d0eb4](https://github.com/GTSpray/P-titPote/commit/71d0eb48e697c34927ca46ad2fcfc71517f146c7))
+* **deps:** bump the mikro-dependencies group with 5 updates ([#152](https://github.com/GTSpray/P-titPote/issues/152)) ([c47609a](https://github.com/GTSpray/P-titPote/commit/c47609af5b267e08aea6da6917e8ff715eea2a7c))
+
 ## [1.1.0](https://github.com/GTSpray/P-titPote/compare/v1.0.5...v1.1.0) (2026-05-19)
 
 ### :sparkles: Features
