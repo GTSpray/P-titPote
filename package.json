@@ -9,9 +9,9 @@
     "node": ">=22.x"
   },
   "scripts": {
-    "start:api": "node dist/src/api.js",
-    "start:gateway": "node dist/src/gateway.js",
-    "register": "node dist/src/register.js",
+    "start:api": "node src/api.js",
+    "start:gateway": "node src/gateway.js",
+    "register": "node src/register.js",
     "dev:api": "nodemon -q dist/src/api.js",
     "dev:gateway": "nodemon -q dist/src/gateway.js",
     "test": "vitest --config ./vitest.config.ts run",

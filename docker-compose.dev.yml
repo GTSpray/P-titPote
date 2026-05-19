@@ -20,6 +20,10 @@ services:
       retries: 20
     restart: on-failure
   api:
+    build:
+      context: .
+      dockerfile: docker/ptitpote/Dockerfile
+      target: ptitpotebuilder
     depends_on:
       database:
         condition: service_healthy
@@ -43,6 +47,10 @@ services:
       - ${PWD}/.prettierrc:/app/.prettierrc
       - ${PWD}/.prettierignore:/app/.prettierignore
   gateway:
+    build:
+      context: .
+      dockerfile: docker/ptitpote/Dockerfile
+      target: ptitpotebuilder
     depends_on:
       database:
         condition: service_healthy

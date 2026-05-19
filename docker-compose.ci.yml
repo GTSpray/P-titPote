@@ -5,7 +5,10 @@ services:
       LOG_LEVEL: "info"
       GITHUB_ACTIONS: 1
       GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}
-    command: npm run --silent start
+    build:
+      context: .
+      dockerfile: docker/ptitpote/Dockerfile
+      target: ptitpotebuilder
     volumes:
       - ${PWD}:/app/
   localtunnel:
