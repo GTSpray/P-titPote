@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/GTSpray/P-titPote/compare/v1.1.2...v1.1.3) (2026-05-19)
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/release-notes-generator from 14.1.0 to 14.1.1 ([#154](https://github.com/GTSpray/P-titPote/issues/154)) ([eca0ff1](https://github.com/GTSpray/P-titPote/commit/eca0ff169fdd349913143d0d2c8cfb1594306712))
+
 ## [1.1.2](https://github.com/GTSpray/P-titPote/compare/v1.1.1...v1.1.2) (2026-05-19)
 
 ### :repeat: Chore
