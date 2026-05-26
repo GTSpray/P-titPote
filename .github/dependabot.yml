@@ -11,7 +11,7 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      mikro-dependencies:
+      mikro-orm:
         patterns:
           - "@mikro-orm/*"
     commit-message:
