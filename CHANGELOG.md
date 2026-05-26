@@ -1,3 +1,9 @@
+## [1.1.9](https://github.com/GTSpray/P-titPote/compare/v1.1.8...v1.1.9) (2026-05-26)
+
+### :fast_forward: Performance
+
+* **docker:** improves image building speed ([#156](https://github.com/GTSpray/P-titPote/issues/156)) ([9312b5e](https://github.com/GTSpray/P-titPote/commit/9312b5ee22b13e668415c5f66f677df224bc7eb5))
+
 ## [1.1.8](https://github.com/GTSpray/P-titPote/compare/v1.1.7...v1.1.8) (2026-05-26)
 
 ### :repeat: Chore
