@@ -17,9 +17,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-      - run: npm ci
-      - run: npm run build
-      - run: tar -czf ptitpote.tar.gz -C dist/ src -C $PWD package.json -C $PWD package-lock.json
-      - run: npx semantic-release
+      - name: Prepare ci env
+        run: cp .env.sample .env
+      - name: Build using Docker
+        run: make bundle
+      - name: Release
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

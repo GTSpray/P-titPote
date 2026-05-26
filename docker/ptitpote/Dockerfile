@@ -21,6 +21,7 @@ FROM ptitpoteprod AS api
 CMD ["npm","run","--silent","start:api"]
 
 FROM ptitpotebase AS ptitpotebuilder
+ENV NODE_ENV development
 RUN npm ci
 COPY --chown=node:node . /app
 RUN npm run build
