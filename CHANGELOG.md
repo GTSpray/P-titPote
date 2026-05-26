@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/GTSpray/P-titPote/compare/v1.1.4...v1.1.5) (2026-05-26)
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-dependencies group across 1 directory with 5 updates ([#159](https://github.com/GTSpray/P-titPote/issues/159)) ([eb77f73](https://github.com/GTSpray/P-titPote/commit/eb77f73d529c9bcbaddac5d4238c455a4de02e45))
+* **deps:** bump ws from 8.20.1 to 8.21.0 ([#161](https://github.com/GTSpray/P-titPote/issues/161)) ([a43a782](https://github.com/GTSpray/P-titPote/commit/a43a782129db8d197f130c9c14d47415f1ca1020))
+
 ## [1.1.4](https://github.com/GTSpray/P-titPote/compare/v1.1.3...v1.1.4) (2026-05-26)
 
 ### :repeat: Chore
