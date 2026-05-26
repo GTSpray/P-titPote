@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/GTSpray/P-titPote/compare/v1.1.6...v1.1.7) (2026-05-26)
+
+### :repeat: Chore
+
+* **deps:** bump actions/checkout from 4 to 6 ([#157](https://github.com/GTSpray/P-titPote/issues/157)) ([73ed4f1](https://github.com/GTSpray/P-titPote/commit/73ed4f148053d1e74984464bf609ee4989001dc5))
+* **deps:** bump actions/setup-node from 4 to 6 ([#158](https://github.com/GTSpray/P-titPote/issues/158)) ([0468077](https://github.com/GTSpray/P-titPote/commit/0468077d60cd9eab178dc5312c064ac8409d8fdd))
+
 ## [1.1.6](https://github.com/GTSpray/P-titPote/compare/v1.1.5...v1.1.6) (2026-05-26)
 
 ### :repeat: Chore
