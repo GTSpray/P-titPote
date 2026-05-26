@@ -123,7 +123,6 @@ ci: os
 	$(DC_CMD_CI) run api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
 
-
 ## Create a database dump
 db-dump: os
 	$(DC_CMD) exec -t database sh /database/bin/db-dump
