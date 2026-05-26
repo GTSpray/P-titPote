@@ -123,7 +123,6 @@ ci: os
 	$(DC_CMD_CI) run api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
 
-
 ## Create a database dump
 db-dump: os
 	$(DC_CMD) exec -t database sh /database/bin/db-dump
@@ -136,3 +135,9 @@ lint: os
 ## Run tests (need containers as developpement mode)
 test: os
 	$(DC_CMD_CI) run api npm --silent test
+
+## Create the archive of built sources
+bundle: os
+	$(DC_CMD_CI) run api npm ci
+	$(DC_CMD_CI) run api npm run bundle
+	
