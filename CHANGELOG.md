@@ -1,3 +1,9 @@
+## [1.1.8](https://github.com/GTSpray/P-titPote/compare/v1.1.7...v1.1.8) (2026-05-26)
+
+### :repeat: Chore
+
+* **dependabot:** rename the Mikro ORM dependencies group ([#163](https://github.com/GTSpray/P-titPote/issues/163)) ([4772ca3](https://github.com/GTSpray/P-titPote/commit/4772ca3d95c30212a5fa61d7bf959e8a87123d61))
+
 ## [1.1.7](https://github.com/GTSpray/P-titPote/compare/v1.1.6...v1.1.7) (2026-05-26)
 
 ### :repeat: Chore
