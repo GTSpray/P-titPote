@@ -1,3 +1,9 @@
+## [1.1.11](https://github.com/GTSpray/P-titPote/compare/v1.1.10...v1.1.11) (2026-05-28)
+
+### :bug: Fixes
+
+* **docker:** tar the compiled src under the dist folder to fix migrations in local development environment ([#166](https://github.com/GTSpray/P-titPote/issues/166)) ([2ac88f6](https://github.com/GTSpray/P-titPote/commit/2ac88f643c9282bac96761d0d4831f23dc05e26e))
+
 ## [1.1.10](https://github.com/GTSpray/P-titPote/compare/v1.1.9...v1.1.10) (2026-05-26)
 
 ### :repeat: Chore
