@@ -7,3 +7,4 @@ dist
 .vscode
 temp
 docker/database/dumps
+ptitpote.tar.gz
