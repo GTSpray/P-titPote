@@ -35,6 +35,10 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
+      aPoll.publicationDate = new Date();
+
+      await em.persist(aPoll).flush();
+
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {

@@ -202,4 +202,17 @@ describe("cta/pollPub", () => {
       },
     });
   });
+
+  it("should add a publication date to the poll", async () => {
+    
+    expect(aPoll.publicationDate).toBeUndefined()
+
+    await pollPub.handler(handlerOpts);
+
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+
+    expect(poll.publicationDate).toBeInstanceOf(Date)
+  });
 });
