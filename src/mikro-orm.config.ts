@@ -11,6 +11,9 @@ import { Migrator } from "@mikro-orm/migrations";
 import { logger } from "./logger.js";
 import { DiscordGuild } from "./db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "./db/entities/MessageAliased.entity.js";
+import { Poll } from "./db/entities/Poll.entity.js";
+import { PollChoice } from "./db/entities/PollChoice.entity.js";
+import { PollStep } from "./db/entities/PollStep.entity.js";
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
@@ -43,7 +46,7 @@ const config: Options = defineConfig({
   user: process.env.MARIADB_USER,
   password: process.env.MARIADB_PASSWORD,
   port: parseInt(process.env.MARIADB_TCP_PORT ?? "0", 10),
-  entities: [DiscordGuild, MessageAliased],
+  entities: [DiscordGuild, MessageAliased, Poll, PollChoice, PollStep],
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),
   dynamicImportProvider: (id) => import(id),

@@ -1,6 +1,9 @@
 import { type APIBaseInteraction, type InteractionType } from "discord.js";
 
-type InteractionTypeOpts = InteractionType.ApplicationCommand;
+type InteractionTypeOpts =
+  | InteractionType.ApplicationCommand
+  | InteractionType.ModalSubmit
+  | InteractionType.MessageComponent;
 type iModeratorBodyOpts = APIBaseInteraction<InteractionTypeOpts, unknown>;
 
 const PERMISSIONS = {
