@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/GTSpray/P-titPote/compare/v1.2.0...v1.2.1) (2026-05-31)
+
+### :bug: Fixes
+
+* do not include the package.json file in the bundle to avoid version mismatche ([#167](https://github.com/GTSpray/P-titPote/issues/167)) ([59def5e](https://github.com/GTSpray/P-titPote/commit/59def5e426667b6a495b03bdaf9d0e3c0d62754a))
+
 ## [1.2.0](https://github.com/GTSpray/P-titPote/compare/v1.1.11...v1.2.0) (2026-05-31)
 
 ### :sparkles: Features
