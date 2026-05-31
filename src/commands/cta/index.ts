@@ -12,5 +12,5 @@ export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   pollAddC,
   pollPub,
   pollResp,
-  pollVote
+  pollVote,
 };
