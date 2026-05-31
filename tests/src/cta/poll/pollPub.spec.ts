@@ -214,4 +214,17 @@ describe("cta/pollPub", () => {
 
     expect(poll.publicationDate).toBeInstanceOf(Date);
   });
+
+  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+    aPoll.publicationDate = new Date();
+    await em.persist(aPoll).flush();
+    const response = await pollPub.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: "ahem... tu ne peux plus modifier un vote publié",
+      },
+    });
+  });
 });

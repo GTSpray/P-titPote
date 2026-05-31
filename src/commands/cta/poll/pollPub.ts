@@ -2,7 +2,6 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
-  TextInputStyle,
 } from "discord-api-types/v10";
 import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import {
@@ -12,7 +11,7 @@ import {
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { logger } from "../../../logger.js";
 import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
-import { notAllowed } from "../../commonMessages.js";
+import { notAllowed, doNotUpdatePublishedPoll } from "../../commonMessages.js";
 
 export const pollPub: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -34,6 +33,10 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
           populate: ["steps", "steps.choices"],
         },
       );
+
+      if (aPoll.publicationDate !== null) {
+        return res.json(doNotUpdatePublishedPoll());
+      }
 
       aPoll.publicationDate = new Date();
 
