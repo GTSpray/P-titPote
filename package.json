@@ -17,7 +17,7 @@
     "test": "vitest --config ./vitest.config.ts run",
     "build": "tsc --pretty",
     "lint": "prettier . --check",
-    "bundle": "tsc --pretty && tar -czf ptitpote.tar.gz -C $PWD dist/src -C $PWD package.json -C $PWD package-lock.json"
+    "bundle": "tsc --pretty && tar -czf ptitpote.tar.gz -C $PWD dist/src"
   },
   "mikro-orm": {
     "useTsNode": false,
