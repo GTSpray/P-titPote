@@ -52,7 +52,7 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
           custom_id: JSON.stringify({
             t: "cta",
             d: {
-              a: "pollvote",
+              a: "pollVote",
               pId: aPoll.id,
             },
           }),

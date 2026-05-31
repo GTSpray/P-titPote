@@ -67,7 +67,7 @@ describe("cta/pollResp", () => {
         custom_id: JSON.stringify({
           t: "cta",
           d: {
-            a: "pollvote",
+            a: "pollVote",
             pId: aPoll.id,
           },
         }),
@@ -220,7 +220,7 @@ describe("cta/pollResp", () => {
           custom_id: JSON.stringify({
             t: "cta",
             d: {
-              a: "pollvote",
+              a: "pollVote",
               pId: aPoll.id,
             },
           }),

@@ -4,6 +4,7 @@ import { pollAddQ } from "./poll/pollAddQ.js";
 import { pollAddC } from "./poll/pollAddC.js";
 import { pollPub } from "./poll/pollPub.js";
 import { pollResp } from "./poll/pollResp.js";
+import { pollVote } from "./poll/pollVote.js";
 
 export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   pollCreate,
@@ -11,4 +12,5 @@ export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   pollAddC,
   pollPub,
   pollResp,
+  pollVote
 };
