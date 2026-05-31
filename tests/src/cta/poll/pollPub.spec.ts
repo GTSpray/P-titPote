@@ -204,8 +204,7 @@ describe("cta/pollPub", () => {
   });
 
   it("should add a publication date to the poll", async () => {
-    
-    expect(aPoll.publicationDate).toBeUndefined()
+    expect(aPoll.publicationDate).toBeUndefined();
 
     await pollPub.handler(handlerOpts);
 
@@ -213,6 +212,6 @@ describe("cta/pollPub", () => {
       id: aPoll.id,
     });
 
-    expect(poll.publicationDate).toBeInstanceOf(Date)
+    expect(poll.publicationDate).toBeInstanceOf(Date);
   });
 });

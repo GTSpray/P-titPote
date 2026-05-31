@@ -304,5 +304,7 @@ describe("cta/pollAddC", () => {
     });
   });
 
-  it.todo('should display a temporary message indicating that the user is not authorized to update the poll if it is published')
+  it.todo(
+    "should display a temporary message indicating that the user is not authorized to update the poll if it is published",
+  );
 });

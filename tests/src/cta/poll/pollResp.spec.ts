@@ -231,5 +231,7 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it.todo("should display a temporary message indicating that the user is not authorized to vote if the voting period has ended");
+  it.todo(
+    "should display a temporary message indicating that the user is not authorized to vote if the voting period has ended",
+  );
 });
