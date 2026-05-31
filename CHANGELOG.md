@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/GTSpray/P-titPote/compare/v1.1.11...v1.2.0) (2026-05-31)
+
+### :sparkles: Features
+
+* setup anonymous poll creation ([#70](https://github.com/GTSpray/P-titPote/issues/70)) ([fd24718](https://github.com/GTSpray/P-titPote/commit/fd24718f5826443d60446b892479e99aa7480365))
+
 ## [1.1.11](https://github.com/GTSpray/P-titPote/compare/v1.1.10...v1.1.11) (2026-05-28)
 
 ### :bug: Fixes
