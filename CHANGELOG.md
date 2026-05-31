@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/GTSpray/P-titPote/compare/v1.2.1...v1.2.2) (2026-05-31)
+
+### :bug: Fixes
+
+* replace apostrophes in modal titles to prevent the interaction from crashing  ([#168](https://github.com/GTSpray/P-titPote/issues/168)) ([4dad547](https://github.com/GTSpray/P-titPote/commit/4dad547af4466ff72b3de4d179723205751cbc81))
+
 ## [1.2.1](https://github.com/GTSpray/P-titPote/compare/v1.2.0...v1.2.1) (2026-05-31)
 
 ### :bug: Fixes
