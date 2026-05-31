@@ -7,7 +7,11 @@ import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
 import { logger } from "../../../logger.js";
 import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
-import { notAllowed, errorPayload } from "../../commonMessages.js";
+import {
+  notAllowed,
+  errorPayload,
+  doNotUpdatePublishedPoll,
+} from "../../commonMessages.js";
 
 export const STEP_CHOICE_LIMIT = 10;
 export const pollAddC: ModalHandlerDelcaration<CTAData> = {
@@ -31,6 +35,10 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
         },
       );
       const startIndex = aPollStep.choices.count();
+
+      if (aPollStep.poll.publicationDate !== null) {
+        return res.json(doNotUpdatePublishedPoll());
+      }
 
       if (startIndex >= STEP_CHOICE_LIMIT) {
         return res.json(errorPayload("ahem...  ca fait beaucoup là. Non?"));

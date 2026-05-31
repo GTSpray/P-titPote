@@ -13,10 +13,13 @@ export const errorPayload = (content: string) => ({
 });
 
 export const notFoundPayload = () =>
-  errorPayload(`ahem... j'ai rien trouvé... 🤷`);
+  errorPayload("ahem... j'ai rien trouvé... 🤷");
 
 export const notAllowed = () =>
-  errorPayload(`ahem... je ne suis pas habilitée à le faire 🤷`);
+  errorPayload("ahem... je ne suis pas habilitée à le faire 🤷");
+
+export const doNotUpdatePublishedPoll = () =>
+  errorPayload("ahem... tu ne peux plus modifier un vote publié");
 
 export const foundItComponnents = () => [
   {

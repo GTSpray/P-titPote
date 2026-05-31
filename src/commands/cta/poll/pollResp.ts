@@ -6,7 +6,7 @@ import {
 import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
-import { notAllowed } from "../../commonMessages.js";
+import { errorPayload, notAllowed } from "../../commonMessages.js";
 
 export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -23,6 +23,13 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
 
       if (!aPoll) {
         return res.status(500).json({ error: "no Poll" });
+      }
+
+      const today = new Date();
+      if (aPoll.endDate && aPoll.endDate.getTime() < today.getTime()) {
+        return res.json(
+          errorPayload("ahem... le bureau de vote est fermé... désolé"),
+        );
       }
 
       if (aPoll.role && !req.body.member?.roles.includes(aPoll.role)) {

@@ -231,7 +231,17 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it.todo(
-    "should display a temporary message indicating that the user is not authorized to vote if the voting period has ended",
-  );
+  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+    aPoll.publicationDate = new Date("2026-05-31T12:00:00.000Z");
+    aPoll.endDate = new Date("2026-05-31T13:00:00.000Z");
+    await em.persist(aPoll).flush();
+    const response = await pollResp.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: "ahem... le bureau de vote est fermé... désolé",
+      },
+    });
+  });
 });

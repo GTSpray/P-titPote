@@ -5,7 +5,10 @@ import {
 } from "discord-api-types/v10";
 import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
-import { errorPayload } from "../../commonMessages.js";
+import {
+  doNotUpdatePublishedPoll,
+  errorPayload,
+} from "../../commonMessages.js";
 
 export const POLL_STEP_LIMIT = 4;
 export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
@@ -21,6 +24,10 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
           populate: ["steps"],
         },
       );
+
+      if (aPoll.publicationDate !== null) {
+        return res.json(doNotUpdatePublishedPoll());
+      }
 
       if (aPoll.steps.count() >= POLL_STEP_LIMIT) {
         return res.json(errorPayload("ahem...  ca fait beaucoup là. Non?"));

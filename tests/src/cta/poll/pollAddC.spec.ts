@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  applyPopulateHints,
 } from "@mikro-orm/mariadb";
 import {
   pollAddC,
@@ -304,7 +305,16 @@ describe("cta/pollAddC", () => {
     });
   });
 
-  it.todo(
-    "should display a temporary message indicating that the user is not authorized to update the poll if it is published",
-  );
+  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+    existingPoll.publicationDate = new Date();
+    await em.persist(existingPoll).flush();
+    const response = await pollAddC.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: "ahem... tu ne peux plus modifier un vote publié",
+      },
+    });
+  });
 });
