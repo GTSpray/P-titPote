@@ -1,4 +1,3 @@
 export function escapeModalTitle(text: string) {
-  return text
-      .replace(/'/g, "‘");
+  return text.replace(/'/g, "‘");
 }

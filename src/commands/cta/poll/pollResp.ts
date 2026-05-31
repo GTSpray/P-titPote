@@ -7,7 +7,7 @@ import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { PollStep } from "../../../db/entities/PollStep.entity.js";
 import { errorPayload, notAllowed } from "../../commonMessages.js";
-import { escapeModalTitle } from "../../../utils/escapeModalTitle.js"
+import { escapeModalTitle } from "../../../utils/escapeModalTitle.js";
 
 export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
