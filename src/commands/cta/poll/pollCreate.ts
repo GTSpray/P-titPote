@@ -67,6 +67,11 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
         );
         aGuild.polls.add(aPoll);
         const firstStep = new PollStep(`${question?.component.value}`, 0);
+        const qDesc = getInputComponnentById<ComponentSimple>(
+          data,
+          "description",
+        );
+        firstStep.description = <string>qDesc?.component.value ?? null;
         aPoll.steps.add(firstStep);
         await em.persist(aGuild).flush();
       } else {
@@ -83,10 +88,16 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           "question",
         );
         if (newQuestion) {
+
           const newStep = new PollStep(
             `${newQuestion?.component.value}`,
             aPoll.steps.count(),
           );
+          const qDesc = getInputComponnentById<ComponentSimple>(
+            data,
+            "description",
+          );
+          newStep.description = <string>qDesc?.component.value ?? null;
           aPoll.steps.add(newStep);
         }
 

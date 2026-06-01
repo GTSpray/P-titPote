@@ -13,7 +13,7 @@ import {
   doNotUpdatePublishedPoll,
 } from "../../commonMessages.js";
 
-export const STEP_CHOICE_LIMIT = 10;
+export const STEP_CHOICE_LIMIT = 25;
 export const pollAddC: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     try {

@@ -18,8 +18,11 @@ export class PollStep extends EntityBase {
     this.order = order;
   }
 
-  @Property({ type: "varchar", length: 200 })
+  @Property({ type: "varchar", length: 45 })
   question!: string;
+
+  @Property({ type: "varchar", length: 100, nullable: true })
+  description!: string;
 
   @OneToMany({
     entity: () => PollChoice,
