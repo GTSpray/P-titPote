@@ -1,3 +1,9 @@
+## [1.2.4](https://github.com/GTSpray/P-titPote/compare/v1.2.3...v1.2.4) (2026-06-01)
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm from 7.1.1 to 7.1.3 ([#169](https://github.com/GTSpray/P-titPote/issues/169)) ([64a7568](https://github.com/GTSpray/P-titPote/commit/64a756821645f732bf46459ee426d7571f146ba1))
+
 ## [1.2.3](https://github.com/GTSpray/P-titPote/compare/v1.2.2...v1.2.3) (2026-06-01)
 
 ### :bug: Fixes
