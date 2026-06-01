@@ -49,6 +49,7 @@ describe("cta/pollCreate", () => {
     let aTitreCmp: PartialComponentSingle;
     let aQuestionCmp: PartialComponentSingle;
     let aRoleCmp: PartialComponentList;
+    let aDescCmp: PartialComponentSingle;
 
     beforeEach(async () => {
       aTitreCmp = {
@@ -63,6 +64,12 @@ describe("cta/pollCreate", () => {
         value: "La question du sondage?",
       };
 
+      aDescCmp = {
+        custom_id: "description",
+        type: ComponentType.TextInput,
+        value: "Une description de la question",
+      };
+
       aRoleCmp = {
         custom_id: "role",
         type: ComponentType.RoleSelect,
@@ -74,6 +81,7 @@ describe("cta/pollCreate", () => {
           aTitreCmp,
           aRoleCmp,
           aQuestionCmp,
+          aDescCmp,
         ]),
         custom_id: `{"t":"cta","d":{"a":"pollCreate"}}`,
       };
@@ -130,17 +138,22 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should save poll with role", async () => {
+    it("should save poll with role and first step with description", async () => {
       await pollCreate.handler(handlerOpts);
-
       em.clear();
-      const polls = await em.findAll(Poll, {
-        where: { server: { guildId: guild_id } },
+      const poll = await em.findOneOrFail(Poll, {
+        server: { guildId: guild_id },
       });
-      expect(polls).toEqual([
-        expectedPoll({
-          title: <string>aTitreCmp.value,
-          role: <string>aRoleCmp.values[0],
+      const steps = await em.findAll(PollStep, {
+        where: { poll: poll.id },
+      });
+      expect(steps).toEqual([
+        expectedPollStep({
+          poll: expectedPoll({
+            title: <string>aTitreCmp.value,
+            role: <string>aRoleCmp.values[0],
+          }),
+          description: <string>aDescCmp.value,
         }),
       ]);
     });
@@ -301,6 +314,7 @@ describe("cta/pollCreate", () => {
 
   describe("on pollAddQ cta", () => {
     let aQuestionCmp: PartialComponentSingle;
+    let aDescCmp: PartialComponentSingle;
     let existingPoll: Poll;
 
     beforeEach(async () => {
@@ -316,8 +330,14 @@ describe("cta/pollCreate", () => {
         value: "Une deuxième question?",
       };
 
+      aDescCmp = {
+        custom_id: "description",
+        type: ComponentType.TextInput,
+        value: "Une description de la question",
+      };
+
       const data = {
-        components: getModalLabelComponnents([aQuestionCmp]),
+        components: getModalLabelComponnents([aQuestionCmp, aDescCmp]),
         custom_id: `{"t":"cta","d":{"a":"pollCreate", "pId": "${existingPoll.id}"}}`,
       };
       const { req, res } = getInteractionModalHttpMock({
@@ -340,7 +360,7 @@ describe("cta/pollCreate", () => {
       await em.persist(aGuild).flush();
     });
 
-    it("should save new question", async () => {
+    it("should save new question with description", async () => {
       await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -360,6 +380,7 @@ describe("cta/pollCreate", () => {
         expectedPollStep({
           question: <string>aQuestionCmp.value,
           order: 1,
+          description: <string>aDescCmp.value,
         }),
       ]);
     });

@@ -11,6 +11,7 @@ export const expectedPollStep = (opts: Partial<PollStep>): PollStep => {
     deletedAt: expect.any(Date),
     poll: expect.any(Poll),
     question: expect.any(String),
+    description: expect.toBeOneOf([expect.any(String), null]),
     choices: expect.any(Collection<PollChoice>),
     order: expect.any(Number),
     ...opts,
