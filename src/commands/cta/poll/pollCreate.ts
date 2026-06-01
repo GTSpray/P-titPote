@@ -88,7 +88,6 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           "question",
         );
         if (newQuestion) {
-
           const newStep = new PollStep(
             `${newQuestion?.component.value}`,
             aPoll.steps.count(),
