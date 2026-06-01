@@ -1,3 +1,9 @@
+## [1.2.3](https://github.com/GTSpray/P-titPote/compare/v1.2.2...v1.2.3) (2026-06-01)
+
+### :bug: Fixes
+
+* add character limits to the vote creation form to prevent the modal from being rejected ([#170](https://github.com/GTSpray/P-titPote/issues/170)) ([3e09141](https://github.com/GTSpray/P-titPote/commit/3e091415d0cf86d294167605261243b2092e53ab))
+
 ## [1.2.2](https://github.com/GTSpray/P-titPote/compare/v1.2.1...v1.2.2) (2026-05-31)
 
 ### :bug: Fixes
