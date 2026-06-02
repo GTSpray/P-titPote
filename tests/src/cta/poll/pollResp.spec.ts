@@ -102,6 +102,35 @@ describe("cta/pollResp", () => {
     });
   });
 
+  it("should handle non-multiple-choice questions with description", async () => {
+    firstStep.description = 'a description';
+    await em.persist(firstStep).flush();
+
+    const response = await pollResp.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: aPoll.title,
+        components: [
+          {
+            type: ComponentType.Label,
+            label: firstStep.question,
+            description: firstStep.description,
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: firstStep.id,
+              style: TextInputStyle.Short,
+              min_length: 1,
+              max_length: 100,
+              required: true,
+            },
+          },
+        ],
+      },
+    });
+  });
+
   it("should handle a multiple-choice question", async () => {
     const allChoices = [
       new PollChoice("A first choice?", 0),
