@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/GTSpray/P-titPote/compare/v1.3.0...v1.3.1) (2026-06-02)
+
+### :bug: Fixes
+
+* do not pass a “description” attribute when step does not have a description ([#173](https://github.com/GTSpray/P-titPote/issues/173)) ([033ed80](https://github.com/GTSpray/P-titPote/commit/033ed80fb6d0fa3842cfba6dced4006cecf4a98a))
+
 ## [1.3.0](https://github.com/GTSpray/P-titPote/compare/v1.2.4...v1.3.0) (2026-06-02)
 
 ### :sparkles: Features
