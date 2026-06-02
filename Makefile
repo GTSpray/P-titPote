@@ -83,6 +83,14 @@ db-down: os
 db-check: os
 	$(DC_CMD) run api npx mikro-orm migration:check | $(JQC)
 
+## Create a database dump
+db-dump: os
+	$(DC_CMD) exec -t database sh /database/bin/db-dump
+
+## Run shell inside database container
+db-sh: os
+	$(DC_CMD) exec -t database sh /database/bin/db-sh
+
 ###
 # Developper
 ###
@@ -122,11 +130,6 @@ ci: os
 	$(DC_CMD_CI) run api npm ci
 	$(DC_CMD_CI) run api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
-
-## Create a database dump
-db-dump: os
-	$(DC_CMD) exec -t database sh /database/bin/db-dump
-
 
 ## Lint all files with Prettier
 lint: os
