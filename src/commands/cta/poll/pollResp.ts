@@ -88,7 +88,7 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
             }
             return {
               type: ComponentType.Label,
-              description: step.description ?? undefined,
+              ...(step.description ? { description: step.description } : {}),
               label: step.question,
               component: sub,
             };
