@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/GTSpray/P-titPote/compare/v1.2.4...v1.3.0) (2026-06-02)
+
+### :sparkles: Features
+
+* add a helper to easily access to the container's MariaDB interface ([#171](https://github.com/GTSpray/P-titPote/issues/171)) ([a0323d5](https://github.com/GTSpray/P-titPote/commit/a0323d5eac72d868f04ce30466aa733901c5a07d))
+
 ## [1.2.4](https://github.com/GTSpray/P-titPote/compare/v1.2.3...v1.2.4) (2026-06-01)
 
 ### :repeat: Chore
