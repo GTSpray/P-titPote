@@ -1,0 +1,5 @@
+. $(dirname "$0")/_vars
+
+customlog "Connect $usr@$dbhost"
+
+mariadb -u$usr -p$pass -h $dbhost $dbname
