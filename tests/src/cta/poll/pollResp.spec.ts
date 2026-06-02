@@ -103,7 +103,7 @@ describe("cta/pollResp", () => {
   });
 
   it("should handle non-multiple-choice questions with description", async () => {
-    firstStep.description = 'a description';
+    firstStep.description = "a description";
     await em.persist(firstStep).flush();
 
     const response = await pollResp.handler(handlerOpts);
