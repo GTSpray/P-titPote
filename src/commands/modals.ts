@@ -34,7 +34,7 @@ export interface ComponentSimple {
   custom_id: string;
   id: number;
   type: number;
-  value: string; // string | number
+  value: string;  // string | number
 }
 
 export interface ComponentSelect {
