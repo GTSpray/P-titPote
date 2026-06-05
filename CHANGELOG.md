@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/GTSpray/P-titPote/compare/v1.3.1...v1.4.0) (2026-06-05)
+
+### :sparkles: Features
+
+* allows members to vote ([#172](https://github.com/GTSpray/P-titPote/issues/172)) ([283f916](https://github.com/GTSpray/P-titPote/commit/283f91672dc7f8ba8703572cf50d2821644b5182))
+
 ## [1.3.1](https://github.com/GTSpray/P-titPote/compare/v1.3.0...v1.3.1) (2026-06-02)
 
 ### :bug: Fixes
