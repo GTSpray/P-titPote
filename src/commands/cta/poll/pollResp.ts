@@ -90,7 +90,7 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
                 custom_id: step.id,
                 style: TextInputStyle.Paragraph,
                 min_length: 1,
-                max_length: 200,
+                max_length: 400,
                 required: true,
                 value: resp?.content,
               };
