@@ -8,7 +8,7 @@ export type PartialComponentSingle = {
 export type PartialComponentList = {
   custom_id: string;
   type: ComponentType;
-  values: string[];// (string | number)[]
+  values: string[]; // (string | number)[]
 };
 
 export type PartialComponentBase =
