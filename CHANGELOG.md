@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/GTSpray/P-titPote/compare/v1.4.0...v1.4.1) (2026-06-05)
+
+### :bug: Fixes
+
+* add a migration to compensate the migration generator following the mikro-orm upgrade ([#174](https://github.com/GTSpray/P-titPote/issues/174)) ([ace29e0](https://github.com/GTSpray/P-titPote/commit/ace29e077214e6dedc793a166aa3f775de0784c7))
+
 ## [1.4.0](https://github.com/GTSpray/P-titPote/compare/v1.3.1...v1.4.0) (2026-06-05)
 
 ### :sparkles: Features
