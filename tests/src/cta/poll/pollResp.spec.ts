@@ -22,6 +22,7 @@ import {
 import { Poll } from "../../../../src/db/entities/Poll.entity.js";
 import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
 import { PollChoice } from "../../../../src/db/entities/PollChoice.entity.js";
+import { PollResp } from "../../../../src/db/entities/PollResp.entity.js";
 
 describe("cta/pollResp", () => {
   let guild_id: string;
@@ -91,9 +92,9 @@ describe("cta/pollResp", () => {
             component: {
               type: ComponentType.TextInput,
               custom_id: firstStep.id,
-              style: TextInputStyle.Short,
+              style: TextInputStyle.Paragraph,
               min_length: 1,
-              max_length: 100,
+              max_length: 400,
               required: true,
             },
           },
@@ -120,9 +121,9 @@ describe("cta/pollResp", () => {
             component: {
               type: ComponentType.TextInput,
               custom_id: firstStep.id,
-              style: TextInputStyle.Short,
+              style: TextInputStyle.Paragraph,
               min_length: 1,
-              max_length: 100,
+              max_length: 400,
               required: true,
             },
           },
@@ -160,6 +161,7 @@ describe("cta/pollResp", () => {
                 emoji: {
                   name: "▪️",
                 },
+                default: false,
                 label: e.label,
                 value: e.id,
               })),
@@ -270,6 +272,83 @@ describe("cta/pollResp", () => {
       data: {
         flags: MessageFlags.Ephemeral,
         content: "ahem... le bureau de vote est fermé... désolé",
+      },
+    });
+  });
+
+  it("should pre-fill the non-multiple-choice form with the saved response", async () => {
+    const memberId = <string>handlerOpts.req.body.member?.user.id;
+    const firstResp = new PollResp(memberId, firstStep);
+    firstResp.content = "Arthur!! Interprète !! Couillère";
+    await em.persist([firstResp]).flush();
+
+    const response = await pollResp.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: aPoll.title,
+        components: [
+          {
+            type: ComponentType.Label,
+            label: firstStep.question,
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: firstStep.id,
+              style: TextInputStyle.Paragraph,
+              value: firstResp.content,
+              min_length: 1,
+              max_length: 400,
+              required: true,
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  it("should pre-fill the multiple-choice form with the saved response", async () => {
+    const memberId = <string>handlerOpts.req.body.member?.user.id;
+    firstStep.choices.add([
+      new PollChoice("A first choice?", 0),
+      new PollChoice("A second choice?", 1),
+      new PollChoice("A third choice?", 2),
+    ]);
+    const firstResp = new PollResp(memberId, firstStep);
+    firstResp.pollChoice = firstStep.choices[1];
+    await em.persist([firstStep, firstResp]).flush();
+
+    const response = await pollResp.handler(handlerOpts);
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: expect.any(String),
+        title: aPoll.title,
+        components: [
+          {
+            type: ComponentType.Label,
+            label: firstStep.question,
+            component: {
+              type: ComponentType.StringSelect,
+              custom_id: firstStep.id,
+              placeholder: "Choisis...",
+              options: [
+                expect.objectContaining({
+                  value: firstStep.choices[0].id,
+                  default: false,
+                }),
+                expect.objectContaining({
+                  value: firstStep.choices[1].id,
+                  default: true,
+                }),
+                expect.objectContaining({
+                  value: firstStep.choices[2].id,
+                  default: false,
+                }),
+              ],
+            },
+          },
+        ],
       },
     });
   });
