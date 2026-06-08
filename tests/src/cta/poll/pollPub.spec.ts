@@ -87,7 +87,7 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        content: "Ahem... je ne suis pas habilité à le faire 🤷",
       },
     });
   });
@@ -223,7 +223,7 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... tu ne peux plus modifier un vote publié",
+        content: "Ahem... tu ne peux plus modifier un vote publié",
       },
     });
   });

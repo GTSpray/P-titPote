@@ -33,7 +33,7 @@ describe("/alias ls", () => {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.EPHEMERAL,
-      content: "ahem... j'ai rien trouvé... 🤷",
+      content: "Ahem... j'ai rien trouvé... 🤷",
     },
   };
   const subcommand: aliasLsSubCommandData = {

@@ -92,7 +92,7 @@ describe("/alias", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "definit un alias message",
+            description: "définit un alias message",
             options: [
               {
                 description: "alias du message",
@@ -129,7 +129,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+          content: "Ahem... je ne suis pas habilité à le faire 🤷",
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);
@@ -233,7 +233,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+          content: "Ahem... je ne suis pas habilité à le faire 🤷",
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);
@@ -326,7 +326,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "ahem... je ne suis pas habilitée à le faire 🤷",
+          content: "Ahem... je ne suis pas habilité à le faire 🤷",
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);

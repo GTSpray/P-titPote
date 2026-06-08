@@ -112,7 +112,7 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem...  ca fait beaucoup là. Non?",
+        content: "Ahem...  ca fait beaucoup là. Non?",
       },
     });
   });
@@ -125,7 +125,7 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... tu ne peux plus modifier un vote publié",
+        content: "Ahem... tu ne peux plus modifier un vote publié",
       },
     });
   });

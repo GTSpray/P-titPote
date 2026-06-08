@@ -109,7 +109,7 @@ describe("/alias say", () => {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         flags: InteractionResponseFlags.EPHEMERAL,
-        content: `ahem... il n'y pas d'alias "${aliasOpts.value}" 🤷`,
+        content: `Ahem... il n'y pas d'alias "${aliasOpts.value}" 🤷`,
       },
     });
   });

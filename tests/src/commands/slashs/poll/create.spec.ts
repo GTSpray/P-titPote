@@ -142,7 +142,7 @@ describe("/poll create", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        content: "Ahem... je ne suis pas habilité à le faire 🤷",
       },
     });
   });

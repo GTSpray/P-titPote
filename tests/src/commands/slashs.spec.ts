@@ -4,9 +4,9 @@ import { slashcommands } from "../../../src/commands/slash/index.js";
 describe("slashcommands", () => {
   const commands = Object.keys(slashcommands);
   describe.each(commands)("/%s command", (commandname) => {
-    const commandDefinition = slashcommands[commandname];
+    const commanddéfinition = slashcommands[commandname];
     it("should have a command builder", () => {
-      expect(commandDefinition).toMatchObject({
+      expect(commanddéfinition).toMatchObject({
         builder: expect.any(SlashCommandBuilder),
         handler: expect.any(Function),
       });
@@ -17,7 +17,7 @@ describe("slashcommands", () => {
     });
 
     it("should have 1-100 character description", () => {
-      const desc = commandDefinition.builder.description;
+      const desc = commanddéfinition.builder.description;
       expect(desc.length).toBeWithin(1, 100);
     });
   });
