@@ -1,3 +1,9 @@
+## [1.4.4](https://github.com/GTSpray/P-titPote/compare/v1.4.3...v1.4.4) (2026-06-08)
+
+### :repeat: Chore
+
+* **deps:** bump vitest from 4.1.7 to 4.1.8 ([#176](https://github.com/GTSpray/P-titPote/issues/176)) ([85581e5](https://github.com/GTSpray/P-titPote/commit/85581e5d61d27ed1b4ea40df2669f14d004364b5))
+
 ## [1.4.3](https://github.com/GTSpray/P-titPote/compare/v1.4.2...v1.4.3) (2026-06-08)
 
 ### :repeat: Chore
