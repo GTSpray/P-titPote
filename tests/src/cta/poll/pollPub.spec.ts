@@ -164,8 +164,8 @@ describe('cta/pollPub', () => {
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
                 content: t('poll.publish.header', {
-                  mention: ` <@&${aPoll.role}>`
-                })
+                  mention: ` <@&${aPoll.role}>`,
+                }),
               },
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
