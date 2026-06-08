@@ -1,5 +1,5 @@
-import "vitest";
-import "./tests/customMatchers/customMatchers.d.ts";
+import 'vitest';
+import './tests/customMatchers/customMatchers.d.ts';
 
 declare global {
   namespace NodeJS {
@@ -87,7 +87,7 @@ interface CustomMatchers<R = unknown> {
   };
 }
 
-declare module "vitest" {
+declare module 'vitest' {
   interface ExpectationResult {
     actual?: unknown;
 

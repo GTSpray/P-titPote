@@ -1,17 +1,17 @@
-import "dotenv/config";
-import * as winston from "winston";
-import "winston-daily-rotate-file";
-import { v4 } from "uuid";
+import 'dotenv/config';
+import * as winston from 'winston';
+import 'winston-daily-rotate-file';
+import { v4 } from 'uuid';
 const { combine, timestamp, json, errors } = winston.format;
 const { Console, DailyRotateFile } = winston.transports;
 
-const level = process.env.LOG_LEVEL || "http";
+const level = process.env.LOG_LEVEL || 'http';
 const v = process.env.npm_package_version;
 const dailyOpts = {
-  datePattern: "YYYY-MM-DD",
+  datePattern: 'YYYY-MM-DD',
   zippedArchive: true,
-  maxSize: "20m",
-  maxFiles: "7d",
+  maxSize: '20m',
+  maxFiles: '7d',
 };
 export const logger = winston.createLogger({
   level,
@@ -35,19 +35,19 @@ export const logger = winston.createLogger({
     new Console({ level }),
     new DailyRotateFile({
       level,
-      filename: "logs/ptitpote-combined-%DATE%.log",
+      filename: 'logs/ptitpote-combined-%DATE%.log',
       ...dailyOpts,
     }),
   ],
   exceptionHandlers: [
     new DailyRotateFile({
-      filename: "logs/ptitpote-exceptions-%DATE%.log",
+      filename: 'logs/ptitpote-exceptions-%DATE%.log',
       ...dailyOpts,
     }),
   ],
   rejectionHandlers: [
     new DailyRotateFile({
-      filename: "logs/ptitpote-rejections-%DATE%.log",
+      filename: 'logs/ptitpote-rejections-%DATE%.log',
       ...dailyOpts,
     }),
   ],

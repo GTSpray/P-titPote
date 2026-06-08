@@ -1,12 +1,12 @@
-import { Response } from "express";
-import { CommandHandlerOptions } from "../../commands.js";
+import { Response } from 'express';
+import { CommandHandlerOptions } from '../../commands.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
-import { foundItComponnents, notFoundPayload } from "../../commonMessages.js";
+} from 'discord-interactions';
+import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
+import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
 
 export interface aliasLsCommandData {
   id: string;
@@ -16,7 +16,7 @@ export interface aliasLsCommandData {
 }
 
 export type aliasLsSubCommandData = {
-  name: "ls";
+  name: 'ls';
   options: [];
   type: number;
 };
@@ -33,7 +33,7 @@ export const ls = async ({
 
     const messageAliaseds = await em.findAll(MessageAliased, {
       where: { server: { guildId } },
-      orderBy: { alias: "asc" },
+      orderBy: { alias: 'asc' },
     });
 
     let components = [];
@@ -44,7 +44,7 @@ export const ls = async ({
         ...foundItComponnents(),
         {
           type: MessageComponentTypes.TEXT_DISPLAY,
-          content: messageAliaseds.map((e) => `* ${e.alias}`).join("\n"),
+          content: messageAliaseds.map((e) => `* ${e.alias}`).join('\n'),
         },
       ];
     }

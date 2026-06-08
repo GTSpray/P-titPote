@@ -95,13 +95,13 @@ services:
   localtunnel:
     image: ngrok/ngrok:alpine
     environment:
-      NGROK_AUTHTOKEN: "..."
-    command: "http api:3000"
+      NGROK_AUTHTOKEN: '...'
+    command: 'http api:3000'
     build: !reset null
     ports:
-      - "4040:4040"
+      - '4040:4040'
     expose:
-      - "4040"
+      - '4040'
 ```
 
 - Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.

@@ -1,5 +1,5 @@
-import WebSocket from "ws";
-import { GatewaySocket } from "./GatewaySocket.js";
+import WebSocket from 'ws';
+import { GatewaySocket } from './GatewaySocket.js';
 import {
   GatewayDispatchEvents,
   GatewayHeartbeatAck,
@@ -7,51 +7,51 @@ import {
   GatewayIntentBits,
   GatewayInvalidSession,
   GatewayOpcodes,
-} from "discord.js";
-import { WsClosedCode, GWSEvent } from "./gatewaytypes.js";
-import { getPromiseWithTimeout } from "../utils/getPromiseWithTimeout.js";
+} from 'discord.js';
+import { WsClosedCode, GWSEvent } from './gatewaytypes.js';
+import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
 
-const encoding = "json";
-const apiVersion = "10";
+const encoding = 'json';
+const apiVersion = '10';
 
 // todo: implement erlpack https://github.com/discord/erlpack
 const s = JSON.stringify;
 const onConnectionDelay = 20;
 
 const specificStatusCodeMappings = new Map([
-  [1000, "Normal Closure"],
-  [1001, "Going Away"],
-  [1002, "Protocol Error"],
-  [1003, "Unsupported Data"],
-  [1004, "(For future)"],
-  [1005, "No Status Received"],
-  [1006, "Abnormal Closure"],
-  [1007, "Invalid frame payload data"],
-  [1008, "Policy Violation"],
-  [1009, "Message too big"],
-  [1010, "Missing Extension"],
-  [1011, "Internal Error"],
-  [1012, "Service Restart"],
-  [1013, "Try Again Later"],
-  [1014, "Bad Gateway"],
-  [1015, "TLS Handshake"],
+  [1000, 'Normal Closure'],
+  [1001, 'Going Away'],
+  [1002, 'Protocol Error'],
+  [1003, 'Unsupported Data'],
+  [1004, '(For future)'],
+  [1005, 'No Status Received'],
+  [1006, 'Abnormal Closure'],
+  [1007, 'Invalid frame payload data'],
+  [1008, 'Policy Violation'],
+  [1009, 'Message too big'],
+  [1010, 'Missing Extension'],
+  [1011, 'Internal Error'],
+  [1012, 'Service Restart'],
+  [1013, 'Try Again Later'],
+  [1014, 'Bad Gateway'],
+  [1015, 'TLS Handshake'],
 ]);
 
 function getStatusCodeString(code: number): string {
   if (code >= 0 && code <= 999) {
-    return "(Unused)";
+    return '(Unused)';
   } else if (code >= 1016) {
     if (code <= 1999) {
-      return "(For WebSocket standard)";
+      return '(For WebSocket standard)';
     } else if (code <= 2999) {
-      return "(For WebSocket extensions)";
+      return '(For WebSocket extensions)';
     } else if (code <= 3999) {
-      return "(For libraries and frameworks)";
+      return '(For libraries and frameworks)';
     } else if (code <= 4999) {
-      return "(For applications)";
+      return '(For applications)';
     }
   }
-  return specificStatusCodeMappings.get(code) || "(Unknown)";
+  return specificStatusCodeMappings.get(code) || '(Unknown)';
 }
 
 export class ShardSocket {
@@ -96,12 +96,12 @@ export class ShardSocket {
     if (!this.closePromise) {
       this.closePromise = getPromiseWithTimeout(
         ShardSocket.maxTimeout,
-        "ShardSocket.close timed out after %t ms",
+        'ShardSocket.close timed out after %t ms',
         (resolve) => {
           this.main.emit(
             GWSEvent.Debug,
             this.shard,
-            "client attempting to close connection",
+            'client attempting to close connection',
           );
 
           if (this.heartbitTimer) {
@@ -118,17 +118,17 @@ export class ShardSocket {
               <any>this.ws?.readyState,
             )
           ) {
-            this.ws?.once("close", async () => {
+            this.ws?.once('close', async () => {
               this.main.emit(
                 GWSEvent.Debug,
                 this.shard,
-                "client closed connection",
+                'client closed connection',
               );
-              this.ws?.removeAllListeners("close");
+              this.ws?.removeAllListeners('close');
               this.ws = null;
               resolve();
             });
-            this.ws?.close(1001, "cya later alligator");
+            this.ws?.close(1001, 'cya later alligator');
           } else {
             this.ws = null;
             resolve();
@@ -148,7 +148,7 @@ export class ShardSocket {
 
   private continueHeartbeat() {
     this.heartbitTimer = setTimeout(() => {
-      this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit interval");
+      this.main.emit(GWSEvent.Debug, this.shard, 'emit heartbit interval');
       this.beat();
       this.continueHeartbeat();
     }, this.heartbitInterval);
@@ -158,7 +158,7 @@ export class ShardSocket {
     if (!this.heartbitTimer) {
       const firstBitTimeOut = Math.floor(this.heartbitInterval * this.jitter);
       this.heartbitTimer = setTimeout(() => {
-        this.main.emit(GWSEvent.Debug, this.shard, "emit first heartbit");
+        this.main.emit(GWSEvent.Debug, this.shard, 'emit first heartbit');
         this.beat();
         this.continueHeartbeat();
       }, firstBitTimeOut);
@@ -166,20 +166,20 @@ export class ShardSocket {
   }
 
   private hello(e: GatewayHello) {
-    this.main.emit(GWSEvent.Debug, this.shard, "recieved hello info", {
+    this.main.emit(GWSEvent.Debug, this.shard, 'recieved hello info', {
       payload: e,
     });
     this.heartbitInterval = e.d.heartbeat_interval;
   }
 
   async invalidSession(e: GatewayInvalidSession) {
-    this.main.emit(GWSEvent.Debug, this.shard, "receive invalid session", {
+    this.main.emit(GWSEvent.Debug, this.shard, 'receive invalid session', {
       e,
     });
     if (e.d) {
       await this.resume();
     } else {
-      this.main.emit(GWSEvent.Debug, this.shard, "try to reconnect gateway");
+      this.main.emit(GWSEvent.Debug, this.shard, 'try to reconnect gateway');
       await this.close();
       await this.open();
     }
@@ -196,7 +196,7 @@ export class ShardSocket {
         this.main.emit(
           GWSEvent.Debug,
           this.shard,
-          "no heartbit ack event timeout",
+          'no heartbit ack event timeout',
         );
         await this.resume();
       }, ShardSocket.maxTimeout);
@@ -205,12 +205,12 @@ export class ShardSocket {
       op: GatewayOpcodes.Heartbeat,
       d: this.s,
     };
-    this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit", { e });
+    this.main.emit(GWSEvent.Debug, this.shard, 'emit heartbit', { e });
     this.send(e);
   }
 
   private beatAck(e: GatewayHeartbeatAck) {
-    this.main.emit(GWSEvent.Debug, this.shard, "heartbit acknowledged");
+    this.main.emit(GWSEvent.Debug, this.shard, 'heartbit acknowledged');
     if (this.heartbitTimeOut) {
       clearTimeout(this.heartbitTimeOut);
       this.heartbitTimeOut = null;
@@ -227,7 +227,7 @@ export class ShardSocket {
 
   private async onMessage(d: WebSocket.RawData) {
     const e = JSON.parse(d.toString());
-    this.main.emit(GWSEvent.Debug, this.shard, "ShardSocket.dispatch", { e });
+    this.main.emit(GWSEvent.Debug, this.shard, 'ShardSocket.dispatch', { e });
     if (e && !!e.s) {
       this.s = e.s;
     }
@@ -242,11 +242,11 @@ export class ShardSocket {
         this.hello(<any>e);
         break;
       case GatewayOpcodes.Heartbeat:
-        this.main.emit(GWSEvent.Debug, this.shard, "emit heartbit response");
+        this.main.emit(GWSEvent.Debug, this.shard, 'emit heartbit response');
         this.beat();
         break;
       case GatewayOpcodes.Reconnect:
-        this.main.emit(GWSEvent.Debug, this.shard, "recieved reconnect");
+        this.main.emit(GWSEvent.Debug, this.shard, 'recieved reconnect');
         await this.resume();
         break;
       case GatewayOpcodes.InvalidSession:
@@ -260,11 +260,11 @@ export class ShardSocket {
   }
 
   private configureSocket(ws: WebSocket) {
-    ws.on("message", async (data: WebSocket.RawData) => {
+    ws.on('message', async (data: WebSocket.RawData) => {
       await this.onMessage(data);
     });
-    ws.once("close", async (code: WsClosedCode, reason: string) => {
-      this.main.emit(GWSEvent.Debug, this.shard, "server closed connection", {
+    ws.once('close', async (code: WsClosedCode, reason: string) => {
+      this.main.emit(GWSEvent.Debug, this.shard, 'server closed connection', {
         code,
         codeString: getStatusCodeString(code),
         reason: reason.toString(),
@@ -274,7 +274,7 @@ export class ShardSocket {
         try {
           await this.resume();
         } catch (error) {
-          this.main.emit(GWSEvent.Debug, this.shard, "fail to resume", {
+          this.main.emit(GWSEvent.Debug, this.shard, 'fail to resume', {
             error,
           });
           await this.close();
@@ -282,8 +282,8 @@ export class ShardSocket {
         }
       }
     });
-    ws.once("error", (e) => {
-      this.main.emit(GWSEvent.Debug, this.shard, "recieved error", e);
+    ws.once('error', (e) => {
+      this.main.emit(GWSEvent.Debug, this.shard, 'recieved error', e);
     });
   }
 
@@ -291,16 +291,16 @@ export class ShardSocket {
     if (!this.resumePromise) {
       this.resumePromise = getPromiseWithTimeout(
         this.maxTimeout,
-        "ShardSocket.resume timed out after %t ms",
+        'ShardSocket.resume timed out after %t ms',
         async (resolve) => {
           if (this.ws) {
-            this.main.emit(GWSEvent.Debug, this.shard, "close connection");
+            this.main.emit(GWSEvent.Debug, this.shard, 'close connection');
             await this.close();
           }
           this.main.emit(
             GWSEvent.Debug,
             this.shard,
-            "try to resume connection",
+            'try to resume connection',
           );
           const ws = new WebSocket(
             `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
@@ -310,14 +310,14 @@ export class ShardSocket {
             this.main.emit(
               GWSEvent.Debug,
               this.shard,
-              "recieved resumed packet",
+              'recieved resumed packet',
             );
             resolve(undefined);
           });
-          ws.once("open", () => {
-            this.main.emit(GWSEvent.Debug, this.shard, "resumed connection");
+          ws.once('open', () => {
+            this.main.emit(GWSEvent.Debug, this.shard, 'resumed connection');
             setTimeout(() => {
-              this.main.emit(GWSEvent.Debug, this.shard, "send resume packet");
+              this.main.emit(GWSEvent.Debug, this.shard, 'send resume packet');
               this.send({
                 op: GatewayOpcodes.Resume,
                 d: {
@@ -347,28 +347,28 @@ export class ShardSocket {
   async open(): Promise<void> {
     if (this.destroyed) {
       return Promise.reject(
-        new Error("destroyed ShardSocket should be removed"),
+        new Error('destroyed ShardSocket should be removed'),
       );
     }
 
     if (!this.openPromise) {
       this.openPromise = getPromiseWithTimeout(
         this.maxTimeout,
-        "ShardSocket.open timed out after %t ms",
+        'ShardSocket.open timed out after %t ms',
         (resolve) => {
-          this.main.emit(GWSEvent.Debug, this.shard, "starting connection");
+          this.main.emit(GWSEvent.Debug, this.shard, 'starting connection');
 
           const ws = new WebSocket(
             `${this.main.url}?v=${apiVersion}&encoding=${encoding}`,
           );
 
-          ws.once("open", () => {
-            this.main.emit(GWSEvent.Debug, this.shard, "opened connection");
+          ws.once('open', () => {
+            this.main.emit(GWSEvent.Debug, this.shard, 'opened connection');
             setTimeout(() => {
               this.main.emit(
                 GWSEvent.Debug,
                 this.shard,
-                "send identify packet",
+                'send identify packet',
               );
               this.send({
                 op: GatewayOpcodes.Identify,
@@ -379,9 +379,9 @@ export class ShardSocket {
                   large_threshold: 250,
                   presence: {},
                   properties: {
-                    os: "linux",
-                    browser: "PtitPote",
-                    device: "PtitPote",
+                    os: 'linux',
+                    browser: 'PtitPote',
+                    device: 'PtitPote',
                   },
                   intents:
                     GatewayIntentBits.GuildMessageReactions |
@@ -397,7 +397,7 @@ export class ShardSocket {
           this.ws = ws;
 
           this.main.once(GatewayDispatchEvents.Ready, ({ event }) => {
-            this.main.emit(GWSEvent.Debug, this.shard, "recieved ready info");
+            this.main.emit(GWSEvent.Debug, this.shard, 'recieved ready info');
             this.session_id = event.session_id;
             this.resumeGatewayUrl = event.resume_gateway_url;
             resolve();
@@ -416,7 +416,7 @@ export class ShardSocket {
   }
 
   destroy(): Promise<void> {
-    this.main.emit(GWSEvent.Debug, this.shard, "destroy");
+    this.main.emit(GWSEvent.Debug, this.shard, 'destroy');
     this.destroyed = true;
     return this.close();
   }

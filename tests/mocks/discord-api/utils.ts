@@ -1,23 +1,23 @@
 export type BitFieldFlag = any;
-import { randomBytes, randomInt } from "crypto";
+import { randomBytes, randomInt } from 'crypto';
 
 function conditionnal(returnArr: boolean, str: string) {
   if (returnArr) {
-    return str.split("");
+    return str.split('');
   }
   return [];
 }
 
 const cryptoRandom = () =>
-  parseInt(randomBytes(4).toString("hex"), 16) / (0xffffffff + 1);
+  parseInt(randomBytes(4).toString('hex'), 16) / (0xffffffff + 1);
 
 const cryptoRandomString = (
   charLength: number,
-  charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+  charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
 ) => {
   return Array.apply(null, Array(charLength))
     .map(() => charset.charAt(Math.floor(cryptoRandom() * charset.length)))
-    .join("");
+    .join('');
 };
 
 type RandomStringOptions = {
@@ -32,13 +32,13 @@ export function getRandomString({
   number,
   uppercase,
 }: RandomStringOptions) {
-  const letterCharSet = "abcdefghijklmnopqrstuvwxyz";
-  const numberCharSet = "012345678901234567890123456789";
+  const letterCharSet = 'abcdefghijklmnopqrstuvwxyz';
+  const numberCharSet = '012345678901234567890123456789';
   const charSet = [
     ...conditionnal(!!letter, letterCharSet),
     ...conditionnal(!!number, numberCharSet),
     ...conditionnal(!!uppercase, letterCharSet.toUpperCase()),
-  ].join("");
+  ].join('');
 
   return cryptoRandomString(length, charSet);
 }

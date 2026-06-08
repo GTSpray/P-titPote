@@ -1,4 +1,4 @@
 export function getRandomEmoji() {
-  const emojiList = ["😄", "😌", "🤓", "😎", "🤖", "😶‍🌫️", "👋", "✨"];
+  const emojiList = ['😄', '😌', '🤓', '😎', '🤖', '😶‍🌫️', '👋', '✨'];
   return emojiList[Math.floor(Math.random() * emojiList.length)];
 }

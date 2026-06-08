@@ -3,26 +3,27 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
+} from '@mikro-orm/mariadb';
 import {
   POLL_STEP_LIMIT,
   pollAddQ,
-} from "../../../../src/commands/cta/poll/pollAddQ.js";
-import { ModalHandlerOptions } from "../../../../src/commands/modals.js";
-import { initORM } from "../../../initORM.js";
-import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { DiscordGuild } from "../../../../src/db/entities/DiscordGuild.entity.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
+} from '../../../../src/commands/cta/poll/pollAddQ.js';
+import { ModalHandlerOptions } from '../../../../src/commands/modals.js';
+import { initORM } from '../../../initORM.js';
+import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
+import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
+import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
   TextInputStyle,
-} from "discord-api-types/v10";
-import { Poll } from "../../../../src/db/entities/Poll.entity.js";
-import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
+} from 'discord-api-types/v10';
+import { Poll } from '../../../../src/db/entities/Poll.entity.js';
+import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
+import { t } from '../../../../src/i18n/index.js';
 
-describe("cta/pollAddQ", () => {
+describe('cta/pollAddQ', () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
@@ -57,20 +58,20 @@ describe("cta/pollAddQ", () => {
     await em.persist(aGuild).flush();
   });
 
-  it("should respond a modal with a question componnent", async () => {
+  it('should respond a modal with a question componnent', async () => {
     const response = await pollAddQ.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
-          t: "cta",
-          d: { a: "pollCreate", pId: existingPoll.id },
+          t: 'cta',
+          d: { a: 'pollCreate', pId: existingPoll.id },
         }),
-        title: "Ajouter une question",
+        title: t('poll.modal.addQuestion.title'),
         components: [
           {
             type: ComponentType.Label,
-            label: `Question du sondage`,
+            label: t('poll.modal.label.question'),
             component: {
               type: ComponentType.TextInput,
               custom_id: `question`,
@@ -112,12 +113,12 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem...  ca fait beaucoup là. Non?",
+        content: t('errors.tooMany'),
       },
     });
   });
 
-  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+  it('should display a temporary message indicating that the user is not authorized to update the poll if it is published', async () => {
     existingPoll.publicationDate = new Date();
     await em.persist(existingPoll).flush();
     const response = await pollAddQ.handler(handlerOpts);
@@ -125,7 +126,7 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... tu ne peux plus modifier un vote publié",
+        content: t('common.doNotUpdatePublishedPoll'),
       },
     });
   });

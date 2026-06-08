@@ -2,22 +2,23 @@ import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
+} from 'discord-interactions';
 
-import { CommandHandlerOptions } from "../../commands.js";
+import { CommandHandlerOptions } from '../../commands.js';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
   SlashCommandBuilder,
-} from "discord.js";
+} from 'discord.js';
 
-import { getRandomEmoji } from "../../../utils/getRandomEmoji.js";
+import { getRandomEmoji } from '../../../utils/getRandomEmoji.js';
 
-import { Response } from "express";
+import { Response } from 'express';
+import { t } from '../../../i18n/index.js';
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Affiche une image de loutre")
+  .setDescription(t('gimme.otter.description'))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -37,7 +38,7 @@ export interface gimmeVersionCommandData {
 }
 
 export type gimmeVersionSubCommandData = {
-  name: "version";
+  name: 'version';
   type: number;
 };
 
@@ -51,7 +52,10 @@ export const version = async ({
       components: [
         {
           type: MessageComponentTypes.TEXT_DISPLAY,
-          content: `Hello here ${getRandomEmoji()}! \nJe suis P'titPote v${process.env.npm_package_version}.`,
+          content: t('gimme.version.message', {
+            emoji: getRandomEmoji(),
+            version: process.env.npm_package_version ?? 'unknown',
+          }),
         },
       ],
     },

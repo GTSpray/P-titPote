@@ -1,6 +1,6 @@
-import { APIBaseInteraction, InteractionType } from "discord.js";
-import { Request, Response } from "express";
-import { DBServices } from "../db/db.js";
+import { APIBaseInteraction, InteractionType } from 'discord.js';
+import { Request, Response } from 'express';
+import { DBServices } from '../db/db.js';
 
 type DiscordInteractionBody<Data> = APIBaseInteraction<
   InteractionType.ModalSubmit | InteractionType.MessageComponent,

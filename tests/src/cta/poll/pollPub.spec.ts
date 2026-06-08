@@ -3,34 +3,35 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
-import { pollPub } from "../../../../src/commands/cta/poll/pollPub.js";
+} from '@mikro-orm/mariadb';
+import { pollPub } from '../../../../src/commands/cta/poll/pollPub.js';
 import {
   CTAData,
   ModalHandlerOptions,
-} from "../../../../src/commands/modals.js";
-import { initORM } from "../../../initORM.js";
-import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { DiscordGuild } from "../../../../src/db/entities/DiscordGuild.entity.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
+} from '../../../../src/commands/modals.js';
+import { initORM } from '../../../initORM.js';
+import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
+import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
+import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
   MessageFlags,
-} from "discord-api-types/v10";
-import { Poll } from "../../../../src/db/entities/Poll.entity.js";
-import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
+} from 'discord-api-types/v10';
+import { Poll } from '../../../../src/db/entities/Poll.entity.js';
+import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
 import {
   InteractionResponseFlags,
   MessageComponentTypes,
-} from "discord-interactions";
+} from 'discord-interactions';
 import {
   admin_permissions,
   default_member_permissions,
-} from "../../../mocks/discord-api/rolePermission.js";
+} from '../../../mocks/discord-api/rolePermission.js';
+import { t } from '../../../../src/i18n/index.js';
 
-describe("cta/pollPub", () => {
+describe('cta/pollPub', () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
@@ -70,7 +71,7 @@ describe("cta/pollPub", () => {
     await em.persist(aGuild).flush();
   });
 
-  it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+  it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
       guild_id,
@@ -87,12 +88,12 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        content: t('common.notAllowed'),
       },
     });
   });
 
-  it("should send a message in the channel inviting members to vote", async () => {
+  it('should send a message in the channel inviting members to vote', async () => {
     const response = await pollPub.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -105,7 +106,7 @@ describe("cta/pollPub", () => {
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
                 content:
-                  "# Oyé Oyé!\n-# Le staff réclame votre attention pour un sondage!",
+                  '# Oyé Oyé!\n-# Le staff réclame votre attention pour un sondage!',
               },
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
@@ -130,11 +131,11 @@ describe("cta/pollPub", () => {
               {
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
-                label: "Je vote!",
+                label: t('poll.button.vote'),
                 custom_id: JSON.stringify({
-                  t: "cta",
+                  t: 'cta',
                   d: {
-                    a: "pollResp",
+                    a: 'pollResp',
                     pId: aPoll.id,
                   },
                 }),
@@ -146,7 +147,7 @@ describe("cta/pollPub", () => {
     });
   });
 
-  it("should ping role in the channel inviting members whith this role to vote", async () => {
+  it('should ping role in the channel inviting members whith this role to vote', async () => {
     aPoll.role = randomDiscordId19();
 
     await em.persist(aPoll).flush();
@@ -162,7 +163,9 @@ describe("cta/pollPub", () => {
             components: [
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
-                content: `# Oyé Oyé <@&${aPoll.role}>!\n-# Le staff réclame votre attention pour un sondage!`,
+                content: t('poll.publish.header', {
+                  mention: ` <@&${aPoll.role}>`,
+                }),
               },
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
@@ -187,11 +190,11 @@ describe("cta/pollPub", () => {
               {
                 type: ComponentType.Button,
                 style: ButtonStyle.Primary,
-                label: "Je vote!",
+                label: t('poll.button.vote'),
                 custom_id: JSON.stringify({
-                  t: "cta",
+                  t: 'cta',
                   d: {
-                    a: "pollResp",
+                    a: 'pollResp',
                     pId: aPoll.id,
                   },
                 }),
@@ -203,7 +206,7 @@ describe("cta/pollPub", () => {
     });
   });
 
-  it("should add a publication date to the poll", async () => {
+  it('should add a publication date to the poll', async () => {
     expect(aPoll.publicationDate).toBeUndefined();
 
     await pollPub.handler(handlerOpts);
@@ -215,7 +218,7 @@ describe("cta/pollPub", () => {
     expect(poll.publicationDate).toBeInstanceOf(Date);
   });
 
-  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+  it('should display a temporary message indicating that the user is not authorized to update the poll if it is published', async () => {
     aPoll.publicationDate = new Date();
     await em.persist(aPoll).flush();
     const response = await pollPub.handler(handlerOpts);
@@ -223,7 +226,7 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... tu ne peux plus modifier un vote publié",
+        content: t('common.doNotUpdatePublishedPoll'),
       },
     });
   });

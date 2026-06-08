@@ -1,4 +1,4 @@
-import { Migration } from "@mikro-orm/migrations";
+import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20260201182601 extends Migration {
   override up(): void | Promise<void> {

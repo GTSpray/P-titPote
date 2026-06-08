@@ -1,17 +1,17 @@
-import { EntityBase } from "../EntityBase.js";
+import { EntityBase } from '../EntityBase.js';
 import {
   Entity,
   OneToMany,
   Property,
   Unique,
-} from "@mikro-orm/decorators/legacy";
-import { Collection } from "@mikro-orm/core";
-import { MessageAliased } from "./MessageAliased.entity.js";
-import { Poll } from "./Poll.entity.js";
+} from '@mikro-orm/decorators/legacy';
+import { Collection } from '@mikro-orm/core';
+import { MessageAliased } from './MessageAliased.entity.js';
+import { Poll } from './Poll.entity.js';
 
 @Entity()
 @Unique({
-  properties: ["guildId", "deletedAt"],
+  properties: ['guildId', 'deletedAt'],
 })
 export class DiscordGuild extends EntityBase {
   constructor(guildId: string) {
@@ -19,7 +19,7 @@ export class DiscordGuild extends EntityBase {
     this.guildId = guildId;
   }
 
-  @Property({ type: "varchar", length: 50 })
+  @Property({ type: 'varchar', length: 50 })
   guildId: string;
 
   @OneToMany(() => MessageAliased, (msg) => msg.server)

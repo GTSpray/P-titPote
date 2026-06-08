@@ -2,41 +2,42 @@ import {
   pollCreateCommandData,
   pollCreateSubCommandData,
   create,
-} from "../../../../../src/commands/slash/poll/create.js";
+} from '../../../../../src/commands/slash/poll/create.js';
 import {
   ComponentType,
   InteractionResponseType,
   TextInputStyle,
   MessageFlags,
-} from "discord-api-types/v10";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
-import { initORM } from "../../../../initORM.js";
+} from 'discord-api-types/v10';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import { initORM } from '../../../../initORM.js';
 import {
   SqlEntityManager,
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
+} from '@mikro-orm/mariadb';
 import {
   admin_permissions,
   default_member_permissions,
-} from "../../../../mocks/discord-api/rolePermission.js";
+} from '../../../../mocks/discord-api/rolePermission.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/poll create", () => {
+describe('/poll create', () => {
   let guild_id: string;
   let handlerOpts: CommandHandlerOptions<pollCreateCommandData>;
 
   const subcommand: pollCreateSubCommandData = {
-    name: "create",
+    name: 'create',
     options: [],
     type: 1,
   };
 
   const data: pollCreateCommandData = {
     id: randomDiscordId19(),
-    name: "poll",
+    name: 'poll',
     options: [subcommand],
     type: 1,
   };
@@ -61,17 +62,17 @@ describe("/poll create", () => {
     em = orm.em.fork();
   });
 
-  it("should respond success message", async () => {
+  it('should respond success message', async () => {
     const response = await create(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
-          t: "cta",
-          d: { a: "pollCreate" },
+          t: 'cta',
+          d: { a: 'pollCreate' },
         }),
-        title: "Créer un sondage",
+        title: t('poll.modal.create.title'),
         components: [
           {
             type: ComponentType.Label,
@@ -96,7 +97,7 @@ describe("/poll create", () => {
           },
           {
             type: ComponentType.Label,
-            label: `Question du sondage`,
+            label: t('poll.modal.label.question'),
             component: {
               type: ComponentType.TextInput,
               custom_id: `question`,
@@ -123,7 +124,7 @@ describe("/poll create", () => {
     });
   });
 
-  it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+  it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
     const { req, res } = getInteractionCommandHttpMock({
       data,
       permissions: default_member_permissions,
@@ -142,7 +143,7 @@ describe("/poll create", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        content: t('common.notAllowed'),
       },
     });
   });

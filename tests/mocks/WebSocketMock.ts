@@ -1,5 +1,5 @@
-import EventEmitter from "events";
-import { getRandomString } from "./discord-api/utils.js";
+import EventEmitter from 'events';
+import { getRandomString } from './discord-api/utils.js';
 
 export class WebSocketServerMock {
   static instances = new Map<string, WebSocketServerMock>();
@@ -23,20 +23,20 @@ export class WebSocketServerMock {
 
   private constructor(private url: string) {
     if (WebSocketServerMock.instances.has(url)) {
-      throw Error("existing mockserver");
+      throw Error('existing mockserver');
     }
 
-    this.on("wsmessage", (d) => {
+    this.on('wsmessage', (d) => {
       this.spy(d);
     });
 
-    this.on("wsconnection", (ws, url) => {
+    this.on('wsconnection', (ws, url) => {
       ws.readyState = 1; // WebSocket.OPEN;
-      this.emit("open");
+      this.emit('open');
     });
 
-    this.on("wsclose", () => {
-      this.emit("close", 1000, "client close close");
+    this.on('wsclose', () => {
+      this.emit('close', 1000, 'client close close');
     });
   }
 
@@ -61,7 +61,7 @@ export class WebSocketServerMock {
   }
 
   send(d: string) {
-    this.emitter.emit("message", d);
+    this.emitter.emit('message', d);
   }
 }
 
@@ -70,14 +70,14 @@ export class WebSocketMock {
   public readyState = 0; // WebSocket.CONNECTING;
 
   constructor(private url: string) {
-    const [domain] = url.split("?");
+    const [domain] = url.split('?');
     this.mockedServer = WebSocketServerMock.getInstance(domain);
 
     setTimeout(() => {
-      this.mockedServer.emit("wsconnection", this, url);
+      this.mockedServer.emit('wsconnection', this, url);
     }, 20);
 
-    this.on("close", () => {
+    this.on('close', () => {
       this.readyState = 3; // WebSocket.CLOSED
     });
   }
@@ -91,11 +91,11 @@ export class WebSocketMock {
   }
 
   send(d: string) {
-    this.mockedServer.emit("wsmessage", d);
+    this.mockedServer.emit('wsmessage', d);
   }
 
   close(...args: any[]) {
-    this.mockedServer.emit("wsclose", ...args);
+    this.mockedServer.emit('wsclose', ...args);
     this.readyState = 2; // WebSocket.CLOSING
   }
 

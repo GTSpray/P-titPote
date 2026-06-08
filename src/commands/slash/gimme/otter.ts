@@ -2,21 +2,22 @@ import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
+} from 'discord-interactions';
 
-import { CommandHandlerOptions } from "../../commands.js";
+import { CommandHandlerOptions } from '../../commands.js';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
   SlashCommandBuilder,
-} from "discord.js";
+} from 'discord.js';
 
-import { Response } from "express";
-import { foundItComponnents } from "../../commonMessages.js";
+import { Response } from 'express';
+import { foundItComponnents } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Affiche une image de loutre")
+  .setDescription(t('gimme.otter.description'))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -36,7 +37,7 @@ export interface gimmeOtterCommandData {
 }
 
 export type gimmeOtterSubCommandData = {
-  name: "otter";
+  name: 'otter';
   type: number;
 };
 
@@ -53,9 +54,9 @@ export const otter = async ({
           type: MessageComponentTypes.MEDIA_GALLERY,
           items: [
             {
-              description: "otter",
+              description: 'otter',
               media: {
-                url: "https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true",
+                url: 'https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true',
               },
             },
           ],

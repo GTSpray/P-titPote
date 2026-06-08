@@ -1,26 +1,27 @@
-import * as z from "zod";
+import * as z from 'zod';
 
-import { type SlashCommandDeclaration } from "../../commands.js";
+import { type SlashCommandDeclaration } from '../../commands.js';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
   SlashCommandBuilder,
-} from "discord.js";
+} from 'discord.js';
 
-import { Response } from "express";
-import { logger } from "../../../logger.js";
-import { gimmeOtterCommandData, otter } from "./otter.js";
-import { gimmeVersionCommandData, version } from "./version.js";
+import { Response } from 'express';
+import { logger } from '../../../logger.js';
+import { gimmeOtterCommandData, otter } from './otter.js';
+import { gimmeVersionCommandData, version } from './version.js';
 import {
   emoji,
   gimmeEmojiCommandData,
   stealemoji_emojiLimit,
   stealemoji_msgLimit,
-} from "./emoji.js";
+} from './emoji.js';
+import { t } from '../../../i18n/index.js';
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Récupère une image")
+  .setDescription(t('gimme.description'))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -32,19 +33,20 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   )
   .addSubcommand((subcommand) =>
-    subcommand.setName("otter").setDescription("Affiche une image de loutre"),
+    subcommand.setName('otter').setDescription(t('gimme.otter.description')),
+  )
+  .addSubcommand((subcommand) =>
+    subcommand.setName('emoji').setDescription(
+      t('gimme.emoji.description', {
+        emojiLimit: stealemoji_emojiLimit,
+        msgLimit: stealemoji_msgLimit,
+      }),
+    ),
   )
   .addSubcommand((subcommand) =>
     subcommand
-      .setName("emoji")
-      .setDescription(
-        `Récupère les ${stealemoji_emojiLimit} dernières emotes dans les ${stealemoji_msgLimit} derniers messages de ce chan`,
-      ),
-  )
-  .addSubcommand((subcommand) =>
-    subcommand
-      .setName("version")
-      .setDescription("Affiche la version de P'titPote Bot"),
+      .setName('version')
+      .setDescription(t('gimme.version.description')),
   );
 
 const ValidCommandPayload = z.object({
@@ -72,25 +74,27 @@ export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
 
     if (!command.success) {
       const issues = command.error.issues;
-      logger.debug("zod errors", { issues });
-      return res.status(400).json({ error: "invalid command payload", issues });
+      logger.debug('zod errors', { issues });
+      return res
+        .status(400)
+        .json({ error: t('errors.invalidCommandPayload'), issues });
     }
 
     const [subcommand] = command.data.options;
     let result: Response | null;
     switch (subcommand.name) {
-      case "otter":
+      case 'otter':
         result = await otter(<any>handlerOpts);
         break;
-      case "emoji":
+      case 'emoji':
         result = await emoji(<any>handlerOpts);
         break;
-      case "version":
+      case 'version':
         result = await version(<any>handlerOpts);
         break;
       default:
         result = res.status(400).json({
-          error: "invalid subcommand",
+          error: t('errors.invalidSubcommand'),
           context: {
             subcommandName: subcommand.name,
           },
@@ -101,7 +105,7 @@ export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
     return (
       result ??
       res.status(500).json({
-        error: "unmeet result",
+        error: t('errors.unmetResult'),
       })
     );
   },

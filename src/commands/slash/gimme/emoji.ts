@@ -1,23 +1,24 @@
-import { CommandHandlerOptions } from "../../commands.js";
-import { Response } from "express";
-import { logger } from "../../../logger.js";
+import { CommandHandlerOptions } from '../../commands.js';
+import { Response } from 'express';
+import { logger } from '../../../logger.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { Routes, SlashCommandBuilder } from "discord.js";
+} from 'discord-interactions';
+import { Routes, SlashCommandBuilder } from 'discord.js';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
   RESTGetAPIChannelMessagesResult,
-} from "discord-api-types/v10";
+} from 'discord-api-types/v10';
 
-import { discordapi } from "../../../utils/discordapi.js";
-import { getEmojiUrl } from "../../../utils/getEmojiUrl.js";
-import { ExtractedEmoji, extractEmoji } from "../../../utils/extractEmoji.js";
-import { foundItComponnents, notFoundPayload } from "../../commonMessages.js";
+import { discordapi } from '../../../utils/discordapi.js';
+import { getEmojiUrl } from '../../../utils/getEmojiUrl.js';
+import { ExtractedEmoji, extractEmoji } from '../../../utils/extractEmoji.js';
+import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export const stealemoji_emojiLimit = 3;
 export const stealemoji_msgLimit = 10;
@@ -26,7 +27,7 @@ export const stealemoji_msgSizeLimit = 500;
 const emojiLimitPrefetch = 50;
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Affiche une image de loutre")
+  .setDescription(t('gimme.otter.description'))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -46,7 +47,7 @@ export interface gimmeEmojiCommandData {
 }
 
 export type gimmeEmojiSubCommandData = {
-  name: "emoji";
+  name: 'emoji';
   type: number;
 };
 
@@ -56,7 +57,7 @@ export const emoji = async ({
 }: CommandHandlerOptions<gimmeEmojiCommandData>): Promise<Response | null> => {
   const { channel } = req.body;
   if (!channel) {
-    return res.status(500).json({ error: "invalid" });
+    return res.status(500).json({ error: t('errors.invalid') });
   }
 
   const reqId = req.requestId;
@@ -69,13 +70,13 @@ export const emoji = async ({
     },
   )) as RESTGetAPIChannelMessagesResult;
 
-  logger.verbose("channel messages", {
+  logger.verbose('channel messages', {
     reqId,
     channelId: channel.id,
     nbMessages: channelMessages.length,
   });
 
-  logger.debug("channelMessages", {
+  logger.debug('channelMessages', {
     url: Routes.channelMessages(channel.id),
     channelMessages,
   });
@@ -96,7 +97,7 @@ export const emoji = async ({
     })
     .slice(0, stealemoji_emojiLimit);
 
-  logger.verbose("extracted emojies", {
+  logger.verbose('extracted emojies', {
     reqId,
     nbEmotes: extractedEmotes.length,
   });
@@ -114,7 +115,7 @@ export const emoji = async ({
     }),
   );
 
-  logger.debug("extracted emojies", { reqId, emojies });
+  logger.debug('extracted emojies', { reqId, emojies });
 
   return res.json({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,

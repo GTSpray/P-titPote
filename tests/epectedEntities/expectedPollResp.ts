@@ -1,6 +1,6 @@
-import { PollStep } from "../../src/db/entities/PollStep.entity.js";
-import { PollChoice } from "../../src/db/entities/PollChoice.entity.js";
-import { PollResp } from "../../src/db/entities/PollResp.entity.js";
+import { PollStep } from '../../src/db/entities/PollStep.entity.js';
+import { PollChoice } from '../../src/db/entities/PollChoice.entity.js';
+import { PollResp } from '../../src/db/entities/PollResp.entity.js';
 
 export const expectedPollResp = (opts: Partial<PollResp>): PollResp => {
   return {

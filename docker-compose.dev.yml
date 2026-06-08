@@ -1,19 +1,19 @@
 services:
   database:
     ports:
-      - "3306:3306"
+      - '3306:3306'
   dbtest:
     image: mariadb:12.0.2-noble
     container_name: ptitpote-database-test
     environment:
-      MARIADB_DATABASE: "ptitpotetest"
-      MARIADB_USER: "ptitpotetest"
-      MARIADB_PASSWORD: "ptitpotetestpassword"
-      MARIADB_ROOT_PASSWORD: "ptitpotetestrootpassword"
+      MARIADB_DATABASE: 'ptitpotetest'
+      MARIADB_USER: 'ptitpotetest'
+      MARIADB_PASSWORD: 'ptitpotetestpassword'
+      MARIADB_ROOT_PASSWORD: 'ptitpotetestrootpassword'
     ports:
-      - "3307:3306"
+      - '3307:3306'
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
       start_period: 10s
       interval: 10s
       timeout: 5s
@@ -30,7 +30,7 @@ services:
       dbtest:
         condition: service_healthy
     environment:
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: 'debug'
       NODE_ENV: development
     command: npm run --silent dev:api
     volumes:
@@ -57,7 +57,7 @@ services:
       dbtest:
         condition: service_healthy
     environment:
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: 'debug'
       NODE_ENV: development
     command: npm run --silent dev:gateway
     volumes:

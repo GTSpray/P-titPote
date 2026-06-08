@@ -1,7 +1,7 @@
-import type { SlashCommandDeclaration } from "../commands.js";
-import { alias } from "./alias/index.js";
-import { gimme } from "./gimme/index.js";
-import { poll } from "./poll/index.js";
+import type { SlashCommandDeclaration } from '../commands.js';
+import { alias } from './alias/index.js';
+import { gimme } from './gimme/index.js';
+import { poll } from './poll/index.js';
 
 export const slashcommands: Record<string, SlashCommandDeclaration<any>> = {
   alias,

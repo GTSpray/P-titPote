@@ -1,24 +1,25 @@
-import "dotenv/config";
-import express from "express";
-import { Request, Response, NextFunction } from "express";
-import morgan from "morgan";
-import { v4 } from "uuid";
+import 'dotenv/config';
+import express from 'express';
+import { Request, Response, NextFunction } from 'express';
+import morgan from 'morgan';
+import { v4 } from 'uuid';
 import {
   InteractionResponseType,
   InteractionType,
   verifyKeyMiddleware,
-} from "discord-interactions";
+} from 'discord-interactions';
 
-import { logger } from "./logger.js";
-import { slashcommands } from "./commands/slash/index.js";
-import { cta } from "./commands/cta/index.js";
+import { logger } from './logger.js';
+import { slashcommands } from './commands/slash/index.js';
+import { cta } from './commands/cta/index.js';
+import { t } from './i18n/index.js';
 
-import config from "./mikro-orm.config.js";
-import { initORM } from "./db/db.js";
+import config from './mikro-orm.config.js';
+import { initORM } from './db/db.js';
 
 const orm = initORM(config);
 
-morgan.token("requestId", (req) => {
+morgan.token('requestId', (req) => {
   return (<any>req).requestId;
 });
 
@@ -28,7 +29,7 @@ const PORT = process.env.APP_PORT || 3000;
 
 app.use(function (req: Request, res: Response, next: NextFunction) {
   req.requestId = v4();
-  res.set("x-request-id", req.requestId);
+  res.set('x-request-id', req.requestId);
   next();
 });
 
@@ -39,23 +40,23 @@ app.use(
         method: tokens.method(req, res),
         url: tokens.url(req, res),
         status: Number.parseInt(<string>tokens.status(req, res)),
-        length: Number.parseInt(<string>tokens.res(req, res, "content-length")),
-        duration: Number.parseFloat(<string>tokens["response-time"](req, res)),
-        reqId: tokens["requestId"](req, res),
+        length: Number.parseInt(<string>tokens.res(req, res, 'content-length')),
+        duration: Number.parseFloat(<string>tokens['response-time'](req, res)),
+        reqId: tokens['requestId'](req, res),
       });
     },
     {
       stream: {
         write: (message) => {
           const data = JSON.parse(message);
-          logger.http("request", data);
+          logger.http('request', data);
         },
       },
     },
   ),
 );
 
-app.get("/health", (_req, res) => {
+app.get('/health', (_req, res) => {
   res.json({});
 });
 
@@ -64,14 +65,14 @@ app.get("/health", (_req, res) => {
  * Parse request body and verifies incoming requests using discord-interactions package
  */
 app.post(
-  "/interactions",
+  '/interactions',
   verifyKeyMiddleware(process.env.PUBLIC_KEY),
   async function (req, res) {
     // Interaction id, type and data
     const { type, data } = req.body;
     const reqId = req.requestId;
 
-    logger.debug("request.body", {
+    logger.debug('request.body', {
       reqId,
       body: req.body,
     });
@@ -96,7 +97,7 @@ app.post(
         return slashcommands[name].handler({ req, res, dbServices });
       }
       logger.error(`unknown command`, { reqId, name });
-      return res.status(400).json({ error: "unknown command" });
+      return res.status(400).json({ error: t('errors.unknownCommand') });
     }
 
     if (
@@ -124,15 +125,15 @@ app.post(
           }
         } catch (error) {
           logger.error(`unknown error`, { reqId, custom_id });
-          return res.status(500).json({ error: "unknown error" });
+          return res.status(500).json({ error: t('errors.unknownError') });
         }
       }
       logger.error(`unknown modal`, { reqId, custom_id });
-      return res.status(400).json({ error: "unknown modal" });
+      return res.status(400).json({ error: t('errors.unknownModal') });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
-    return res.status(400).json({ error: "unknown interaction type" });
+    return res.status(400).json({ error: t('errors.unknownInteractionType') });
   },
 );
 
@@ -140,7 +141,7 @@ app.use(express.json()); // after interaction route to prevent We recommend disa
 
 app.listen(PORT, (err) => {
   if (err) {
-    logger.error("startup error", err);
+    logger.error('startup error', err);
     return;
   }
   logger.info(`startup success`, { port: PORT });

@@ -1,16 +1,16 @@
-import { DiscrodRESTMock } from "./mocks/discordjs.js";
-import { vi } from "vitest";
-import "./customMatchers/customMatchers.js";
-import { initORM } from "./initORM.js";
-import { WebSocketMock } from "./mocks/WebSocketMock.js";
+import { DiscrodRESTMock } from './mocks/discordjs.js';
+import { vi } from 'vitest';
+import './customMatchers/customMatchers.js';
+import { initORM } from './initORM.js';
+import { WebSocketMock } from './mocks/WebSocketMock.js';
 
-vi.mock("../src/logger.js");
+vi.mock('../src/logger.js');
 
-vi.mock("ws", () => ({
+vi.mock('ws', () => ({
   default: WebSocketMock,
 }));
 
-vi.mock("discord.js", async (importOriginal) => {
+vi.mock('discord.js', async (importOriginal) => {
   const mod: any = await importOriginal();
   return {
     ...mod,

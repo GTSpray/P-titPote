@@ -1,14 +1,14 @@
-import { EntityBase } from "../EntityBase.js";
-import { types } from "@mikro-orm/mariadb";
+import { EntityBase } from '../EntityBase.js';
+import { types } from '@mikro-orm/mariadb';
 import {
   Entity,
   ManyToOne,
   OneToMany,
   Property,
-} from "@mikro-orm/decorators/legacy";
-import { Collection, type Rel } from "@mikro-orm/core";
-import { PollChoice } from "./PollChoice.entity.js";
-import { Poll } from "./Poll.entity.js";
+} from '@mikro-orm/decorators/legacy';
+import { Collection, type Rel } from '@mikro-orm/core';
+import { PollChoice } from './PollChoice.entity.js';
+import { Poll } from './Poll.entity.js';
 
 @Entity()
 export class PollStep extends EntityBase {
@@ -18,16 +18,16 @@ export class PollStep extends EntityBase {
     this.order = order;
   }
 
-  @Property({ type: "varchar", length: 45 })
+  @Property({ type: 'varchar', length: 45 })
   question!: string;
 
-  @Property({ type: "varchar", length: 100, nullable: true })
+  @Property({ type: 'varchar', length: 100, nullable: true })
   description!: string;
 
   @OneToMany({
     entity: () => PollChoice,
     mappedBy: (pc: PollChoice) => pc.pollstep,
-    orderBy: [{ order: "asc" }],
+    orderBy: [{ order: 'asc' }],
   })
   choices: Collection<PollChoice> = new Collection<PollChoice>(this);
 

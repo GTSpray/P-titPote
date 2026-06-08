@@ -4,34 +4,35 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
   applyPopulateHints,
-} from "@mikro-orm/mariadb";
+} from '@mikro-orm/mariadb';
 import {
   pollAddC,
   STEP_CHOICE_LIMIT,
-} from "../../../../src/commands/cta/poll/pollAddC.js";
+} from '../../../../src/commands/cta/poll/pollAddC.js';
 import {
   CTAData,
   ModalHandlerOptions,
-} from "../../../../src/commands/modals.js";
-import { initORM } from "../../../initORM.js";
-import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { DiscordGuild } from "../../../../src/db/entities/DiscordGuild.entity.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
+} from '../../../../src/commands/modals.js';
+import { initORM } from '../../../initORM.js';
+import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
+import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
+import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
   TextInputStyle,
-} from "discord-api-types/v10";
-import { Poll } from "../../../../src/db/entities/Poll.entity.js";
-import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
-import { PollChoice } from "../../../../src/db/entities/PollChoice.entity.js";
+} from 'discord-api-types/v10';
+import { Poll } from '../../../../src/db/entities/Poll.entity.js';
+import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
+import { PollChoice } from '../../../../src/db/entities/PollChoice.entity.js';
 import {
   admin_permissions,
   default_member_permissions,
-} from "../../../mocks/discord-api/rolePermission.js";
+} from '../../../mocks/discord-api/rolePermission.js';
+import { t } from '../../../../src/i18n/index.js';
 
-describe("cta/pollAddC", () => {
+describe('cta/pollAddC', () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
@@ -72,7 +73,7 @@ describe("cta/pollAddC", () => {
     };
   });
 
-  it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+  it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
       guild_id,
@@ -89,27 +90,27 @@ describe("cta/pollAddC", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... je ne suis pas habilitée à le faire 🤷",
+        content: t('common.notAllowed'),
       },
     });
   });
 
-  it("should respond a modal", async () => {
+  it('should respond a modal', async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
-          t: "cta",
-          d: { a: "pollCreate", pId: existingPoll.id },
+          t: 'cta',
+          d: { a: 'pollCreate', pId: existingPoll.id },
         }),
-        title: "Ajouter des choix",
+        title: t('poll.modal.addChoices.title'),
         components: expect.any(Array),
       },
     });
   });
 
-  it("should respond a modal with a text display componnent as question summary", async () => {
+  it('should respond a modal with a text display componnent as question summary', async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
@@ -126,7 +127,7 @@ describe("cta/pollAddC", () => {
     });
   });
 
-  it("should respond a modal with 4 labels max due to discord limit", async () => {
+  it('should respond a modal with 4 labels max due to discord limit', async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
@@ -158,7 +159,7 @@ describe("cta/pollAddC", () => {
     });
   });
 
-  it("should respond a modal with 2 required input text because a select input need 2 choices minimumn", async () => {
+  it('should respond a modal with 2 required input text because a select input need 2 choices minimumn', async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
@@ -187,10 +188,10 @@ describe("cta/pollAddC", () => {
     });
   });
 
-  it("should respond a modal with no required input text when step had already 2 choices", async () => {
+  it('should respond a modal with no required input text when step had already 2 choices', async () => {
     firstStep.choices.add([
-      new PollChoice("A first choice", 0),
-      new PollChoice("A second choice", 1),
+      new PollChoice('A first choice', 0),
+      new PollChoice('A second choice', 1),
     ]);
     await em.persist(firstStep).flush();
 
@@ -221,7 +222,7 @@ describe("cta/pollAddC", () => {
       STEP_CHOICE_LIMIT - (i + 1),
     ]),
   )(
-    "should display a form with %s options when there are already %s options saved in the poll",
+    'should display a form with %s options when there are already %s options saved in the poll',
     async (length: number, stepSize: number) => {
       firstStep.choices.add(
         Array.from({ length: stepSize }).map(
@@ -254,7 +255,7 @@ describe("cta/pollAddC", () => {
     },
   );
 
-  it("should support step with long list of choices", async () => {
+  it('should support step with long list of choices', async () => {
     const stepSize = STEP_CHOICE_LIMIT - 4;
     firstStep.choices.add(
       Array.from({ length: stepSize }).map(
@@ -300,12 +301,12 @@ describe("cta/pollAddC", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem...  ca fait beaucoup là. Non?",
+        content: t('errors.tooMany'),
       },
     });
   });
 
-  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
+  it('should display a temporary message indicating that the user is not authorized to update the poll if it is published', async () => {
     existingPoll.publicationDate = new Date();
     await em.persist(existingPoll).flush();
     const response = await pollAddC.handler(handlerOpts);
@@ -313,7 +314,7 @@ describe("cta/pollAddC", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "ahem... tu ne peux plus modifier un vote publié",
+        content: t('common.doNotUpdatePublishedPoll'),
       },
     });
   });

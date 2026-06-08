@@ -2,26 +2,27 @@ import {
   aliasLsCommandData,
   aliasLsSubCommandData,
   ls,
-} from "../../../../../src/commands/slash/alias/ls.js";
+} from '../../../../../src/commands/slash/alias/ls.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
-import { initORM } from "../../../../initORM.js";
+} from 'discord-interactions';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import { initORM } from '../../../../initORM.js';
 import {
   SqlEntityManager,
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
-import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
+} from '@mikro-orm/mariadb';
+import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from '../../../../../src/db/entities/MessageAliased.entity.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/alias ls", () => {
+describe('/alias ls', () => {
   let guild_id: string;
   let handlerOpts: CommandHandlerOptions<aliasLsCommandData>;
 
@@ -33,29 +34,29 @@ describe("/alias ls", () => {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.EPHEMERAL,
-      content: "ahem... j'ai rien trouvé... 🤷",
+      content: t('common.notFound'),
     },
   };
   const subcommand: aliasLsSubCommandData = {
-    name: "ls",
+    name: 'ls',
     options: [],
     type: 1,
   };
   const data: aliasLsCommandData = {
     id: randomDiscordId19(),
-    name: "alias",
+    name: 'alias',
     options: [subcommand],
     type: 1,
   };
   beforeEach(async () => {
     const subcommand: aliasLsSubCommandData = {
-      name: "ls",
+      name: 'ls',
       options: [],
       type: 1,
     };
     const data: aliasLsCommandData = {
       id: randomDiscordId19(),
-      name: "alias",
+      name: 'alias',
       options: [subcommand],
       type: 1,
     };
@@ -72,15 +73,15 @@ describe("/alias ls", () => {
     em = orm.em.fork();
   });
 
-  describe("when guild has aliased messages", () => {
+  describe('when guild has aliased messages', () => {
     let messageAliaseds: MessageAliased[];
     beforeEach(async () => {
       const guild = new DiscordGuild(guild_id);
 
       messageAliaseds = [
-        new MessageAliased(`alias1`, "alias1 content"),
-        new MessageAliased(`alias2`, "alias2 content"),
-        new MessageAliased(`alias3`, "alias3 content"),
+        new MessageAliased(`alias1`, 'alias1 content'),
+        new MessageAliased(`alias2`, 'alias2 content'),
+        new MessageAliased(`alias3`, 'alias3 content'),
       ];
 
       messageAliaseds.forEach(async (e) => {
@@ -89,7 +90,7 @@ describe("/alias ls", () => {
       await em.persist(guild).flush();
     });
 
-    it("should respond with aliased message names", async () => {
+    it('should respond with aliased message names', async () => {
       const response = await ls(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
@@ -99,7 +100,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content: t('common.foundIt'),
             },
             {
               type: MessageComponentTypes.SEPARATOR,
@@ -108,14 +109,14 @@ describe("/alias ls", () => {
             },
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: messageAliaseds.map((e) => `* ${e.alias}`).join("\n"),
+              content: messageAliaseds.map((e) => `* ${e.alias}`).join('\n'),
             },
           ],
         },
       });
     });
 
-    it("should not display soft deleted alias", async () => {
+    it('should not display soft deleted alias', async () => {
       const softDeleted = messageAliaseds[1];
       softDeleted.deletedAt = new Date();
       await em.persist(softDeleted).flush();
@@ -130,7 +131,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content: t('common.foundIt'),
             },
             {
               type: MessageComponentTypes.SEPARATOR,
@@ -146,7 +147,7 @@ describe("/alias ls", () => {
       });
     });
 
-    it("should display not found message when all alias are soft deleted", async () => {
+    it('should display not found message when all alias are soft deleted', async () => {
       messageAliaseds.forEach((e) => {
         e.deletedAt = new Date();
         em.persist(e);
@@ -163,7 +164,7 @@ describe("/alias ls", () => {
       const otherGuild = new DiscordGuild(randomDiscordId19());
       const otherAlias = new MessageAliased(
         `otherguildalias`,
-        "an other guild aliased message content",
+        'an other guild aliased message content',
       );
       otherGuild.messageAliaseds.add(otherAlias);
       await em.persist(otherAlias).flush();
@@ -178,7 +179,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content: t('common.foundIt'),
             },
             {
               type: MessageComponentTypes.SEPARATOR,
@@ -195,7 +196,7 @@ describe("/alias ls", () => {
     });
   });
 
-  it("should display not found message when no alias", async () => {
+  it('should display not found message when no alias', async () => {
     const response = await ls(handlerOpts);
 
     expect(response).toMeetApiResponse(200, notFoundMessagePayload);

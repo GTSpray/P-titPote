@@ -7,8 +7,8 @@ import {
   GatewayReadyDispatch,
   GatewayReconnect,
   GatewayResumedDispatch,
-} from "discord.js";
-import { getRandomString, randomDiscordId19 } from "./discord-api/utils.js";
+} from 'discord.js';
+import { getRandomString, randomDiscordId19 } from './discord-api/utils.js';
 
 export const helloMsg = (d: { heartbeat_interval?: number }): GatewayHello => ({
   t: null,
@@ -49,13 +49,13 @@ export const readyMsg = (d: any): GatewayReadyDispatch => ({
       }),
     },
     shard: [0, 1],
-    session_type: "normal",
+    session_type: 'normal',
     session_id: getRandomString({
       length: 32,
       number: true,
       letter: true,
     }),
-    resume_gateway_url: "wss://gateway-us-east1-c.discord.gg",
+    resume_gateway_url: 'wss://gateway-us-east1-c.discord.gg',
     relationships: [],
     private_channels: [],
     presences: [],
@@ -67,11 +67,11 @@ export const readyMsg = (d: any): GatewayReadyDispatch => ({
     ],
     guild_join_requests: [],
     geo_ordered_rtc_regions: [
-      "milan",
-      "paris",
-      "frankfurt",
-      "rotterdam",
-      "london",
+      'milan',
+      'paris',
+      'frankfurt',
+      'rotterdam',
+      'london',
     ],
     game_relationships: [],
     auth: {},

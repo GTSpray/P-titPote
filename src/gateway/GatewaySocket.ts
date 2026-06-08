@@ -1,9 +1,9 @@
-import { ShardSocket } from "./ShardSocket.js";
-import { discordapi } from "../utils/discordapi.js";
-import { type APIGatewayBotInfo, Routes } from "discord.js";
-import { logger } from "../logger.js";
-import { type GatewayEvent } from "./gatewaytypes.js";
-import { TypedEventEmitter } from "./TypedEventEmitter.js";
+import { ShardSocket } from './ShardSocket.js';
+import { discordapi } from '../utils/discordapi.js';
+import { type APIGatewayBotInfo, Routes } from 'discord.js';
+import { logger } from '../logger.js';
+import { type GatewayEvent } from './gatewaytypes.js';
+import { TypedEventEmitter } from './TypedEventEmitter.js';
 
 export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
@@ -16,20 +16,20 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
     this.token = token;
     this.shards = shards ? shards : null;
     this.sockets = new Map();
-    this.url = "";
+    this.url = '';
   }
 
   private async setSocket(socketId: number) {
     const oldSocket = this.sockets.get(socketId);
     if (oldSocket) {
-      logger.debug("GatewaySocket.setSocket close", { sockId: socketId });
+      logger.debug('GatewaySocket.setSocket close', { sockId: socketId });
       await oldSocket.close();
     }
 
     const newSocket = new ShardSocket(this, socketId);
     this.sockets.set(socketId, newSocket);
     await newSocket.open();
-    logger.debug("GatewaySocket.setSocket", { sockId: socketId });
+    logger.debug('GatewaySocket.setSocket', { sockId: socketId });
   }
 
   async connect(start = 0, end?: number) {
@@ -39,7 +39,7 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
 
     const { url, shards } = apigatewayInfosBot;
 
-    logger.debug("GatewaySocket.connect", { apigatewayInfosBot });
+    logger.debug('GatewaySocket.connect', { apigatewayInfosBot });
 
     this.url = url;
     if (this.shards === null) {

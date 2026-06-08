@@ -1,4 +1,4 @@
-import { Migration } from "@mikro-orm/migrations";
+import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20250918123204 extends Migration {
   override async up(): Promise<void> {
@@ -32,7 +32,7 @@ CREATE TABLE \`message_aliased\` (
   }
 
   override async down(): Promise<void> {
-    this.addSql("DROP TABLE `message_aliased`;");
-    this.addSql("DROP TABLE `discord_guild`;");
+    this.addSql('DROP TABLE `message_aliased`;');
+    this.addSql('DROP TABLE `discord_guild`;');
   }
 }
