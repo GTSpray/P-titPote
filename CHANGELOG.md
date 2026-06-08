@@ -1,3 +1,9 @@
+## [1.4.6](https://github.com/GTSpray/P-titPote/compare/v1.4.5...v1.4.6) (2026-06-08)
+
+### :repeat: Chore
+
+* add internationalization to the application ([#179](https://github.com/GTSpray/P-titPote/issues/179)) ([dd2d890](https://github.com/GTSpray/P-titPote/commit/dd2d890c4b4fe8cedd02d99b4f9783424779dc42))
+
 ## [1.4.5](https://github.com/GTSpray/P-titPote/compare/v1.4.4...v1.4.5) (2026-06-08)
 
 ### :repeat: Chore
