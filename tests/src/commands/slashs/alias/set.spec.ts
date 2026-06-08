@@ -29,6 +29,7 @@ import {
 } from "@mikro-orm/mariadb";
 import { expectedDiscordGuild } from "../../../../epectedEntities/expectedDiscordGuild.js";
 import { expectedMessageAliased } from "../../../../epectedEntities/expectedMessageAliased.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/alias set", () => {
   let guild_id: string;
@@ -84,7 +85,7 @@ describe("/alias set", () => {
         components: [
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "Ok! C'est noté ;)",
+            content:  t("common.ok"),
           },
         ],
       },
@@ -288,7 +289,7 @@ describe("/alias set", () => {
     const response = await set({ ...handlerOpts, req, res }, badsubcommand);
 
     expect(response).toMeetApiResponse(400, {
-      error: "invalid subcommand payload",
+      error:  t("errors.invalidSubcommandPayload"),
       issues: expect.arrayContaining([
         {
           code,
@@ -351,7 +352,7 @@ describe("/alias set", () => {
       const response = await set({ ...handlerOpts, req, res }, badsubcommand);
 
       expect(response).toMeetApiResponse(400, {
-        error: "invalid subcommand payload",
+        error:  t("errors.invalidSubcommandPayload"),
         issues: expect.arrayContaining([
           {
             code,

@@ -27,13 +27,14 @@ import {
   admin_permissions,
   default_member_permissions,
 } from "../../../../mocks/discord-api/rolePermission.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/alias", () => {
   let handlerOpts: CommandHandlerOptions<aliasDataOpts>;
   it("should declare a slash command", () => {
     const declaration = alias.builder.setName("alias");
     expect(declaration.toJSON()).toMatchObject({
-      description: "Alias un message",
+      description: t("alias.description"),
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -92,14 +93,14 @@ describe("/alias", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "définit un alias message",
+            description:  t("alias.sub.set.description"),
             options: [
               {
-                description: "alias du message",
+                description:  t("alias.option.alias"),
                 name: "alias",
               },
               {
-                description: "contenu du message",
+                description:  t("alias.option.message"),
                 name: "message",
               },
             ].map((e) => expect.objectContaining(e)),
@@ -129,7 +130,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "Ahem... je ne suis pas habilité à le faire 🤷",
+          content: t("common.notAllowed"),
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);
@@ -200,10 +201,10 @@ describe("/alias", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "demande a p'titpote d'envoyer le message",
+            description:  t("alias.sub.say.description"),
             options: [
               {
-                description: "alias du message",
+                description:  t("alias.option.alias"),
                 name: "alias",
               },
             ].map((e) => expect.objectContaining(e)),
@@ -233,7 +234,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "Ahem... je ne suis pas habilité à le faire 🤷",
+          content: t("common.notAllowed"),
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);
@@ -298,7 +299,7 @@ describe("/alias", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "liste les alias disponnibles sur ton serveur",
+            description:  t("alias.sub.ls.description"),
             options: [],
           }),
         ]),
@@ -326,7 +327,7 @@ describe("/alias", () => {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           flags: InteractionResponseFlags.EPHEMERAL,
-          content: "Ahem... je ne suis pas habilité à le faire 🤷",
+          content: t("common.notAllowed"),
         },
       });
       expect(spy).toHaveBeenCalledTimes(0);
@@ -388,7 +389,7 @@ describe("/alias", () => {
       const response = await alias.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(400, {
-        error: "invalid subcommand",
+        error:  t("errors.invalidSubcommand"),
         context: {
           subcommandName: data.options[0].name,
         },
@@ -456,7 +457,7 @@ describe("/alias", () => {
         const response = await alias.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: "invalid command payload",
+          error:  t("errors.invalidCommandPayload"),
           issues: [issue],
         });
       },
@@ -489,7 +490,7 @@ describe("/alias", () => {
         const response = await alias.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: "invalid command payload",
+          error:  t("errors.invalidCommandPayload"),
           issues: [issue],
         });
       },

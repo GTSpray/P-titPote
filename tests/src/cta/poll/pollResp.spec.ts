@@ -23,6 +23,7 @@ import { Poll } from "../../../../src/db/entities/Poll.entity.js";
 import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
 import { PollChoice } from "../../../../src/db/entities/PollChoice.entity.js";
 import { PollResp } from "../../../../src/db/entities/PollResp.entity.js";
+import { t } from "../../../../src/i18n/index.js";
 
 describe("cta/pollResp", () => {
   let guild_id: string;
@@ -232,7 +233,7 @@ describe("cta/pollResp", () => {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           flags: MessageFlags.Ephemeral,
-          content: "Ahem... je ne suis pas habilité à le faire 🤷",
+          content: t("common.notAllowed"),
         },
       });
     });
@@ -271,7 +272,7 @@ describe("cta/pollResp", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem... le bureau de vote est fermé... désolé",
+        content:  t("errors.voteClosed"),
       },
     });
   });

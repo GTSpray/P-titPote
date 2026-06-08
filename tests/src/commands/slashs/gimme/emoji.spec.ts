@@ -27,6 +27,7 @@ import {
   stealemoji_msgLimit,
   stealemoji_msgSizeLimit,
 } from "../../../../../src/commands/slash/gimme/emoji.js";
+import { t } from "../../../../../src/i18n/index.js";
 describe("/gimme emoji", () => {
   let request: MockRequest<Request>;
   let handlerOpts: CommandHandlerOptions<gimmeEmojiCommandData>;
@@ -45,7 +46,7 @@ describe("/gimme emoji", () => {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.EPHEMERAL,
-      content: "Ahem... j'ai rien trouvé... 🤷",
+      content:  t("common.notFound"),
     },
   };
 
@@ -166,7 +167,7 @@ describe("/gimme emoji", () => {
             components: [
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
-                content: "Voilà.. ce que j'ai trouvé",
+                content:  t("common.foundIt"),
               },
               {
                 type: MessageComponentTypes.SEPARATOR,

@@ -11,6 +11,7 @@ import {
   gimmeOtterSubCommandData,
   otter,
 } from "../../../../../src/commands/slash/gimme/otter.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/gimme otter", () => {
   let handlerOpts: CommandHandlerOptions<gimmeOtterCommandData>;
@@ -46,7 +47,7 @@ describe("/gimme otter", () => {
         components: [
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
-            content: "Voilà.. ce que j'ai trouvé",
+            content:  t("common.foundIt"),
           },
           {
             type: MessageComponentTypes.SEPARATOR,

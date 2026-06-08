@@ -23,6 +23,7 @@ import {
   admin_permissions,
   default_member_permissions,
 } from "../../../../mocks/discord-api/rolePermission.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/poll create", () => {
   let guild_id: string;
@@ -142,7 +143,7 @@ describe("/poll create", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem... je ne suis pas habilité à le faire 🤷",
+        content: t("common.notAllowed"),
       },
     });
   });

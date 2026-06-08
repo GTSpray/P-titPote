@@ -20,6 +20,7 @@ import {
 } from "@mikro-orm/mariadb";
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/alias ls", () => {
   let guild_id: string;
@@ -33,7 +34,7 @@ describe("/alias ls", () => {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.EPHEMERAL,
-      content: "Ahem... j'ai rien trouvé... 🤷",
+      content:  t("common.notFound"),
     },
   };
   const subcommand: aliasLsSubCommandData = {
@@ -99,7 +100,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content:  t("common.foundIt"),
             },
             {
               type: MessageComponentTypes.SEPARATOR,
@@ -130,7 +131,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content:  t("common.foundIt"),
             },
             {
               type: MessageComponentTypes.SEPARATOR,
@@ -178,7 +179,7 @@ describe("/alias ls", () => {
           components: [
             {
               type: MessageComponentTypes.TEXT_DISPLAY,
-              content: "Voilà.. ce que j'ai trouvé",
+              content:  t("common.foundIt"),
             },
             {
               type: MessageComponentTypes.SEPARATOR,

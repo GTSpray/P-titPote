@@ -26,6 +26,7 @@ import {
 import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
 import { initORM } from "../../../../initORM.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/alias say", () => {
   let guild_id: string;
@@ -109,7 +110,9 @@ describe("/alias say", () => {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         flags: InteractionResponseFlags.EPHEMERAL,
-        content: `Ahem... il n'y pas d'alias "${aliasOpts.value}" 🤷`,
+        content: t("alias.say.notFound", {
+          alias: aliasOpts.value
+        })
       },
     });
   });
@@ -175,7 +178,7 @@ describe("/alias say", () => {
     const response = await say({ ...handlerOpts, req, res }, badsubcommand);
 
     expect(response).toMeetApiResponse(400, {
-      error: "invalid subcommand payload",
+      error: t("errors.invalidSubcommandPayload"),
       issues: expect.arrayContaining([
         {
           code,

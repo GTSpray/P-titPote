@@ -21,6 +21,7 @@ import {
 } from "discord-api-types/v10";
 import { Poll } from "../../../../src/db/entities/Poll.entity.js";
 import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
+import { t } from "../../../../src/i18n/index.js";
 
 describe("cta/pollAddQ", () => {
   let guild_id: string;
@@ -112,7 +113,7 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem...  ca fait beaucoup là. Non?",
+        content:  t("errors.tooMany"),
       },
     });
   });
@@ -125,7 +126,7 @@ describe("cta/pollAddQ", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem... tu ne peux plus modifier un vote publié",
+        content:  t("common.doNotUpdatePublishedPoll"),
       },
     });
   });

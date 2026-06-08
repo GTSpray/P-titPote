@@ -29,6 +29,7 @@ import {
   admin_permissions,
   default_member_permissions,
 } from "../../../mocks/discord-api/rolePermission.js";
+import { t } from "../../../../src/i18n/index.js";
 
 describe("cta/pollPub", () => {
   let guild_id: string;
@@ -87,7 +88,7 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem... je ne suis pas habilité à le faire 🤷",
+        content: t("common.notAllowed"),
       },
     });
   });
@@ -223,7 +224,7 @@ describe("cta/pollPub", () => {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content: "Ahem... tu ne peux plus modifier un vote publié",
+        content:  t("common.doNotUpdatePublishedPoll"),
       },
     });
   });

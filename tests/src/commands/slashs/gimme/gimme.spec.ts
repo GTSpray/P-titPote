@@ -15,6 +15,7 @@ import {
   ApplicationIntegrationType,
   PermissionFlagsBits,
 } from "discord.js";
+import { t } from "../../../../../src/i18n/index.js";
 
 describe("/gimme", () => {
   let handlerOpts: CommandHandlerOptions<gimmeDataOpts>;
@@ -22,7 +23,7 @@ describe("/gimme", () => {
   it("should declare a slash command", () => {
     const declaration = gimme.builder.setName("gimme");
     expect(declaration.toJSON()).toMatchObject({
-      description: "Récupère une image",
+      description: t("gimme.description"),
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -66,7 +67,7 @@ describe("/gimme", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "Affiche une image de loutre",
+            description: t("gimme.otter.description"),
             options: [],
           }),
         ]),
@@ -130,7 +131,10 @@ describe("/gimme", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: `Récupère les ${emojiModule.stealemoji_emojiLimit} dernières emotes dans les ${emojiModule.stealemoji_msgLimit} derniers messages de ce chan`,
+            description: t("gimme.emoji.description", {
+              emojiLimit: emojiModule.stealemoji_emojiLimit,
+              msgLimit: emojiModule.stealemoji_msgLimit
+            }),
             options: [],
           }),
         ]),
@@ -194,7 +198,7 @@ describe("/gimme", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "Affiche la version de P'titPote Bot",
+            description: t("gimme.version.description"),
             options: [],
           }),
         ]),
@@ -256,7 +260,7 @@ describe("/gimme", () => {
       const response = await gimme.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(400, {
-        error: "invalid subcommand",
+        error: t("errors.invalidSubcommand"),
         context: {
           subcommandName: data.options[0].name,
         },
@@ -323,7 +327,7 @@ describe("/gimme", () => {
         const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: "invalid command payload",
+          error: t("errors.invalidCommandPayload"),
           issues: [issue],
         });
       },
@@ -355,7 +359,7 @@ describe("/gimme", () => {
         const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: "invalid command payload",
+          error: t("errors.invalidCommandPayload"),
           issues: [issue],
         });
       },
