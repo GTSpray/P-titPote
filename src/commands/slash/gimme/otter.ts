@@ -14,9 +14,10 @@ import {
 
 import { Response } from "express";
 import { foundItComponnents } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Affiche une image de loutre")
+  .setDescription(t("gimme.otter.description"))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,

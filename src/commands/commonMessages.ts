@@ -3,6 +3,7 @@ import {
   InteractionResponseType,
   MessageComponentTypes,
 } from "discord-interactions";
+import { t } from "../i18n/index.js";
 
 export const errorPayload = (content: string) => ({
   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -12,19 +13,17 @@ export const errorPayload = (content: string) => ({
   },
 });
 
-export const notFoundPayload = () =>
-  errorPayload("ahem... j'ai rien trouvé... 🤷");
+export const notFoundPayload = () => errorPayload(t("common.notFound"));
 
-export const notAllowed = () =>
-  errorPayload("ahem... je ne suis pas habilitée à le faire 🤷");
+export const notAllowed = () => errorPayload(t("common.notAllowed"));
 
 export const doNotUpdatePublishedPoll = () =>
-  errorPayload("ahem... tu ne peux plus modifier un vote publié");
+  errorPayload(t("common.doNotUpdatePublishedPoll"));
 
 export const foundItComponnents = () => [
   {
     type: MessageComponentTypes.TEXT_DISPLAY,
-    content: "Voilà.. ce que j'ai trouvé",
+    content: t("common.foundIt"),
   },
   {
     type: MessageComponentTypes.SEPARATOR,
@@ -36,6 +35,6 @@ export const foundItComponnents = () => [
 export const okComponnents = () => [
   {
     type: MessageComponentTypes.TEXT_DISPLAY,
-    content: "Ok! C'est noté ;)",
+    content: t("common.ok"),
   },
 ];

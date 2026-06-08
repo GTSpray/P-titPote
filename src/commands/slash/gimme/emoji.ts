@@ -18,6 +18,7 @@ import { discordapi } from "../../../utils/discordapi.js";
 import { getEmojiUrl } from "../../../utils/getEmojiUrl.js";
 import { ExtractedEmoji, extractEmoji } from "../../../utils/extractEmoji.js";
 import { foundItComponnents, notFoundPayload } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 export const stealemoji_emojiLimit = 3;
 export const stealemoji_msgLimit = 10;
@@ -26,7 +27,7 @@ export const stealemoji_msgSizeLimit = 500;
 const emojiLimitPrefetch = 50;
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Affiche une image de loutre")
+  .setDescription(t("gimme.otter.description"))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -56,7 +57,7 @@ export const emoji = async ({
 }: CommandHandlerOptions<gimmeEmojiCommandData>): Promise<Response | null> => {
   const { channel } = req.body;
   if (!channel) {
-    return res.status(500).json({ error: "invalid" });
+    return res.status(500).json({ error: t("errors.invalid") });
   }
 
   const reqId = req.requestId;

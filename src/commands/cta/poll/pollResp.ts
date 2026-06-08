@@ -9,6 +9,7 @@ import { PollStep } from "../../../db/entities/PollStep.entity.js";
 import { errorPayload, notAllowed } from "../../commonMessages.js";
 import { escapeModalTitle } from "../../../utils/escapeModalTitle.js";
 import { PollResp } from "../../../db/entities/PollResp.entity.js";
+import { t } from "../../../i18n/index.js";
 
 export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -25,14 +26,12 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
       });
 
       if (!aPoll) {
-        return res.status(500).json({ error: "no Poll" });
+        return res.status(500).json({ error: t("errors.noPoll") });
       }
 
       const today = new Date();
       if (aPoll.endDate && aPoll.endDate.getTime() < today.getTime()) {
-        return res.json(
-          errorPayload("ahem... le bureau de vote est fermé... désolé"),
-        );
+        return res.json(errorPayload(t("errors.voteClosed")));
       }
 
       if (aPoll.role && !req.body.member?.roles.includes(aPoll.role)) {
@@ -71,7 +70,7 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
               sub = {
                 type: ComponentType.StringSelect,
                 custom_id: step.id,
-                placeholder: "Choisis...",
+                placeholder: t("poll.response.placeholder"),
                 options: step.choices
                   .toArray()
                   .sort((a, b) => a.order - b.order)
@@ -105,6 +104,6 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
         },
       });
     }
-    return res.status(500).json({ error: "unknown" });
+    return res.status(500).json({ error: t("errors.unknown") });
   },
 };

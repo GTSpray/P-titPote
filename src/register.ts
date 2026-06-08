@@ -3,9 +3,10 @@ import { Routes } from "discord.js";
 import { discordapi } from "./utils/discordapi.js";
 import { slashcommandsRegister } from "./commands/slash/index.js";
 import { logger } from "./logger.js";
+import { t } from "./i18n/index.js";
 
 if (!process.env.APP_ID) {
-  throw Error("no APP_ID provided in env");
+  throw Error(t("startup.noTokenEnv"));
 }
 
 logger.debug("register", { payload: slashcommandsRegister });
@@ -17,10 +18,10 @@ logger.info("register", { commands: slashcommandsRegister.map((e) => e.name) });
     await discordapi.put(Routes.applicationCommands(process.env.APP_ID), {
       body: slashcommandsRegister,
     });
-    logger.info("success");
+    logger.info(t("register.success"));
   } catch (err) {
     logger.error("register error", err);
   } finally {
-    logger.info("end process");
+    logger.info(t("register.endProcess"));
   }
 })();

@@ -12,6 +12,7 @@ import { logger } from "./logger.js";
 import { GWSEvent } from "./gateway/gatewaytypes.js";
 import { InteractionType } from "discord.js";
 import { discordapi } from "./utils/discordapi.js";
+import { t } from "./i18n/index.js";
 
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
   const { emoji, user_id } = event;
@@ -41,8 +42,8 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
       since: Date.now(),
       activities: [
         {
-          name: "🫖 Teapot Simulator",
-          state: "Autour du cou de Lila",
+          name: t("gateway.activity.name"),
+          state: t("gateway.activity.state"),
           type: ActivityType.Playing,
         },
       ],
@@ -102,8 +103,8 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
       since: Date.now(),
       activities: [
         {
-          name: "🫖 Teapot Simulator",
-          state: "Autour du cou de Lila",
+          name: t("gateway.activity.name"),
+          state: t("gateway.activity.state"),
           type: ActivityType.Playing,
         },
       ],

@@ -14,9 +14,10 @@ import { aliasLsCommandData, ls } from "./ls.js";
 import { Response } from "express";
 import { logger } from "../../../logger.js";
 import { notAllowed } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Alias un message")
+  .setDescription(t("alias.description"))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -30,35 +31,33 @@ const builder = new SlashCommandBuilder()
   .addSubcommand((subcommand) =>
     subcommand
       .setName("set")
-      .setDescription("definit un alias message")
+      .setDescription(t("alias.sub.set.description"))
       .addStringOption((opt) =>
         opt
           .setName("alias")
-          .setDescription("alias du message")
+          .setDescription(t("alias.option.alias"))
           .setRequired(true),
       )
       .addStringOption((opt) =>
         opt
           .setName("message")
-          .setDescription("contenu du message")
+          .setDescription(t("alias.option.message"))
           .setRequired(true),
       ),
   )
   .addSubcommand((subcommand) =>
     subcommand
       .setName("say")
-      .setDescription("demande a p'titpote d'envoyer le message")
+      .setDescription(t("alias.sub.say.description"))
       .addStringOption((opt) =>
         opt
           .setName("alias")
-          .setDescription("alias du message")
+          .setDescription(t("alias.option.alias"))
           .setRequired(true),
       ),
   )
   .addSubcommand((subcommand) =>
-    subcommand
-      .setName("ls")
-      .setDescription("liste les alias disponnibles sur ton serveur"),
+    subcommand.setName("ls").setDescription(t("alias.sub.ls.description")),
   );
 
 const ValidCommandPayload = z.object({
@@ -94,7 +93,9 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
     if (!command.success) {
       const issues = command.error.issues;
       logger.debug("zod errors", { issues });
-      return res.status(400).json({ error: "invalid command payload", issues });
+      return res
+        .status(400)
+        .json({ error: t("errors.invalidCommandPayload"), issues });
     }
 
     const [subcommand] = command.data.options;
@@ -111,7 +112,7 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
         break;
       default:
         result = res.status(400).json({
-          error: "invalid subcommand",
+          error: t("errors.invalidSubcommand"),
           context: {
             subcommandName: subcommand.name,
           },
@@ -122,7 +123,7 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
     return (
       result ??
       res.status(500).json({
-        error: "unmeet result",
+        error: t("errors.unmetResult"),
       })
     );
   },

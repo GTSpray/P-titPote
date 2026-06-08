@@ -10,6 +10,7 @@ import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 import { logger } from "../../../logger.js";
 import { okComponnents } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 export interface aliasSetCommandData {
   id: string;
@@ -53,7 +54,7 @@ export const set = async (
     logger.debug("zod errors", { issues });
     return res
       .status(400)
-      .json({ error: "invalid subcommand payload", issues });
+      .json({ error: t("errors.invalidSubcommandPayload"), issues });
   }
 
   if (dbServices && guildId) {

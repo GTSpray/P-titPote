@@ -10,9 +10,10 @@ import {
 import { create, pollCreateCommandData } from "./create.js";
 import { Response } from "express";
 import { logger } from "../../../logger.js";
+import { t } from "../../../i18n/index.js";
 
 const builder = new SlashCommandBuilder()
-  .setDescription("Gestion de sondage")
+  .setDescription(t("poll.description"))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -24,7 +25,7 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   )
   .addSubcommand((subcommand) =>
-    subcommand.setName("create").setDescription("créer un sondage"),
+    subcommand.setName("create").setDescription(t("poll.create.description")),
   );
 
 const ValidCommandPayload = z.object({
@@ -49,7 +50,9 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
     if (!command.success) {
       const issues = command.error.issues;
       logger.debug("zod errors", { issues });
-      return res.status(400).json({ error: "invalid command payload", issues });
+      return res
+        .status(400)
+        .json({ error: t("errors.invalidCommandPayload"), issues });
     }
 
     const [subcommand] = command.data.options;
@@ -60,7 +63,7 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
         break;
       default:
         result = res.status(400).json({
-          error: "invalid subcommand",
+          error: t("errors.invalidSubcommand"),
           context: {
             subcommandName: subcommand.name,
           },
@@ -71,7 +74,7 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
     return (
       result ??
       res.status(500).json({
-        error: "unmeet result",
+        error: t("errors.unmetResult"),
       })
     );
   },

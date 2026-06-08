@@ -9,6 +9,7 @@ import {
 import { logger } from "../../../logger.js";
 import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
 import { errorPayload } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 export interface aliasSayCommandData {
   id: string;
@@ -47,7 +48,7 @@ export const say = async (
     logger.debug("zod errors", { issues });
     return res
       .status(400)
-      .json({ error: "invalid subcommand payload", issues });
+      .json({ error: t("errors.invalidSubcommandPayload"), issues });
   }
 
   if (dbServices && guildId) {
@@ -74,7 +75,9 @@ export const say = async (
     } else {
       return res.json(
         errorPayload(
-          `ahem... il n'y pas d'alias "${AliasMessageInput.data.alias}" 🤷`,
+          t("alias.say.notFound", {
+            alias: AliasMessageInput.data.alias,
+          }),
         ),
       );
     }

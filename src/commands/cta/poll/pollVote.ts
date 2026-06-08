@@ -8,6 +8,7 @@ import {
 import { errorPayload } from "../../commonMessages.js";
 import { Poll } from "../../../db/entities/Poll.entity.js";
 import { PollResp } from "../../../db/entities/PollResp.entity.js";
+import { t } from "../../../i18n/index.js";
 
 export const pollVote: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -53,8 +54,8 @@ export const pollVote: ModalHandlerDelcaration<CTAData> = {
 
       await em.persist(resps).flush();
 
-      return res.json(errorPayload("A voté!"));
+      return res.json(errorPayload(t("poll.vote.success")));
     }
-    return res.status(500).json({ error: "unknown" });
+    return res.status(500).json({ error: t("errors.unknown") });
   },
 };

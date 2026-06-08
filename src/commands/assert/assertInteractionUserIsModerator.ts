@@ -1,4 +1,5 @@
 import { type APIBaseInteraction, type InteractionType } from "discord.js";
+import { t } from "../../i18n/index.js";
 
 type InteractionTypeOpts =
   | InteractionType.ApplicationCommand
@@ -17,7 +18,7 @@ const PERMISSIONS = {
 
 export function assertInteractionUserIsModerator(body: iModeratorBodyOpts) {
   if (!body.member || !body.member.permissions) {
-    throw Error("not server scope");
+    throw Error(t("errors.notServerScope"));
   }
   const perms = BigInt(body.member.permissions);
 
@@ -30,6 +31,6 @@ export function assertInteractionUserIsModerator(body: iModeratorBodyOpts) {
     perms & PERMISSIONS.BAN_MEMBERS;
 
   if (!isModerator) {
-    throw Error("not moderator");
+    throw Error(t("errors.notModerator"));
   }
 }

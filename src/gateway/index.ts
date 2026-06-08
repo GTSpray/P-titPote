@@ -1,9 +1,10 @@
 import "dotenv/config";
 
 import { GatewaySocket } from "./GatewaySocket.js";
+import { t } from "../i18n/index.js";
 
 if (!process.env.BOT_TOKEN) {
-  throw Error("no APP_ID provided in env");
+  throw Error(t("startup.noTokenEnv"));
 }
 
 export const gateway = new GatewaySocket(process.env.BOT_TOKEN);

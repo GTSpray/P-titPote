@@ -9,6 +9,7 @@ import {
   doNotUpdatePublishedPoll,
   errorPayload,
 } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 export const POLL_STEP_LIMIT = 4;
 export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
@@ -30,7 +31,7 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
       }
 
       if (aPoll.steps.count() >= POLL_STEP_LIMIT) {
-        return res.json(errorPayload("ahem...  ca fait beaucoup là. Non?"));
+        return res.json(errorPayload(t("errors.tooMany")));
       }
 
       return res.json({
@@ -40,11 +41,11 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
             t: "cta",
             d: { a: "pollCreate", pId: aPoll.id },
           }),
-          title: "Ajouter une question",
+          title: t("poll.modal.addQuestion.title"),
           components: [
             {
               type: ComponentType.Label,
-              label: `Question du sondage`,
+              label: t("poll.modal.label.question"),
               component: {
                 type: ComponentType.TextInput,
                 custom_id: `question`,
@@ -56,7 +57,7 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
             },
             {
               type: ComponentType.Label,
-              label: `Description`,
+              label: t("poll.modal.label.description"),
               component: {
                 type: ComponentType.TextInput,
                 custom_id: `description`,
@@ -71,6 +72,6 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
       });
     }
 
-    return res.status(500).json({ error: "unknown" });
+    return res.status(500).json({ error: t("errors.unknown") });
   },
 };

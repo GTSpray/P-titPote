@@ -19,6 +19,7 @@ import { PollChoice } from "../../../db/entities/PollChoice.entity.js";
 import { logger } from "../../../logger.js";
 import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
 import { notAllowed } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
@@ -139,7 +140,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Ajouter des choix",
+                  label: t("poll.button.addChoices"),
                   custom_id: JSON.stringify({
                     t: "cta",
                     d: {
@@ -151,7 +152,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Nouvelle question",
+                  label: t("poll.button.newQuestion"),
                   custom_id: JSON.stringify({
                     t: "cta",
                     d: {
@@ -163,7 +164,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Publier le sondage",
+                  label: t("poll.button.publish"),
                   custom_id: JSON.stringify({
                     t: "cta",
                     d: {
@@ -179,6 +180,6 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
       });
     }
 
-    return res.status(500).json({ error: "unknown" });
+    return res.status(500).json({ error: t("errors.unknown") });
   },
 };

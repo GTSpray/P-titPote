@@ -12,6 +12,7 @@ import {
 import { logger } from "./logger.js";
 import { slashcommands } from "./commands/slash/index.js";
 import { cta } from "./commands/cta/index.js";
+import { t } from "./i18n/index.js";
 
 import config from "./mikro-orm.config.js";
 import { initORM } from "./db/db.js";
@@ -96,7 +97,7 @@ app.post(
         return slashcommands[name].handler({ req, res, dbServices });
       }
       logger.error(`unknown command`, { reqId, name });
-      return res.status(400).json({ error: "unknown command" });
+      return res.status(400).json({ error: t("errors.unknownCommand") });
     }
 
     if (
@@ -124,15 +125,15 @@ app.post(
           }
         } catch (error) {
           logger.error(`unknown error`, { reqId, custom_id });
-          return res.status(500).json({ error: "unknown error" });
+          return res.status(500).json({ error: t("errors.unknownError") });
         }
       }
       logger.error(`unknown modal`, { reqId, custom_id });
-      return res.status(400).json({ error: "unknown modal" });
+      return res.status(400).json({ error: t("errors.unknownModal") });
     }
 
     logger.error(`unknown interaction type`, { reqId, type });
-    return res.status(400).json({ error: "unknown interaction type" });
+    return res.status(400).json({ error: t("errors.unknownInteractionType") });
   },
 );
 

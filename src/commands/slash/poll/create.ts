@@ -8,6 +8,7 @@ import {
 import { logger } from "../../../logger.js";
 import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
 import { notAllowed } from "../../commonMessages.js";
+import { t } from "../../../i18n/index.js";
 
 export interface pollCreateCommandData {
   id: string;
@@ -42,11 +43,11 @@ export const create = async (
           t: "cta",
           d: { a: "pollCreate" },
         }),
-        title: "Créer un sondage",
+        title: t("poll.modal.create.title"),
         components: [
           {
             type: ComponentType.Label,
-            label: `Titre du sondage`,
+            label: t("poll.modal.label.title"),
             component: {
               type: ComponentType.TextInput,
               custom_id: "title",
@@ -58,7 +59,7 @@ export const create = async (
           },
           {
             type: ComponentType.Label,
-            label: `Role des sondés`,
+            label: t("poll.modal.label.role"),
             component: {
               type: ComponentType.RoleSelect,
               custom_id: "role",
@@ -67,7 +68,7 @@ export const create = async (
           },
           {
             type: ComponentType.Label,
-            label: `Question du sondage`,
+            label: t("poll.modal.label.question"),
             component: {
               type: ComponentType.TextInput,
               custom_id: "question",
@@ -79,7 +80,7 @@ export const create = async (
           },
           {
             type: ComponentType.Label,
-            label: `Description`,
+            label: t("poll.modal.label.description"),
             component: {
               type: ComponentType.TextInput,
               custom_id: "description",
