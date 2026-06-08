@@ -1,11 +1,11 @@
-import { RequestData, RouteLike } from "discord.js";
+import { RequestData, RouteLike } from 'discord.js';
 
 export enum DiscrodRESTMockVerb {
-  get = "get",
-  delete = "delete",
-  post = "post",
-  put = "put",
-  patch = "patch",
+  get = 'get',
+  delete = 'delete',
+  post = 'post',
+  put = 'put',
+  patch = 'patch',
 }
 
 export type RESTMockRegisterOPtions = {
@@ -25,7 +25,7 @@ export class DiscrodRESTMock {
   ) {
     const key = DiscrodRESTMock.resultkey(verb, fullRoute);
     if (this.results.has(key)) {
-      throw Error("register existing result");
+      throw Error('register existing result');
     }
     this.results.set(key, result);
   }
@@ -46,7 +46,7 @@ export class DiscrodRESTMock {
   ) {
     const key = DiscrodRESTMock.resultkey(verb, fullRoute);
     if (!DiscrodRESTMock.results.has(key)) {
-      throw Error("no existing result");
+      throw Error('no existing result');
     }
     return Promise.resolve(DiscrodRESTMock.results.get(key));
   }

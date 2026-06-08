@@ -3,42 +3,42 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
-import { pollCreate } from "../../../../src/commands/cta/poll/pollCreate.js";
+} from '@mikro-orm/mariadb';
+import { pollCreate } from '../../../../src/commands/cta/poll/pollCreate.js';
 import {
   CTAData,
   ModalHandlerOptions,
-} from "../../../../src/commands/modals.js";
-import { initORM } from "../../../initORM.js";
-import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { DiscordGuild } from "../../../../src/db/entities/DiscordGuild.entity.js";
-import { expectedDiscordGuild } from "../../../epectedEntities/expectedDiscordGuild.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
+} from '../../../../src/commands/modals.js';
+import { initORM } from '../../../initORM.js';
+import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
+import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
+import { expectedDiscordGuild } from '../../../epectedEntities/expectedDiscordGuild.js';
+import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
   MessageFlags,
-} from "discord-api-types/v10";
-import { InteractionResponseFlags } from "discord-interactions";
-import { expectedPoll } from "../../../epectedEntities/expectedPoll.js";
-import { Poll } from "../../../../src/db/entities/Poll.entity.js";
+} from 'discord-api-types/v10';
+import { InteractionResponseFlags } from 'discord-interactions';
+import { expectedPoll } from '../../../epectedEntities/expectedPoll.js';
+import { Poll } from '../../../../src/db/entities/Poll.entity.js';
 import {
   getModalLabelComponnents,
   PartialComponentList,
   PartialComponentSingle,
-} from "../../../helpers/getModalLabelComponnents.js";
-import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
-import { expectedPollStep } from "../../../epectedEntities/expectedPollStep.js";
-import { PollChoice } from "../../../../src/db/entities/PollChoice.entity.js";
-import { expectedPollChoice } from "../../../epectedEntities/expectedPollChoice.js";
+} from '../../../helpers/getModalLabelComponnents.js';
+import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
+import { expectedPollStep } from '../../../epectedEntities/expectedPollStep.js';
+import { PollChoice } from '../../../../src/db/entities/PollChoice.entity.js';
+import { expectedPollChoice } from '../../../epectedEntities/expectedPollChoice.js';
 import {
   admin_permissions,
   default_member_permissions,
-} from "../../../mocks/discord-api/rolePermission.js";
-import { t } from "../../../../src/i18n/index.js";
+} from '../../../mocks/discord-api/rolePermission.js';
+import { t } from '../../../../src/i18n/index.js';
 
-describe("cta/pollCreate", () => {
+describe('cta/pollCreate', () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
@@ -46,7 +46,7 @@ describe("cta/pollCreate", () => {
   let handlerOpts: ModalHandlerOptions<any>;
   let data: CTAData;
 
-  describe("on init poll", () => {
+  describe('on init poll', () => {
     let aTitreCmp: PartialComponentSingle;
     let aQuestionCmp: PartialComponentSingle;
     let aRoleCmp: PartialComponentList;
@@ -54,25 +54,25 @@ describe("cta/pollCreate", () => {
 
     beforeEach(async () => {
       aTitreCmp = {
-        custom_id: "title",
+        custom_id: 'title',
         type: ComponentType.TextInput,
-        value: "Le titre du sondage",
+        value: 'Le titre du sondage',
       };
 
       aQuestionCmp = {
-        custom_id: "question",
+        custom_id: 'question',
         type: ComponentType.TextInput,
-        value: "La question du sondage?",
+        value: 'La question du sondage?',
       };
 
       aDescCmp = {
-        custom_id: "description",
+        custom_id: 'description',
         type: ComponentType.TextInput,
-        value: "Une description de la question",
+        value: 'Une description de la question',
       };
 
       aRoleCmp = {
-        custom_id: "role",
+        custom_id: 'role',
         type: ComponentType.RoleSelect,
         values: [randomDiscordId19()],
       };
@@ -102,7 +102,7 @@ describe("cta/pollCreate", () => {
       em = orm.em.fork();
     });
 
-    it("should save discord server", async () => {
+    it('should save discord server', async () => {
       await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -117,7 +117,7 @@ describe("cta/pollCreate", () => {
       );
     });
 
-    it("should display a temporary message indicating that the command cannot be executed if the user is not a moderator", async () => {
+    it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
       const { req, res } = getInteractionModalHttpMock({
         data,
         guild_id,
@@ -134,12 +134,12 @@ describe("cta/pollCreate", () => {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           flags: MessageFlags.Ephemeral,
-          content: t("common.notAllowed"),
+          content: t('common.notAllowed'),
         },
       });
     });
 
-    it("should save poll with role and first step with description", async () => {
+    it('should save poll with role and first step with description', async () => {
       await pollCreate.handler(handlerOpts);
       em.clear();
       const poll = await em.findOneOrFail(Poll, {
@@ -161,17 +161,17 @@ describe("cta/pollCreate", () => {
 
     it.each([
       {
-        custom_id: "role",
+        custom_id: 'role',
         type: ComponentType.RoleSelect,
-        values: [""],
+        values: [''],
       },
       {
-        custom_id: "role",
+        custom_id: 'role',
         type: ComponentType.RoleSelect,
         values: [],
       },
       undefined,
-    ])("should save poll with %o as role", async (role) => {
+    ])('should save poll with %o as role', async (role) => {
       const data = {
         components: getModalLabelComponnents(
           [aTitreCmp, role, aQuestionCmp].filter((e) => !!e),
@@ -204,7 +204,7 @@ describe("cta/pollCreate", () => {
       ]);
     });
 
-    it("should respond a ephemeral message because poll is not ready", async () => {
+    it('should respond a ephemeral message because poll is not ready', async () => {
       const response = await pollCreate.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -216,7 +216,7 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should respond a message with only title and first question as summary", async () => {
+    it('should respond a message with only title and first question as summary', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -225,16 +225,16 @@ describe("cta/pollCreate", () => {
         {
           server: { guildId: guild_id },
         },
-        { populate: ["steps"] },
+        { populate: ['steps'] },
       );
 
       const firstStep = poll.steps[0];
 
       const expectedSummary = [
         `## ${poll.title}`,
-        "",
+        '',
         `1. ${firstStep.question}`,
-      ].join("\n");
+      ].join('\n');
 
       expect(response).toMeetApiResponse(200, {
         type: expect.anything(),
@@ -246,7 +246,7 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should add ActionRow componnent to invite user to complete poll", async () => {
+    it('should add ActionRow componnent to invite user to complete poll', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -255,7 +255,7 @@ describe("cta/pollCreate", () => {
         {
           server: { guildId: guild_id },
         },
-        { populate: ["steps"] },
+        { populate: ['steps'] },
       );
 
       const firstStep = poll.steps[0];
@@ -272,11 +272,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Ajouter des choix",
+                  label: t('poll.button.addChoices'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddC",
+                      a: 'pollAddC',
                       sId: firstStep?.id,
                     },
                   }),
@@ -284,11 +284,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Nouvelle question",
+                  label: t('poll.button.newQuestion'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddQ",
+                      a: 'pollAddQ',
                       pId: poll.id,
                     },
                   }),
@@ -296,11 +296,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Publier le sondage",
+                  label: t('poll.button.publish'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollPub",
+                      a: 'pollPub',
                       pId: poll.id,
                     },
                   }),
@@ -313,7 +313,7 @@ describe("cta/pollCreate", () => {
     });
   });
 
-  describe("on pollAddQ cta", () => {
+  describe('on pollAddQ cta', () => {
     let aQuestionCmp: PartialComponentSingle;
     let aDescCmp: PartialComponentSingle;
     let existingPoll: Poll;
@@ -326,15 +326,15 @@ describe("cta/pollCreate", () => {
       guild_id = randomDiscordId19();
 
       aQuestionCmp = {
-        custom_id: "question",
+        custom_id: 'question',
         type: ComponentType.TextInput,
-        value: "Une deuxième question?",
+        value: 'Une deuxième question?',
       };
 
       aDescCmp = {
-        custom_id: "description",
+        custom_id: 'description',
         type: ComponentType.TextInput,
-        value: "Une description de la question",
+        value: 'Une description de la question',
       };
 
       const data = {
@@ -361,15 +361,15 @@ describe("cta/pollCreate", () => {
       await em.persist(aGuild).flush();
     });
 
-    it("should save new question with description", async () => {
+    it('should save new question with description', async () => {
       await pollCreate.handler(handlerOpts);
 
       em.clear();
       const pollSteps = await em.findAll(PollStep, {
         where: { poll: existingPoll.id },
-        populate: ["choices"],
+        populate: ['choices'],
         orderBy: {
-          order: "ASC",
+          order: 'ASC',
         },
       });
 
@@ -386,7 +386,7 @@ describe("cta/pollCreate", () => {
       ]);
     });
 
-    it("should respond a ephemeral message because poll is not ready", async () => {
+    it('should respond a ephemeral message because poll is not ready', async () => {
       const response = await pollCreate.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -398,7 +398,7 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should respond a message with title and two questions as summary", async () => {
+    it('should respond a message with title and two questions as summary', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -407,15 +407,15 @@ describe("cta/pollCreate", () => {
         {
           id: existingPoll.id,
         },
-        { populate: ["steps"] },
+        { populate: ['steps'] },
       );
 
       const expectedSummary = [
         `## ${poll.title}`,
-        "",
+        '',
         `1. ${poll.steps[0].question}`,
         `2. ${poll.steps[1].question}`,
-      ].join("\n");
+      ].join('\n');
 
       expect(response).toMeetApiResponse(200, {
         type: expect.anything(),
@@ -427,14 +427,14 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should add ActionRow componnent to invite user to complete poll", async () => {
+    it('should add ActionRow componnent to invite user to complete poll', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
       const pollSteps = await em.findAll(PollStep, {
         where: { poll: existingPoll.id },
         orderBy: {
-          order: "DESC",
+          order: 'DESC',
         },
       });
 
@@ -452,11 +452,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Ajouter des choix",
+                  label: t('poll.button.addChoices'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddC",
+                      a: 'pollAddC',
                       sId: lastStep?.id,
                     },
                   }),
@@ -464,11 +464,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Nouvelle question",
+                  label: t('poll.button.newQuestion'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddQ",
+                      a: 'pollAddQ',
                       pId: existingPoll.id,
                     },
                   }),
@@ -476,11 +476,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Publier le sondage",
+                  label: t('poll.button.publish'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollPub",
+                      a: 'pollPub',
                       pId: existingPoll.id,
                     },
                   }),
@@ -493,7 +493,7 @@ describe("cta/pollCreate", () => {
     });
   });
 
-  describe("on pollAddC cta", () => {
+  describe('on pollAddC cta', () => {
     let aFirstChoiceCmp: PartialComponentSingle;
     let aSecondChoiceCmp: PartialComponentSingle;
     let existingPollStep: PollStep;
@@ -505,14 +505,14 @@ describe("cta/pollCreate", () => {
       guild_id = randomDiscordId19();
 
       aFirstChoiceCmp = {
-        custom_id: "choice1",
+        custom_id: 'choice1',
         type: ComponentType.TextInput,
-        value: "Un choix 1",
+        value: 'Un choix 1',
       };
       aSecondChoiceCmp = {
-        custom_id: "choice2",
+        custom_id: 'choice2',
         type: ComponentType.TextInput,
-        value: "Un deuxieme",
+        value: 'Un deuxieme',
       };
 
       const data = {
@@ -542,14 +542,14 @@ describe("cta/pollCreate", () => {
       await em.persist(aGuild).flush();
     });
 
-    it("should save new question choice", async () => {
+    it('should save new question choice', async () => {
       await pollCreate.handler(handlerOpts);
 
       em.clear();
       const choices = await em.findAll(PollChoice, {
         where: { pollstep: existingPollStep.id },
         orderBy: {
-          order: "ASC",
+          order: 'ASC',
         },
       });
 
@@ -565,7 +565,7 @@ describe("cta/pollCreate", () => {
       ]);
     });
 
-    it("should respond a ephemeral message because poll is not ready", async () => {
+    it('should respond a ephemeral message because poll is not ready', async () => {
       const response = await pollCreate.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
@@ -577,7 +577,7 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should respond a message with title and two questions as summary", async () => {
+    it('should respond a message with title and two questions as summary', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
@@ -586,16 +586,16 @@ describe("cta/pollCreate", () => {
         {
           id: existingPollStep.poll.id,
         },
-        { populate: ["steps"] },
+        { populate: ['steps'] },
       );
 
       const expectedSummary = [
         `## ${poll.title}`,
-        "",
+        '',
         `1. ${poll.steps[0].question}`,
         `    - ${aFirstChoiceCmp.value}`,
         `    - ${aSecondChoiceCmp.value}`,
-      ].join("\n");
+      ].join('\n');
 
       expect(response).toMeetApiResponse(200, {
         type: expect.anything(),
@@ -607,14 +607,14 @@ describe("cta/pollCreate", () => {
       });
     });
 
-    it("should add ActionRow componnent to invite user to complete poll", async () => {
+    it('should add ActionRow componnent to invite user to complete poll', async () => {
       const response = await pollCreate.handler(handlerOpts);
 
       em.clear();
       const pollSteps = await em.findAll(PollStep, {
         where: { poll: existingPollStep.poll.id },
         orderBy: {
-          order: "DESC",
+          order: 'DESC',
         },
       });
 
@@ -632,11 +632,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Ajouter des choix",
+                  label: t('poll.button.addChoices'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddC",
+                      a: 'pollAddC',
                       sId: lastStep?.id,
                     },
                   }),
@@ -644,11 +644,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Nouvelle question",
+                  label: t('poll.button.newQuestion'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddQ",
+                      a: 'pollAddQ',
                       pId: existingPollStep.poll.id,
                     },
                   }),
@@ -656,11 +656,11 @@ describe("cta/pollCreate", () => {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: "Publier le sondage",
+                  label: t('poll.button.publish'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollPub",
+                      a: 'pollPub',
                       pId: existingPollStep.poll.id,
                     },
                   }),

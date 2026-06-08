@@ -1,22 +1,22 @@
-import { SlashCommandBuilder } from "discord.js";
-import { slashcommands } from "../../../src/commands/slash/index.js";
+import { SlashCommandBuilder } from 'discord.js';
+import { slashcommands } from '../../../src/commands/slash/index.js';
 
-describe("slashcommands", () => {
+describe('slashcommands', () => {
   const commands = Object.keys(slashcommands);
-  describe.each(commands)("/%s command", (commandname) => {
+  describe.each(commands)('/%s command', (commandname) => {
     const commanddéfinition = slashcommands[commandname];
-    it("should have a command builder", () => {
+    it('should have a command builder', () => {
       expect(commanddéfinition).toMatchObject({
         builder: expect.any(SlashCommandBuilder),
         handler: expect.any(Function),
       });
     });
 
-    it("should have 1-32 character name", () => {
+    it('should have 1-32 character name', () => {
       expect(commandname).toMatch(/^[a-z]{1,32}$/);
     });
 
-    it("should have 1-100 character description", () => {
+    it('should have 1-100 character description', () => {
       const desc = commanddéfinition.builder.description;
       expect(desc.length).toBeWithin(1, 100);
     });

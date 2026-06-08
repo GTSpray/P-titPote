@@ -1,6 +1,6 @@
-import { APIMessage, MessageType } from "discord.js";
-import { BitFieldFlag, getRandomString, randomDiscordId19 } from "./utils.js";
-import { getApiUserData } from "./getApiUserData.js";
+import { APIMessage, MessageType } from 'discord.js';
+import { BitFieldFlag, getRandomString, randomDiscordId19 } from './utils.js';
+import { getApiUserData } from './getApiUserData.js';
 
 export const getApiMessageData = (
   options: Partial<APIMessage> = {},
@@ -12,7 +12,7 @@ export const getApiMessageData = (
     mention_roles: [],
     attachments: [],
     embeds: [],
-    timestamp: "2025-09-01T15:35:01.588000+00:00",
+    timestamp: '2025-09-01T15:35:01.588000+00:00',
     edited_timestamp: null,
     flags: <BitFieldFlag>0,
     components: [],

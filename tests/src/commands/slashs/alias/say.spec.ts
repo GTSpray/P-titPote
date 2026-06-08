@@ -2,44 +2,44 @@ import {
   aliasSayCommandData,
   aliasSaySubCommandData,
   say,
-} from "../../../../../src/commands/slash/alias/say.js";
+} from '../../../../../src/commands/slash/alias/say.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+} from 'discord-interactions';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import {
   getRandomString,
   randomDiscordId19,
-} from "../../../../mocks/discord-api/utils.js";
+} from '../../../../mocks/discord-api/utils.js';
 import {
   CommandHandlerOptions,
   SubCommandOption,
-} from "../../../../../src/commands/commands.js";
+} from '../../../../../src/commands/commands.js';
 import {
   SqlEntityManager,
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
-import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
-import { initORM } from "../../../../initORM.js";
-import { t } from "../../../../../src/i18n/index.js";
+} from '@mikro-orm/mariadb';
+import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from '../../../../../src/db/entities/MessageAliased.entity.js';
+import { initORM } from '../../../../initORM.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/alias say", () => {
+describe('/alias say', () => {
   let guild_id: string;
   let handlerOpts: CommandHandlerOptions<aliasSayCommandData>;
 
-  const aliasOpts: SubCommandOption<"alias", string> = {
-    name: "alias",
+  const aliasOpts: SubCommandOption<'alias', string> = {
+    name: 'alias',
     type: 3,
-    value: "welcome",
+    value: 'welcome',
   };
 
   const subcommand: aliasSaySubCommandData = {
-    name: "say",
+    name: 'say',
     options: [aliasOpts],
     type: 1,
   };
@@ -52,7 +52,7 @@ describe("/alias say", () => {
   beforeEach(async () => {
     const data: aliasSayCommandData = {
       id: randomDiscordId19(),
-      name: "alias",
+      name: 'alias',
       options: [subcommand],
       type: 1,
     };
@@ -71,13 +71,13 @@ describe("/alias say", () => {
     const guild = new DiscordGuild(guild_id);
     messageAliased = new MessageAliased(
       aliasOpts.value,
-      "an example of aliased message content",
+      'an example of aliased message content',
     );
     guild.messageAliaseds.add(messageAliased);
     await em.persist(guild).persist(messageAliased).flush();
   });
 
-  it("should respond with aliased message content", async () => {
+  it('should respond with aliased message content', async () => {
     const response = await say(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
@@ -94,12 +94,12 @@ describe("/alias say", () => {
     });
   });
 
-  it("should not respond with aliased message content of another guild", async () => {
+  it('should not respond with aliased message content of another guild', async () => {
     const { req, res } = getInteractionCommandHttpMock({
       guild_id: randomDiscordId19(),
       data: <aliasSayCommandData>{
         id: randomDiscordId19(),
-        name: "alias",
+        name: 'alias',
         options: [subcommand],
         type: 1,
       },
@@ -110,55 +110,55 @@ describe("/alias say", () => {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         flags: InteractionResponseFlags.EPHEMERAL,
-        content: t("alias.say.notFound", {
-          alias: aliasOpts.value
-        })
+        content: t('alias.say.notFound', {
+          alias: aliasOpts.value,
+        }),
       },
     });
   });
 
   it.each([
     [
-      "too_small",
+      'too_small',
       {
         inclusive: true,
-        message: "Too small: expected string to have >=1 characters",
+        message: 'Too small: expected string to have >=1 characters',
         minimum: 1,
-        origin: "string",
-        path: ["alias"],
+        origin: 'string',
+        path: ['alias'],
       },
-      "",
+      '',
     ],
     [
-      "invalid_format",
+      'invalid_format',
       {
-        format: "regex",
-        message: "Invalid string: must match pattern /^[a-z0-9]+$/",
-        origin: "string",
-        path: ["alias"],
-        pattern: "/^[a-z0-9]+$/",
+        format: 'regex',
+        message: 'Invalid string: must match pattern /^[a-z0-9]+$/',
+        origin: 'string',
+        path: ['alias'],
+        pattern: '/^[a-z0-9]+$/',
       },
-      "#@!ù",
+      '#@!ù',
     ],
 
     [
-      "too_big",
+      'too_big',
       {
         inclusive: true,
         maximum: 50,
-        message: "Too big: expected string to have <=50 characters",
-        origin: "string",
-        path: ["alias"],
+        message: 'Too big: expected string to have <=50 characters',
+        origin: 'string',
+        path: ['alias'],
       },
 
       getRandomString({ length: 51, letter: true, number: false }),
     ],
   ])('should respond error on %s "alias"', async (code, issue, badAlias) => {
     const badsubcommand: aliasSaySubCommandData = {
-      name: "say",
+      name: 'say',
       options: [
         {
-          name: "alias",
+          name: 'alias',
           type: 3,
           value: badAlias,
         },
@@ -169,7 +169,7 @@ describe("/alias say", () => {
     const { req, res } = getInteractionCommandHttpMock<aliasSayCommandData>({
       data: {
         id: randomDiscordId19(),
-        name: "alias",
+        name: 'alias',
         options: [badsubcommand],
         type: 1,
       },
@@ -178,7 +178,7 @@ describe("/alias say", () => {
     const response = await say({ ...handlerOpts, req, res }, badsubcommand);
 
     expect(response).toMeetApiResponse(400, {
-      error: t("errors.invalidSubcommandPayload"),
+      error: t('errors.invalidSubcommandPayload'),
       issues: expect.arrayContaining([
         {
           code,

@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { gateway } from "./gateway/index.js";
+import 'dotenv/config';
+import { gateway } from './gateway/index.js';
 import {
   ActivityType,
   GatewayDispatchEvents,
@@ -7,32 +7,32 @@ import {
   GatewayUpdatePresence,
   PresenceUpdateStatus,
   Routes,
-} from "discord.js";
-import { logger } from "./logger.js";
-import { GWSEvent } from "./gateway/gatewaytypes.js";
-import { InteractionType } from "discord.js";
-import { discordapi } from "./utils/discordapi.js";
-import { t } from "./i18n/index.js";
+} from 'discord.js';
+import { logger } from './logger.js';
+import { GWSEvent } from './gateway/gatewaytypes.js';
+import { InteractionType } from 'discord.js';
+import { discordapi } from './utils/discordapi.js';
+import { t } from './i18n/index.js';
 
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
   const { emoji, user_id } = event;
-  logger.info("emoji recat", { user_id, emoji });
+  logger.info('emoji recat', { user_id, emoji });
 });
 
 gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
-  logger.debug("gateway", { shard, debugmsg, meta });
+  logger.debug('gateway', { shard, debugmsg, meta });
 });
 
 gateway.on(GWSEvent.Payload, (shard, meta) => {
-  logger.debug("gateway payload", { shard, meta });
+  logger.debug('gateway payload', { shard, meta });
 });
 
 gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
-  logger.info("gateway guild_create", { shard, event });
+  logger.info('gateway guild_create', { shard, event });
 });
 
 gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
-  logger.info("gateway guild_delete", { shard, event });
+  logger.info('gateway guild_delete', { shard, event });
 });
 
 gateway.on(GatewayDispatchEvents.Ready, () => {
@@ -42,8 +42,8 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
       since: Date.now(),
       activities: [
         {
-          name: t("gateway.activity.name"),
-          state: t("gateway.activity.state"),
+          name: t('gateway.activity.name'),
+          state: t('gateway.activity.state'),
           type: ActivityType.Playing,
         },
       ],
@@ -54,28 +54,28 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
   gateway.send(data);
 });
 gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
-  logger.debug("gateway", { shard, debugmsg, meta });
+  logger.debug('gateway', { shard, debugmsg, meta });
 });
 
 gateway.on(GWSEvent.Payload, (shard, meta) => {
-  logger.debug("gateway payload", { shard, meta });
+  logger.debug('gateway payload', { shard, meta });
 });
 
 gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
-  logger.info("gateway guild_create", { shard, event });
+  logger.info('gateway guild_create', { shard, event });
 });
 
 gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
-  logger.info("gateway guild_delete", { shard, event });
+  logger.info('gateway guild_delete', { shard, event });
 });
 
 gateway.on(GatewayDispatchEvents.MessageCreate, async ({ event }) => {
   const metadata = event.interaction_metadata;
   if (metadata?.type === InteractionType.ApplicationCommand) {
     const name = (metadata as any).name;
-    if (name === "poll c") {
+    if (name === 'poll c') {
       await discordapi.put(
-        Routes.channelMessageOwnReaction(event.channel_id, event.id, "✉️"),
+        Routes.channelMessageOwnReaction(event.channel_id, event.id, '✉️'),
       );
     }
   }
@@ -83,7 +83,7 @@ gateway.on(GatewayDispatchEvents.MessageCreate, async ({ event }) => {
 
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, async ({ event }) => {
   if (event.member?.user.id !== process.env.APP_ID) {
-    if (event.emoji.name === "✉️") {
+    if (event.emoji.name === '✉️') {
       await discordapi.delete(
         Routes.channelMessageUserReaction(
           event.channel_id,
@@ -103,8 +103,8 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
       since: Date.now(),
       activities: [
         {
-          name: t("gateway.activity.name"),
-          state: t("gateway.activity.state"),
+          name: t('gateway.activity.name'),
+          state: t('gateway.activity.state'),
           type: ActivityType.Playing,
         },
       ],
@@ -118,8 +118,8 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
 gateway
   .connect()
   .then(() => {
-    logger.debug("gateway connected");
+    logger.debug('gateway connected');
   })
   .catch((err) => {
-    logger.error("gateway error", { err });
+    logger.error('gateway error', { err });
   });

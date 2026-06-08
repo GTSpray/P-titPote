@@ -1,5 +1,5 @@
-import { DiscordGuild } from "../../src/db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../../src/db/entities/MessageAliased.entity.js";
+import { DiscordGuild } from '../../src/db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from '../../src/db/entities/MessageAliased.entity.js';
 
 export const expectedMessageAliased = (
   opts: Partial<MessageAliased>,

@@ -1,17 +1,17 @@
-import { EntityBase } from "../EntityBase.js";
+import { EntityBase } from '../EntityBase.js';
 import {
   Entity,
   ManyToOne,
   Property,
   Unique,
-} from "@mikro-orm/decorators/legacy";
-import { type Rel } from "@mikro-orm/core";
-import { PollStep } from "./PollStep.entity.js";
-import { PollChoice } from "./PollChoice.entity.js";
+} from '@mikro-orm/decorators/legacy';
+import { type Rel } from '@mikro-orm/core';
+import { PollStep } from './PollStep.entity.js';
+import { PollChoice } from './PollChoice.entity.js';
 
 @Entity()
 @Unique({
-  properties: ["memberId", "pollStep", "deletedAt"],
+  properties: ['memberId', 'pollStep', 'deletedAt'],
 })
 export class PollResp extends EntityBase {
   constructor(memberId: string, step: PollStep) {
@@ -20,7 +20,7 @@ export class PollResp extends EntityBase {
     this.pollStep = step;
   }
 
-  @Property({ type: "varchar", length: 25 })
+  @Property({ type: 'varchar', length: 25 })
   memberId: string;
 
   @ManyToOne(() => PollStep)
@@ -29,6 +29,6 @@ export class PollResp extends EntityBase {
   @ManyToOne(() => PollChoice, { nullable: true })
   pollChoice?: Rel<PollChoice> | null;
 
-  @Property({ type: "varchar", length: 400, nullable: true })
+  @Property({ type: 'varchar', length: 400, nullable: true })
   content?: string | null;
 }

@@ -1,19 +1,19 @@
-import * as z from "zod";
+import * as z from 'zod';
 
-import { type SlashCommandDeclaration } from "../../commands.js";
+import { type SlashCommandDeclaration } from '../../commands.js';
 import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
   SlashCommandBuilder,
-} from "discord.js";
-import { create, pollCreateCommandData } from "./create.js";
-import { Response } from "express";
-import { logger } from "../../../logger.js";
-import { t } from "../../../i18n/index.js";
+} from 'discord.js';
+import { create, pollCreateCommandData } from './create.js';
+import { Response } from 'express';
+import { logger } from '../../../logger.js';
+import { t } from '../../../i18n/index.js';
 
 const builder = new SlashCommandBuilder()
-  .setDescription(t("poll.description"))
+  .setDescription(t('poll.description'))
   .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
   .setContexts(
     InteractionContextType.BotDM,
@@ -25,7 +25,7 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   )
   .addSubcommand((subcommand) =>
-    subcommand.setName("create").setDescription(t("poll.create.description")),
+    subcommand.setName('create').setDescription(t('poll.create.description')),
   );
 
 const ValidCommandPayload = z.object({
@@ -49,21 +49,21 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
 
     if (!command.success) {
       const issues = command.error.issues;
-      logger.debug("zod errors", { issues });
+      logger.debug('zod errors', { issues });
       return res
         .status(400)
-        .json({ error: t("errors.invalidCommandPayload"), issues });
+        .json({ error: t('errors.invalidCommandPayload'), issues });
     }
 
     const [subcommand] = command.data.options;
     let result: Response | null;
     switch (subcommand.name) {
-      case "create":
+      case 'create':
         result = await create(<any>handlerOpts, <any>req.body.data?.options[0]);
         break;
       default:
         result = res.status(400).json({
-          error: t("errors.invalidSubcommand"),
+          error: t('errors.invalidSubcommand'),
           context: {
             subcommandName: subcommand.name,
           },
@@ -74,7 +74,7 @@ export const poll: SlashCommandDeclaration<pollDataOpts> = {
     return (
       result ??
       res.status(500).json({
-        error: t("errors.unmetResult"),
+        error: t('errors.unmetResult'),
       })
     );
   },

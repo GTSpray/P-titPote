@@ -1,29 +1,29 @@
 import {
   gimme,
   type gimmeDataOpts,
-} from "../../../../../src/commands/slash/gimme/index.js";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
-import * as otterModule from "../../../../../src/commands/slash/gimme/otter.js";
-import * as emojiModule from "../../../../../src/commands/slash/gimme/emoji.js";
-import * as versionModule from "../../../../../src/commands/slash/gimme/version.js";
-import { DBServices } from "../../../../../src/db/db.js";
-import { initORM } from "../../../../initORM.js";
+} from '../../../../../src/commands/slash/gimme/index.js';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import * as otterModule from '../../../../../src/commands/slash/gimme/otter.js';
+import * as emojiModule from '../../../../../src/commands/slash/gimme/emoji.js';
+import * as versionModule from '../../../../../src/commands/slash/gimme/version.js';
+import { DBServices } from '../../../../../src/db/db.js';
+import { initORM } from '../../../../initORM.js';
 import {
   InteractionContextType,
   ApplicationIntegrationType,
   PermissionFlagsBits,
-} from "discord.js";
-import { t } from "../../../../../src/i18n/index.js";
+} from 'discord.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/gimme", () => {
+describe('/gimme', () => {
   let handlerOpts: CommandHandlerOptions<gimmeDataOpts>;
 
-  it("should declare a slash command", () => {
-    const declaration = gimme.builder.setName("gimme");
+  it('should declare a slash command', () => {
+    const declaration = gimme.builder.setName('gimme');
     expect(declaration.toJSON()).toMatchObject({
-      description: t("gimme.description"),
+      description: t('gimme.description'),
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -39,14 +39,14 @@ describe("/gimme", () => {
     });
   });
 
-  describe("otter subcommand", () => {
+  describe('otter subcommand', () => {
     const subcommand: otterModule.gimmeOtterSubCommandData = {
-      name: "otter",
+      name: 'otter',
       type: 1,
     };
     const data: otterModule.gimmeOtterCommandData = {
       id: randomDiscordId19(),
-      name: "gimme",
+      name: 'gimme',
       options: [subcommand],
       type: 1,
     };
@@ -61,13 +61,13 @@ describe("/gimme", () => {
       };
     });
 
-    it("should be declared as subcommand", () => {
+    it('should be declared as subcommand', () => {
       const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: t("gimme.otter.description"),
+            description: t('gimme.otter.description'),
             options: [],
           }),
         ]),
@@ -76,12 +76,12 @@ describe("/gimme", () => {
 
     it('should call "otter" handler', async () => {
       using spy = vi
-        .spyOn(otterModule, "otter")
+        .spyOn(otterModule, 'otter')
         .mockResolvedValue(handlerOpts.res);
 
       const fakeOpts = {
         ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
       await gimme.handler(fakeOpts);
@@ -95,7 +95,7 @@ describe("/gimme", () => {
         perceval: "j'aime les fruits en sirop",
       }) as typeof handlerOpts.res;
 
-      vi.spyOn(otterModule, "otter").mockResolvedValue(fakeResp);
+      vi.spyOn(otterModule, 'otter').mockResolvedValue(fakeResp);
 
       const response = await gimme.handler(handlerOpts);
 
@@ -103,14 +103,14 @@ describe("/gimme", () => {
     });
   });
 
-  describe("emoji subcommand", () => {
+  describe('emoji subcommand', () => {
     const subcommand: emojiModule.gimmeEmojiSubCommandData = {
-      name: "emoji",
+      name: 'emoji',
       type: 1,
     };
     const data: emojiModule.gimmeEmojiCommandData = {
       id: randomDiscordId19(),
-      name: "gimme",
+      name: 'gimme',
       options: [subcommand],
       type: 1,
     };
@@ -125,15 +125,15 @@ describe("/gimme", () => {
       };
     });
 
-    it("should be declared as subcommand", () => {
+    it('should be declared as subcommand', () => {
       const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: t("gimme.emoji.description", {
+            description: t('gimme.emoji.description', {
               emojiLimit: emojiModule.stealemoji_emojiLimit,
-              msgLimit: emojiModule.stealemoji_msgLimit
+              msgLimit: emojiModule.stealemoji_msgLimit,
             }),
             options: [],
           }),
@@ -143,12 +143,12 @@ describe("/gimme", () => {
 
     it('should call "emoji" handler', async () => {
       using spy = vi
-        .spyOn(emojiModule, "emoji")
+        .spyOn(emojiModule, 'emoji')
         .mockResolvedValue(handlerOpts.res);
 
       const fakeOpts = {
         ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
       await gimme.handler(fakeOpts);
@@ -162,7 +162,7 @@ describe("/gimme", () => {
         perceval: "j'aime les fruits en sirop",
       }) as typeof handlerOpts.res;
 
-      vi.spyOn(emojiModule, "emoji").mockResolvedValue(fakeResp);
+      vi.spyOn(emojiModule, 'emoji').mockResolvedValue(fakeResp);
 
       const response = await gimme.handler(handlerOpts);
 
@@ -170,14 +170,14 @@ describe("/gimme", () => {
     });
   });
 
-  describe("version subcommand", () => {
+  describe('version subcommand', () => {
     const subcommand: versionModule.gimmeVersionSubCommandData = {
-      name: "version",
+      name: 'version',
       type: 1,
     };
     const data: emojiModule.gimmeEmojiCommandData = {
       id: randomDiscordId19(),
-      name: "gimme",
+      name: 'gimme',
       options: [subcommand],
       type: 1,
     };
@@ -192,13 +192,13 @@ describe("/gimme", () => {
       };
     });
 
-    it("should be declared as subcommand", () => {
+    it('should be declared as subcommand', () => {
       const declaration = gimme.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: t("gimme.version.description"),
+            description: t('gimme.version.description'),
             options: [],
           }),
         ]),
@@ -207,12 +207,12 @@ describe("/gimme", () => {
 
     it('should call "version" handler', async () => {
       using spy = vi
-        .spyOn(versionModule, "version")
+        .spyOn(versionModule, 'version')
         .mockResolvedValue(handlerOpts.res);
 
       const fakeOpts = {
         ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
       await gimme.handler(fakeOpts);
@@ -226,7 +226,7 @@ describe("/gimme", () => {
         perceval: "j'aime les fruits en sirop",
       }) as typeof handlerOpts.res;
 
-      vi.spyOn(versionModule, "version").mockResolvedValue(fakeResp);
+      vi.spyOn(versionModule, 'version').mockResolvedValue(fakeResp);
 
       const response = await gimme.handler(handlerOpts);
 
@@ -234,13 +234,13 @@ describe("/gimme", () => {
     });
   });
 
-  describe("on invalid subcommand option", () => {
+  describe('on invalid subcommand option', () => {
     const data = {
       id: randomDiscordId19(),
-      name: "gimme",
+      name: 'gimme',
       options: [
         {
-          name: "unexistingsubcommand",
+          name: 'unexistingsubcommand',
         },
       ],
       type: 1,
@@ -256,11 +256,11 @@ describe("/gimme", () => {
       };
     });
 
-    it("should return invalid subcommand result", async () => {
+    it('should return invalid subcommand result', async () => {
       const response = await gimme.handler(handlerOpts);
 
       expect(response).toMeetApiResponse(400, {
-        error: t("errors.invalidSubcommand"),
+        error: t('errors.invalidSubcommand'),
         context: {
           subcommandName: data.options[0].name,
         },
@@ -268,15 +268,15 @@ describe("/gimme", () => {
     });
   });
 
-  describe("on invalid command option", () => {
+  describe('on invalid command option', () => {
     let dbServices: DBServices;
     gimme;
     const validdata = {
       id: randomDiscordId19(),
-      name: "gimme",
+      name: 'gimme',
       options: [
         {
-          name: "validsubcommandname",
+          name: 'validsubcommandname',
         },
       ],
       type: 1,
@@ -288,12 +288,12 @@ describe("/gimme", () => {
 
     it.each([
       [
-        "invalid_type",
+        'invalid_type',
         {
-          code: "invalid_type",
-          expected: "array",
-          message: "Invalid input: expected array, received undefined",
-          path: ["options"],
+          code: 'invalid_type',
+          expected: 'array',
+          message: 'Invalid input: expected array, received undefined',
+          path: ['options'],
         },
         {
           ...validdata,
@@ -301,14 +301,14 @@ describe("/gimme", () => {
         },
       ],
       [
-        "too_small",
+        'too_small',
         {
-          code: "too_small",
+          code: 'too_small',
           inclusive: true,
-          message: "Too small: expected array to have >=1 items",
+          message: 'Too small: expected array to have >=1 items',
           minimum: 1,
-          origin: "array",
-          path: ["options"],
+          origin: 'array',
+          path: ['options'],
         },
         {
           ...validdata,
@@ -316,7 +316,7 @@ describe("/gimme", () => {
         },
       ],
     ])(
-      "should return invalid command result when %s options",
+      'should return invalid command result when %s options',
       async (_code, issue, data) => {
         const { req, res } = getInteractionCommandHttpMock({
           data,
@@ -327,7 +327,7 @@ describe("/gimme", () => {
         const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: t("errors.invalidCommandPayload"),
+          error: t('errors.invalidCommandPayload'),
           issues: [issue],
         });
       },
@@ -335,12 +335,12 @@ describe("/gimme", () => {
 
     it.each([
       [
-        "invalid_type",
+        'invalid_type',
         {
-          code: "invalid_type",
-          expected: "string",
-          message: "Invalid input: expected string, received undefined",
-          path: ["name"],
+          code: 'invalid_type',
+          expected: 'string',
+          message: 'Invalid input: expected string, received undefined',
+          path: ['name'],
         },
         {
           ...validdata,
@@ -348,7 +348,7 @@ describe("/gimme", () => {
         },
       ],
     ])(
-      "should return invalid command result when %s name",
+      'should return invalid command result when %s name',
       async (_code, issue, data) => {
         const { req, res } = getInteractionCommandHttpMock({
           data,
@@ -359,7 +359,7 @@ describe("/gimme", () => {
         const response = await gimme.handler(handlerOpts);
 
         expect(response).toMeetApiResponse(400, {
-          error: t("errors.invalidCommandPayload"),
+          error: t('errors.invalidCommandPayload'),
           issues: [issue],
         });
       },

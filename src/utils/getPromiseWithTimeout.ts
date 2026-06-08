@@ -10,7 +10,7 @@ export const getPromiseWithTimeout = <T extends unknown>(
     let expired = false;
     const timer = setTimeout(() => {
       expired = true;
-      reject(new Error(`${message.replace("%t", `${timeout}`)}`));
+      reject(new Error(`${message.replace('%t', `${timeout}`)}`));
     }, timeout);
 
     const rej = (reason: unknown) => {

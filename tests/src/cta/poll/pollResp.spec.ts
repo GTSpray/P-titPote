@@ -3,29 +3,29 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-} from "@mikro-orm/mariadb";
-import { pollResp } from "../../../../src/commands/cta/poll/pollResp.js";
+} from '@mikro-orm/mariadb';
+import { pollResp } from '../../../../src/commands/cta/poll/pollResp.js';
 import {
   ModalHandlerOptions,
   CTAData,
-} from "../../../../src/commands/modals.js";
-import { initORM } from "../../../initORM.js";
-import { getInteractionModalHttpMock } from "../../../mocks/getInteractionHttpMock.js";
-import { DiscordGuild } from "../../../../src/db/entities/DiscordGuild.entity.js";
-import { randomDiscordId19 } from "../../../mocks/discord-api/utils.js";
+} from '../../../../src/commands/modals.js';
+import { initORM } from '../../../initORM.js';
+import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
+import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
+import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
   TextInputStyle,
-} from "discord-api-types/v10";
-import { Poll } from "../../../../src/db/entities/Poll.entity.js";
-import { PollStep } from "../../../../src/db/entities/PollStep.entity.js";
-import { PollChoice } from "../../../../src/db/entities/PollChoice.entity.js";
-import { PollResp } from "../../../../src/db/entities/PollResp.entity.js";
-import { t } from "../../../../src/i18n/index.js";
+} from 'discord-api-types/v10';
+import { Poll } from '../../../../src/db/entities/Poll.entity.js';
+import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
+import { PollChoice } from '../../../../src/db/entities/PollChoice.entity.js';
+import { PollResp } from '../../../../src/db/entities/PollResp.entity.js';
+import { t } from '../../../../src/i18n/index.js';
 
-describe("cta/pollResp", () => {
+describe('cta/pollResp', () => {
   let guild_id: string;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
@@ -61,15 +61,15 @@ describe("cta/pollResp", () => {
     await em.persist(aGuild).flush();
   });
 
-  it("should respond a modal with poll form", async () => {
+  it('should respond a modal with poll form', async () => {
     const response = await pollResp.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
-          t: "cta",
+          t: 'cta',
           d: {
-            a: "pollVote",
+            a: 'pollVote',
             pId: aPoll.id,
           },
         }),
@@ -79,7 +79,7 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it("should handle non-multiple-choice questions", async () => {
+  it('should handle non-multiple-choice questions', async () => {
     const response = await pollResp.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
@@ -104,8 +104,8 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it("should handle non-multiple-choice questions with description", async () => {
-    firstStep.description = "a description";
+  it('should handle non-multiple-choice questions with description', async () => {
+    firstStep.description = 'a description';
     await em.persist(firstStep).flush();
 
     const response = await pollResp.handler(handlerOpts);
@@ -133,12 +133,12 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it("should handle a multiple-choice question", async () => {
+  it('should handle a multiple-choice question', async () => {
     const allChoices = [
-      new PollChoice("A first choice?", 0),
-      new PollChoice("A second choice?", 1),
-      new PollChoice("A third choice?", 2),
-      new PollChoice("A fourth choice?", 3),
+      new PollChoice('A first choice?', 0),
+      new PollChoice('A second choice?', 1),
+      new PollChoice('A third choice?', 2),
+      new PollChoice('A fourth choice?', 3),
     ];
 
     firstStep.choices.add(allChoices);
@@ -157,10 +157,10 @@ describe("cta/pollResp", () => {
             component: {
               type: ComponentType.StringSelect,
               custom_id: firstStep.id,
-              placeholder: "Choisis...",
+              placeholder: t('poll.response.placeholder'),
               options: allChoices.map((e) => ({
                 emoji: {
-                  name: "▪️",
+                  name: '▪️',
                 },
                 default: false,
                 label: e.label,
@@ -173,23 +173,23 @@ describe("cta/pollResp", () => {
     });
   });
 
-  describe("when the voting form contains more than 5 questions", () => {
+  describe('when the voting form contains more than 5 questions', () => {
     let allSteps: PollStep[];
     beforeEach(async () => {
       allSteps = [
         firstStep,
-        new PollStep("A second question?", 1),
-        new PollStep("A third question?", 2),
-        new PollStep("A fourth question?", 3),
-        new PollStep("A fifth question?", 4),
-        new PollStep("A sixth question?", 5),
-        new PollStep("A  seventh step", 6),
+        new PollStep('A second question?', 1),
+        new PollStep('A third question?', 2),
+        new PollStep('A fourth question?', 3),
+        new PollStep('A fifth question?', 4),
+        new PollStep('A sixth question?', 5),
+        new PollStep('A  seventh step', 6),
       ];
       aPoll.steps.add(allSteps);
       await em.persist(aPoll).flush();
     });
 
-    it("should respond message with the first 5 steps of the poll", async () => {
+    it('should respond message with the first 5 steps of the poll', async () => {
       const response = await pollResp.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.Modal,
@@ -212,16 +212,16 @@ describe("cta/pollResp", () => {
         },
       });
     });
-    it.todo("should complete a form with the following 5 questions");
+    it.todo('should complete a form with the following 5 questions');
   });
 
-  describe("when poll had role", () => {
+  describe('when poll had role', () => {
     beforeEach(async () => {
       aPoll.role = randomDiscordId19();
       await em.persist(aPoll).flush();
     });
 
-    it("should respond with a temporary message indicating that the user is not authorized to vote if they do not have the required role", async () => {
+    it('should respond with a temporary message indicating that the user is not authorized to vote if they do not have the required role', async () => {
       const { req, res } = getInteractionModalHttpMock({
         data,
         guild_id,
@@ -233,12 +233,12 @@ describe("cta/pollResp", () => {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           flags: MessageFlags.Ephemeral,
-          content: t("common.notAllowed"),
+          content: t('common.notAllowed'),
         },
       });
     });
 
-    it("should display a modal with the poll questions when the user has the required role", async () => {
+    it('should display a modal with the poll questions when the user has the required role', async () => {
       const { req, res } = getInteractionModalHttpMock({
         data,
         guild_id,
@@ -250,9 +250,9 @@ describe("cta/pollResp", () => {
         type: InteractionResponseType.Modal,
         data: {
           custom_id: JSON.stringify({
-            t: "cta",
+            t: 'cta',
             d: {
-              a: "pollVote",
+              a: 'pollVote',
               pId: aPoll.id,
             },
           }),
@@ -263,24 +263,24 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it("should display a temporary message indicating that the user is not authorized to update the poll if it is published", async () => {
-    aPoll.publicationDate = new Date("2026-05-31T12:00:00.000Z");
-    aPoll.endDate = new Date("2026-05-31T13:00:00.000Z");
+  it('should display a temporary message indicating that the user is not authorized to update the poll if it is published', async () => {
+    aPoll.publicationDate = new Date('2026-05-31T12:00:00.000Z');
+    aPoll.endDate = new Date('2026-05-31T13:00:00.000Z');
     await em.persist(aPoll).flush();
     const response = await pollResp.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         flags: MessageFlags.Ephemeral,
-        content:  t("errors.voteClosed"),
+        content: t('errors.voteClosed'),
       },
     });
   });
 
-  it("should pre-fill the non-multiple-choice form with the saved response", async () => {
+  it('should pre-fill the non-multiple-choice form with the saved response', async () => {
     const memberId = <string>handlerOpts.req.body.member?.user.id;
     const firstResp = new PollResp(memberId, firstStep);
-    firstResp.content = "Arthur!! Interprète !! Couillère";
+    firstResp.content = 'Arthur!! Interprète !! Couillère';
     await em.persist([firstResp]).flush();
 
     const response = await pollResp.handler(handlerOpts);
@@ -308,12 +308,12 @@ describe("cta/pollResp", () => {
     });
   });
 
-  it("should pre-fill the multiple-choice form with the saved response", async () => {
+  it('should pre-fill the multiple-choice form with the saved response', async () => {
     const memberId = <string>handlerOpts.req.body.member?.user.id;
     firstStep.choices.add([
-      new PollChoice("A first choice?", 0),
-      new PollChoice("A second choice?", 1),
-      new PollChoice("A third choice?", 2),
+      new PollChoice('A first choice?', 0),
+      new PollChoice('A second choice?', 1),
+      new PollChoice('A third choice?', 2),
     ]);
     const firstResp = new PollResp(memberId, firstStep);
     firstResp.pollChoice = firstStep.choices[1];
@@ -332,7 +332,7 @@ describe("cta/pollResp", () => {
             component: {
               type: ComponentType.StringSelect,
               custom_id: firstStep.id,
-              placeholder: "Choisis...",
+              placeholder: t('poll.response.placeholder'),
               options: [
                 expect.objectContaining({
                   value: firstStep.choices[0].id,

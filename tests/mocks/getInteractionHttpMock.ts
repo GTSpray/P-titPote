@@ -3,19 +3,19 @@ import {
   createResponse,
   MockRequest,
   MockResponse,
-} from "node-mocks-http";
+} from 'node-mocks-http';
 import {
   randomDiscordId19,
   randomDiscordId16,
   getRandomString,
-} from "./discord-api/utils.js";
+} from './discord-api/utils.js';
 
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-import { APIBaseInteraction, InteractionType, Locale } from "discord.js";
-import { getAPIInteractionGuildMemberData } from "./discord-api/getAPIInteractionGuildMemberData.js";
-import { getApiUserData } from "./discord-api/getApiUserData.js";
-import { getApiChannelData } from "./discord-api/getApiChannelData.js";
+import { APIBaseInteraction, InteractionType, Locale } from 'discord.js';
+import { getAPIInteractionGuildMemberData } from './discord-api/getAPIInteractionGuildMemberData.js';
+import { getApiUserData } from './discord-api/getApiUserData.js';
+import { getApiChannelData } from './discord-api/getApiChannelData.js';
 
 type DiscordInteractionBody<
   T extends InteractionType,
@@ -42,7 +42,7 @@ const getBasicInteractionPayload = <
   guild_id = randomDiscordId19(),
   channel_id = randomDiscordId19(),
   type = InteractionType.ApplicationCommand as T,
-  permissions = "2248473465835073",
+  permissions = '2248473465835073',
   roles = [],
 }: BasicInteractionPayloadOpts<T, D>): DiscordInteractionBody<T, D> => {
   return {
@@ -67,12 +67,12 @@ const getBasicInteractionPayload = <
     guild_id: guild_id,
     guild_locale: Locale.EnglishUS,
     id: randomDiscordId19(),
-    locale: "us" as Locale,
+    locale: 'us' as Locale,
     member: getAPIInteractionGuildMemberData({
-      nick: "a random nick",
+      nick: 'a random nick',
       user: getApiUserData({
-        username: "a random user name",
-        global_name: "a random global name",
+        username: 'a random user name',
+        global_name: 'a random global name',
       }),
       roles,
       permissions,
@@ -110,8 +110,8 @@ export const getInteractionCommandHttpMock = <D extends object>(
 } => ({
   res: createResponse(),
   req: createRequest({
-    method: "POST",
-    url: "/interactions",
+    method: 'POST',
+    url: '/interactions',
     body: <D>getBasicInteractionPayload({
       ...opts,
       type: InteractionType.ApplicationCommand,
@@ -135,8 +135,8 @@ export const getInteractionModalHttpMock = <D extends object>(
 } => ({
   res: createResponse(),
   req: createRequest({
-    method: "POST",
-    url: "/interactions",
+    method: 'POST',
+    url: '/interactions',
     body: <D>getBasicInteractionPayload({
       ...opts,
       type: InteractionType.ModalSubmit,

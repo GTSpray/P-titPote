@@ -2,8 +2,8 @@ import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { t } from "../i18n/index.js";
+} from 'discord-interactions';
+import { t } from '../i18n/index.js';
 
 export const errorPayload = (content: string) => ({
   type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -13,17 +13,17 @@ export const errorPayload = (content: string) => ({
   },
 });
 
-export const notFoundPayload = () => errorPayload(t("common.notFound"));
+export const notFoundPayload = () => errorPayload(t('common.notFound'));
 
-export const notAllowed = () => errorPayload(t("common.notAllowed"));
+export const notAllowed = () => errorPayload(t('common.notAllowed'));
 
 export const doNotUpdatePublishedPoll = () =>
-  errorPayload(t("common.doNotUpdatePublishedPoll"));
+  errorPayload(t('common.doNotUpdatePublishedPoll'));
 
 export const foundItComponnents = () => [
   {
     type: MessageComponentTypes.TEXT_DISPLAY,
-    content: t("common.foundIt"),
+    content: t('common.foundIt'),
   },
   {
     type: MessageComponentTypes.SEPARATOR,
@@ -35,6 +35,6 @@ export const foundItComponnents = () => [
 export const okComponnents = () => [
   {
     type: MessageComponentTypes.TEXT_DISPLAY,
-    content: t("common.ok"),
+    content: t('common.ok'),
   },
 ];

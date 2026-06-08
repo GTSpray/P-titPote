@@ -1,7 +1,7 @@
-import { Collection } from "@mikro-orm/mariadb";
-import { DiscordGuild } from "../../src/db/entities/DiscordGuild.entity.js";
-import { Poll } from "../../src/db/entities/Poll.entity.js";
-import { PollStep } from "../../src/db/entities/PollStep.entity.js";
+import { Collection } from '@mikro-orm/mariadb';
+import { DiscordGuild } from '../../src/db/entities/DiscordGuild.entity.js';
+import { Poll } from '../../src/db/entities/Poll.entity.js';
+import { PollStep } from '../../src/db/entities/PollStep.entity.js';
 
 export const expectedPoll = (opts: Partial<Poll>): Poll => {
   return {

@@ -1,14 +1,14 @@
-import { Response } from "express";
-import { CommandHandlerOptions, SubCommandOption } from "../../commands.js";
+import { Response } from 'express';
+import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
 import {
   ComponentType,
   InteractionResponseType,
   TextInputStyle,
-} from "discord-api-types/v10";
-import { logger } from "../../../logger.js";
-import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
-import { notAllowed } from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from 'discord-api-types/v10';
+import { logger } from '../../../logger.js';
+import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import { notAllowed } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export interface pollCreateCommandData {
   id: string;
@@ -18,7 +18,7 @@ export interface pollCreateCommandData {
 }
 
 export type pollCreateSubCommandData = {
-  name: "create";
+  name: 'create';
   options: [];
   type: number;
 };
@@ -40,17 +40,17 @@ export const create = async (
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
-          t: "cta",
-          d: { a: "pollCreate" },
+          t: 'cta',
+          d: { a: 'pollCreate' },
         }),
-        title: t("poll.modal.create.title"),
+        title: t('poll.modal.create.title'),
         components: [
           {
             type: ComponentType.Label,
-            label: t("poll.modal.label.title"),
+            label: t('poll.modal.label.title'),
             component: {
               type: ComponentType.TextInput,
-              custom_id: "title",
+              custom_id: 'title',
               style: TextInputStyle.Short,
               min_length: 1,
               max_length: 45,
@@ -59,19 +59,19 @@ export const create = async (
           },
           {
             type: ComponentType.Label,
-            label: t("poll.modal.label.role"),
+            label: t('poll.modal.label.role'),
             component: {
               type: ComponentType.RoleSelect,
-              custom_id: "role",
+              custom_id: 'role',
               required: false,
             },
           },
           {
             type: ComponentType.Label,
-            label: t("poll.modal.label.question"),
+            label: t('poll.modal.label.question'),
             component: {
               type: ComponentType.TextInput,
-              custom_id: "question",
+              custom_id: 'question',
               style: TextInputStyle.Short,
               min_length: 1,
               max_length: 45,
@@ -80,10 +80,10 @@ export const create = async (
           },
           {
             type: ComponentType.Label,
-            label: t("poll.modal.label.description"),
+            label: t('poll.modal.label.description'),
             component: {
               type: ComponentType.TextInput,
-              custom_id: "description",
+              custom_id: 'description',
               style: TextInputStyle.Short,
               min_length: 1,
               max_length: 100,

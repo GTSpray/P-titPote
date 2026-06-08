@@ -1,4 +1,4 @@
-import { EntityManager, MikroORM, Options } from "@mikro-orm/mariadb";
+import { EntityManager, MikroORM, Options } from '@mikro-orm/mariadb';
 export interface DBServices {
   orm: MikroORM;
   em: EntityManager;

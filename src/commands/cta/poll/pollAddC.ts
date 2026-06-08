@@ -2,17 +2,17 @@ import {
   ComponentType,
   InteractionResponseType,
   TextInputStyle,
-} from "discord-api-types/v10";
-import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
-import { PollStep } from "../../../db/entities/PollStep.entity.js";
-import { logger } from "../../../logger.js";
-import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
+} from 'discord-api-types/v10';
+import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
+import { PollStep } from '../../../db/entities/PollStep.entity.js';
+import { logger } from '../../../logger.js';
+import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
   notAllowed,
   errorPayload,
   doNotUpdatePublishedPoll,
-} from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export const STEP_CHOICE_LIMIT = 25;
 export const pollAddC: ModalHandlerDelcaration<CTAData> = {
@@ -32,7 +32,7 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
         PollStep,
         { id: questionId },
         {
-          populate: ["poll", "choices"],
+          populate: ['poll', 'choices'],
         },
       );
       const startIndex = aPollStep.choices.count();
@@ -42,21 +42,21 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
       }
 
       if (startIndex >= STEP_CHOICE_LIMIT) {
-        return res.json(errorPayload(t("errors.tooMany")));
+        return res.json(errorPayload(t('errors.tooMany')));
       }
 
       return res.json({
         type: InteractionResponseType.Modal,
         data: {
           custom_id: JSON.stringify({
-            t: "cta",
-            d: { a: "pollCreate", pId: aPollStep.poll.id },
+            t: 'cta',
+            d: { a: 'pollCreate', pId: aPollStep.poll.id },
           }),
-          title: t("poll.modal.addChoices.title"),
+          title: t('poll.modal.addChoices.title'),
           components: [
             {
               type: ComponentType.TextDisplay,
-              content: `# ${aPollStep.question}\n${aPollStep.choices.map((e) => e.label).join("\n")}`,
+              content: `# ${aPollStep.question}\n${aPollStep.choices.map((e) => e.label).join('\n')}`,
             },
             ...Array.from({
               length: Math.min(4, STEP_CHOICE_LIMIT - startIndex),
@@ -64,7 +64,7 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
               const choiceOrder = startIndex + i + 1;
               return {
                 type: ComponentType.Label,
-                label: t("poll.modal.label.choice", { order: choiceOrder }),
+                label: t('poll.modal.label.choice', { order: choiceOrder }),
                 component: {
                   type: ComponentType.TextInput,
                   custom_id: `choice${choiceOrder}`,
@@ -80,6 +80,6 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
       });
     }
 
-    return res.status(500).json({ error: t("errors.unknown") });
+    return res.status(500).json({ error: t('errors.unknown') });
   },
 };

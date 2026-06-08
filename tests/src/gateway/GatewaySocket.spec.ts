@@ -1,26 +1,26 @@
-import { REST, Routes } from "discord.js";
-import { GatewaySocket } from "../../../src/gateway/GatewaySocket.js";
-import { DiscrodRESTMock, DiscrodRESTMockVerb } from "../../mocks/discordjs.js";
-import { ShardSocket } from "../../../src/gateway/ShardSocket.js";
-import * as ShardSocketModule from "../../../src/gateway/ShardSocket.js";
-import { MockInstance } from "vitest";
+import { REST, Routes } from 'discord.js';
+import { GatewaySocket } from '../../../src/gateway/GatewaySocket.js';
+import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
+import { ShardSocket } from '../../../src/gateway/ShardSocket.js';
+import * as ShardSocketModule from '../../../src/gateway/ShardSocket.js';
+import { MockInstance } from 'vitest';
 
 class FakeShardSocket extends ShardSocket {}
-vi.mock("../../../src/gateway/ShardSocket.js");
+vi.mock('../../../src/gateway/ShardSocket.js');
 
-describe("GatewaySocket", () => {
-  const fakeToken = "fake token";
+describe('GatewaySocket', () => {
+  const fakeToken = 'fake token';
   let gateway: GatewaySocket;
 
   beforeEach(() => {
     gateway = new GatewaySocket(fakeToken);
   });
-  it("should instance", () => {
+  it('should instance', () => {
     expect(gateway).toBeTruthy();
   });
 
-  describe("connect", () => {
-    const fakeUrl = "wss://gateway.discord.gg";
+  describe('connect', () => {
+    const fakeUrl = 'wss://gateway.discord.gg';
     const fakeshards = 1;
 
     let shardSocketOpenSpy: MockInstance<() => Promise<void>>;
@@ -28,11 +28,11 @@ describe("GatewaySocket", () => {
 
     beforeEach(() => {
       shardSocketOpenSpy = vi
-        .spyOn(ShardSocket.prototype, "open")
+        .spyOn(ShardSocket.prototype, 'open')
         .mockResolvedValue();
 
       shardSocketCloseSpy = vi
-        .spyOn(ShardSocket.prototype, "close")
+        .spyOn(ShardSocket.prototype, 'close')
         .mockResolvedValue();
 
       DiscrodRESTMock.register(
@@ -53,8 +53,8 @@ describe("GatewaySocket", () => {
       );
     });
 
-    it("should call discord api to determine websocket url and recomended shards", async () => {
-      const getSpy = vi.spyOn(REST.prototype, "get");
+    it('should call discord api to determine websocket url and recomended shards', async () => {
+      const getSpy = vi.spyOn(REST.prototype, 'get');
       await gateway.connect();
 
       expect(getSpy).toHaveBeenCalledWith(Routes.gatewayBot());
@@ -62,32 +62,32 @@ describe("GatewaySocket", () => {
       expect(gateway.shards).toBe(fakeshards);
     });
 
-    it("should create one ShardSocket for each shard", async () => {
+    it('should create one ShardSocket for each shard', async () => {
       const ShardSocketConstructor = vi
-        .spyOn(ShardSocketModule, "ShardSocket")
+        .spyOn(ShardSocketModule, 'ShardSocket')
         .mockImplementationOnce(FakeShardSocket);
       await gateway.connect();
       expect(ShardSocketConstructor).toHaveBeenCalledWith(gateway, 0);
     });
 
-    it("should open created ShardSocket", async () => {
+    it('should open created ShardSocket', async () => {
       await gateway.connect();
       expect(shardSocketOpenSpy).toHaveBeenCalledWith();
     });
 
-    it("should close previous created ShardSocket", async () => {
+    it('should close previous created ShardSocket', async () => {
       await gateway.connect();
       await gateway.connect();
       expect(shardSocketCloseSpy).toHaveBeenCalledWith();
     });
   });
 
-  describe("send", () => {
+  describe('send', () => {
     let shardSocketOpenSpy: MockInstance<(data: object) => void>;
     beforeEach(async () => {
-      vi.spyOn(ShardSocket.prototype, "open").mockResolvedValue();
+      vi.spyOn(ShardSocket.prototype, 'open').mockResolvedValue();
 
-      shardSocketOpenSpy = vi.spyOn(ShardSocket.prototype, "send");
+      shardSocketOpenSpy = vi.spyOn(ShardSocket.prototype, 'send');
 
       DiscrodRESTMock.register(
         {
@@ -95,7 +95,7 @@ describe("GatewaySocket", () => {
           fullRoute: Routes.gatewayBot(),
         },
         {
-          url: "wss://gateway.discord.gg",
+          url: 'wss://gateway.discord.gg',
           session_start_limit: {
             max_concurrency: 1,
             remaining: 973,
@@ -109,8 +109,8 @@ describe("GatewaySocket", () => {
       await gateway.connect();
     });
 
-    it("should call ShardSocket.send", () => {
-      const d = { data: "fake payload " };
+    it('should call ShardSocket.send', () => {
+      const d = { data: 'fake payload ' };
       gateway.send(d);
 
       expect(shardSocketOpenSpy).toHaveBeenCalledWith(d);

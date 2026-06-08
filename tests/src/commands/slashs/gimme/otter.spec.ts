@@ -2,27 +2,27 @@ import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
+} from 'discord-interactions';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import {
   gimmeOtterCommandData,
   gimmeOtterSubCommandData,
   otter,
-} from "../../../../../src/commands/slash/gimme/otter.js";
-import { t } from "../../../../../src/i18n/index.js";
+} from '../../../../../src/commands/slash/gimme/otter.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/gimme otter", () => {
+describe('/gimme otter', () => {
   let handlerOpts: CommandHandlerOptions<gimmeOtterCommandData>;
 
   const subcommand: gimmeOtterSubCommandData = {
-    name: "otter",
+    name: 'otter',
     type: 1,
   };
   const data: gimmeOtterCommandData = {
     id: randomDiscordId19(),
-    name: "gimme",
+    name: 'gimme',
     options: [subcommand],
     type: 1,
   };
@@ -37,7 +37,7 @@ describe("/gimme otter", () => {
     };
   });
 
-  it("should respond to version interaction with bot version message", async () => {
+  it('should respond to version interaction with bot version message', async () => {
     const response = await otter(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
@@ -47,7 +47,7 @@ describe("/gimme otter", () => {
         components: [
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
-            content:  t("common.foundIt"),
+            content: t('common.foundIt'),
           },
           {
             type: MessageComponentTypes.SEPARATOR,
@@ -58,9 +58,9 @@ describe("/gimme otter", () => {
             type: MessageComponentTypes.MEDIA_GALLERY,
             items: [
               {
-                description: "otter",
+                description: 'otter',
                 media: {
-                  url: "https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true",
+                  url: 'https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true',
                 },
               },
             ],

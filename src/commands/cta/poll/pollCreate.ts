@@ -2,7 +2,7 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
-} from "discord-api-types/v10";
+} from 'discord-api-types/v10';
 import {
   ComponentSelect,
   ComponentSimple,
@@ -10,21 +10,21 @@ import {
   getInputComponnentById,
   getInputComponnentsByPrefix,
   ModalHandlerDelcaration,
-} from "../../modals.js";
-import { InteractionResponseFlags } from "discord-interactions";
-import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
-import { Poll } from "../../../db/entities/Poll.entity.js";
-import { PollStep } from "../../../db/entities/PollStep.entity.js";
-import { PollChoice } from "../../../db/entities/PollChoice.entity.js";
-import { logger } from "../../../logger.js";
-import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
-import { notAllowed } from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from '../../modals.js';
+import { InteractionResponseFlags } from 'discord-interactions';
+import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
+import { Poll } from '../../../db/entities/Poll.entity.js';
+import { PollStep } from '../../../db/entities/PollStep.entity.js';
+import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
+import { logger } from '../../../logger.js';
+import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import { notAllowed } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
     `## ${aPoll.title}`,
-    "",
+    '',
     ...aPoll.steps.reduce(
       (acc: string[], aStep) => [
         ...acc,
@@ -34,7 +34,7 @@ const getSummary = (aPoll: Poll) => {
       [],
     ),
   ];
-  return summaryLines.join("\n");
+  return summaryLines.join('\n');
 };
 
 export const pollCreate: ModalHandlerDelcaration<CTAData> = {
@@ -52,11 +52,11 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
       const pollId = (<any>additionalData).d.pId;
       let aPoll: Poll;
       if (!pollId) {
-        const title = getInputComponnentById<ComponentSimple>(data, "title");
-        const role = getInputComponnentById<ComponentSelect>(data, "role");
+        const title = getInputComponnentById<ComponentSimple>(data, 'title');
+        const role = getInputComponnentById<ComponentSelect>(data, 'role');
         const question = getInputComponnentById<ComponentSimple>(
           data,
-          "question",
+          'question',
         );
         let aGuild: DiscordGuild;
         aGuild =
@@ -70,7 +70,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
         const firstStep = new PollStep(`${question?.component.value}`, 0);
         const qDesc = getInputComponnentById<ComponentSimple>(
           data,
-          "description",
+          'description',
         );
         firstStep.description = <string>qDesc?.component.value ?? null;
         aPoll.steps.add(firstStep);
@@ -80,13 +80,13 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           Poll,
           { id: pollId },
           {
-            populate: ["steps", "steps.choices"],
+            populate: ['steps', 'steps.choices'],
           },
         );
 
         const newQuestion = getInputComponnentById<ComponentSimple>(
           data,
-          "question",
+          'question',
         );
         if (newQuestion) {
           const newStep = new PollStep(
@@ -95,7 +95,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           );
           const qDesc = getInputComponnentById<ComponentSimple>(
             data,
-            "description",
+            'description',
           );
           newStep.description = <string>qDesc?.component.value ?? null;
           aPoll.steps.add(newStep);
@@ -103,7 +103,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
 
         const newChoices = getInputComponnentsByPrefix<ComponentSimple>(
           data,
-          "choice",
+          'choice',
         );
         if (newChoices.length > 0) {
           const lastStep = aPoll.steps.reduce(
@@ -113,7 +113,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           const l = lastStep.choices.count();
           newChoices
             .map((e) => `${e.component.value}`.trim())
-            .filter((e) => e !== "")
+            .filter((e) => e !== '')
             .forEach((e, i) => {
               const newChoice = new PollChoice(e, l + i);
               lastStep.choices.add(newChoice);
@@ -140,11 +140,11 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: t("poll.button.addChoices"),
+                  label: t('poll.button.addChoices'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddC",
+                      a: 'pollAddC',
                       sId: lastStep.id,
                     },
                   }),
@@ -152,11 +152,11 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: t("poll.button.newQuestion"),
+                  label: t('poll.button.newQuestion'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollAddQ",
+                      a: 'pollAddQ',
                       pId: aPoll.id,
                     },
                   }),
@@ -164,11 +164,11 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: t("poll.button.publish"),
+                  label: t('poll.button.publish'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollPub",
+                      a: 'pollPub',
                       pId: aPoll.id,
                     },
                   }),
@@ -180,6 +180,6 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
       });
     }
 
-    return res.status(500).json({ error: t("errors.unknown") });
+    return res.status(500).json({ error: t('errors.unknown') });
   },
 };

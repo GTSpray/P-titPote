@@ -1,27 +1,28 @@
 import {
   poll,
   type pollDataOpts,
-} from "../../../../../src/commands/slash/poll/index.js";
-import * as createModule from "../../../../../src/commands/slash/poll/create.js";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { randomDiscordId19 } from "../../../../mocks/discord-api/utils.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
-import { initORM } from "../../../../initORM.js";
+} from '../../../../../src/commands/slash/poll/index.js';
+import * as createModule from '../../../../../src/commands/slash/poll/create.js';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import { initORM } from '../../../../initORM.js';
 import {
   InteractionContextType,
   ApplicationIntegrationType,
   PermissionFlagsBits,
-} from "discord.js";
-import { pollCreateSubCommandData } from "../../../../../src/commands/slash/poll/create.js";
+} from 'discord.js';
+import { pollCreateSubCommandData } from '../../../../../src/commands/slash/poll/create.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/poll", () => {
+describe('/poll', () => {
   let handlerOpts: CommandHandlerOptions<pollDataOpts>;
 
-  it("should declare a slash command", () => {
-    const declaration = poll.builder.setName("poll");
+  it('should declare a slash command', () => {
+    const declaration = poll.builder.setName('poll');
 
     expect(declaration.toJSON()).toMatchObject({
-      description: "Gestion de sondage",
+      description: t('poll.description'),
       contexts: [
         InteractionContextType.BotDM,
         InteractionContextType.Guild,
@@ -36,15 +37,15 @@ describe("/poll", () => {
     });
   });
 
-  describe("create subcommand", () => {
+  describe('create subcommand', () => {
     const subcommand: pollCreateSubCommandData = {
-      name: "create",
+      name: 'create',
       options: [],
       type: 1,
     };
     const data: createModule.pollCreateCommandData = {
       id: randomDiscordId19(),
-      name: "poll",
+      name: 'poll',
       options: [subcommand],
       type: 1,
     };
@@ -59,13 +60,13 @@ describe("/poll", () => {
       };
     });
 
-    it("should be declared as subcommand", () => {
+    it('should be declared as subcommand', () => {
       const declaration = poll.builder.setName(subcommand.name);
       expect(declaration.toJSON()).toMatchObject({
         options: expect.arrayContaining([
           expect.objectContaining({
             name: subcommand.name,
-            description: "créer un sondage",
+            description: t('poll.create.description'),
             options: [],
           }),
         ]),
@@ -74,12 +75,12 @@ describe("/poll", () => {
 
     it('should call "set" handler', async () => {
       using spy = vi
-        .spyOn(createModule, "create")
+        .spyOn(createModule, 'create')
         .mockResolvedValue(handlerOpts.res);
 
       const fakeOpts = {
         ...handlerOpts,
-        dbServices: "fakeDbServices", // because toHaveBeenCalledWith hang with MikroORM instance
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
       } as unknown as typeof handlerOpts;
 
       await poll.handler(fakeOpts);
@@ -93,7 +94,7 @@ describe("/poll", () => {
         perceval: "j'aime les fruits en sirop",
       }) as typeof handlerOpts.res;
 
-      vi.spyOn(createModule, "create").mockResolvedValue(fakeResp);
+      vi.spyOn(createModule, 'create').mockResolvedValue(fakeResp);
 
       const response = await poll.handler(handlerOpts);
 

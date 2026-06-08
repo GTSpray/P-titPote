@@ -4,9 +4,9 @@ import {
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
   SlashCommandSubcommandsOnlyBuilder,
-} from "discord.js";
-import { Request, Response } from "express";
-import { DBServices } from "../db/db.js";
+} from 'discord.js';
+import { Request, Response } from 'express';
+import { DBServices } from '../db/db.js';
 
 type DiscordInteractionBody<Data> = APIBaseInteraction<
   InteractionType.ApplicationCommand,

@@ -1,16 +1,16 @@
-import * as z from "zod";
-import { Response } from "express";
-import { CommandHandlerOptions, SubCommandOption } from "../../commands.js";
+import * as z from 'zod';
+import { Response } from 'express';
+import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { DiscordGuild } from "../../../db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
-import { logger } from "../../../logger.js";
-import { okComponnents } from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from 'discord-interactions';
+import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
+import { logger } from '../../../logger.js';
+import { okComponnents } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export interface aliasSetCommandData {
   id: string;
@@ -20,10 +20,10 @@ export interface aliasSetCommandData {
 }
 
 export type aliasSetSubCommandData = {
-  name: "set";
+  name: 'set';
   options: [
-    SubCommandOption<"alias", string>,
-    SubCommandOption<"message", string>,
+    SubCommandOption<'alias', string>,
+    SubCommandOption<'message', string>,
   ];
   type: number;
 };
@@ -51,10 +51,10 @@ export const set = async (
 
   if (!AliasMessageInput.success) {
     const issues = AliasMessageInput.error.issues;
-    logger.debug("zod errors", { issues });
+    logger.debug('zod errors', { issues });
     return res
       .status(400)
-      .json({ error: t("errors.invalidSubcommandPayload"), issues });
+      .json({ error: t('errors.invalidSubcommandPayload'), issues });
   }
 
   if (dbServices && guildId) {
@@ -66,7 +66,7 @@ export const set = async (
       (await em.findOne(
         DiscordGuild,
         { guildId },
-        { populate: ["messageAliaseds"] },
+        { populate: ['messageAliaseds'] },
       )) || new DiscordGuild(guildId);
 
     let messageAliased = guild.messageAliaseds.find(

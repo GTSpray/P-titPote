@@ -1,7 +1,7 @@
-import { Collection } from "@mikro-orm/mariadb";
-import { PollStep } from "../../src/db/entities/PollStep.entity.js";
-import { PollChoice } from "../../src/db/entities/PollChoice.entity.js";
-import { Poll } from "../../src/db/entities/Poll.entity.js";
+import { Collection } from '@mikro-orm/mariadb';
+import { PollStep } from '../../src/db/entities/PollStep.entity.js';
+import { PollChoice } from '../../src/db/entities/PollChoice.entity.js';
+import { Poll } from '../../src/db/entities/Poll.entity.js';
 
 export const expectedPollStep = (opts: Partial<PollStep>): PollStep => {
   return {

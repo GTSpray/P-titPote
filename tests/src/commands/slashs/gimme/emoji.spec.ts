@@ -1,24 +1,24 @@
-import { Request } from "express";
-import { MockRequest } from "node-mocks-http";
+import { Request } from 'express';
+import { MockRequest } from 'node-mocks-http';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
-import { REST, Routes } from "discord.js";
+} from 'discord-interactions';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { REST, Routes } from 'discord.js';
 import {
   getRandomString,
   randomDiscordId19,
-} from "../../../../mocks/discord-api/utils.js";
-import { getApiMessagesChannelData } from "../../../../mocks/discord-api/getApiMessageChannelData.js";
+} from '../../../../mocks/discord-api/utils.js';
+import { getApiMessagesChannelData } from '../../../../mocks/discord-api/getApiMessageChannelData.js';
 import {
   DiscrodRESTMock,
   DiscrodRESTMockVerb,
-} from "../../../../mocks/discordjs.js";
-import { getApiMessageData } from "../../../../mocks/discord-api/getApiMessageData.js";
-import * as getEmojiUrlModule from "../../../../../src/utils/getEmojiUrl.js";
-import { CommandHandlerOptions } from "../../../../../src/commands/commands.js";
+} from '../../../../mocks/discordjs.js';
+import { getApiMessageData } from '../../../../mocks/discord-api/getApiMessageData.js';
+import * as getEmojiUrlModule from '../../../../../src/utils/getEmojiUrl.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import {
   emoji,
   gimmeEmojiCommandData,
@@ -26,19 +26,19 @@ import {
   stealemoji_emojiLimit,
   stealemoji_msgLimit,
   stealemoji_msgSizeLimit,
-} from "../../../../../src/commands/slash/gimme/emoji.js";
-import { t } from "../../../../../src/i18n/index.js";
-describe("/gimme emoji", () => {
+} from '../../../../../src/commands/slash/gimme/emoji.js';
+import { t } from '../../../../../src/i18n/index.js';
+describe('/gimme emoji', () => {
   let request: MockRequest<Request>;
   let handlerOpts: CommandHandlerOptions<gimmeEmojiCommandData>;
 
   const subcommand: gimmeEmojiSubCommandData = {
-    name: "emoji",
+    name: 'emoji',
     type: 1,
   };
   const data: gimmeEmojiCommandData = {
     id: randomDiscordId19(),
-    name: "gimme",
+    name: 'gimme',
     options: [subcommand],
     type: 1,
   };
@@ -46,7 +46,7 @@ describe("/gimme emoji", () => {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
       flags: InteractionResponseFlags.EPHEMERAL,
-      content:  t("common.notFound"),
+      content: t('common.notFound'),
     },
   };
 
@@ -62,17 +62,17 @@ describe("/gimme emoji", () => {
       res,
     };
 
-    channel_id = request.body.channel.id || "failed mock response";
-    vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue("no mock");
+    channel_id = request.body.channel.id || 'failed mock response';
+    vi.spyOn(getEmojiUrlModule, 'getEmojiUrl').mockResolvedValue('no mock');
   });
 
   afterEach(() => {
-    const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, "getEmojiUrl");
+    const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, 'getEmojiUrl');
     getEmojiUrlSpy.mockClear();
   });
 
   it(`should use discord api to fetch last ${stealemoji_msgLimit} messages of current channel`, async () => {
-    const getSpy = vi.spyOn(REST.prototype, "get");
+    const getSpy = vi.spyOn(REST.prototype, 'get');
 
     DiscrodRESTMock.register(
       {
@@ -117,7 +117,7 @@ describe("/gimme emoji", () => {
     expect(response).toMeetApiResponse(200, notFoundMessagePayload);
   });
 
-  const n = "Str0ngB0ng0Cat";
+  const n = 'Str0ngB0ng0Cat';
   const i18 = getRandomString({ length: 18, number: true });
   const i19 = getRandomString({ length: 19, number: true });
   const i20 = getRandomString({ length: 20, number: true });
@@ -148,7 +148,7 @@ describe("/gimme emoji", () => {
       });
 
       it(`should call getEmojiUrl to determine emoji "format"`, async () => {
-        const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, "getEmojiUrl");
+        const getEmojiUrlSpy = vi.spyOn(getEmojiUrlModule, 'getEmojiUrl');
         await emoji(handlerOpts);
 
         expect(getEmojiUrlSpy).toHaveBeenCalledWith(emojiId);
@@ -157,7 +157,7 @@ describe("/gimme emoji", () => {
 
       it(`should respond found message with  emoji url and ${emojiName} as desciption `, async () => {
         const url = `http://amockedurl/${emojiId}.png`;
-        vi.spyOn(getEmojiUrlModule, "getEmojiUrl").mockResolvedValue(url);
+        vi.spyOn(getEmojiUrlModule, 'getEmojiUrl').mockResolvedValue(url);
 
         const response = await emoji(handlerOpts);
         expect(response).toMeetApiResponse(200, {
@@ -167,7 +167,7 @@ describe("/gimme emoji", () => {
             components: [
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
-                content:  t("common.foundIt"),
+                content: t('common.foundIt'),
               },
               {
                 type: MessageComponentTypes.SEPARATOR,
@@ -194,7 +194,7 @@ describe("/gimme emoji", () => {
     const content = Array.from(
       { length: stealemoji_emojiLimit + 3 },
       (_e, i) => `<a:${n}${i}:${i18}${i}>`,
-    ).join(" ");
+    ).join(' ');
     const result = [
       getApiMessageData({ channel_id, content }),
       getApiMessageData({ channel_id, content }),

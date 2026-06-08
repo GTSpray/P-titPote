@@ -1,4 +1,4 @@
-import "dotenv/config";
+import 'dotenv/config';
 import {
   Options,
   MariaDbDriver,
@@ -6,31 +6,31 @@ import {
   LogContext,
   LoggerNamespace,
   defineConfig,
-} from "@mikro-orm/mariadb";
-import { Migrator } from "@mikro-orm/migrations";
-import { logger } from "./logger.js";
-import { DiscordGuild } from "./db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "./db/entities/MessageAliased.entity.js";
-import { Poll } from "./db/entities/Poll.entity.js";
-import { PollChoice } from "./db/entities/PollChoice.entity.js";
-import { PollStep } from "./db/entities/PollStep.entity.js";
-import { PollResp } from "./db/entities/PollResp.entity.js";
+} from '@mikro-orm/mariadb';
+import { Migrator } from '@mikro-orm/migrations';
+import { logger } from './logger.js';
+import { DiscordGuild } from './db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from './db/entities/MessageAliased.entity.js';
+import { Poll } from './db/entities/Poll.entity.js';
+import { PollChoice } from './db/entities/PollChoice.entity.js';
+import { PollStep } from './db/entities/PollStep.entity.js';
+import { PollResp } from './db/entities/PollResp.entity.js';
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
-    logger.info("new sql query", {
+    logger.info('new sql query', {
       context,
     });
   }
   log(namespace: LoggerNamespace, message: string, context?: LogContext) {
     switch (context?.level) {
-      case "error":
+      case 'error':
         logger.error(message, { context });
         break;
-      case "info":
+      case 'info':
         logger.info(message, { context });
         break;
-      case "warning":
+      case 'warning':
         logger.warn(message, { context });
         break;
       default:
@@ -46,7 +46,7 @@ const config: Options = defineConfig({
   host: process.env.DB_HOST,
   user: process.env.MARIADB_USER,
   password: process.env.MARIADB_PASSWORD,
-  port: parseInt(process.env.MARIADB_TCP_PORT ?? "0", 10),
+  port: parseInt(process.env.MARIADB_TCP_PORT ?? '0', 10),
   entities: [
     DiscordGuild,
     MessageAliased,
@@ -60,7 +60,7 @@ const config: Options = defineConfig({
   dynamicImportProvider: (id) => import(id),
   extensions: [Migrator],
   migrations: {
-    path: "dist/src/migrations",
+    path: 'dist/src/migrations',
     transactional: false,
   },
 });

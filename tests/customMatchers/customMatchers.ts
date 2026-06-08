@@ -1,7 +1,7 @@
-import { expect, ExpectationResult } from "vitest";
+import { expect, ExpectationResult } from 'vitest';
 
-import { Response } from "express";
-import { MockResponse } from "node-mocks-http";
+import { Response } from 'express';
+import { MockResponse } from 'node-mocks-http';
 
 function toBeType(received: unknown, expectedType: string): ExpectationResult {
   const pass = typeof received === expectedType && !Number.isNaN(received);
@@ -50,7 +50,7 @@ expect.extend({
     }
 
     return {
-      message: () => messages.join("\n\n"),
+      message: () => messages.join('\n\n'),
       pass: messages.length <= 0,
     };
   },
@@ -58,7 +58,7 @@ expect.extend({
     const { printReceived, printExpected, matcherHint } = this.utils;
 
     const pass =
-      (typeof actual === "number" || typeof actual === "bigint") &&
+      (typeof actual === 'number' || typeof actual === 'bigint') &&
       actual >= start &&
       actual < end;
 
@@ -66,17 +66,17 @@ expect.extend({
       pass,
       message: () =>
         pass
-          ? matcherHint(".not.toBeWithin") +
-            "\n\n" +
-            "Expected number to not be within start (inclusive) and end (exclusive):\n" +
+          ? matcherHint('.not.toBeWithin') +
+            '\n\n' +
+            'Expected number to not be within start (inclusive) and end (exclusive):\n' +
             `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
-            "Received:\n" +
+            'Received:\n' +
             `  ${printReceived(actual)}`
-          : matcherHint(".toBeWithin") +
-            "\n\n" +
-            "Expected number to be within start (inclusive) and end (exclusive):\n" +
+          : matcherHint('.toBeWithin') +
+            '\n\n' +
+            'Expected number to be within start (inclusive) and end (exclusive):\n' +
             `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
-            "Received:\n" +
+            'Received:\n' +
             `  ${printReceived(actual)}`,
     };
   },
@@ -101,12 +101,12 @@ expect.extend({
     const pass = Array.isArray(received);
     return pass
       ? {
-          message: () => "expected array",
+          message: () => 'expected array',
           pass: true,
         }
       : {
           message: () =>
-            `expected ${this.utils.printExpected("array")}, but received ${this.utils.printReceived(typeof received)}`,
+            `expected ${this.utils.printExpected('array')}, but received ${this.utils.printReceived(typeof received)}`,
           pass: false,
         };
   },
@@ -126,7 +126,7 @@ expect.extend({
         };
   },
   toBeNegative(received: number): ExpectationResult {
-    if (typeof received !== "number") {
+    if (typeof received !== 'number') {
       throw new TypeError(`Expected a number, but received ${typeof received}`);
     }
 
@@ -144,7 +144,7 @@ expect.extend({
         };
   },
   toBePositive(received: number): ExpectationResult {
-    if (typeof received !== "number") {
+    if (typeof received !== 'number') {
       throw new TypeError(`Expected a number, but received ${typeof received}`);
     }
 
@@ -161,12 +161,12 @@ expect.extend({
             `expected ${this.utils.printReceived(received)} to be positive`,
         };
   },
-  toBeNumber: (received: unknown) => toBeType(received, "number"),
-  toBeFunction: (received: unknown) => toBeType(received, "function"),
-  toBeString: (received: unknown) => toBeType(received, "string"),
+  toBeNumber: (received: unknown) => toBeType(received, 'number'),
+  toBeFunction: (received: unknown) => toBeType(received, 'function'),
+  toBeString: (received: unknown) => toBeType(received, 'string'),
   toBeObject(received: unknown): ExpectationResult {
     const pass =
-      typeof received === "object" &&
+      typeof received === 'object' &&
       !Array.isArray(received) &&
       received !== null;
     return pass
@@ -177,12 +177,12 @@ expect.extend({
         }
       : {
           message: () =>
-            `expected ${this.utils.printReceived(received)} to be an object but was ${Array.isArray(received) ? "array" : typeof received}`,
+            `expected ${this.utils.printReceived(received)} to be an object but was ${Array.isArray(received) ? 'array' : typeof received}`,
           pass: false,
         };
   },
   toBeInteger(received: number): ExpectationResult {
-    if (typeof received !== "number") {
+    if (typeof received !== 'number') {
       throw new TypeError(`Expected a number, but received ${typeof received}`);
     }
 
@@ -233,7 +233,7 @@ expect.extend({
     // Check if received is an array or an object
     if (Array.isArray(received)) {
       receivedValues = received;
-    } else if (typeof received === "object" && received !== null) {
+    } else if (typeof received === 'object' && received !== null) {
       receivedValues = Object.values(received);
     } else {
       return {
@@ -275,9 +275,9 @@ expect.extend({
 
     if (Array.isArray(received)) {
       pass = received.includes(value);
-    } else if (typeof received === "string") {
+    } else if (typeof received === 'string') {
       pass = received.includes(value);
-    } else if (typeof received === "object" && received !== null) {
+    } else if (typeof received === 'object' && received !== null) {
       pass = Object.values(received).includes(value);
     } else {
       pass = false;
@@ -299,7 +299,7 @@ expect.extend({
       return {
         pass: false,
         message: () =>
-          "Expected both received and expected values to be arrays.",
+          'Expected both received and expected values to be arrays.',
       };
     }
 
@@ -323,7 +323,7 @@ expect.extend({
     received: object,
     expectedKeys: string[],
   ): ExpectationResult {
-    if (typeof received !== "object" || received === null) {
+    if (typeof received !== 'object' || received === null) {
       return {
         pass: false,
         message: () =>
@@ -359,7 +359,7 @@ expect.extend({
     received: object,
     expectedValues: unknown[],
   ): ExpectationResult {
-    if (typeof received !== "object" || received === null) {
+    if (typeof received !== 'object' || received === null) {
       return {
         pass: false,
         message: () =>
@@ -380,7 +380,7 @@ expect.extend({
     const deepEqual = (a: any, b: any): boolean => {
       if (a === b) return true;
       if (typeof a !== typeof b) return false;
-      if (a && b && typeof a === "object") {
+      if (a && b && typeof a === 'object') {
         const aKeys = Object.keys(a);
         const bKeys = Object.keys(b);
         if (aKeys.length !== bKeys.length) return false;
@@ -411,9 +411,9 @@ expect.extend({
   toBeEmpty(received: unknown): ExpectationResult {
     let isEmpty = false;
 
-    if (Array.isArray(received) || typeof received === "string") {
+    if (Array.isArray(received) || typeof received === 'string') {
       isEmpty = received.length === 0;
-    } else if (received && typeof received === "object") {
+    } else if (received && typeof received === 'object') {
       isEmpty = Object.keys(received).length === 0;
     } else if (received instanceof Map || received instanceof Set) {
       isEmpty = received.size === 0;
@@ -428,11 +428,11 @@ expect.extend({
     return isEmpty
       ? {
           pass: true,
-          message: () => "Expected value not to be empty, but it was.",
+          message: () => 'Expected value not to be empty, but it was.',
         }
       : {
           pass: false,
-          message: () => "Expected value to be empty, but it was not.",
+          message: () => 'Expected value to be empty, but it was not.',
         };
   },
   toBeValidDate(received: unknown) {

@@ -73,11 +73,11 @@ import {
   type GatewayVoiceServerUpdateDispatchData,
   type GatewayVoiceStateUpdateDispatchData,
   type GatewayWebhooksUpdateDispatchData,
-} from "discord.js";
+} from 'discord.js';
 
 export enum GWSEvent {
-  Debug = "DEBUG",
-  Payload = "PAYLOAD",
+  Debug = 'DEBUG',
+  Payload = 'PAYLOAD',
 }
 
 // https://www.rfc-editor.org/rfc/rfc6455

@@ -1,5 +1,5 @@
-import { ShardSocket } from "../../../src/gateway/ShardSocket.js";
-import { GatewaySocket } from "../../../src/gateway/GatewaySocket.js";
+import { ShardSocket } from '../../../src/gateway/ShardSocket.js';
+import { GatewaySocket } from '../../../src/gateway/GatewaySocket.js';
 import {
   heartbeatAckMsg,
   helloMsg,
@@ -7,21 +7,21 @@ import {
   readyMsg,
   reconnectMsg,
   resumedMsg,
-} from "../../mocks/discordGatewayMsg.js";
+} from '../../mocks/discordGatewayMsg.js';
 import {
   GatewayDispatchEvents,
   GatewayIntentBits,
   GatewayOpcodes,
   GatewayReadyDispatch,
-} from "discord.js";
-import { WebSocketServerMock } from "../../mocks/WebSocketMock.js";
-import { WsClosedCode, GWSEvent } from "../../../src/gateway/gatewaytypes.js";
+} from 'discord.js';
+import { WebSocketServerMock } from '../../mocks/WebSocketMock.js';
+import { WsClosedCode, GWSEvent } from '../../../src/gateway/gatewaytypes.js';
 
 const s = JSON.stringify;
 const p = JSON.parse;
 
-const encoding = "json";
-const apiVersion = "10";
+const encoding = 'json';
+const apiVersion = '10';
 
 const fakeLatency = async (min: number, max: number) => {
   const latency = Math.random() * (max - min) + min;
@@ -33,24 +33,24 @@ const intents =
   GatewayIntentBits.GuildMessages |
   GatewayIntentBits.DirectMessages;
 
-describe("ShardSocket", () => {
+describe('ShardSocket', () => {
   let shardSocket: ShardSocket;
   let gateway: GatewaySocket;
   let server: WebSocketServerMock;
   beforeEach(() => {
     vi.useFakeTimers();
     server = WebSocketServerMock.createInstance();
-    gateway = new GatewaySocket("fakeToken");
-    vi.spyOn(gateway, "url", "get").mockReturnValue(server.getUrl());
+    gateway = new GatewaySocket('fakeToken');
+    vi.spyOn(gateway, 'url', 'get').mockReturnValue(server.getUrl());
     shardSocket = new ShardSocket(gateway, 0);
   });
   afterEach(() => {
     vi.clearAllTimers();
   });
 
-  it("should open connection on Discord Gateway API version 10 using json encoding", async () => {
+  it('should open connection on Discord Gateway API version 10 using json encoding', async () => {
     const wsCoSpy = vi.fn();
-    server.on("wsconnection", wsCoSpy);
+    server.on('wsconnection', wsCoSpy);
 
     shardSocket.open().catch(() => {});
 
@@ -62,7 +62,7 @@ describe("ShardSocket", () => {
     );
   });
 
-  it("should reject with timeout (ShardSocket.maxTimeout) when Discord does not send a welcome message", async () => {
+  it('should reject with timeout (ShardSocket.maxTimeout) when Discord does not send a welcome message', async () => {
     const helloDelay = 100;
     const openPromise = shardSocket.open();
     vi.advanceTimersByTime(helloDelay);
@@ -75,7 +75,7 @@ describe("ShardSocket", () => {
     );
   });
 
-  it("should send identify with intents", async () => {
+  it('should send identify with intents', async () => {
     shardSocket.open().catch(() => {});
     await vi.advanceTimersByTimeAsync(100);
     server.send(s(helloMsg({})));
@@ -90,9 +90,9 @@ describe("ShardSocket", () => {
         large_threshold: 250,
         presence: {},
         properties: {
-          os: "linux",
-          browser: "PtitPote",
-          device: "PtitPote",
+          os: 'linux',
+          browser: 'PtitPote',
+          device: 'PtitPote',
         },
         intents:
           GatewayIntentBits.GuildMessageReactions |
@@ -103,14 +103,14 @@ describe("ShardSocket", () => {
     expect(server.getSpy()).toBeCalledWith(s(identityPayload));
   });
 
-  describe("connection continuity mechanism", () => {
+  describe('connection continuity mechanism', () => {
     let resumeServer: WebSocketServerMock;
     let readyPayload: GatewayReadyDispatch;
     beforeEach(async () => {
       await vi.advanceTimersByTimeAsync(50);
       resumeServer = WebSocketServerMock.createInstance();
 
-      resumeServer.on("wsmessage", async (d) => {
+      resumeServer.on('wsmessage', async (d) => {
         const m = p(d);
         await fakeLatency(20, 50);
         if (m.op === GatewayOpcodes.Heartbeat) {
@@ -139,21 +139,21 @@ describe("ShardSocket", () => {
 
     describe.each([
       [
-        "websocket connection close with abnormal closure",
+        'websocket connection close with abnormal closure',
         async () => {
           await fakeLatency(20, 50);
-          server.emit("close", WsClosedCode.AbnormalClosure, Buffer.from(""));
+          server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
         },
       ],
       [
-        "discord send reconnect event",
+        'discord send reconnect event',
         async () => {
           await fakeLatency(20, 50);
           server.send(s(reconnectMsg()));
         },
       ],
       [
-        "discord send invalid session event with resumable connection",
+        'discord send invalid session event with resumable connection',
         async () => {
           await fakeLatency(20, 50);
           server.send(s(invalidSessionMsg(true)));
@@ -163,7 +163,7 @@ describe("ShardSocket", () => {
         "when app doesn't receive a heartbeat ACK in time",
         async () => {
           let nbOfHbAckSended = 0;
-          server.on("wsmessage", async (d) => {
+          server.on('wsmessage', async (d) => {
             const m = p(d);
             await fakeLatency(30, 50);
             if (m.op === GatewayOpcodes.Heartbeat) {
@@ -175,14 +175,14 @@ describe("ShardSocket", () => {
           });
         },
       ],
-    ])("when %s", (_s: string, prepare: () => Promise<void>) => {
+    ])('when %s', (_s: string, prepare: () => Promise<void>) => {
       beforeEach(async () => {
         await prepare();
       });
 
       it(`should open new connection on resume server version ${apiVersion} using ${encoding} as encoding`, async () => {
         const wsCoSpy = vi.fn();
-        resumeServer.on("wsconnection", wsCoSpy);
+        resumeServer.on('wsconnection', wsCoSpy);
 
         await vi.advanceTimersByTimeAsync(1000000);
 
@@ -192,7 +192,7 @@ describe("ShardSocket", () => {
         );
       });
 
-      it("should send resume event to replay missed events when a disconnected client resumes", async () => {
+      it('should send resume event to replay missed events when a disconnected client resumes', async () => {
         const serverSp = resumeServer.getSpy();
 
         await vi.advanceTimersByTimeAsync(1000000);
@@ -210,7 +210,7 @@ describe("ShardSocket", () => {
       });
     });
 
-    describe("when discord send invalid session event with unresumable connection", () => {
+    describe('when discord send invalid session event with unresumable connection', () => {
       beforeEach(async () => {
         await fakeLatency(20, 50);
         server.send(s(invalidSessionMsg(false)));
@@ -218,7 +218,7 @@ describe("ShardSocket", () => {
 
       it(`should open new connection on initial gateway server version ${apiVersion} using ${encoding} as encoding`, async () => {
         const wsCoSpy = vi.fn();
-        server.on("wsconnection", wsCoSpy);
+        server.on('wsconnection', wsCoSpy);
 
         await vi.advanceTimersByTimeAsync(200);
 
@@ -228,7 +228,7 @@ describe("ShardSocket", () => {
         );
       });
 
-      it("should send identify with intents", async () => {
+      it('should send identify with intents', async () => {
         await vi.advanceTimersByTimeAsync(100);
         const identityPayload = {
           op: GatewayOpcodes.Identify,
@@ -239,9 +239,9 @@ describe("ShardSocket", () => {
             large_threshold: 250,
             presence: {},
             properties: {
-              os: "linux",
-              browser: "PtitPote",
-              device: "PtitPote",
+              os: 'linux',
+              browser: 'PtitPote',
+              device: 'PtitPote',
             },
             intents:
               GatewayIntentBits.GuildMessageReactions |
@@ -254,7 +254,7 @@ describe("ShardSocket", () => {
     });
   });
 
-  describe("heartbit mechanism", () => {
+  describe('heartbit mechanism', () => {
     const heartbeat_interval = 7500;
     let resumeServer: WebSocketServerMock;
     let readyPayload: GatewayReadyDispatch;
@@ -279,10 +279,10 @@ describe("ShardSocket", () => {
       server.getSpy().mockClear();
     });
 
-    it("should start heartbit mechanism using jitter method", async () => {
+    it('should start heartbit mechanism using jitter method', async () => {
       const currentTime = Date.now();
       const times: number[] = [];
-      server.on("wsmessage", async (d) => {
+      server.on('wsmessage', async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {
           times.push(Date.now() - currentTime);
@@ -299,9 +299,9 @@ describe("ShardSocket", () => {
       expect(times[3] - times[2]).toEqual(heartbeat_interval);
     });
 
-    it("should keep heartbit interval using hello reponse interval", async () => {
+    it('should keep heartbit interval using hello reponse interval', async () => {
       shardSocket.jitter = 1 / 10000; // force jitter cause random is painfull to test
-      server.on("wsmessage", async (d) => {
+      server.on('wsmessage', async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {
           await fakeLatency(20, 50);
@@ -319,7 +319,7 @@ describe("ShardSocket", () => {
   });
 
   it.each(Object.keys(GatewayDispatchEvents))(
-    "should emit gateway event on dispatch %s message",
+    'should emit gateway event on dispatch %s message',
     async (e: unknown) => {
       shardSocket.open().catch(() => {});
       await vi.advanceTimersByTimeAsync(100);
@@ -332,7 +332,7 @@ describe("ShardSocket", () => {
       );
       gateway.on(event, spy);
 
-      const expectedEvent = { aPayload: "expected" };
+      const expectedEvent = { aPayload: 'expected' };
 
       server.send(
         s({

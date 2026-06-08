@@ -1,5 +1,5 @@
-import { APIChannel, ChannelType } from "discord.js";
-import { BitFieldFlag, getRandomString, randomDiscordId19 } from "./utils.js";
+import { APIChannel, ChannelType } from 'discord.js';
+import { BitFieldFlag, getRandomString, randomDiscordId19 } from './utils.js';
 
 export const getApiChannelData = (
   options: Partial<APIChannel> = {},
@@ -13,7 +13,7 @@ export const getApiChannelData = (
     // },
     id: randomDiscordId19(),
     last_message_id: randomDiscordId19(),
-    last_pin_timestamp: "2025-09-01T15:36:46.304000+00:00",
+    last_pin_timestamp: '2025-09-01T15:36:46.304000+00:00',
     name: `a random channel name ${getRandomString({ letter: true, uppercase: true })}`,
     nsfw: false,
     parent_id: randomDiscordId19(),

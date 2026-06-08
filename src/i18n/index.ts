@@ -1,4 +1,4 @@
-import { fr, type TranslationKey } from "./fr.js";
+import { fr, type TranslationKey } from './fr.js';
 
 type TranslationParams = Record<string, string | number>;
 

@@ -1,53 +1,53 @@
 import {
   aliasSetSubCommandData,
   set,
-} from "../../../../../src/commands/slash/alias/set.js";
+} from '../../../../../src/commands/slash/alias/set.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { getInteractionCommandHttpMock } from "../../../../mocks/getInteractionHttpMock.js";
+} from 'discord-interactions';
+import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import {
   getRandomString,
   randomDiscordId19,
-} from "../../../../mocks/discord-api/utils.js";
+} from '../../../../mocks/discord-api/utils.js';
 import {
   CommandHandlerOptions,
   SubCommandOption,
-} from "../../../../../src/commands/commands.js";
-import { aliasSetCommandData } from "../../../../../src/commands/slash/alias/set.js";
-import { initORM } from "../../../../initORM.js";
-import { DiscordGuild } from "../../../../../src/db/entities/DiscordGuild.entity.js";
-import { MessageAliased } from "../../../../../src/db/entities/MessageAliased.entity.js";
+} from '../../../../../src/commands/commands.js';
+import { aliasSetCommandData } from '../../../../../src/commands/slash/alias/set.js';
+import { initORM } from '../../../../initORM.js';
+import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
+import { MessageAliased } from '../../../../../src/db/entities/MessageAliased.entity.js';
 import {
   SqlEntityManager,
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
   QueryOrder,
-} from "@mikro-orm/mariadb";
-import { expectedDiscordGuild } from "../../../../epectedEntities/expectedDiscordGuild.js";
-import { expectedMessageAliased } from "../../../../epectedEntities/expectedMessageAliased.js";
-import { t } from "../../../../../src/i18n/index.js";
+} from '@mikro-orm/mariadb';
+import { expectedDiscordGuild } from '../../../../epectedEntities/expectedDiscordGuild.js';
+import { expectedMessageAliased } from '../../../../epectedEntities/expectedMessageAliased.js';
+import { t } from '../../../../../src/i18n/index.js';
 
-describe("/alias set", () => {
+describe('/alias set', () => {
   let guild_id: string;
   let handlerOpts: CommandHandlerOptions<aliasSetCommandData>;
 
-  const aliasOpts: SubCommandOption<"alias", string> = {
-    name: "alias",
+  const aliasOpts: SubCommandOption<'alias', string> = {
+    name: 'alias',
     type: 3,
-    value: "welcome",
+    value: 'welcome',
   };
-  const msgOpts: SubCommandOption<"message", string> = {
-    name: "message",
+  const msgOpts: SubCommandOption<'message', string> = {
+    name: 'message',
     type: 3,
     value: "Bienvenue sur le serveur de test de p'tit pote !!!!",
   };
 
   const subcommand: aliasSetSubCommandData = {
-    name: "set",
+    name: 'set',
     options: [aliasOpts, msgOpts],
     type: 1,
   };
@@ -58,7 +58,7 @@ describe("/alias set", () => {
   beforeEach(async () => {
     const data: aliasSetCommandData = {
       id: randomDiscordId19(),
-      name: "alias",
+      name: 'alias',
       options: [subcommand],
       type: 1,
     };
@@ -75,7 +75,7 @@ describe("/alias set", () => {
     em = orm.em.fork();
   });
 
-  it("should respond success message", async () => {
+  it('should respond success message', async () => {
     const response = await set(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
@@ -85,14 +85,14 @@ describe("/alias set", () => {
         components: [
           {
             type: MessageComponentTypes.TEXT_DISPLAY,
-            content:  t("common.ok"),
+            content: t('common.ok'),
           },
         ],
       },
     });
   });
 
-  it("should save discord server", async () => {
+  it('should save discord server', async () => {
     await set(handlerOpts, subcommand);
 
     em.clear();
@@ -107,7 +107,7 @@ describe("/alias set", () => {
     );
   });
 
-  it("should save aliased message", async () => {
+  it('should save aliased message', async () => {
     await set(handlerOpts, subcommand);
 
     em.clear();
@@ -122,14 +122,14 @@ describe("/alias set", () => {
     ]);
   });
 
-  describe("on existing server", () => {
+  describe('on existing server', () => {
     let guild: DiscordGuild;
     beforeEach(async () => {
       guild = new DiscordGuild(guild_id);
       await em.persist(guild).flush();
     });
 
-    it("should not duplicate discord server", async () => {
+    it('should not duplicate discord server', async () => {
       await set(handlerOpts, subcommand);
 
       em.clear();
@@ -145,15 +145,15 @@ describe("/alias set", () => {
       ]);
     });
 
-    describe("on existing aliased message", () => {
+    describe('on existing aliased message', () => {
       let messageAliased: MessageAliased;
       beforeEach(async () => {
-        messageAliased = new MessageAliased(aliasOpts.value, "old message");
+        messageAliased = new MessageAliased(aliasOpts.value, 'old message');
         guild.messageAliaseds.add(messageAliased);
         await em.persist(guild).persist(messageAliased).flush();
       });
 
-      it("should not create duplicate aliased message", async () => {
+      it('should not create duplicate aliased message', async () => {
         await set(handlerOpts, subcommand);
 
         em.clear();
@@ -164,7 +164,7 @@ describe("/alias set", () => {
         expect(msgs).toBeArrayOfSize(1);
       });
 
-      it("should update existing aliased message", async () => {
+      it('should update existing aliased message', async () => {
         await set(handlerOpts, subcommand);
 
         em.clear();
@@ -180,14 +180,14 @@ describe("/alias set", () => {
         );
       });
 
-      it("should allow to create another aliased message on this server", async () => {
-        const anotherAliasOpts: SubCommandOption<"alias", string> = {
-          name: "alias",
+      it('should allow to create another aliased message on this server', async () => {
+        const anotherAliasOpts: SubCommandOption<'alias', string> = {
+          name: 'alias',
           type: 3,
-          value: "anotheralias",
+          value: 'anotheralias',
         };
         const anotherAliasSubCommand: aliasSetSubCommandData = {
-          name: "set",
+          name: 'set',
           options: [anotherAliasOpts, msgOpts],
           type: 1,
         };
@@ -197,7 +197,7 @@ describe("/alias set", () => {
             guild_id,
             data: {
               id: randomDiscordId19(),
-              name: "alias",
+              name: 'alias',
               options: [anotherAliasSubCommand],
               type: 1,
             },
@@ -229,46 +229,46 @@ describe("/alias set", () => {
 
   it.each([
     [
-      "too_small",
+      'too_small',
       {
         inclusive: true,
-        message: "Too small: expected string to have >=1 characters",
+        message: 'Too small: expected string to have >=1 characters',
         minimum: 1,
-        origin: "string",
-        path: ["alias"],
+        origin: 'string',
+        path: ['alias'],
       },
-      "",
+      '',
     ],
     [
-      "invalid_format",
+      'invalid_format',
       {
-        format: "regex",
-        message: "Invalid string: must match pattern /^[a-z0-9]+$/",
-        origin: "string",
-        path: ["alias"],
-        pattern: "/^[a-z0-9]+$/",
+        format: 'regex',
+        message: 'Invalid string: must match pattern /^[a-z0-9]+$/',
+        origin: 'string',
+        path: ['alias'],
+        pattern: '/^[a-z0-9]+$/',
       },
-      "#@!ù",
+      '#@!ù',
     ],
 
     [
-      "too_big",
+      'too_big',
       {
         inclusive: true,
         maximum: 50,
-        message: "Too big: expected string to have <=50 characters",
-        origin: "string",
-        path: ["alias"],
+        message: 'Too big: expected string to have <=50 characters',
+        origin: 'string',
+        path: ['alias'],
       },
 
       getRandomString({ length: 51, letter: true, number: false }),
     ],
   ])('should respond error on %s "alias"', async (code, issue, badAlias) => {
     const badsubcommand: aliasSetSubCommandData = {
-      name: "set",
+      name: 'set',
       options: [
         {
-          name: "alias",
+          name: 'alias',
           type: 3,
           value: badAlias,
         },
@@ -280,7 +280,7 @@ describe("/alias set", () => {
     const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
       data: {
         id: randomDiscordId19(),
-        name: "alias",
+        name: 'alias',
         options: [badsubcommand],
         type: 1,
       },
@@ -289,7 +289,7 @@ describe("/alias set", () => {
     const response = await set({ ...handlerOpts, req, res }, badsubcommand);
 
     expect(response).toMeetApiResponse(400, {
-      error:  t("errors.invalidSubcommandPayload"),
+      error: t('errors.invalidSubcommandPayload'),
       issues: expect.arrayContaining([
         {
           code,
@@ -301,25 +301,25 @@ describe("/alias set", () => {
 
   it.each([
     [
-      "too_small",
+      'too_small',
       {
         inclusive: true,
-        message: "Too small: expected string to have >=1 characters",
+        message: 'Too small: expected string to have >=1 characters',
         minimum: 1,
-        origin: "string",
-        path: ["message"],
+        origin: 'string',
+        path: ['message'],
       },
-      "",
+      '',
     ],
 
     [
-      "too_big",
+      'too_big',
       {
         inclusive: true,
         maximum: 500,
-        message: "Too big: expected string to have <=500 characters",
-        origin: "string",
-        path: ["message"],
+        message: 'Too big: expected string to have <=500 characters',
+        origin: 'string',
+        path: ['message'],
       },
 
       getRandomString({ length: 501, letter: true, number: false }),
@@ -328,11 +328,11 @@ describe("/alias set", () => {
     'should respond error on %s "message"',
     async (code, issue, badMessage) => {
       const badsubcommand: aliasSetSubCommandData = {
-        name: "set",
+        name: 'set',
         options: [
           aliasOpts,
           {
-            name: "message",
+            name: 'message',
             type: 3,
             value: badMessage,
           },
@@ -343,7 +343,7 @@ describe("/alias set", () => {
       const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
         data: {
           id: randomDiscordId19(),
-          name: "alias",
+          name: 'alias',
           options: [badsubcommand],
           type: 1,
         },
@@ -352,7 +352,7 @@ describe("/alias set", () => {
       const response = await set({ ...handlerOpts, req, res }, badsubcommand);
 
       expect(response).toMeetApiResponse(400, {
-        error:  t("errors.invalidSubcommandPayload"),
+        error: t('errors.invalidSubcommandPayload'),
         issues: expect.arrayContaining([
           {
             code,

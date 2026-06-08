@@ -1,4 +1,4 @@
-import { ComponentType } from "discord-api-types/v10";
+import { ComponentType } from 'discord-api-types/v10';
 
 export type PartialComponentSingle = {
   custom_id: string;

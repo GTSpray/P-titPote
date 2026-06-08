@@ -1,15 +1,15 @@
-import * as z from "zod";
-import { Response } from "express";
-import { CommandHandlerOptions, SubCommandOption } from "../../commands.js";
+import * as z from 'zod';
+import { Response } from 'express';
+import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
 import {
   InteractionResponseFlags,
   InteractionResponseType,
   MessageComponentTypes,
-} from "discord-interactions";
-import { logger } from "../../../logger.js";
-import { MessageAliased } from "../../../db/entities/MessageAliased.entity.js";
-import { errorPayload } from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from 'discord-interactions';
+import { logger } from '../../../logger.js';
+import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
+import { errorPayload } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export interface aliasSayCommandData {
   id: string;
@@ -19,8 +19,8 @@ export interface aliasSayCommandData {
 }
 
 export type aliasSaySubCommandData = {
-  name: "say";
-  options: [SubCommandOption<"alias", string>];
+  name: 'say';
+  options: [SubCommandOption<'alias', string>];
   type: number;
 };
 
@@ -45,10 +45,10 @@ export const say = async (
 
   if (!AliasMessageInput.success) {
     const issues = AliasMessageInput.error.issues;
-    logger.debug("zod errors", { issues });
+    logger.debug('zod errors', { issues });
     return res
       .status(400)
-      .json({ error: t("errors.invalidSubcommandPayload"), issues });
+      .json({ error: t('errors.invalidSubcommandPayload'), issues });
   }
 
   if (dbServices && guildId) {
@@ -75,7 +75,7 @@ export const say = async (
     } else {
       return res.json(
         errorPayload(
-          t("alias.say.notFound", {
+          t('alias.say.notFound', {
             alias: AliasMessageInput.data.alias,
           }),
         ),

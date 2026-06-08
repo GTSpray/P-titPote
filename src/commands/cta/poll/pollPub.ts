@@ -2,17 +2,17 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
-} from "discord-api-types/v10";
-import { CTAData, ModalHandlerDelcaration } from "../../modals.js";
+} from 'discord-api-types/v10';
+import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
 import {
   InteractionResponseFlags,
   MessageComponentTypes,
-} from "discord-interactions";
-import { Poll } from "../../../db/entities/Poll.entity.js";
-import { logger } from "../../../logger.js";
-import { assertInteractionUserIsModerator } from "../../assert/assertInteractionUserIsModerator.js";
-import { notAllowed, doNotUpdatePublishedPoll } from "../../commonMessages.js";
-import { t } from "../../../i18n/index.js";
+} from 'discord-interactions';
+import { Poll } from '../../../db/entities/Poll.entity.js';
+import { logger } from '../../../logger.js';
+import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import { notAllowed, doNotUpdatePublishedPoll } from '../../commonMessages.js';
+import { t } from '../../../i18n/index.js';
 
 export const pollPub: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -31,7 +31,7 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
         Poll,
         { id: pollId },
         {
-          populate: ["steps", "steps.choices"],
+          populate: ['steps', 'steps.choices'],
         },
       );
 
@@ -53,8 +53,8 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
               components: [
                 {
                   type: MessageComponentTypes.TEXT_DISPLAY,
-                  content: t("poll.publish.header", {
-                    mention: aPoll.role ? ` <@&${aPoll.role}>` : "",
+                  content: t('poll.publish.header', {
+                    mention: aPoll.role ? ` <@&${aPoll.role}>` : '',
                   }),
                 },
                 {
@@ -80,11 +80,11 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
                 {
                   type: ComponentType.Button,
                   style: ButtonStyle.Primary,
-                  label: t("poll.button.vote"),
+                  label: t('poll.button.vote'),
                   custom_id: JSON.stringify({
-                    t: "cta",
+                    t: 'cta',
                     d: {
-                      a: "pollResp",
+                      a: 'pollResp',
                       pId: pollId,
                     },
                   }),
@@ -96,6 +96,6 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
       });
     }
 
-    return res.status(500).json({ error: t("errors.unknown") });
+    return res.status(500).json({ error: t('errors.unknown') });
   },
 };
