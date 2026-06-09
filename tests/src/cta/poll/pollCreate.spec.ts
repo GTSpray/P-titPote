@@ -20,7 +20,6 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
-import { InteractionResponseFlags } from 'discord-interactions';
 import { expectedPoll } from '../../../epectedEntities/expectedPoll.js';
 import { Poll } from '../../../../src/db/entities/Poll.entity.js';
 import {
@@ -209,7 +208,7 @@ describe('cta/pollCreate', () => {
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: expect.any(String),
           components: expect.any(Array),
         },
@@ -391,7 +390,7 @@ describe('cta/pollCreate', () => {
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: expect.any(String),
           components: expect.any(Array),
         },
@@ -570,7 +569,7 @@ describe('cta/pollCreate', () => {
       expect(response).toMeetApiResponse(200, {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: expect.any(String),
           components: expect.any(Array),
         },

@@ -1,9 +1,3 @@
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
-
 import { CommandHandlerOptions } from '../../commands.js';
 import {
   ApplicationIntegrationType,
@@ -11,6 +5,11 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from 'discord.js';
+import {
+  ComponentType,
+  InteractionResponseType,
+  MessageFlags,
+} from 'discord-api-types/v10';
 
 import { getRandomEmoji } from '../../../utils/getRandomEmoji.js';
 
@@ -46,12 +45,12 @@ export const version = async ({
   res,
 }: CommandHandlerOptions<gimmeVersionCommandData>): Promise<Response | null> => {
   return res.json({
-    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    type: InteractionResponseType.ChannelMessageWithSource,
     data: {
-      flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+      flags: MessageFlags.IsComponentsV2,
       components: [
         {
-          type: MessageComponentTypes.TEXT_DISPLAY,
+          type: ComponentType.TextDisplay,
           content: t('gimme.version.message', {
             emoji: getRandomEmoji(),
             version: process.env.npm_package_version ?? 'unknown',

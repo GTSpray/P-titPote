@@ -1,10 +1,10 @@
 import { Response } from 'express';
 import { CommandHandlerOptions } from '../../commands.js';
 import {
-  InteractionResponseFlags,
+  ComponentType,
   InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
+  MessageFlags,
+} from 'discord-api-types/v10';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
 
@@ -43,15 +43,15 @@ export const ls = async ({
       components = [
         ...foundItComponnents(),
         {
-          type: MessageComponentTypes.TEXT_DISPLAY,
+          type: ComponentType.TextDisplay,
           content: messageAliaseds.map((e) => `* ${e.alias}`).join('\n'),
         },
       ];
     }
     return res.json({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components,
       },
     });

@@ -19,10 +19,7 @@ import {
   PermissionFlagsBits,
 } from 'discord.js';
 
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-} from 'discord-interactions';
+import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
   admin_permissions,
   default_member_permissions,
@@ -127,9 +124,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });
@@ -231,9 +228,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });
@@ -324,9 +321,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });

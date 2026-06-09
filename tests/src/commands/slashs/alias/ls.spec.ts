@@ -4,10 +4,10 @@ import {
   ls,
 } from '../../../../../src/commands/slash/alias/ls.js';
 import {
-  InteractionResponseFlags,
+  ComponentType,
   InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
+  MessageFlags,
+} from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
 import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
@@ -31,9 +31,9 @@ describe('/alias ls', () => {
   >;
 
   const notFoundMessagePayload = {
-    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    type: InteractionResponseType.ChannelMessageWithSource,
     data: {
-      flags: InteractionResponseFlags.EPHEMERAL,
+      flags: MessageFlags.Ephemeral,
       content: t('common.notFound'),
     },
   };
@@ -94,21 +94,21 @@ describe('/alias ls', () => {
       const response = await ls(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+          flags: MessageFlags.IsComponentsV2,
           components: [
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: t('common.foundIt'),
             },
             {
-              type: MessageComponentTypes.SEPARATOR,
+              type: ComponentType.Separator,
               divider: true,
               spacing: 1,
             },
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: messageAliaseds.map((e) => `* ${e.alias}`).join('\n'),
             },
           ],
@@ -125,21 +125,21 @@ describe('/alias ls', () => {
       const response = await ls(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+          flags: MessageFlags.IsComponentsV2,
           components: [
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: t('common.foundIt'),
             },
             {
-              type: MessageComponentTypes.SEPARATOR,
+              type: ComponentType.Separator,
               divider: true,
               spacing: 1,
             },
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: expect.not.stringContaining(softDeleted.alias),
             },
           ],
@@ -173,21 +173,21 @@ describe('/alias ls', () => {
       const response = await ls(handlerOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+          flags: MessageFlags.IsComponentsV2,
           components: [
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: t('common.foundIt'),
             },
             {
-              type: MessageComponentTypes.SEPARATOR,
+              type: ComponentType.Separator,
               divider: true,
               spacing: 1,
             },
             {
-              type: MessageComponentTypes.TEXT_DISPLAY,
+              type: ComponentType.TextDisplay,
               content: expect.not.stringContaining(otherAlias.alias),
             },
           ],
