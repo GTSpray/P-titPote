@@ -2,7 +2,7 @@ import {
   SqlEntityManager,
   AbstractSqlDriver,
   AbstractSqlConnection,
-  AbstractSqlPlatform
+  AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import {
   pollAddC,
