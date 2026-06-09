@@ -47,7 +47,7 @@ describe('cta/pollSummary', () => {
     em = orm.em.fork();
 
     aPoll = new Poll(`aTitre`);
-    aPoll.endDate = new Date(Date.now()+1000);
+    aPoll.endDate = new Date(Date.now() + 1000);
     guild_id = randomDiscordId19();
 
     data = {
@@ -100,10 +100,10 @@ describe('cta/pollSummary', () => {
     });
   });
 
-  it('should update the poll end date to now when publishing the summary', async () => {
-    const beforeSummary = new Date();
+  it('should set the poll endDate to now when publishing the summary', async () => {
+    const beforeSummary = new Date(Date.now() - 500);
     await pollSummary.handler(handlerOpts);
-    const afterSummary = new Date();
+    const afterSummary = new Date(Date.now() + 500);
 
     em.clear();
     const poll = await em.findOneOrFail(Poll, {
@@ -111,10 +111,12 @@ describe('cta/pollSummary', () => {
     });
 
     expect(poll.endDate).toBeDateBetween(
-      new Date(beforeSummary.getTime() - 1000),
-      new Date(afterSummary.getTime() + 1000),
+      beforeSummary,
+      afterSummary
     );
   });
+
+  it.todo('should not update the end date of a poll that has already been published')
 
   it('should publish a vote summary with choice counts and free responses', async () => {
     const firstMemberId = randomDiscordId19();
