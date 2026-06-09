@@ -12,7 +12,8 @@ import {
 
 import { Request, Response } from 'express';
 
-import { APIBaseInteraction, InteractionType, Locale } from 'discord.js';
+import type { APIBaseInteraction } from 'discord-api-types/v10';
+import { InteractionType, Locale } from 'discord-api-types/v10';
 import { getAPIInteractionGuildMemberData } from './discord-api/getAPIInteractionGuildMemberData.js';
 import { getApiUserData } from './discord-api/getApiUserData.js';
 import { getApiChannelData } from './discord-api/getApiChannelData.js';

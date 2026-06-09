@@ -14,12 +14,12 @@ import { type aliasSetSubCommandData } from '../../../../../src/commands/slash/a
 import { type aliasSaySubCommandData } from '../../../../../src/commands/slash/alias/say.js';
 import { type aliasLsSubCommandData } from '../../../../../src/commands/slash/alias/ls.js';
 import {
-  InteractionContextType,
   ApplicationIntegrationType,
+  InteractionContextType,
+  InteractionResponseType,
+  MessageFlags,
   PermissionFlagsBits,
-} from 'discord.js';
-
-import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
+} from 'discord-api-types/v10';
 import {
   admin_permissions,
   default_member_permissions,

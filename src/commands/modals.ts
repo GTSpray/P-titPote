@@ -1,4 +1,5 @@
-import { APIBaseInteraction, InteractionType } from 'discord.js';
+import type { APIBaseInteraction } from 'discord-api-types/v10';
+import { InteractionType } from 'discord-api-types/v10';
 import { Request, Response } from 'express';
 import { DBServices } from '../db/db.js';
 

@@ -1,4 +1,5 @@
-import { type APIBaseInteraction, type InteractionType } from 'discord.js';
+import type { APIBaseInteraction } from 'discord-api-types/v10';
+import type { InteractionType } from 'discord-api-types/v10';
 import { t } from '../../i18n/index.js';
 
 type InteractionTypeOpts =

@@ -1,4 +1,5 @@
-import { APIUser, UserFlags } from 'discord.js';
+import type { APIUser } from 'discord-api-types/v10';
+import { UserFlags } from 'discord-api-types/v10';
 import { getRandomString, randomDiscordId18 } from './utils.js';
 
 export const getApiUserData = (options: Partial<APIUser> = {}): APIUser => {

@@ -1,4 +1,5 @@
-import { APIInteractionGuildMember, GuildMemberFlags } from 'discord.js';
+import type { APIInteractionGuildMember } from 'discord-api-types/v10';
+import { GuildMemberFlags } from 'discord-api-types/v10';
 import { randomDiscordId16 } from './utils.js';
 import { getApiUserData } from './getApiUserData.js';
 

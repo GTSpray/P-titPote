@@ -1,4 +1,5 @@
-import { REST, Routes } from 'discord.js';
+import { REST } from 'discord.js';
+import { Routes } from 'discord-api-types/v10';
 import { GatewaySocket } from '../../../src/gateway/GatewaySocket.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { ShardSocket } from '../../../src/gateway/ShardSocket.js';

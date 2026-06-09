@@ -7,7 +7,7 @@ import {
   GatewayIntentBits,
   GatewayInvalidSession,
   GatewayOpcodes,
-} from 'discord.js';
+} from 'discord-api-types/v10';
 import { WsClosedCode, GWSEvent } from './gatewaytypes.js';
 import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
 

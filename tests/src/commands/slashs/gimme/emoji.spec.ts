@@ -6,7 +6,8 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
-import { REST, Routes } from 'discord.js';
+import { REST } from 'discord.js';
+import { Routes } from 'discord-api-types/v10';
 import {
   getRandomString,
   randomDiscordId19,

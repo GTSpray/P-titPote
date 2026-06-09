@@ -11,10 +11,10 @@ import * as versionModule from '../../../../../src/commands/slash/gimme/version.
 import { DBServices } from '../../../../../src/db/db.js';
 import { initORM } from '../../../../initORM.js';
 import {
-  InteractionContextType,
   ApplicationIntegrationType,
+  InteractionContextType,
   PermissionFlagsBits,
-} from 'discord.js';
+} from 'discord-api-types/v10';
 import { t } from '../../../../../src/i18n/index.js';
 
 describe('/gimme', () => {

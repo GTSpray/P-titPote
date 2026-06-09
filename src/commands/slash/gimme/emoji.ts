@@ -1,7 +1,7 @@
 import { CommandHandlerOptions } from '../../commands.js';
 import { Response } from 'express';
 import { logger } from '../../../logger.js';
-import { Routes, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import {
   ApplicationIntegrationType,
   ComponentType,
@@ -10,6 +10,7 @@ import {
   MessageFlags,
   PermissionFlagsBits,
   RESTGetAPIChannelMessagesResult,
+  Routes,
 } from 'discord-api-types/v10';
 
 import { discordapi } from '../../../utils/discordapi.js';

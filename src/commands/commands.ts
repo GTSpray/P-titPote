@@ -1,6 +1,6 @@
+import type { APIBaseInteraction } from 'discord-api-types/v10';
+import { InteractionType } from 'discord-api-types/v10';
 import {
-  APIBaseInteraction,
-  InteractionType,
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
   SlashCommandSubcommandsOnlyBuilder,

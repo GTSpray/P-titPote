@@ -1,15 +1,13 @@
 import { CommandHandlerOptions } from '../../commands.js';
 import {
   ApplicationIntegrationType,
-  InteractionContextType,
-  PermissionFlagsBits,
-  SlashCommandBuilder,
-} from 'discord.js';
-import {
   ComponentType,
+  InteractionContextType,
   InteractionResponseType,
   MessageFlags,
+  PermissionFlagsBits,
 } from 'discord-api-types/v10';
+import { SlashCommandBuilder } from 'discord.js';
 
 import { getRandomEmoji } from '../../../utils/getRandomEmoji.js';
 

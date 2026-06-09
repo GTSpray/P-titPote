@@ -7,7 +7,7 @@ import {
   GatewayReadyDispatch,
   GatewayReconnect,
   GatewayResumedDispatch,
-} from 'discord.js';
+} from 'discord-api-types/v10';
 import { getRandomString, randomDiscordId19 } from './discord-api/utils.js';
 
 export const helloMsg = (d: { heartbeat_interval?: number }): GatewayHello => ({
