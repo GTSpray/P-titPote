@@ -1,3 +1,9 @@
+## [1.4.8](https://github.com/GTSpray/P-titPote/compare/v1.4.7...v1.4.8) (2026-06-09)
+
+### :zap: Refactor
+
+* standardize Discord types on discord-api-types/v10 ([#181](https://github.com/GTSpray/P-titPote/issues/181)) ([6594b68](https://github.com/GTSpray/P-titPote/commit/6594b6828bcf1eb771482ea6a4c0d3749d2361e7))
+
 ## [1.4.7](https://github.com/GTSpray/P-titPote/compare/v1.4.6...v1.4.7) (2026-06-09)
 
 ### :repeat: Chore
