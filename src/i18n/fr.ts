@@ -10,12 +10,6 @@ export const fr = {
   'errors.invalid': 'invalid',
   'errors.noPoll': 'no Poll',
   'errors.voteClosed': 'Ahem... le bureau de vote est fermé... désolé',
-  'errors.voteNotClosed':
-    "Ahem... le vote n'est pas encore terminé. Reviens après la clôture.",
-  'errors.invalidPollEndDate':
-    'Ahem... la date de fin doit être au format AAAA-MM-JJ ou AAAA-MM-JJ HH:mm',
-  'errors.pollEndDateInPast':
-    'Ahem... la date de fin du vote doit être dans le futur',
   'errors.unknownCommand': 'unknown command',
   'errors.unknownModal': 'unknown modal',
   'errors.unknownError': 'unknown error',
@@ -50,9 +44,6 @@ export const fr = {
   'poll.modal.label.question': 'Question du sondage',
   'poll.modal.label.description': 'Description',
   'poll.modal.label.choice': 'Choix n°{order}',
-  'poll.modal.label.endDate': 'Date de fin du vote',
-  'poll.modal.description.endDate':
-    'Format attendu : AAAA-MM-JJ ou AAAA-MM-JJ HH:mm',
   'poll.button.addChoices': 'Ajouter des choix',
   'poll.button.newQuestion': 'Nouvelle question',
   'poll.button.publish': 'Publier le sondage',

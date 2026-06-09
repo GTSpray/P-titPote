@@ -47,7 +47,7 @@ describe('cta/pollSummary', () => {
     em = orm.em.fork();
 
     aPoll = new Poll(`aTitre`);
-    aPoll.endDate = new Date('2000-01-01T00:00:00.000Z');
+    aPoll.endDate = new Date('2099-06-30T18:00:00.000Z');
     guild_id = randomDiscordId19();
 
     data = {
@@ -78,6 +78,10 @@ describe('cta/pollSummary', () => {
     await em.persist(aGuild).flush();
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
@@ -100,22 +104,25 @@ describe('cta/pollSummary', () => {
     });
   });
 
-  it('should refuse to summarize a poll before its end date', async () => {
-    aPoll.endDate = new Date('2099-06-30T18:00:00.000Z');
-    await em.persist(aPoll).flush();
+  it('should update the poll end date to now when publishing the summary', async () => {
+    const closedAt = new Date('2026-06-09T13:45:00.000Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(closedAt);
 
-    const response = await pollSummary.handler(handlerOpts);
+    await pollSummary.handler(handlerOpts);
 
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.Ephemeral,
-        content: t('errors.voteNotClosed'),
-      },
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
     });
+
+    expect(poll.endDate).toEqual(closedAt);
   });
 
   it('should publish a vote summary with choice counts and free responses', async () => {
+    const closedAt = new Date('2026-06-09T13:45:00.000Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(closedAt);
     const firstMemberId = randomDiscordId19();
     const secondMemberId = randomDiscordId19();
     const thirdMemberId = randomDiscordId19();
@@ -143,7 +150,7 @@ describe('cta/pollSummary', () => {
               `## ${aPoll.title}`,
               t('poll.report.participants', { count: 3 }),
               t('poll.report.endDate', {
-                date: formatDiscordTimestamp(<Date>aPoll.endDate),
+                date: formatDiscordTimestamp(closedAt),
               }),
               '',
               `### 1. ${firstStep.question}`,

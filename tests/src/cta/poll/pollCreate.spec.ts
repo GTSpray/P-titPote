@@ -36,7 +36,6 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
-import { formatDiscordTimestamp } from '../../../../src/utils/pollDates.js';
 
 describe('cta/pollCreate', () => {
   let guild_id: string;
@@ -51,7 +50,6 @@ describe('cta/pollCreate', () => {
     let aQuestionCmp: PartialComponentSingle;
     let aRoleCmp: PartialComponentList;
     let aDescCmp: PartialComponentSingle;
-    let aEndDateCmp: PartialComponentSingle;
 
     beforeEach(async () => {
       aTitreCmp = {
@@ -78,19 +76,12 @@ describe('cta/pollCreate', () => {
         values: [randomDiscordId19()],
       };
 
-      aEndDateCmp = {
-        custom_id: 'endDate',
-        type: ComponentType.TextInput,
-        value: '2099-06-30 18:00',
-      };
-
       data = {
         components: getModalLabelComponnents([
           aTitreCmp,
           aRoleCmp,
           aQuestionCmp,
           aDescCmp,
-          aEndDateCmp,
         ]),
         custom_id: `{"t":"cta","d":{"a":"pollCreate"}}`,
       };
@@ -161,7 +152,6 @@ describe('cta/pollCreate', () => {
           poll: expectedPoll({
             title: <string>aTitreCmp.value,
             role: <string>aRoleCmp.values[0],
-            endDate: new Date('2099-06-30T18:00:00.000Z'),
           }),
           description: <string>aDescCmp.value,
         }),
@@ -183,7 +173,7 @@ describe('cta/pollCreate', () => {
     ])('should save poll with %o as role', async (role) => {
       const data = {
         components: getModalLabelComponnents(
-          [aTitreCmp, role, aQuestionCmp, aEndDateCmp].filter((e) => !!e),
+          [aTitreCmp, role, aQuestionCmp].filter((e) => !!e),
         ),
         custom_id: `{"t":"cta","d":{"a":"pollCreate"}}`,
       };
@@ -213,53 +203,6 @@ describe('cta/pollCreate', () => {
       ]);
     });
 
-    it.each([
-      {
-        value: '2099-02-31 18:00',
-        error: t('errors.invalidPollEndDate'),
-      },
-      {
-        value: '2000-01-01 00:00',
-        error: t('errors.pollEndDateInPast'),
-      },
-    ])(
-      'should reject poll creation with $value as end date',
-      async ({ value, error }) => {
-        const endDateCmp = {
-          ...aEndDateCmp,
-          value,
-        };
-        const { req, res } = getInteractionModalHttpMock({
-          data: {
-            components: getModalLabelComponnents([
-              aTitreCmp,
-              aRoleCmp,
-              aQuestionCmp,
-              aDescCmp,
-              endDateCmp,
-            ]),
-            custom_id: `{"t":"cta","d":{"a":"pollCreate"}}`,
-          },
-          guild_id,
-          permissions: admin_permissions,
-        });
-
-        const response = await pollCreate.handler({
-          ...handlerOpts,
-          req,
-          res,
-        });
-
-        expect(response).toMeetApiResponse(200, {
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data: {
-            flags: MessageFlags.Ephemeral,
-            content: error,
-          },
-        });
-      },
-    );
-
     it('should respond a ephemeral message because poll is not ready', async () => {
       const response = await pollCreate.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
@@ -288,10 +231,6 @@ describe('cta/pollCreate', () => {
 
       const expectedSummary = [
         `## ${poll.title}`,
-        t('poll.publish.endDate', {
-          date: formatDiscordTimestamp(<Date>poll.endDate),
-          relative: formatDiscordTimestamp(<Date>poll.endDate, 'R'),
-        }),
         '',
         `1. ${firstStep.question}`,
       ].join('\n');
