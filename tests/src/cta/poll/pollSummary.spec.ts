@@ -110,10 +110,7 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
 
-    expect(poll.endDate).toBeDateBetween(
-      beforeSummary,
-      afterSummary
-    );
+    expect(poll.endDate).toBeDateBetween(beforeSummary, afterSummary);
   });
 
   it('should not update the end date of a poll that has already been published', async () => {
