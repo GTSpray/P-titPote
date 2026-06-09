@@ -105,8 +105,7 @@ describe('cta/pollPub', () => {
             components: [
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
-                content:
-                  '# Oyé Oyé!\n-# Le staff réclame votre attention pour un sondage!',
+                content: t('poll.publish.header', { mention: '' }),
               },
               {
                 type: MessageComponentTypes.TEXT_DISPLAY,
