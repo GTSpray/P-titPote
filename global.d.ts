@@ -79,6 +79,8 @@ interface CustomMatchers<R = unknown> {
 
   toBeEmpty(): ExpectationResult;
 
+  toBeDateBetween(start: Date, end: Date): ExpectationResult;
+
   toBeValidDate(): {
     pass: boolean;
 

@@ -110,9 +110,9 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
 
-    expect(poll.endDate?.getTime()).toBeWithin(
-      beforeSummary.getTime() - 1000,
-      afterSummary.getTime() + 1000,
+    expect(poll.endDate).toBeDateBetween(
+      new Date(beforeSummary.getTime() - 1000),
+      new Date(afterSummary.getTime() + 1000),
     );
   });
 
