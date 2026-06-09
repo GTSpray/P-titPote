@@ -18,12 +18,25 @@ import { PollStep } from '../../../db/entities/PollStep.entity.js';
 import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
-import { notAllowed } from '../../commonMessages.js';
+import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import {
+  formatDiscordTimestamp,
+  isPollClosed,
+  parsePollEndDate,
+} from '../../../utils/pollDates.js';
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
     `## ${aPoll.title}`,
+    ...(aPoll.endDate
+      ? [
+          t('poll.publish.endDate', {
+            date: formatDiscordTimestamp(aPoll.endDate),
+            relative: formatDiscordTimestamp(aPoll.endDate, 'R'),
+          }),
+        ]
+      : []),
     '',
     ...aPoll.steps.reduce(
       (acc: string[], aStep) => [
@@ -66,6 +79,18 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           `${title?.component.value}`,
           role?.component.values[0],
         );
+        const endDateInput = getInputComponnentById<ComponentSimple>(
+          data,
+          'endDate',
+        );
+        const endDate = parsePollEndDate(endDateInput?.component.value);
+        if (!endDate) {
+          return res.json(errorPayload(t('errors.invalidPollEndDate')));
+        }
+        if (isPollClosed(endDate)) {
+          return res.json(errorPayload(t('errors.pollEndDateInPast')));
+        }
+        aPoll.endDate = endDate;
         aGuild.polls.add(aPoll);
         const firstStep = new PollStep(`${question?.component.value}`, 0);
         const qDesc = getInputComponnentById<ComponentSimple>(

@@ -119,6 +119,20 @@ describe('/poll create', () => {
               required: false,
             },
           },
+          {
+            type: ComponentType.Label,
+            label: t('poll.modal.label.endDate'),
+            description: t('poll.modal.description.endDate'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: `endDate`,
+              style: TextInputStyle.Short,
+              min_length: 10,
+              max_length: 16,
+              placeholder: '2026-06-30 18:00',
+              required: true,
+            },
+          },
         ],
       },
     });

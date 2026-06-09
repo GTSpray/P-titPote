@@ -10,6 +10,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { notAllowed, doNotUpdatePublishedPoll } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
 
 export const pollPub: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -58,6 +59,17 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
                   type: ComponentType.TextDisplay,
                   content: aPoll.title,
                 },
+                ...(aPoll.endDate
+                  ? [
+                      {
+                        type: ComponentType.TextDisplay,
+                        content: t('poll.publish.endDate', {
+                          date: formatDiscordTimestamp(aPoll.endDate),
+                          relative: formatDiscordTimestamp(aPoll.endDate, 'R'),
+                        }),
+                      },
+                    ]
+                  : []),
               ],
               accessory: {
                 type: ComponentType.Thumbnail,
@@ -82,6 +94,18 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
                     t: 'cta',
                     d: {
                       a: 'pollResp',
+                      pId: pollId,
+                    },
+                  }),
+                },
+                {
+                  type: ComponentType.Button,
+                  style: ButtonStyle.Secondary,
+                  label: t('poll.button.report'),
+                  custom_id: JSON.stringify({
+                    t: 'cta',
+                    d: {
+                      a: 'pollSummary',
                       pId: pollId,
                     },
                   }),

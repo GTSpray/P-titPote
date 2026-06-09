@@ -10,6 +10,12 @@ export const fr = {
   'errors.invalid': 'invalid',
   'errors.noPoll': 'no Poll',
   'errors.voteClosed': 'Ahem... le bureau de vote est fermé... désolé',
+  'errors.voteNotClosed':
+    "Ahem... le vote n'est pas encore terminé. Reviens après la clôture.",
+  'errors.invalidPollEndDate':
+    'Ahem... la date de fin doit être au format AAAA-MM-JJ ou AAAA-MM-JJ HH:mm',
+  'errors.pollEndDateInPast':
+    'Ahem... la date de fin du vote doit être dans le futur',
   'errors.unknownCommand': 'unknown command',
   'errors.unknownModal': 'unknown modal',
   'errors.unknownError': 'unknown error',
@@ -44,14 +50,23 @@ export const fr = {
   'poll.modal.label.question': 'Question du sondage',
   'poll.modal.label.description': 'Description',
   'poll.modal.label.choice': 'Choix n°{order}',
+  'poll.modal.label.endDate': 'Date de fin du vote',
+  'poll.modal.description.endDate':
+    'Format attendu : AAAA-MM-JJ ou AAAA-MM-JJ HH:mm',
   'poll.button.addChoices': 'Ajouter des choix',
   'poll.button.newQuestion': 'Nouvelle question',
   'poll.button.publish': 'Publier le sondage',
   'poll.button.vote': 'Je vote!',
+  'poll.button.report': 'Compte rendu',
   'poll.publish.header':
     '# Oyé Oyé{mention}!\n-# Le staff réclame votre attention pour un sondage!',
+  'poll.publish.endDate': 'Fin du vote : {date} ({relative})',
   'poll.response.placeholder': 'Choisis...',
   'poll.vote.success': 'A voté!',
+  'poll.report.title': '# Compte rendu du vote',
+  'poll.report.participants': 'Participants : {count}',
+  'poll.report.endDate': 'Clôture : {date}',
+  'poll.report.noResponse': 'Aucune réponse pour le moment.',
   'gateway.activity.name': '🫖 Teapot Simulator',
   'gateway.activity.state': 'Autour du cou de Lila',
   'startup.noTokenEnv': 'no APP_ID provided in env',
