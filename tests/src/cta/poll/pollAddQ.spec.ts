@@ -83,7 +83,7 @@ describe('cta/pollAddQ', () => {
           },
           {
             type: ComponentType.Label,
-            label: `Description`,
+            label: t('poll.modal.label.description'),
             component: {
               type: ComponentType.TextInput,
               custom_id: `description`,

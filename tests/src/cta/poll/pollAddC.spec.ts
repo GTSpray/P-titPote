@@ -143,7 +143,7 @@ describe('cta/pollAddC', () => {
             const choiceOrder = i + 1;
             return {
               type: ComponentType.Label,
-              label: `Choix n°${choiceOrder}`,
+              label: t('poll.modal.label.choice', { order: choiceOrder }),
               component: {
                 type: ComponentType.TextInput,
                 custom_id: `choice${choiceOrder}`,
@@ -243,7 +243,7 @@ describe('cta/pollAddC', () => {
             ...Array.from({ length }).map((e, i) => {
               const choiceOrder = stepSize + i + 1;
               return expect.objectContaining({
-                label: `Choix n°${choiceOrder}`,
+                label: t('poll.modal.label.choice', { order: choiceOrder }),
                 component: expect.objectContaining({
                   custom_id: `choice${choiceOrder}`,
                 }),
@@ -276,7 +276,7 @@ describe('cta/pollAddC', () => {
           ...Array.from({ length: 4 }).map((e, i) => {
             const choiceOrder = stepSize + i + 1;
             return expect.objectContaining({
-              label: `Choix n°${choiceOrder}`,
+              label: t('poll.modal.label.choice', { order: choiceOrder }),
               component: expect.objectContaining({
                 custom_id: `choice${choiceOrder}`,
               }),

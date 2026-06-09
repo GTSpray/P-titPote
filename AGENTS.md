@@ -2,6 +2,23 @@
 
 Repository-wide instructions for AI coding agents working on **P'tit Pote**.
 
+## Token-efficient mode
+
+- Default to concise, action-first responses.
+- Keep final answers short unless the user asks for more detail.
+- Avoid restating the prompt.
+- Ask at most one clarifying question, and only when truly blocked.
+- Prefer minimal, focused diffs over broad refactors.
+
+## Response format
+
+When reporting results, prefer this compact order:
+
+1. Result
+2. Changes
+3. Checks
+4. Next
+
 ## Project summary
 
 P'tit Pote is a Discord bot built with TypeScript, Express, Discord.js, MikroORM, MariaDB, Winston, Docker Compose, and Vitest. The codebase is ESM/NodeNext and targets Node.js 22+.
@@ -11,7 +28,9 @@ These instructions apply to the whole repository unless a more specific `AGENTS.
 ## Agent operating rules
 
 - Make small, focused changes that match the existing architecture.
+- Read obvious target files first; avoid wide codebase scans unless needed.
 - Prefer the Makefile targets documented below over ad-hoc shell commands, especially when Docker services are required.
+- Run only the checks needed for the request.
 - Do not commit generated output from `dist/`, `logs/`,`temp/`, local environment files, logs, database dumps, or temporary artifacts.
 - Do not introduce new dependencies unless the task clearly requires them. Update `package-lock.json` whenever `package.json` dependencies change.
 - Never commit secrets, Discord tokens, app IDs, public/private keys, local tunnel URLs, database passwords, or real `.env` values.
@@ -213,3 +232,4 @@ When reporting back to a maintainer:
 - Mention the exact commands run and their results.
 - Call out any commands that could not be run.
 - Highlight risky areas such as Discord registration, database migrations, permissions, or environment variables.
+- Keep the response concise and actionable by default.

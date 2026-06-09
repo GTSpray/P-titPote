@@ -76,7 +76,7 @@ describe('/poll create', () => {
         components: [
           {
             type: ComponentType.Label,
-            label: `Titre du sondage`,
+            label: t('poll.modal.label.title'),
             component: {
               type: ComponentType.TextInput,
               custom_id: `title`,
@@ -88,7 +88,7 @@ describe('/poll create', () => {
           },
           {
             type: ComponentType.Label,
-            label: `Role des sondés`,
+            label: t('poll.modal.label.role'),
             component: {
               type: ComponentType.RoleSelect,
               custom_id: `role`,
@@ -109,7 +109,7 @@ describe('/poll create', () => {
           },
           {
             type: ComponentType.Label,
-            label: `Description`,
+            label: t('poll.modal.label.description'),
             component: {
               type: ComponentType.TextInput,
               custom_id: `description`,
