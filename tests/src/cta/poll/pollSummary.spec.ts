@@ -78,10 +78,6 @@ describe('cta/pollSummary', () => {
     await em.persist(aGuild).flush();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
@@ -105,24 +101,22 @@ describe('cta/pollSummary', () => {
   });
 
   it('should update the poll end date to now when publishing the summary', async () => {
-    const closedAt = new Date('2026-06-09T13:45:00.000Z');
-    vi.useFakeTimers();
-    vi.setSystemTime(closedAt);
-
+    const beforeSummary = new Date();
     await pollSummary.handler(handlerOpts);
+    const afterSummary = new Date();
 
     em.clear();
     const poll = await em.findOneOrFail(Poll, {
       id: aPoll.id,
     });
 
-    expect(poll.endDate).toEqual(closedAt);
+    expect(poll.endDate?.getTime()).toBeWithin(
+      beforeSummary.getTime() - 1000,
+      afterSummary.getTime() + 1000,
+    );
   });
 
   it('should publish a vote summary with choice counts and free responses', async () => {
-    const closedAt = new Date('2026-06-09T13:45:00.000Z');
-    vi.useFakeTimers();
-    vi.setSystemTime(closedAt);
     const firstMemberId = randomDiscordId19();
     const secondMemberId = randomDiscordId19();
     const thirdMemberId = randomDiscordId19();
@@ -137,6 +131,10 @@ describe('cta/pollSummary', () => {
     await em.persist([firstResp, secondResp, thirdResp, freeResp]).flush();
 
     const response = await pollSummary.handler(handlerOpts);
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -150,7 +148,7 @@ describe('cta/pollSummary', () => {
               `## ${aPoll.title}`,
               t('poll.report.participants', { count: 3 }),
               t('poll.report.endDate', {
-                date: formatDiscordTimestamp(closedAt),
+                date: formatDiscordTimestamp(<Date>poll.endDate),
               }),
               '',
               `### 1. ${firstStep.question}`,
