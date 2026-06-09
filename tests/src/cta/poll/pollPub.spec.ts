@@ -27,6 +27,7 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
+import { formatDiscordTimestamp } from '../../../../src/utils/pollDates.js';
 
 describe('cta/pollPub', () => {
   let guild_id: string;
@@ -136,6 +137,18 @@ describe('cta/pollPub', () => {
                   },
                 }),
               },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Secondary,
+                label: t('poll.button.report'),
+                custom_id: JSON.stringify({
+                  t: 'cta',
+                  d: {
+                    a: 'pollSummary',
+                    pId: aPoll.id,
+                  },
+                }),
+              },
             ],
           },
         ],
@@ -150,7 +163,7 @@ describe('cta/pollPub', () => {
       permissions: admin_permissions,
     });
 
-    expect(() =>
+    await expect(() =>
       pollPub.handler({
         ...handlerOpts,
         req,
@@ -217,9 +230,49 @@ describe('cta/pollPub', () => {
                   },
                 }),
               },
+              {
+                type: ComponentType.Button,
+                style: ButtonStyle.Secondary,
+                label: t('poll.button.report'),
+                custom_id: JSON.stringify({
+                  t: 'cta',
+                  d: {
+                    a: 'pollSummary',
+                    pId: aPoll.id,
+                  },
+                }),
+              },
             ],
           },
         ],
+      },
+    });
+  });
+
+  it('should display the poll end date when it is set', async () => {
+    aPoll.endDate = new Date('2026-01-01T18:00:00.000Z');
+    await em.persist(aPoll).flush();
+
+    const response = await pollPub.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.IsComponentsV2,
+        components: expect.arrayContaining([
+          expect.objectContaining({
+            type: ComponentType.Section,
+            components: expect.arrayContaining([
+              {
+                type: ComponentType.TextDisplay,
+                content: t('poll.publish.endDate', {
+                  date: formatDiscordTimestamp(aPoll.endDate),
+                  relative: formatDiscordTimestamp(aPoll.endDate, 'R'),
+                }),
+              },
+            ]),
+          }),
+        ]),
       },
     });
   });

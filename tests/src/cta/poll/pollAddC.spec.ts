@@ -117,7 +117,7 @@ describe('cta/pollAddC', () => {
       permissions: admin_permissions,
     });
 
-    expect(() =>
+    await expect(() =>
       pollAddC.handler({
         ...handlerOpts,
         req,

@@ -20,10 +20,19 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { doNotUpdatePublishedPoll, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
     `## ${aPoll.title}`,
+    ...(aPoll.endDate
+      ? [
+          t('poll.publish.endDate', {
+            date: formatDiscordTimestamp(aPoll.endDate),
+            relative: formatDiscordTimestamp(aPoll.endDate, 'R'),
+          }),
+        ]
+      : []),
     '',
     ...aPoll.steps.reduce(
       (acc: string[], aStep) => [

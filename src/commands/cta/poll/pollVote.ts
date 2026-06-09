@@ -9,6 +9,7 @@ import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { t } from '../../../i18n/index.js';
+import { isPollClosed } from '../../../utils/pollDates.js';
 
 export const pollVote: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -32,6 +33,10 @@ export const pollVote: ModalHandlerDelcaration<CTAData> = {
 
       if (aPoll.role && !member.roles.includes(aPoll.role)) {
         return res.json(notAllowed());
+      }
+
+      if (isPollClosed(aPoll.endDate)) {
+        return res.json(errorPayload(t('errors.voteClosed')));
       }
 
       const pollResps = await em.findAll(PollResp, {
