@@ -10,7 +10,10 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
+import {
+  formatDiscordTimestamp,
+  isPollClosed,
+} from '../../../utils/pollDates.js';
 
 const MAX_REPORT_LENGTH = 3900;
 
@@ -100,7 +103,9 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         return res.status(500).json({ error: t('errors.noPoll') });
       }
 
-      aPoll.endDate = new Date();
+      if (!isPollClosed(aPoll.endDate)) {
+        aPoll.endDate = new Date();
+      }
 
       const pollResps = await em.findAll(PollResp, {
         where: { pollStep: { poll: aPoll } },

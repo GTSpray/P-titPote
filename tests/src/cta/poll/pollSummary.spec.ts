@@ -116,7 +116,20 @@ describe('cta/pollSummary', () => {
     );
   });
 
-  it.todo('should not update the end date of a poll that has already been published')
+  it('should not update the end date of a poll that has already been published', async () => {
+    const publishedEndDate = new Date('2026-06-01T12:00:00.000Z');
+    aPoll.endDate = publishedEndDate;
+    await em.persist(aPoll).flush();
+
+    await pollSummary.handler(handlerOpts);
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+
+    expect(poll.endDate?.getTime()).toBe(publishedEndDate.getTime());
+  });
 
   it('should publish a vote summary with choice counts and free responses', async () => {
     const firstMemberId = randomDiscordId19();
