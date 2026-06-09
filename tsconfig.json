@@ -5,6 +5,7 @@
     "moduleResolution": "nodenext",
     "target": "ES2022",
     "outDir": "dist",
+    "rootDir": ".",
     "noEmitOnError": true,
     "strict": true,
     "skipLibCheck": true,
