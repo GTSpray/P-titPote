@@ -47,7 +47,7 @@ describe('cta/pollSummary', () => {
     em = orm.em.fork();
 
     aPoll = new Poll(`aTitre`);
-    aPoll.endDate = new Date('2099-06-30T18:00:00.000Z');
+    aPoll.endDate = new Date(Date.now()+1000);
     guild_id = randomDiscordId19();
 
     data = {
