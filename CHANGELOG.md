@@ -1,3 +1,9 @@
+## [1.4.7](https://github.com/GTSpray/P-titPote/compare/v1.4.6...v1.4.7) (2026-06-09)
+
+### :repeat: Chore
+
+* use internationalization in all tests ([#180](https://github.com/GTSpray/P-titPote/issues/180)) ([e0178c4](https://github.com/GTSpray/P-titPote/commit/e0178c42dc00b3e78a28cafbf328e3061a812c09))
+
 ## [1.4.6](https://github.com/GTSpray/P-titPote/compare/v1.4.5...v1.4.6) (2026-06-08)
 
 ### :repeat: Chore
