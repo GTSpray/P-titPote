@@ -1,16 +1,13 @@
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
-
 import { CommandHandlerOptions } from '../../commands.js';
 import {
   ApplicationIntegrationType,
+  ComponentType,
   InteractionContextType,
+  InteractionResponseType,
+  MessageFlags,
   PermissionFlagsBits,
-  SlashCommandBuilder,
-} from 'discord.js';
+} from 'discord-api-types/v10';
+import { SlashCommandBuilder } from 'discord.js';
 
 import { Response } from 'express';
 import { foundItComponnents } from '../../commonMessages.js';
@@ -45,13 +42,13 @@ export const otter = async ({
   res,
 }: CommandHandlerOptions<gimmeOtterCommandData>): Promise<Response | null> => {
   return res.json({
-    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    type: InteractionResponseType.ChannelMessageWithSource,
     data: {
-      flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+      flags: MessageFlags.IsComponentsV2,
       components: [
         ...foundItComponnents(),
         {
-          type: MessageComponentTypes.MEDIA_GALLERY,
+          type: ComponentType.MediaGallery,
           items: [
             {
               description: 'otter',

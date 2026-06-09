@@ -5,8 +5,8 @@ import {
   ApplicationIntegrationType,
   InteractionContextType,
   PermissionFlagsBits,
-  SlashCommandBuilder,
-} from 'discord.js';
+} from 'discord-api-types/v10';
+import { SlashCommandBuilder } from 'discord.js';
 
 import { aliasSetCommandData, set } from './set.js';
 import { aliasSayCommandData, say } from './say.js';

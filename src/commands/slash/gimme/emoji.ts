@@ -1,17 +1,16 @@
 import { CommandHandlerOptions } from '../../commands.js';
 import { Response } from 'express';
 import { logger } from '../../../logger.js';
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
-import { Routes, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import {
   ApplicationIntegrationType,
+  ComponentType,
   InteractionContextType,
+  InteractionResponseType,
+  MessageFlags,
   PermissionFlagsBits,
   RESTGetAPIChannelMessagesResult,
+  Routes,
 } from 'discord-api-types/v10';
 
 import { discordapi } from '../../../utils/discordapi.js';
@@ -118,13 +117,13 @@ export const emoji = async ({
   logger.debug('extracted emojies', { reqId, emojies });
 
   return res.json({
-    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    type: InteractionResponseType.ChannelMessageWithSource,
     data: {
-      flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+      flags: MessageFlags.IsComponentsV2,
       components: [
         ...foundItComponnents(),
         {
-          type: MessageComponentTypes.MEDIA_GALLERY,
+          type: ComponentType.MediaGallery,
           items: emojies.map(({ url, name }) => ({
             description: name,
             media: { url },

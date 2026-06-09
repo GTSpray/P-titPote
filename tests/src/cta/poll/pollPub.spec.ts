@@ -22,10 +22,6 @@ import {
 import { Poll } from '../../../../src/db/entities/Poll.entity.js';
 import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
 import {
-  InteractionResponseFlags,
-  MessageComponentTypes,
-} from 'discord-interactions';
-import {
   admin_permissions,
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
@@ -98,29 +94,29 @@ describe('cta/pollPub', () => {
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components: [
           {
-            type: MessageComponentTypes.SECTION,
+            type: ComponentType.Section,
             components: [
               {
-                type: MessageComponentTypes.TEXT_DISPLAY,
+                type: ComponentType.TextDisplay,
                 content: t('poll.publish.header', { mention: '' }),
               },
               {
-                type: MessageComponentTypes.TEXT_DISPLAY,
+                type: ComponentType.TextDisplay,
                 content: aPoll.title,
               },
             ],
             accessory: {
-              type: MessageComponentTypes.THUMBNAIL,
+              type: ComponentType.Thumbnail,
               media: {
                 url: `https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote-sam.png?salt=${aPoll.id}`,
               },
             },
           },
           {
-            type: MessageComponentTypes.SEPARATOR,
+            type: ComponentType.Separator,
             divider: true,
             spacing: 1,
           },
@@ -155,31 +151,31 @@ describe('cta/pollPub', () => {
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components: [
           {
-            type: MessageComponentTypes.SECTION,
+            type: ComponentType.Section,
             components: [
               {
-                type: MessageComponentTypes.TEXT_DISPLAY,
+                type: ComponentType.TextDisplay,
                 content: t('poll.publish.header', {
                   mention: ` <@&${aPoll.role}>`,
                 }),
               },
               {
-                type: MessageComponentTypes.TEXT_DISPLAY,
+                type: ComponentType.TextDisplay,
                 content: aPoll.title,
               },
             ],
             accessory: {
-              type: MessageComponentTypes.THUMBNAIL,
+              type: ComponentType.Thumbnail,
               media: {
                 url: `https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote-sam.png?salt=${aPoll.id}`,
               },
             },
           },
           {
-            type: MessageComponentTypes.SEPARATOR,
+            type: ComponentType.Separator,
             divider: true,
             spacing: 1,
           },

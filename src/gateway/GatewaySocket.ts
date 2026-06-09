@@ -1,6 +1,7 @@
 import { ShardSocket } from './ShardSocket.js';
 import { discordapi } from '../utils/discordapi.js';
-import { type APIGatewayBotInfo, Routes } from 'discord.js';
+import type { APIGatewayBotInfo } from 'discord-api-types/v10';
+import { Routes } from 'discord-api-types/v10';
 import { logger } from '../logger.js';
 import { type GatewayEvent } from './gatewaytypes.js';
 import { TypedEventEmitter } from './TypedEventEmitter.js';

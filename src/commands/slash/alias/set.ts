@@ -1,11 +1,7 @@
 import * as z from 'zod';
 import { Response } from 'express';
 import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
-import {
-  InteractionResponseFlags,
-  InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
+import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';
@@ -87,9 +83,9 @@ export const set = async (
 
     await em.persist(messageAliased).flush();
     return res.json({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components: [...okComponnents()],
       },
     });

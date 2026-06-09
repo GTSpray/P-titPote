@@ -1,4 +1,5 @@
-import { APIChannel, ChannelType } from 'discord.js';
+import type { APIChannel } from 'discord-api-types/v10';
+import { ChannelType } from 'discord-api-types/v10';
 import { BitFieldFlag, getRandomString, randomDiscordId19 } from './utils.js';
 
 export const getApiChannelData = (

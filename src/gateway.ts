@@ -5,12 +5,12 @@ import {
   GatewayDispatchEvents,
   GatewayOpcodes,
   GatewayUpdatePresence,
+  InteractionType,
   PresenceUpdateStatus,
   Routes,
-} from 'discord.js';
+} from 'discord-api-types/v10';
 import { logger } from './logger.js';
 import { GWSEvent } from './gateway/gatewaytypes.js';
-import { InteractionType } from 'discord.js';
 import { discordapi } from './utils/discordapi.js';
 import { t } from './i18n/index.js';
 

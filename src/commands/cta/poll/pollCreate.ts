@@ -2,6 +2,7 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
+  MessageFlags,
 } from 'discord-api-types/v10';
 import {
   ComponentSelect,
@@ -11,7 +12,6 @@ import {
   getInputComponnentsByPrefix,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { InteractionResponseFlags } from 'discord-interactions';
 import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollStep } from '../../../db/entities/PollStep.entity.js';
@@ -131,7 +131,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: getSummary(aPoll),
           components: [
             {

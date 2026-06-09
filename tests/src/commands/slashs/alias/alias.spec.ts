@@ -14,15 +14,12 @@ import { type aliasSetSubCommandData } from '../../../../../src/commands/slash/a
 import { type aliasSaySubCommandData } from '../../../../../src/commands/slash/alias/say.js';
 import { type aliasLsSubCommandData } from '../../../../../src/commands/slash/alias/ls.js';
 import {
-  InteractionContextType,
   ApplicationIntegrationType,
-  PermissionFlagsBits,
-} from 'discord.js';
-
-import {
-  InteractionResponseFlags,
+  InteractionContextType,
   InteractionResponseType,
-} from 'discord-interactions';
+  MessageFlags,
+  PermissionFlagsBits,
+} from 'discord-api-types/v10';
 import {
   admin_permissions,
   default_member_permissions,
@@ -127,9 +124,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });
@@ -231,9 +228,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });
@@ -324,9 +321,9 @@ describe('/alias', () => {
       const response = await alias.handler(fakeOpts);
 
       expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.EPHEMERAL,
+          flags: MessageFlags.Ephemeral,
           content: t('common.notAllowed'),
         },
       });

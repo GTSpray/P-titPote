@@ -1,12 +1,13 @@
 import { Request } from 'express';
 import { MockRequest } from 'node-mocks-http';
 import {
-  InteractionResponseFlags,
+  ComponentType,
   InteractionResponseType,
-  MessageComponentTypes,
-} from 'discord-interactions';
+  MessageFlags,
+} from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
-import { REST, Routes } from 'discord.js';
+import { REST } from 'discord.js';
+import { Routes } from 'discord-api-types/v10';
 import {
   getRandomString,
   randomDiscordId19,
@@ -43,9 +44,9 @@ describe('/gimme emoji', () => {
     type: 1,
   };
   const notFoundMessagePayload = {
-    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    type: InteractionResponseType.ChannelMessageWithSource,
     data: {
-      flags: InteractionResponseFlags.EPHEMERAL,
+      flags: MessageFlags.Ephemeral,
       content: t('common.notFound'),
     },
   };
@@ -161,21 +162,21 @@ describe('/gimme emoji', () => {
 
         const response = await emoji(handlerOpts);
         expect(response).toMeetApiResponse(200, {
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          type: InteractionResponseType.ChannelMessageWithSource,
           data: {
-            flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+            flags: MessageFlags.IsComponentsV2,
             components: [
               {
-                type: MessageComponentTypes.TEXT_DISPLAY,
+                type: ComponentType.TextDisplay,
                 content: t('common.foundIt'),
               },
               {
-                type: MessageComponentTypes.SEPARATOR,
+                type: ComponentType.Separator,
                 divider: true,
                 spacing: 1,
               },
               {
-                type: MessageComponentTypes.MEDIA_GALLERY,
+                type: ComponentType.MediaGallery,
                 items: [
                   {
                     description: emojiName,
@@ -211,21 +212,21 @@ describe('/gimme emoji', () => {
 
     const response = await emoji(handlerOpts);
     expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components: [
           {
-            type: MessageComponentTypes.TEXT_DISPLAY,
+            type: ComponentType.TextDisplay,
             content: expect.any(String),
           },
           {
-            type: MessageComponentTypes.SEPARATOR,
+            type: ComponentType.Separator,
             divider: true,
             spacing: 1,
           },
           {
-            type: MessageComponentTypes.MEDIA_GALLERY,
+            type: ComponentType.MediaGallery,
             items: expect.toBeArrayOfSize(stealemoji_emojiLimit),
           },
         ],
@@ -258,21 +259,21 @@ describe('/gimme emoji', () => {
 
     const response = await emoji(handlerOpts);
     expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+        flags: MessageFlags.IsComponentsV2,
         components: [
           {
-            type: MessageComponentTypes.TEXT_DISPLAY,
+            type: ComponentType.TextDisplay,
             content: expect.any(String),
           },
           {
-            type: MessageComponentTypes.SEPARATOR,
+            type: ComponentType.Separator,
             divider: true,
             spacing: 1,
           },
           {
-            type: MessageComponentTypes.MEDIA_GALLERY,
+            type: ComponentType.MediaGallery,
             items: expect.toBeArrayOfSize(1),
           },
         ],

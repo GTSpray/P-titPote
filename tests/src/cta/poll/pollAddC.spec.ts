@@ -3,7 +3,6 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-  applyPopulateHints,
 } from '@mikro-orm/mariadb';
 import {
   pollAddC,

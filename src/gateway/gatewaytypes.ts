@@ -73,7 +73,7 @@ import {
   type GatewayVoiceServerUpdateDispatchData,
   type GatewayVoiceStateUpdateDispatchData,
   type GatewayWebhooksUpdateDispatchData,
-} from 'discord.js';
+} from 'discord-api-types/v10';
 
 export enum GWSEvent {
   Debug = 'DEBUG',

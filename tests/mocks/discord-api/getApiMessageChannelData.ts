@@ -1,6 +1,6 @@
-import { RESTGetAPIChannelMessagesResult } from 'discord.js';
+import type { RESTGetAPIChannelMessagesResult } from 'discord-api-types/v10';
 import { getApiMessageData } from './getApiMessageData.js';
-import { randomDiscordId19 } from './utils';
+import { randomDiscordId19 } from './utils.js';
 
 type ApiMessagesChannelDataOptions = {
   channel_id?: string;

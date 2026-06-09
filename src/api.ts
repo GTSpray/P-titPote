@@ -6,8 +6,8 @@ import { v4 } from 'uuid';
 import {
   InteractionResponseType,
   InteractionType,
-  verifyKeyMiddleware,
-} from 'discord-interactions';
+} from 'discord-api-types/v10';
+import { verifyKeyMiddleware } from 'discord-interactions';
 
 import { logger } from './logger.js';
 import { slashcommands } from './commands/slash/index.js';
@@ -62,7 +62,7 @@ app.get('/health', (_req, res) => {
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
- * Parse request body and verifies incoming requests using discord-interactions package
+ * Parse request body and verifies incoming Discord interaction signatures
  */
 app.post(
   '/interactions',
@@ -81,15 +81,15 @@ app.post(
     /**
      * Handle verification requests
      */
-    if (type === InteractionType.PING) {
-      return res.send({ type: InteractionResponseType.PONG });
+    if (type === InteractionType.Ping) {
+      return res.send({ type: InteractionResponseType.Pong });
     }
 
     /**
      * Handle slash command requests
      * See https://discord.com/developers/docs/interactions/application-commands#slash-commands
      */
-    if (type === InteractionType.APPLICATION_COMMAND) {
+    if (type === InteractionType.ApplicationCommand) {
       const { name } = data;
       if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
         logger.debug(`interaction handler`, { reqId, name });
@@ -101,10 +101,9 @@ app.post(
     }
 
     if (
-      [
-        InteractionType.MESSAGE_COMPONENT,
-        InteractionType.MODAL_SUBMIT,
-      ].includes(type)
+      [InteractionType.MessageComponent, InteractionType.ModalSubmit].includes(
+        type,
+      )
     ) {
       const { custom_id } = data;
       if (custom_id.startsWith('{"t":"cta","d":{"a":"')) {

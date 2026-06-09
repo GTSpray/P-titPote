@@ -2,12 +2,9 @@ import {
   ButtonStyle,
   ComponentType,
   InteractionResponseType,
+  MessageFlags,
 } from 'discord-api-types/v10';
 import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
-import {
-  InteractionResponseFlags,
-  MessageComponentTypes,
-} from 'discord-interactions';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
@@ -46,31 +43,31 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: InteractionResponseFlags.IS_COMPONENTS_V2,
+          flags: MessageFlags.IsComponentsV2,
           components: [
             {
-              type: MessageComponentTypes.SECTION,
+              type: ComponentType.Section,
               components: [
                 {
-                  type: MessageComponentTypes.TEXT_DISPLAY,
+                  type: ComponentType.TextDisplay,
                   content: t('poll.publish.header', {
                     mention: aPoll.role ? ` <@&${aPoll.role}>` : '',
                   }),
                 },
                 {
-                  type: MessageComponentTypes.TEXT_DISPLAY,
+                  type: ComponentType.TextDisplay,
                   content: aPoll.title,
                 },
               ],
               accessory: {
-                type: MessageComponentTypes.THUMBNAIL,
+                type: ComponentType.Thumbnail,
                 media: {
                   url: `https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote-sam.png?salt=${pollId}`,
                 },
               },
             },
             {
-              type: MessageComponentTypes.SEPARATOR,
+              type: ComponentType.Separator,
               divider: true,
               spacing: 1,
             },

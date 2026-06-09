@@ -1,5 +1,4 @@
 import 'vitest';
-import './tests/customMatchers/customMatchers.d.ts';
 
 declare global {
   namespace NodeJS {

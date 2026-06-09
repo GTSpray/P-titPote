@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Routes } from 'discord.js';
+import { Routes } from 'discord-api-types/v10';
 import { discordapi } from './utils/discordapi.js';
 import { slashcommandsRegister } from './commands/slash/index.js';
 import { logger } from './logger.js';

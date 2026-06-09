@@ -1,4 +1,8 @@
-import { RequestData, RouteLike } from 'discord.js';
+type RouteLike = `/${string}`;
+type RequestData = {
+  body?: unknown;
+  query?: URLSearchParams;
+};
 
 export enum DiscrodRESTMockVerb {
   get = 'get',
