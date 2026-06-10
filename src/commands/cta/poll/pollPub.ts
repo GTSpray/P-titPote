@@ -32,7 +32,7 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
-      if (aPoll.publicationDate != null) {
+      if (aPoll.publicationDate !== null) {
         return res.json(doNotUpdatePublishedPoll());
       }
 

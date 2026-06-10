@@ -76,7 +76,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
         aPoll.steps.add(firstStep);
         await em.persist(aGuild).flush();
       } else {
-        const existingPoll = await em.findOneOrFail(
+        aPoll = await em.findOneOrFail(
           Poll,
           { id: pollId, server: { guildId } },
           {
@@ -84,11 +84,9 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           },
         );
 
-        if (existingPoll.publicationDate !== null) {
+        if (aPoll.publicationDate !== null) {
           return res.json(doNotUpdatePublishedPoll());
         }
-
-        aPoll = existingPoll;
 
         const newQuestion = getInputComponnentById<ComponentSimple>(
           data,
