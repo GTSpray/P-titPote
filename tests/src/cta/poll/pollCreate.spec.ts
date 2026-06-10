@@ -413,19 +413,20 @@ describe('cta/pollCreate', () => {
         guild_id: randomDiscordId19(),
         permissions: admin_permissions,
       });
-      
-      expect(() => pollCreate.handler({
-        ...handlerOpts,
-        req,
-        res,
-      })).rejects.toThrow(NotFoundError)
+
+      expect(() =>
+        pollCreate.handler({
+          ...handlerOpts,
+          req,
+          res,
+        }),
+      ).rejects.toThrow(NotFoundError);
 
       em.clear();
       const pollSteps = await em.findAll(PollStep, {
         where: { poll: existingPoll.id },
       });
       expect(pollSteps).toHaveLength(1);
-
     });
 
     it('should respond a ephemeral message because poll is not ready', async () => {

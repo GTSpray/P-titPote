@@ -121,11 +121,13 @@ describe('cta/pollVote', () => {
     });
     const memberId = <string>req.body.member?.user.id;
 
-    expect(() => pollVote.handler({
-      ...handlerOpts,
-      req,
-      res,
-    })).rejects.toThrow(NotFoundError)
+    expect(() =>
+      pollVote.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
 
     const pollResps = await em.findAll(PollResp, {
       where: { memberId },

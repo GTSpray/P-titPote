@@ -117,12 +117,13 @@ describe('cta/pollAddC', () => {
       permissions: admin_permissions,
     });
 
-    expect(() => pollAddC.handler({
-      ...handlerOpts,
-      req,
-      res,
-    })).rejects.toThrow(NotFoundError)
-    
+    expect(() =>
+      pollAddC.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
   });
 
   it('should respond a modal with a text display componnent as question summary', async () => {

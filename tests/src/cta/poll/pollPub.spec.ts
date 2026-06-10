@@ -150,11 +150,13 @@ describe('cta/pollPub', () => {
       permissions: admin_permissions,
     });
 
-    expect(() => pollPub.handler({
-      ...handlerOpts,
-      req,
-      res,
-    })).rejects.toThrow(NotFoundError)
+    expect(() =>
+      pollPub.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
 
     em.clear();
     const poll = await em.findOneOrFail(Poll, {
