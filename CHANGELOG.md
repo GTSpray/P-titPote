@@ -1,3 +1,9 @@
+## [1.4.9](https://github.com/GTSpray/P-titPote/compare/v1.4.8...v1.4.9) (2026-06-10)
+
+### :bug: Fixes
+
+* revents the cross guilds modification of polls ([#184](https://github.com/GTSpray/P-titPote/issues/184)) ([f021c46](https://github.com/GTSpray/P-titPote/commit/f021c46269ec8b7e010c11f400d4a2c6b6c1a2fe))
+
 ## [1.4.8](https://github.com/GTSpray/P-titPote/compare/v1.4.7...v1.4.8) (2026-06-09)
 
 ### :zap: Refactor
