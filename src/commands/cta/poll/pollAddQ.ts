@@ -8,7 +8,6 @@ import { Poll } from '../../../db/entities/Poll.entity.js';
 import {
   doNotUpdatePublishedPoll,
   errorPayload,
-  notAllowed,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 
@@ -19,7 +18,7 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
       const pollId = (<any>additionalData).d.pId;
-      const aPoll = await em.findOne(
+      const aPoll = await em.findOneOrFail(
         Poll,
         { id: pollId, server: { guildId } },
         {
@@ -27,11 +26,7 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
-      if (!aPoll) {
-        return res.json(notAllowed());
-      }
-
-      if (aPoll.publicationDate != null) {
+      if (aPoll.publicationDate !== null) {
         return res.json(doNotUpdatePublishedPoll());
       }
 
