@@ -28,7 +28,7 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
       const questionId = (<any>additionalData).d.sId;
-      const aPollStep = await em.findOne(
+      const aPollStep = await em.findOneOrFail(
         PollStep,
         { id: questionId, poll: { server: { guildId } } },
         {
@@ -36,13 +36,8 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
-      if (!aPollStep) {
-        return res.json(notAllowed());
-      }
-
       const startIndex = aPollStep.choices.count();
-
-      if (aPollStep.poll.publicationDate != null) {
+      if (aPollStep.poll.publicationDate !== null) {
         return res.json(doNotUpdatePublishedPoll());
       }
 

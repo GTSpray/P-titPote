@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollCreate } from '../../../../src/commands/cta/poll/pollCreate.js';
 import {
@@ -412,26 +413,19 @@ describe('cta/pollCreate', () => {
         guild_id: randomDiscordId19(),
         permissions: admin_permissions,
       });
-
-      const response = await pollCreate.handler({
+      
+      expect(() => pollCreate.handler({
         ...handlerOpts,
         req,
         res,
-      });
-
-      expect(response).toMeetApiResponse(200, {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.Ephemeral,
-          content: t('common.notAllowed'),
-        },
-      });
+      })).rejects.toThrow(NotFoundError)
 
       em.clear();
       const pollSteps = await em.findAll(PollStep, {
         where: { poll: existingPoll.id },
       });
       expect(pollSteps).toHaveLength(1);
+
     });
 
     it('should respond a ephemeral message because poll is not ready', async () => {

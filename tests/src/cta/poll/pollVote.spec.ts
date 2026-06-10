@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollVote } from '../../../../src/commands/cta/poll/pollVote.js';
 import {
@@ -120,19 +121,11 @@ describe('cta/pollVote', () => {
     });
     const memberId = <string>req.body.member?.user.id;
 
-    const response = await pollVote.handler({
+    expect(() => pollVote.handler({
       ...handlerOpts,
       req,
       res,
-    });
-
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.Ephemeral,
-        content: t('common.notAllowed'),
-      },
-    });
+    })).rejects.toThrow(NotFoundError)
 
     const pollResps = await em.findAll(PollResp, {
       where: { memberId },

@@ -18,18 +18,13 @@ export const pollVote: ModalHandlerDelcaration<CTAData> = {
       const em = dbServices.orm.em.fork();
 
       const pollId = (<any>additionalData).d.pId;
-      const aPoll = await em.findOne(
+      const aPoll = await em.findOneOrFail(
         Poll,
         { id: <string>pollId, server: { guildId } },
         {
           populate: ['steps', 'steps.choices'],
         },
       );
-
-      if (!aPoll) {
-        return res.json(notAllowed());
-      }
-
       const today = new Date();
       if (aPoll.endDate && aPoll.endDate.getTime() < today.getTime()) {
         return res.json(errorPayload(t('errors.voteClosed')));

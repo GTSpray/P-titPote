@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import {
   pollAddC,
@@ -116,19 +117,12 @@ describe('cta/pollAddC', () => {
       permissions: admin_permissions,
     });
 
-    const response = await pollAddC.handler({
+    expect(() => pollAddC.handler({
       ...handlerOpts,
       req,
       res,
-    });
-
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.Ephemeral,
-        content: t('common.notAllowed'),
-      },
-    });
+    })).rejects.toThrow(NotFoundError)
+    
   });
 
   it('should respond a modal with a text display componnent as question summary', async () => {
