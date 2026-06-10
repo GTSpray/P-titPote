@@ -385,6 +385,55 @@ describe('cta/pollCreate', () => {
       ]);
     });
 
+    it('should not save a new question when the poll was published after the modal was opened', async () => {
+      existingPoll.publicationDate = new Date();
+      await em.persist(existingPoll).flush();
+
+      const response = await pollCreate.handler(handlerOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.Ephemeral,
+          content: t('common.doNotUpdatePublishedPoll'),
+        },
+      });
+
+      em.clear();
+      const pollSteps = await em.findAll(PollStep, {
+        where: { poll: existingPoll.id },
+      });
+      expect(pollSteps).toHaveLength(1);
+    });
+
+    it('should not save a new question for a poll from another guild', async () => {
+      const { req, res } = getInteractionModalHttpMock({
+        data: handlerOpts.req.body.data,
+        guild_id: randomDiscordId19(),
+        permissions: admin_permissions,
+      });
+
+      const response = await pollCreate.handler({
+        ...handlerOpts,
+        req,
+        res,
+      });
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.Ephemeral,
+          content: t('common.notAllowed'),
+        },
+      });
+
+      em.clear();
+      const pollSteps = await em.findAll(PollStep, {
+        where: { poll: existingPoll.id },
+      });
+      expect(pollSteps).toHaveLength(1);
+    });
+
     it('should respond a ephemeral message because poll is not ready', async () => {
       const response = await pollCreate.handler(handlerOpts);
       expect(response).toMeetApiResponse(200, {
@@ -562,6 +611,27 @@ describe('cta/pollCreate', () => {
           order: 1,
         }),
       ]);
+    });
+
+    it('should not save new choices when the poll was published after the modal was opened', async () => {
+      existingPollStep.poll.publicationDate = new Date();
+      await em.persist(existingPollStep.poll).flush();
+
+      const response = await pollCreate.handler(handlerOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.Ephemeral,
+          content: t('common.doNotUpdatePublishedPoll'),
+        },
+      });
+
+      em.clear();
+      const choices = await em.findAll(PollChoice, {
+        where: { pollstep: existingPollStep.id },
+      });
+      expect(choices).toHaveLength(0);
     });
 
     it('should respond a ephemeral message because poll is not ready', async () => {

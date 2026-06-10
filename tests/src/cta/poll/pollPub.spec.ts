@@ -142,6 +142,34 @@ describe('cta/pollPub', () => {
     });
   });
 
+  it('should not publish a poll from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data,
+      guild_id: randomDiscordId19(),
+      permissions: admin_permissions,
+    });
+
+    const response = await pollPub.handler({
+      ...handlerOpts,
+      req,
+      res,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('common.notAllowed'),
+      },
+    });
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+    expect(poll.publicationDate).toBeNull();
+  });
+
   it('should ping role in the channel inviting members whith this role to vote', async () => {
     aPoll.role = randomDiscordId19();
 

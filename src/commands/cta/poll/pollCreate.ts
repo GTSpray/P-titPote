@@ -18,7 +18,10 @@ import { PollStep } from '../../../db/entities/PollStep.entity.js';
 import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
-import { notAllowed } from '../../commonMessages.js';
+import {
+  doNotUpdatePublishedPoll,
+  notAllowed,
+} from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 
 const getSummary = (aPoll: Poll) => {
@@ -76,13 +79,23 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
         aPoll.steps.add(firstStep);
         await em.persist(aGuild).flush();
       } else {
-        aPoll = await em.findOneOrFail(
+        const existingPoll = await em.findOne(
           Poll,
-          { id: pollId },
+          { id: pollId, server: { guildId } },
           {
             populate: ['steps', 'steps.choices'],
           },
         );
+
+        if (!existingPoll) {
+          return res.json(notAllowed());
+        }
+
+        if (existingPoll.publicationDate != null) {
+          return res.json(doNotUpdatePublishedPoll());
+        }
+
+        aPoll = existingPoll;
 
         const newQuestion = getInputComponnentById<ComponentSimple>(
           data,

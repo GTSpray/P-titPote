@@ -98,6 +98,27 @@ describe('cta/pollAddQ', () => {
     });
   });
 
+  it('should not respond a modal for a poll from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data: handlerOpts.req.body.data,
+      guild_id: randomDiscordId19(),
+    });
+
+    const response = await pollAddQ.handler({
+      ...handlerOpts,
+      req,
+      res,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('common.notAllowed'),
+      },
+    });
+  });
+
   it(`should respond an ephemeral message when poll has ${POLL_STEP_LIMIT} setp`, async () => {
     const stepSize = POLL_STEP_LIMIT;
     existingPoll.steps.add(

@@ -24,15 +24,19 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
     const guildId = req.body.guild_id;
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
-      const aPoll = await em.findOneOrFail(
+      const aPoll = await em.findOne(
         Poll,
-        { id: pollId },
+        { id: pollId, server: { guildId } },
         {
           populate: ['steps', 'steps.choices'],
         },
       );
 
-      if (aPoll.publicationDate !== null) {
+      if (!aPoll) {
+        return res.json(notAllowed());
+      }
+
+      if (aPoll.publicationDate != null) {
         return res.json(doNotUpdatePublishedPoll());
       }
 

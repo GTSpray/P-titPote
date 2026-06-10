@@ -109,6 +109,28 @@ describe('cta/pollAddC', () => {
     });
   });
 
+  it('should not respond a modal for a poll step from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data,
+      guild_id: randomDiscordId19(),
+      permissions: admin_permissions,
+    });
+
+    const response = await pollAddC.handler({
+      ...handlerOpts,
+      req,
+      res,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('common.notAllowed'),
+      },
+    });
+  });
+
   it('should respond a modal with a text display componnent as question summary', async () => {
     const response = await pollAddC.handler(handlerOpts);
     expect(response).toMeetApiResponse(200, {
