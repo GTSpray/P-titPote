@@ -26,7 +26,7 @@ export const pollPub: ModalHandlerDelcaration<CTAData> = {
       const em = dbServices.orm.em.fork();
       const aPoll = await em.findOneOrFail(
         Poll,
-        { id: pollId },
+        { id: pollId, server: { guildId } },
         {
           populate: ['steps', 'steps.choices'],
         },

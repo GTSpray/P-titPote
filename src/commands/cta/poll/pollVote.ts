@@ -5,7 +5,7 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { errorPayload } from '../../commonMessages.js';
+import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { t } from '../../../i18n/index.js';
@@ -20,11 +20,19 @@ export const pollVote: ModalHandlerDelcaration<CTAData> = {
       const pollId = (<any>additionalData).d.pId;
       const aPoll = await em.findOneOrFail(
         Poll,
-        { id: <string>pollId },
+        { id: <string>pollId, server: { guildId } },
         {
           populate: ['steps', 'steps.choices'],
         },
       );
+      const today = new Date();
+      if (aPoll.endDate && aPoll.endDate.getTime() < today.getTime()) {
+        return res.json(errorPayload(t('errors.voteClosed')));
+      }
+
+      if (aPoll.role && !member.roles.includes(aPoll.role)) {
+        return res.json(notAllowed());
+      }
 
       const pollResps = await em.findAll(PollResp, {
         where: { memberId: member.user.id, pollStep: { poll: aPoll } },

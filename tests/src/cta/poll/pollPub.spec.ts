@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollPub } from '../../../../src/commands/cta/poll/pollPub.js';
 import {
@@ -140,6 +141,28 @@ describe('cta/pollPub', () => {
         ],
       },
     });
+  });
+
+  it('should not publish a poll from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data,
+      guild_id: randomDiscordId19(),
+      permissions: admin_permissions,
+    });
+
+    expect(() =>
+      pollPub.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+    expect(poll.publicationDate).toBeNull();
   });
 
   it('should ping role in the channel inviting members whith this role to vote', async () => {

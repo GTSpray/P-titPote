@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollVote } from '../../../../src/commands/cta/poll/pollVote.js';
 import {
@@ -111,6 +112,69 @@ describe('cta/pollVote', () => {
         content: <string>aSecondStepCmp.value,
       }),
     ]);
+  });
+
+  it('should not create a PollResp for a poll from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data,
+      guild_id: randomDiscordId19(),
+    });
+    const memberId = <string>req.body.member?.user.id;
+
+    expect(() =>
+      pollVote.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
+
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId },
+    });
+    expect(pollResps).toHaveLength(0);
+  });
+
+  it('should not create a PollResp when the member lost the required role after opening the modal', async () => {
+    aPoll.role = randomDiscordId19();
+    await em.persist(aPoll).flush();
+    const memberId = <string>handlerOpts.req.body.member?.user.id;
+
+    const response = await pollVote.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('common.notAllowed'),
+      },
+    });
+
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId },
+    });
+    expect(pollResps).toHaveLength(0);
+  });
+
+  it('should not create a PollResp when the poll closed after opening the modal', async () => {
+    aPoll.endDate = new Date('2026-05-31T13:00:00.000Z');
+    await em.persist(aPoll).flush();
+    const memberId = <string>handlerOpts.req.body.member?.user.id;
+
+    const response = await pollVote.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('errors.voteClosed'),
+      },
+    });
+
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId },
+    });
+    expect(pollResps).toHaveLength(0);
   });
 
   it('should update each Resp, if they exist', async () => {

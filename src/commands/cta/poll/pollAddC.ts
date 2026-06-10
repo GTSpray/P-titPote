@@ -30,13 +30,13 @@ export const pollAddC: ModalHandlerDelcaration<CTAData> = {
       const questionId = (<any>additionalData).d.sId;
       const aPollStep = await em.findOneOrFail(
         PollStep,
-        { id: questionId },
+        { id: questionId, poll: { server: { guildId } } },
         {
           populate: ['poll', 'choices'],
         },
       );
-      const startIndex = aPollStep.choices.count();
 
+      const startIndex = aPollStep.choices.count();
       if (aPollStep.poll.publicationDate !== null) {
         return res.json(doNotUpdatePublishedPoll());
       }

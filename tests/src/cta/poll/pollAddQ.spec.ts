@@ -3,6 +3,7 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
+  NotFoundError,
 } from '@mikro-orm/mariadb';
 import {
   POLL_STEP_LIMIT,
@@ -96,6 +97,21 @@ describe('cta/pollAddQ', () => {
         ],
       },
     });
+  });
+
+  it('should not respond a modal for a poll from another guild', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data: handlerOpts.req.body.data,
+      guild_id: randomDiscordId19(),
+    });
+
+    expect(() =>
+      pollAddQ.handler({
+        ...handlerOpts,
+        req,
+        res,
+      }),
+    ).rejects.toThrow(NotFoundError);
   });
 
   it(`should respond an ephemeral message when poll has ${POLL_STEP_LIMIT} setp`, async () => {

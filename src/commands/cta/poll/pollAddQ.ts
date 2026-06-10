@@ -20,7 +20,7 @@ export const pollAddQ: ModalHandlerDelcaration<CTAData> = {
       const pollId = (<any>additionalData).d.pId;
       const aPoll = await em.findOneOrFail(
         Poll,
-        { id: pollId },
+        { id: pollId, server: { guildId } },
         {
           populate: ['steps'],
         },
