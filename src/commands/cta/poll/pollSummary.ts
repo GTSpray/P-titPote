@@ -49,7 +49,7 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
     const lines = [
       `### ${step.order + 1}. ${step.question}`,
       ...(step.description ? [`-# ${step.description}`] : []),
-      `Réponses : ${answeredCount}`,
+      t('poll.report.participants', { count: answeredCount }),
     ];
 
     if (step.choices.count() > 0) {
@@ -60,7 +60,12 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
           ).length;
           const percent =
             answeredCount > 0 ? Math.round((count / answeredCount) * 100) : 0;
-          return `- ${choice.label} : ${count} vote(s) (${percent}%)`;
+
+          return `- ${t('poll.report.votePercent', {
+            label: choice.label,
+            count,
+            percent,
+          })}`;
         }),
       );
       return [...lines, ''];
@@ -78,8 +83,8 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
         }
       })
       .map(
-        (pollResp) =>
-          `- <@${pollResp.memberId}> : ${unMention(pollResp.content)}`,
+        (pollResp, i) =>
+          `__${t('poll.report.answerNb', { nb: i + 1 })}:__\n> ${unMention(pollResp.content?.replaceAll('\n', '\n> '))}\n`,
       );
 
     lines.push(
