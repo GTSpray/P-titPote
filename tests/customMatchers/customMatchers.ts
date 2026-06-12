@@ -435,6 +435,88 @@ expect.extend({
           message: () => 'Expected value to be empty, but it was not.',
         };
   },
+  toBeDateCloseTo(received: unknown, ref: Date, ms: number) {
+    const { printReceived, printExpected, matcherHint } = this.utils;
+
+    if (!(ref instanceof Date) || Number.isNaN(ref.getTime())) {
+      throw new TypeError(
+        `Expected start to be a valid Date, but received ${typeof ref}`,
+      );
+    }
+
+    if (Number.isNaN(ms)) {
+      throw new TypeError(
+        `Expected ms to be a valid number, but received ${typeof ms}`,
+      );
+    }
+
+    const start = new Date(ref.getTime() - ms);
+    const end = new Date(ref.getTime() + ms);
+    const isValidDate =
+      received instanceof Date && !Number.isNaN(received.getTime());
+    const pass =
+      isValidDate &&
+      received.getTime() >= start.getTime() &&
+      received.getTime() <= end.getTime();
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? matcherHint('.not.toBeDateBetween') +
+            '\n\n' +
+            'Expected date not to be between start and end (inclusive):\n' +
+            `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
+            'Received:\n' +
+            `  ${printReceived(received)}`
+          : matcherHint('.toBeDateBetween') +
+            '\n\n' +
+            'Expected date to be between start and end (inclusive):\n' +
+            `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
+            'Received:\n' +
+            `  ${printReceived(received)}`,
+    };
+  },
+  toBeDateBetween(received: unknown, start: Date, end: Date) {
+    const { printReceived, printExpected, matcherHint } = this.utils;
+
+    if (!(start instanceof Date) || Number.isNaN(start.getTime())) {
+      throw new TypeError(
+        `Expected start to be a valid Date, but received ${typeof start}`,
+      );
+    }
+
+    if (!(end instanceof Date) || Number.isNaN(end.getTime())) {
+      throw new TypeError(
+        `Expected end to be a valid Date, but received ${typeof end}`,
+      );
+    }
+
+    const isValidDate =
+      received instanceof Date && !Number.isNaN(received.getTime());
+    const pass =
+      isValidDate &&
+      received.getTime() >= start.getTime() &&
+      received.getTime() <= end.getTime();
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? matcherHint('.not.toBeDateBetween') +
+            '\n\n' +
+            'Expected date not to be between start and end (inclusive):\n' +
+            `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
+            'Received:\n' +
+            `  ${printReceived(received)}`
+          : matcherHint('.toBeDateBetween') +
+            '\n\n' +
+            'Expected date to be between start and end (inclusive):\n' +
+            `  start: ${printExpected(start)}  end: ${printExpected(end)}\n` +
+            'Received:\n' +
+            `  ${printReceived(received)}`,
+    };
+  },
   toBeValidDate(received: unknown) {
     const isValid =
       received instanceof Date && !Number.isNaN(received.getTime());

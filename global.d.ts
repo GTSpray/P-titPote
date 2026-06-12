@@ -79,6 +79,8 @@ interface CustomMatchers<R = unknown> {
 
   toBeEmpty(): ExpectationResult;
 
+  toBeDateCloseTo(ref: Date, ms: number): ExpectationResult;
+
   toBeValidDate(): {
     pass: boolean;
 
