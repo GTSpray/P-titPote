@@ -14,6 +14,7 @@ import {
   formatDiscordTimestamp,
   isPollClosed,
 } from '../../../utils/pollDates.js';
+import { unMention } from '../../../utils/unMention.js';
 
 const MAX_REPORT_LENGTH = 3900;
 
@@ -76,7 +77,10 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
           return timea > timeb ? 1 : -1;
         }
       })
-      .map((pollResp) => `- <@${pollResp.memberId}> : ${pollResp.content}`);
+      .map(
+        (pollResp) =>
+          `- <@${pollResp.memberId}> : ${unMention(pollResp.content)}`,
+      );
 
     lines.push(
       ...(textResponses.length ? textResponses : [t('poll.report.noResponse')]),

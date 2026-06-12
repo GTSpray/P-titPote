@@ -100,7 +100,7 @@ describe('cta/pollSummary', () => {
   });
 
   it('should set the poll endDate to now when publishing the summary', async () => {
-    aPoll.endDate = null;
+    aPoll.endDate = undefined;
     await em.persist(aPoll).flush();
     em.clear();
 
@@ -184,6 +184,52 @@ describe('cta/pollSummary', () => {
                 (memberId) =>
                   `- <@${memberId}> : moi ! ${memberId} je propose une réponse complète... blah blah blah...`,
               ),
+              '',
+            ].join('\n'),
+          },
+        ],
+      },
+    });
+  });
+
+  it('should prevent voters from mention anything in their free responses', async () => {
+    const memberId = randomDiscordId19();
+    const firstResp = new PollResp(memberId, firstStep);
+    firstResp.pollChoice = firstChoice;
+    const freeResp = new PollResp(memberId, secondStep);
+    freeResp.content = `moi ! <@${memberId}> je ping @everyone pour embeter tout le monde`;
+
+    await em.persist([firstResp, freeResp]).flush();
+
+    const response = await pollSummary.handler(handlerOpts);
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.IsComponentsV2,
+        components: [
+          {
+            type: ComponentType.TextDisplay,
+            content: [
+              t('poll.report.title'),
+              `## ${aPoll.title}`,
+              t('poll.report.participants', { count: 1 }),
+              t('poll.report.endDate', {
+                date: formatDiscordTimestamp(<Date>poll.endDate),
+              }),
+              '',
+              `### 1. ${firstStep.question}`,
+              `Réponses : 1`,
+              '- Premier choix : 1 vote(s) (100%)',
+              '- Deuxième choix : 0 vote(s) (0%)',
+              '',
+              `### 2. ${secondStep.question}`,
+              `Réponses : 1`,
+              `- <@${memberId}> : moi ! <@\u200B${memberId}> je ping @\u200Beveryone pour embeter tout le monde`,
               '',
             ].join('\n'),
           },
