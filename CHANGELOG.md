@@ -1,3 +1,9 @@
+## [1.4.11](https://github.com/GTSpray/P-titPote/compare/v1.4.10...v1.4.11) (2026-06-15)
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.8.3 to 3.8.4 ([#186](https://github.com/GTSpray/P-titPote/issues/186)) ([1f36662](https://github.com/GTSpray/P-titPote/commit/1f3666218b8e0c22b668a63cd039c1b63d77a801))
+
 ## [1.4.10](https://github.com/GTSpray/P-titPote/compare/v1.4.9...v1.4.10) (2026-06-15)
 
 ### :repeat: Chore
