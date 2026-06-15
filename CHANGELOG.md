@@ -1,3 +1,10 @@
+## [1.4.10](https://github.com/GTSpray/P-titPote/compare/v1.4.9...v1.4.10) (2026-06-15)
+
+### :repeat: Chore
+
+* **deps:** bump @types/node from 25.9.2 to 25.9.3 ([#187](https://github.com/GTSpray/P-titPote/issues/187)) ([368b84a](https://github.com/GTSpray/P-titPote/commit/368b84ac936e590ab61214d208b6f9c3cfcf4e67))
+* **deps:** bump semantic-release from 25.0.3 to 25.0.5 ([#188](https://github.com/GTSpray/P-titPote/issues/188)) ([5898c36](https://github.com/GTSpray/P-titPote/commit/5898c36cc804ba2323c5c0a511c3e47ed69098c5))
+
 ## [1.4.9](https://github.com/GTSpray/P-titPote/compare/v1.4.8...v1.4.9) (2026-06-10)
 
 ### :bug: Fixes
