@@ -59,7 +59,7 @@
     "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "conventional-changelog-conventionalcommits": "^9.3.1",
     "discord-api-types": "^0.38.48",
     "node-mocks-http": "^1.17.2",
