@@ -20,7 +20,7 @@ const DISCORD_MESSAGE_LENGTH_LIMIT = 2000;
 const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
   const participants = new Set(pollResps.map((pollResp) => pollResp.memberId));
   const summaryLines = [
-    `#${t('poll.report.title')}`,
+    `# ${t('poll.report.title')}`,
     `## ${aPoll.title}`,
     t('poll.report.participants', { count: participants.size }),
     ...(aPoll.endDate
