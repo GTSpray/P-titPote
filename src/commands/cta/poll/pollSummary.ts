@@ -11,59 +11,11 @@ import {
   isPollClosed,
 } from '../../../utils/pollDates.js';
 import { unMention } from '../../../utils/unMention.js';
+import { splitStringIntoChunks } from '../../../utils/splitStringIntoChunks.js';
 import { Routes } from 'discord-api-types/v10';
 import { discordapi } from '../../../utils/discordapi.js';
 
 const DISCORD_MESSAGE_LENGTH_LIMIT = 2000;
-
-const splitDiscordMessage = (
-  content: string,
-  maxLength: number = DISCORD_MESSAGE_LENGTH_LIMIT,
-): string[] => {
-  const normalized = content.replaceAll('\r\n', '\n');
-  if (normalized.length <= maxLength) {
-    return [normalized];
-  }
-
-  const lines = normalized.split('\n');
-  const chunks: string[] = [];
-  let current = '';
-
-  const pushCurrent = () => {
-    if (current.length > 0) {
-      chunks.push(current);
-      current = '';
-    }
-  };
-
-  for (const line of lines) {
-    const lineWithNl = current.length === 0 ? line : `\n${line}`;
-    if (lineWithNl.length > maxLength) {
-      pushCurrent();
-      if (line.length <= maxLength) {
-        current = line;
-        continue;
-      }
-
-      for (let i = 0; i < line.length; i += maxLength) {
-        chunks.push(line.slice(i, i + maxLength));
-      }
-      current = '';
-      continue;
-    }
-
-    if (current.length + lineWithNl.length > maxLength) {
-      pushCurrent();
-      current = line;
-      continue;
-    }
-
-    current += lineWithNl;
-  }
-
-  pushCurrent();
-  return chunks;
-};
 
 const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
   const participants = new Set(pollResps.map((pollResp) => pollResp.memberId));
@@ -137,7 +89,6 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
 
   return [...summaryLines, ...stepLines].join('\n');
 };
-
 export const pollSummary: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     try {
@@ -176,7 +127,10 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
       });
 
       const report = buildPollSummary(aPoll, pollResps);
-      const chunks = splitDiscordMessage(report, DISCORD_MESSAGE_LENGTH_LIMIT);
+      const chunks = splitStringIntoChunks(
+        report,
+        DISCORD_MESSAGE_LENGTH_LIMIT,
+      );
       try {
         const url = Routes.channelMessages(channelId);
         for (const content of chunks) {

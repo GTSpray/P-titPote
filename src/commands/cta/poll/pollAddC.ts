@@ -14,7 +14,7 @@ import {
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 
-export const STEP_CHOICE_LIMIT = 25;
+export const STEP_CHOICE_LIMIT = 10;
 export const pollAddC: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     try {
