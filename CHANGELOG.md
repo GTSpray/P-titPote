@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/GTSpray/P-titPote/compare/v1.4.11...v1.5.0) (2026-06-16)
+
+### :sparkles: Features
+
+* add poll summary CTA ([#182](https://github.com/GTSpray/P-titPote/issues/182)) ([2f10f81](https://github.com/GTSpray/P-titPote/commit/2f10f812d10faddbaa5be6e8428bd1f0c7db1fac))
+
 ## [1.4.11](https://github.com/GTSpray/P-titPote/compare/v1.4.10...v1.4.11) (2026-06-15)
 
 ### :repeat: Chore
