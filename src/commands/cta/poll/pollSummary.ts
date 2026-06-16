@@ -1,8 +1,4 @@
-import {
-  ComponentType,
-  InteractionResponseType,
-  MessageFlags,
-} from 'discord-api-types/v10';
+import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
@@ -15,13 +11,59 @@ import {
   isPollClosed,
 } from '../../../utils/pollDates.js';
 import { unMention } from '../../../utils/unMention.js';
+import { Routes } from 'discord-api-types/v10';
+import { discordapi } from '../../../utils/discordapi.js';
 
-const MAX_REPORT_LENGTH = 3900;
+const DISCORD_MESSAGE_LENGTH_LIMIT = 2000;
 
-const truncateReport = (report: string): string =>
-  report.length > MAX_REPORT_LENGTH
-    ? `${report.slice(0, MAX_REPORT_LENGTH - 3)}...`
-    : report;
+const splitDiscordMessage = (
+  content: string,
+  maxLength: number = DISCORD_MESSAGE_LENGTH_LIMIT,
+): string[] => {
+  const normalized = content.replaceAll('\r\n', '\n');
+  if (normalized.length <= maxLength) {
+    return [normalized];
+  }
+
+  const lines = normalized.split('\n');
+  const chunks: string[] = [];
+  let current = '';
+
+  const pushCurrent = () => {
+    if (current.length > 0) {
+      chunks.push(current);
+      current = '';
+    }
+  };
+
+  for (const line of lines) {
+    const lineWithNl = current.length === 0 ? line : `\n${line}`;
+    if (lineWithNl.length > maxLength) {
+      pushCurrent();
+      if (line.length <= maxLength) {
+        current = line;
+        continue;
+      }
+
+      for (let i = 0; i < line.length; i += maxLength) {
+        chunks.push(line.slice(i, i + maxLength));
+      }
+      current = '';
+      continue;
+    }
+
+    if (current.length + lineWithNl.length > maxLength) {
+      pushCurrent();
+      current = line;
+      continue;
+    }
+
+    current += lineWithNl;
+  }
+
+  pushCurrent();
+  return chunks;
+};
 
 const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
   const participants = new Set(pollResps.map((pollResp) => pollResp.memberId));
@@ -93,7 +135,7 @@ const buildPollSummary = (aPoll: Poll, pollResps: PollResp[]): string => {
     return [...lines, ''];
   });
 
-  return truncateReport([...summaryLines, ...stepLines].join('\n'));
+  return [...summaryLines, ...stepLines].join('\n');
 };
 
 export const pollSummary: ModalHandlerDelcaration<CTAData> = {
@@ -107,19 +149,16 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
 
     const pollId = (<any>additionalData).d.pId;
     const guildId = req.body.guild_id;
-    if (dbServices && guildId) {
+    const channelId = req.body.channel?.id;
+    if (dbServices && guildId && channelId) {
       const em = dbServices.orm.em.fork();
-      const aPoll = await em.findOne(
+      const aPoll = await em.findOneOrFail(
         Poll,
         { server: { guildId }, id: pollId },
         {
           populate: ['steps', 'steps.choices'],
         },
       );
-
-      if (!aPoll) {
-        return res.status(500).json({ error: t('errors.noPoll') });
-      }
 
       if (!isPollClosed(aPoll.endDate)) {
         aPoll.endDate = new Date();
@@ -136,16 +175,27 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         },
       });
 
+      const report = buildPollSummary(aPoll, pollResps);
+      const chunks = splitDiscordMessage(report, DISCORD_MESSAGE_LENGTH_LIMIT);
+      try {
+        const url = Routes.channelMessages(channelId);
+        for (const content of chunks) {
+          await discordapi.post(url, {
+            body: {
+              content,
+              allowed_mentions: { parse: [] },
+            },
+          });
+        }
+      } catch (error) {
+        logger.error(error);
+      }
+
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
-          flags: MessageFlags.IsComponentsV2,
-          components: [
-            {
-              type: ComponentType.TextDisplay,
-              content: buildPollSummary(aPoll, pollResps),
-            },
-          ],
+          flags: MessageFlags.Ephemeral,
+          content: t('poll.report.sent', { count: chunks.length }),
         },
       });
     }
