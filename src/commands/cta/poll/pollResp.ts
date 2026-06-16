@@ -10,6 +10,7 @@ import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { escapeModalTitle } from '../../../utils/escapeModalTitle.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { t } from '../../../i18n/index.js';
+import { isPollClosed } from '../../../utils/pollDates.js';
 
 export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
@@ -29,8 +30,7 @@ export const pollResp: ModalHandlerDelcaration<CTAData> = {
         return res.status(500).json({ error: t('errors.noPoll') });
       }
 
-      const today = new Date();
-      if (aPoll.endDate && aPoll.endDate.getTime() < today.getTime()) {
+      if (isPollClosed(aPoll.endDate)) {
         return res.json(errorPayload(t('errors.voteClosed')));
       }
 

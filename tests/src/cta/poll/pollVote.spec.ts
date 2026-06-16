@@ -121,7 +121,7 @@ describe('cta/pollVote', () => {
     });
     const memberId = <string>req.body.member?.user.id;
 
-    expect(() =>
+    await expect(() =>
       pollVote.handler({
         ...handlerOpts,
         req,
@@ -217,6 +217,21 @@ describe('cta/pollVote', () => {
       data: {
         flags: MessageFlags.Ephemeral,
         content: t('poll.vote.success'),
+      },
+    });
+  });
+
+  it('should not record votes after the poll end date', async () => {
+    aPoll.endDate = new Date('2000-01-01T00:00:00.000Z');
+    await em.persist(aPoll).flush();
+
+    const response = await pollVote.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('errors.voteClosed'),
       },
     });
   });

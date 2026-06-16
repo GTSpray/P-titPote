@@ -414,7 +414,7 @@ describe('cta/pollCreate', () => {
         permissions: admin_permissions,
       });
 
-      expect(() =>
+      await expect(() =>
         pollCreate.handler({
           ...handlerOpts,
           req,

@@ -105,7 +105,7 @@ describe('cta/pollAddQ', () => {
       guild_id: randomDiscordId19(),
     });
 
-    expect(() =>
+    await expect(() =>
       pollAddQ.handler({
         ...handlerOpts,
         req,
