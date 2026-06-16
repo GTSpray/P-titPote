@@ -186,7 +186,7 @@ describe('cta/pollSummary', () => {
     expect(postSpy).toHaveBeenCalledWith(Routes.channelMessages(channel_id), {
       body: {
         content: [
-          t('poll.report.title'),
+          `#${t('poll.report.title')}`,
           `## ${poll.title}`,
           t('poll.report.participants', { count: members.length }),
           t('poll.report.endDate', {
@@ -301,7 +301,7 @@ describe('cta/pollSummary', () => {
       {
         body: {
           content: [
-            t('poll.report.title'),
+            `#${t('poll.report.title')}`,
             `## ${aPoll.title}`,
             t('poll.report.participants', { count: members.length }),
             t('poll.report.endDate', {

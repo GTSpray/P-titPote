@@ -54,7 +54,7 @@ export const fr = {
   'poll.publish.endDate': 'Fin du vote : {date} ({relative})',
   'poll.response.placeholder': 'Choisis...',
   'poll.vote.success': 'A voté!',
-  'poll.report.title': '# Compte rendu du vote',
+  'poll.report.title': 'Compte rendu du vote',
   'poll.report.votePercent': '{label} : {count} vote(s) ({percent}%)',
   'poll.report.answerNb': 'Réponse n°{nb}',
   'poll.report.participants': 'Participants : {count}',
