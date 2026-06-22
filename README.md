@@ -19,6 +19,8 @@
 **P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
 It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
 
+To learn more about how the bot works and the commands available, please refer to the documentation in the “docs” folder
+
 ## 🔧 Prerequisites
 
 - [Node.js](https://nodejs.org/en/download/) (v22 or newer)
@@ -176,6 +178,21 @@ P-titPote/
 ├── package.json                 # Dependencies & scripts
 └── tsconfig.json                # TypeScript config
 ```
+
+### Request flow
+
+- `GET /health` returns an empty JSON response for service health checks.
+- `POST /interactions` is the Discord interactions endpoint. It verifies
+  Discord signatures with `PUBLIC_KEY` before dispatching anything.
+- Slash commands are dispatched from `data.name` through
+  `src/commands/slash/index.ts`.
+- Buttons and modal submissions use a JSON `custom_id`, for example
+  `{"t":"cta","d":{"a":"pollPub","pId":"..."}}`, and are dispatched through
+  `src/commands/cta/index.ts`.
+- Request IDs are added to `x-request-id` and included in structured logs.
+
+Keep `express.json()` after the `/interactions` route. Discord signature
+verification depends on the raw request body handled by `verifyKeyMiddleware`.
 
 ## Database Management
 
