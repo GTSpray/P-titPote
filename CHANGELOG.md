@@ -1,3 +1,10 @@
+## [1.5.4](https://github.com/GTSpray/P-titPote/compare/v1.5.3...v1.5.4) (2026-06-22)
+
+### :repeat: Chore
+
+* **deps:** bump actions/checkout from 6 to 7 ([#190](https://github.com/GTSpray/P-titPote/issues/190)) ([eba668a](https://github.com/GTSpray/P-titPote/commit/eba668a2aff237388a32b16af50bc051b4f59b11))
+* **deps:** bump vitest from 4.1.8 to 4.1.9 ([#191](https://github.com/GTSpray/P-titPote/issues/191)) ([7522342](https://github.com/GTSpray/P-titPote/commit/75223421fca353443d52f09179745b7207c7ebd5))
+
 ## [1.5.3](https://github.com/GTSpray/P-titPote/compare/v1.5.2...v1.5.3) (2026-06-22)
 
 ### :repeat: Chore
