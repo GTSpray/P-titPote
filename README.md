@@ -19,7 +19,12 @@
 **P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
 It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
 
-To learn more about how the bot works and the commands available, please refer to the documentation in the “docs” folder
+To learn more about how the bot works and the commands available, see the
+workflow docs in [`docs/`](docs/):
+
+- [`docs/poll.md`](docs/poll.md) — poll creation, voting, and reports
+- [`docs/alias.md`](docs/alias.md) — reusable message aliases for moderators
+- [`docs/gimme.md`](docs/gimme.md) — otter image, emoji gallery, and version
 
 ## 🔧 Prerequisites
 
