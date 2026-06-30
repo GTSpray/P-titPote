@@ -73,9 +73,7 @@ const ValidCommandPayload = z.object({
 });
 
 export type aliasDataOpts =
-  | aliasSetCommandData
-  | aliasSayCommandData
-  | aliasLsCommandData;
+  aliasSetCommandData | aliasSayCommandData | aliasLsCommandData;
 export const alias: SlashCommandDeclaration<aliasDataOpts> = {
   builder,
   handler: async function (handlerOpts) {

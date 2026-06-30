@@ -46,8 +46,7 @@ export interface ComponentSelect {
 }
 
 type getInputComponnentByIdDeclaration<T extends CTAComponnent> =
-  | Component<T>
-  | undefined;
+  Component<T> | undefined;
 export function getInputComponnentById<T extends CTAComponnent>(
   data: CTAData | undefined,
   componentId: string,
