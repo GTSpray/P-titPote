@@ -12,8 +12,7 @@ export type PartialComponentList = {
 };
 
 export type PartialComponentBase =
-  | PartialComponentSingle
-  | PartialComponentList;
+  PartialComponentSingle | PartialComponentList;
 
 export const getModalLabelComponnents = (complist: PartialComponentBase[]) =>
   complist.map((e, i) => ({

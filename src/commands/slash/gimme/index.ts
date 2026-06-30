@@ -62,9 +62,7 @@ const ValidCommandPayload = z.object({
 });
 
 export type gimmeDataOpts =
-  | gimmeOtterCommandData
-  | gimmeEmojiCommandData
-  | gimmeVersionCommandData;
+  gimmeOtterCommandData | gimmeEmojiCommandData | gimmeVersionCommandData;
 
 export const gimme: SlashCommandDeclaration<gimmeDataOpts> = {
   builder,
