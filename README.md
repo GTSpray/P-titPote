@@ -25,6 +25,8 @@ workflow docs in [`docs/`](docs/):
 - [`docs/poll.md`](docs/poll.md) — poll creation, voting, and reports
 - [`docs/alias.md`](docs/alias.md) — reusable message aliases for moderators
 - [`docs/gimme.md`](docs/gimme.md) — otter image, emoji gallery, and version
+- [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle,
+  events, and troubleshooting
 
 ## 🔧 Prerequisites
 
