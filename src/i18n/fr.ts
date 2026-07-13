@@ -61,6 +61,8 @@ export const fr = {
   'poll.report.endDate': 'Clôture : {date}',
   'poll.report.noResponse': 'Aucune réponse pour le moment.',
   'poll.report.sent': 'Compte rendu envoyé dans ce salon ({count} message(s)).',
+  'poll.report.failed':
+    "Ahem... je n'ai pas réussi à envoyer le compte rendu. Le vote reste ouvert.",
   'gateway.activity.name': '🫖 Teapot Simulator',
   'gateway.activity.state': 'Autour du cou de Lila',
   'startup.noTokenEnv': 'no APP_ID provided in env',
