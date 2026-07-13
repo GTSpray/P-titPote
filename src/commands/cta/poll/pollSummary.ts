@@ -4,7 +4,7 @@ import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
-import { notAllowed } from '../../commonMessages.js';
+import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import {
   formatDiscordTimestamp,
@@ -111,11 +111,6 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
-      if (!isPollClosed(aPoll.endDate)) {
-        aPoll.endDate = new Date();
-        await em.persist(aPoll).flush();
-      }
-
       const pollResps = await em.findAll(PollResp, {
         where: { pollStep: { poll: aPoll } },
         populate: ['pollStep', 'pollChoice'],
@@ -125,6 +120,11 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
           },
         },
       });
+
+      const shouldClosePoll = !isPollClosed(aPoll.endDate);
+      if (shouldClosePoll) {
+        aPoll.endDate = new Date();
+      }
 
       const report = buildPollSummary(aPoll, pollResps);
       const chunks = splitStringIntoChunks(
@@ -143,6 +143,11 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         }
       } catch (error) {
         logger.error(error);
+        return res.json(errorPayload(t('poll.report.failed')));
+      }
+
+      if (shouldClosePoll) {
+        await em.persist(aPoll).flush();
       }
 
       return res.json({

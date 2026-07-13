@@ -130,6 +130,28 @@ describe('cta/pollSummary', () => {
     expect(poll.endDate).toBeDateCloseTo(today, 1000);
   });
 
+  it('should keep the poll open when publishing the summary fails', async () => {
+    aPoll.endDate = undefined;
+    await em.persist(aPoll).flush();
+    em.clear();
+    postSpy.mockRejectedValueOnce(new Error('discord api error'));
+
+    const response = await pollSummary.handler(handlerOpts);
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+    expect(poll.endDate).toBeFalsy();
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('poll.report.failed'),
+      },
+    });
+  });
+
   it('should not update the end date of a poll that has already been published', async () => {
     const publishedEndDate = new Date('2026-06-01T12:00:00.000Z');
     aPoll.endDate = publishedEndDate;
