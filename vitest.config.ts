@@ -1,8 +1,15 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+      emitDecoratorMetadata: true,
+    },
+  },
   test: {
     globals: true,
+    include: ['tests/**/*.spec.ts'],
     setupFiles: ['tests/vitest.setup.ts'],
     reporters: process.env.GITHUB_ACTIONS
       ? [
