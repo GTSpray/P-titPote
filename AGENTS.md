@@ -108,6 +108,52 @@ npm run lint
 npm run register
 ```
 
+## Documentation
+
+The repository documents two audiences. Keep them separate.
+
+### Audiences
+
+| Audience | Goal | Location |
+| --- | --- | --- |
+| Bot users | How to use slash commands on a Discord server | `docs/usage/` |
+| Developers | How the bot is built, deployed, and extended | `README.md`, `docs/`, `AGENTS.md` |
+
+### User documentation (`docs/usage/`)
+
+- Write for server members and moderators, not contributors.
+- Describe workflows, permissions, buttons, modals, and user-visible limits.
+- Do not include source paths, database entities, dispatch details, or internal error handling.
+- Keep user-facing examples aligned with the bot copy. Existing bot messages are mostly French.
+- Place command guides at `docs/usage/<command>/<command>.md`
+  (for example `docs/usage/poll/poll.md`).
+- When adding or changing user-visible command behavior, update the matching usage doc.
+
+### Technical documentation (`docs/`)
+
+- Write for contributors and agents working in the codebase.
+- Describe architecture, services, source modules, validation limits, entities, and dispatch flow.
+- Place cross-cutting technical guides at `docs/<topic>.md`
+  (for example `docs/gateway.md`).
+- If a command needs both a user guide and a technical guide, keep them in separate files instead of mixing both concerns in one document.
+- When changing architecture, limits, persistence, or dispatch behavior, update the relevant technical doc.
+
+### README maintenance
+
+- Keep `README.md` split into a user section and a developer section.
+- Link new usage docs from the **Using the bot** section.
+- Link new technical docs from the **Technical documentation** section under **Developing P'tit Pote**.
+- Update the project tree in `README.md` when adding new top-level documentation folders.
+
+### Documentation checklist for agents
+
+When a change affects documented behavior:
+
+1. Update the usage doc if Discord users will see different flows or messages.
+2. Update the technical doc if implementation, limits, or architecture changed.
+3. Update `README.md` links when adding a new doc file.
+4. Do not create standalone markdown files outside `docs/` unless the task explicitly requires it.
+
 ## Architecture map
 
 Primary source files:
@@ -132,8 +178,11 @@ When adding a slash command:
 2. Export the command declaration from the relevant `index.ts`.
 3. Ensure the root `src/commands/slash/index.ts` includes it in `slashcommands`.
 4. Add tests under the matching `tests/src/commands/` area when practical.
-5. Build and test before proposing the change.
-6. Do not run `make register` unless explicitly asked.
+5. Add or update `docs/usage/<command>/<command>.md` when the command has user-facing behavior.
+6. Add or update a technical doc under `docs/` when the feature needs architecture or implementation notes beyond the usage guide.
+7. Link new docs from `README.md`.
+8. Build and test before proposing the change.
+9. Do not run `make register` unless explicitly asked.
 
 ## TypeScript and module conventions
 

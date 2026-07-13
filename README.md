@@ -14,29 +14,43 @@
 
 ---
 
-## 🌟 About
+## About
 
-**P'tit Pote** is a modern Discord bot built with TypeScript, Express, and Discord.js.  
-It features a robust, scalable architecture, database support via MariaDB with MikroORM, and strong logging via Winston.
+**P'tit Pote** is a Discord bot for polls, reusable message aliases, and a few
+utility commands. It is built with TypeScript, Express, Discord.js, MariaDB, and
+MikroORM.
 
-To learn more about how the bot works and the commands available, see the
-workflow docs in [`docs/`](docs/):
+The documentation is split for two audiences:
 
-- [`docs/poll.md`](docs/poll.md) — poll creation, voting, and reports
-- [`docs/alias.md`](docs/alias.md) — reusable message aliases for moderators
-- [`docs/gimme.md`](docs/gimme.md) — otter image, emoji gallery, and version
-- [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle,
-  events, and troubleshooting
+| Audience | Goal | Where to look |
+| --- | --- | --- |
+| **Bot users** | Learn how to use slash commands on a server | [`docs/usage/`](docs/usage/) |
+| **Developers** | Set up, run, test, and extend the bot | This README and [`docs/`](docs/) |
 
-## 🔧 Prerequisites
+---
+
+## Using the bot
+
+These guides are for server members and moderators. They describe command
+workflows, permissions, and expected bot behavior — not the codebase.
+
+- [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
+- [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store and post reusable message aliases
+- [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
+
+---
+
+## Developing P'tit Pote
+
+### Prerequisites
 
 - [Node.js](https://nodejs.org/en/download/) (v22 or newer)
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - A [Discord application](https://discord.com/developers/applications) (with bot + commands enabled)
 
-## 🚀 Quick Start
+### Quick start
 
-### 1. Clone & Install
+#### 1. Clone and install
 
 ```bash
 git clone https://github.com/GTSpray/P-titPote.git
@@ -44,9 +58,9 @@ cd P-titPote
 npm install
 ```
 
-### 2. App Credentials
+#### 2. App credentials
 
-Get your application credentials (from the Discord Developer Portal):
+Get your application credentials from the Discord Developer Portal:
 
 - **APP_ID**
 - **BOT_TOKEN**
@@ -61,33 +75,35 @@ PUBLIC_KEY=your_public_key
 LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
 ```
 
-### 3. Discord Scopes & Permissions
+#### 3. Discord scopes and permissions
 
 Required scopes:
 
 - `applications.commands`
 - `bot` (with Send Messages enabled)
-  Required permissions:
+
+Required permissions:
+
 - Manage Messages
 - Send Messages
 - Use external Emojis
 
-_For more details, see [Discord's getting started guide](https://docs.discord.com/developers/quick-start/getting-started)._
+For more details, see [Discord's getting started guide](https://docs.discord.com/developers/quick-start/getting-started).
 
-## 🌐 Local Development (Tunnel)
+### Local development (tunnel)
 
-If developing locally, you must expose your dev environment to the internet for Discord events to work. Two main tunnel options:
+If developing locally, expose your dev environment to the internet so Discord
+can reach the interactions endpoint. Two main tunnel options:
 
-### Using Localtunnel
+#### Using Localtunnel
 
-> 💡 Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
+> Set `LOCALTUNNEL_SUBDOMAIN` in your `.env` to reserve your subdomain (see [localtunnel status page](https://status.loca.lt/)).
 
-For exemple if you set: **LOCALTUNNEL_SUBDOMAIN**=_my-bot_
+For example, if you set `LOCALTUNNEL_SUBDOMAIN=my-bot`, you will get a URL like
+`https://my-bot.loca.lt`.
 
-You will get a url like `https://my-bot.loca.lt`
-
-Go to your Discord app "General Information" > **Interactions Endpoint URL**  
-Paste the tunnel url with `/interactions` appended, e.g.:
+Go to your Discord app **General Information** > **Interactions Endpoint URL**
+and paste the tunnel URL with `/interactions` appended, e.g.:
 
 ```
 https://my-bot.loca.lt/interactions
@@ -95,7 +111,7 @@ https://my-bot.loca.lt/interactions
 
 Click **Save Changes**.
 
-### Using ngrok
+#### Using ngrok
 
 Alternatively, update your `docker-compose.local.yml` for ngrok:
 
@@ -113,11 +129,12 @@ services:
       - '4040'
 ```
 
-- Copy your ngrok https forwarding URL and set it as your Interactions Endpoint as above.
+Copy your ngrok HTTPS forwarding URL and set it as your Interactions Endpoint as
+above.
 
-## ⚙️ Usage
+### Running the project
 
-### Production
+#### Production
 
 ```bash
 make start      # Start the bot (prod)
@@ -125,7 +142,7 @@ make register   # Register slash commands
 make stop       # Stop the bot
 ```
 
-### Development
+#### Development
 
 ```bash
 make dev        # Run in dev container
@@ -134,35 +151,30 @@ make test       # Run test suite
 make testw      # Run test suite in watch mode
 ```
 
-> 💡 When developing, after running `make dev`, you should also execute `make install` inside the development container to install all dev dependencies before running the tests or starting development.
+> When developing, after running `make dev`, run `make install` inside the
+> development container to install dev dependencies before running tests.
 
-## ✅ Testing
+### Technical documentation
 
-All tests for this project are located in the `tests/` directory.  
-The test suite uses [Vitest](https://vitest.dev/) to ensure code quality and correct bot functionality.
+These guides describe architecture, services, and implementation details:
 
-### Running tests
+- [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 
-To execute all tests:
+Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
 
-```bash
-make test
-```
+### Testing
 
-- This command will run all unit and integration tests found in the `tests/` directory.
-- To run tests in watch mode (auto-reload on code changes):
+All tests live in `tests/` and run with [Vitest](https://vitest.dev/).
 
 ```bash
-make testw
+make test   # run the full suite
+make testw  # watch mode
 ```
 
-### Guidelines
+When adding features or fixing bugs, add matching `.test.ts` files under
+`tests/` and keep the suite green before proposing major changes.
 
-- When adding new features or fixing bugs, create corresponding test files in the `tests/` directory.
-- Name your test files with the `.test.ts` suffix for consistency.
-- Always make sure the test suite passes before proposing major changes.
-
-## 🗂 Project Structure
+### Project structure
 
 ```
 P-titPote/
@@ -177,6 +189,9 @@ P-titPote/
 │   ├── db/                      # Database entities
 │   ├── utils/                   # Helper utils
 │   └── migrations/              # Database migrations
+├── docs/
+│   ├── usage/                   # End-user command guides
+│   └── gateway.md               # Gateway service technical guide
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
 ├── Makefile                     # Automation
@@ -186,7 +201,7 @@ P-titPote/
 └── tsconfig.json                # TypeScript config
 ```
 
-### Request flow
+#### Request flow
 
 - `GET /health` returns an empty JSON response for service health checks.
 - `POST /interactions` is the Discord interactions endpoint. It verifies
@@ -201,7 +216,7 @@ P-titPote/
 Keep `express.json()` after the `/interactions` route. Discord signature
 verification depends on the raw request body handled by `verifyKeyMiddleware`.
 
-## Database Management
+### Database management
 
 Powered by [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator):
 
@@ -213,7 +228,9 @@ npx mikro-orm schema:update --dump   # Show SQL for incremental update
 npx mikro-orm schema:drop --dump     # Show SQL to drop schema
 ```
 
-## 📚 Resources
+---
+
+## Resources
 
 - [Discord API Docs](https://discord.com/developers/docs/intro)
 - [Discord Developers server (support)](https://discord.gg/discord-developers)
@@ -222,6 +239,6 @@ npx mikro-orm schema:drop --dump     # Show SQL to drop schema
 - [MikroORM Documentation](https://mikro-orm.io/)
 - [discord.js Documentation](https://discord.js.org/)
 
-## 📝 License
+## License
 
 MIT – see [LICENSE](LICENSE)
