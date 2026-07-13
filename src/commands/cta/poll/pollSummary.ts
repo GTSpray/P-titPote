@@ -121,8 +121,7 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         },
       });
 
-      const shouldClosePoll = !isPollClosed(aPoll.endDate);
-      if (shouldClosePoll) {
+      if (!isPollClosed(aPoll.endDate)) {
         aPoll.endDate = new Date();
       }
 
@@ -146,9 +145,7 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         return res.json(errorPayload(t('poll.report.failed')));
       }
 
-      if (shouldClosePoll) {
-        await em.persist(aPoll).flush();
-      }
+      await em.persist(aPoll).flush();
 
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
