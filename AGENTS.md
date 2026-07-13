@@ -114,10 +114,10 @@ The repository documents two audiences. Keep them separate.
 
 ### Audiences
 
-| Audience | Goal | Location |
-| --- | --- | --- |
-| Bot users | How to use slash commands on a Discord server | `docs/usage/` |
-| Developers | How the bot is built, deployed, and extended | `README.md`, `docs/`, `AGENTS.md` |
+| Audience   | Goal                                          | Location                          |
+| ---------- | --------------------------------------------- | --------------------------------- |
+| Bot users  | How to use slash commands on a Discord server | `docs/usage/`                     |
+| Developers | How the bot is built, deployed, and extended  | `README.md`, `docs/`, `AGENTS.md` |
 
 ### User documentation (`docs/usage/`)
 

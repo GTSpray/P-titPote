@@ -22,10 +22,10 @@ MikroORM.
 
 The documentation is split for two audiences:
 
-| Audience | Goal | Where to look |
-| --- | --- | --- |
-| **Bot users** | Learn how to use slash commands on a server | [`docs/usage/`](docs/usage/) |
-| **Developers** | Set up, run, test, and extend the bot | This README and [`docs/`](docs/) |
+| Audience       | Goal                                        | Where to look                    |
+| -------------- | ------------------------------------------- | -------------------------------- |
+| **Bot users**  | Learn how to use slash commands on a server | [`docs/usage/`](docs/usage/)     |
+| **Developers** | Set up, run, test, and extend the bot       | This README and [`docs/`](docs/) |
 
 ---
 
