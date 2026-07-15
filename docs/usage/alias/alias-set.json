@@ -1,0 +1,136 @@
+{
+    "$schema": "../schema/scenario.schema.json",
+    "id": "alias-set-flow",
+    "title": "Créer un alias (/alias set)",
+    "chrome": {
+        "guild": {
+            "name": "Serveur de démo"
+        },
+        "channel": {
+            "name": "général",
+            "type": "text"
+        },
+        "viewer": {
+            "name": "Modo",
+            "status": "Online"
+        }
+    },
+    "actions": [
+        {
+            "type": "wait",
+            "ms": 1500
+        },
+        {
+            "type": "focusInput"
+        },
+        {
+            "type": "wait",
+            "ms": 1200
+        },
+        {
+            "type": "type",
+            "text": "/alias set",
+            "msPerChar": 70,
+            "revealSuggestions": {
+                "mode": "commandMatch",
+                "activeIndex": 2,
+                "suggestions": [
+                    {
+                        "name": "/alias ls",
+                        "description": "liste les alias...",
+                        "botName": "P'titPote"
+                    },
+                    {
+                        "name": "/alias say",
+                        "description": "demande a p'titpote...",
+                        "botName": "P'titPote"
+                    },
+                    {
+                        "name": "/alias set",
+                        "description": "definit un alias message",
+                        "botName": "P'titPote"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "wait",
+            "ms": 200
+        },
+        {
+            "type": "setSlashParams",
+            "params": [
+                {
+                    "name": "alias",
+                    "description": "alias du message"
+                },
+                {
+                    "name": "message",
+                    "description": "contenu du message"
+                }
+            ]
+        },
+        {
+            "type": "wait",
+            "ms": 1200
+        },
+        {
+            "type": "typeSlashParam",
+            "param": "alias",
+            "text": "toto",
+            "msPerChar": 150
+        },
+        {
+            "type": "wait",
+            "ms": 1200
+        },
+        {
+            "type": "typeSlashParam",
+            "param": "message",
+            "text": "Bonjour tout le monde !",
+            "msPerChar": 158
+        },
+        {
+            "type": "wait",
+            "ms": 800
+        },
+        {
+            "type": "pressEnter"
+        },
+        {
+            "type": "applyState",
+            "layers": {
+                "messages": [
+                    {
+                        "author": {
+                            "name": "P'tit Pote",
+                            "bot": true,
+                            "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+                        },
+                        "timestamp": "14:10",
+                        "slashInvocation": {
+                            "user": {
+                                "name": "Modo",
+                                "color": "#5865f2"
+                            },
+                            "command": "alias set"
+                        },
+                        "interaction": {
+                            "type": 4,
+                            "data": {
+                                "flags": 32768,
+                                "components": [
+                                    {
+                                        "type": 10,
+                                        "content": "Ok! C'est noté ;)"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "holdMs": 2000
+        }
+    ]
+}
