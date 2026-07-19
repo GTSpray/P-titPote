@@ -15,16 +15,16 @@ message or posts a report.
 
 ## Entry points
 
-| Interaction | Handler | Purpose |
-| --- | --- | --- |
-| `/poll create` | `src/commands/slash/poll/create.ts` | Opens the first poll creation modal. |
-| `pollCreate` modal | `src/commands/cta/poll/pollCreate.ts` | Creates the draft poll, then appends questions or choices. |
-| `pollAddQ` button | `src/commands/cta/poll/pollAddQ.ts` | Opens a modal for the next question. |
-| `pollAddC` button | `src/commands/cta/poll/pollAddC.ts` | Opens a modal for choices on the latest question. |
-| `pollPub` button | `src/commands/cta/poll/pollPub.ts` | Publishes the public voting message. |
-| `pollResp` button | `src/commands/cta/poll/pollResp.ts` | Opens the voting modal for a member. |
-| `pollVote` modal | `src/commands/cta/poll/pollVote.ts` | Stores or updates the member's answers. |
-| `pollSummary` button | `src/commands/cta/poll/pollSummary.ts` | Posts the public report and closes the poll on success. |
+| Interaction          | Handler                                | Purpose                                                    |
+| -------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| `/poll create`       | `src/commands/slash/poll/create.ts`    | Opens the first poll creation modal.                       |
+| `pollCreate` modal   | `src/commands/cta/poll/pollCreate.ts`  | Creates the draft poll, then appends questions or choices. |
+| `pollAddQ` button    | `src/commands/cta/poll/pollAddQ.ts`    | Opens a modal for the next question.                       |
+| `pollAddC` button    | `src/commands/cta/poll/pollAddC.ts`    | Opens a modal for choices on the latest question.          |
+| `pollPub` button     | `src/commands/cta/poll/pollPub.ts`     | Publishes the public voting message.                       |
+| `pollResp` button    | `src/commands/cta/poll/pollResp.ts`    | Opens the voting modal for a member.                       |
+| `pollVote` modal     | `src/commands/cta/poll/pollVote.ts`    | Stores or updates the member's answers.                    |
+| `pollSummary` button | `src/commands/cta/poll/pollSummary.ts` | Posts the public report and closes the poll on success.    |
 
 Component routing uses JSON `custom_id` values with the shape
 `{"t":"cta","d":{"a":"pollCreate","pId":"..."}}`. The HTTP interactions
