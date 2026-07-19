@@ -49,14 +49,3 @@ The **Compte rendu** button is moderator-only. When clicked, it:
 - disables mentions in report messages and escapes `@` in free-text answers;
 - splits reports over multiple Discord messages when the content exceeds the
   2,000 character message limit.
-
-### Implementation map
-
-- Slash command declaration and command payload validation:
-  `src/commands/slash/poll/`.
-- Poll component handlers: `src/commands/cta/poll/`.
-- Poll persistence model: `Poll`, `PollStep`, `PollChoice`, and `PollResp` in
-  `src/db/entities/`.
-- Date formatting and closure checks: `src/utils/pollDates.ts`.
-- Report chunking and mention escaping:
-  `src/utils/splitStringIntoChunks.ts` and `src/utils/unMention.ts`.

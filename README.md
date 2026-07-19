@@ -158,6 +158,7 @@ make testw      # Run test suite in watch mode
 
 These guides describe architecture, services, and implementation details:
 
+- [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 
 Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
@@ -191,6 +192,7 @@ P-titPote/
 │   └── migrations/              # Database migrations
 ├── docs/
 │   ├── usage/                   # End-user command guides
+│   ├── poll.md                  # Poll workflow technical guide
 │   └── gateway.md               # Gateway service technical guide
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
