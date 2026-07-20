@@ -27,7 +27,10 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
-import { formatDiscordTimestamp } from '../../../../src/utils/pollDates.js';
+import {
+  formatDiscordTimestamp,
+  isPollClosed,
+} from '../../../../src/utils/pollDates.js';
 import { REST } from 'discord.js';
 import {
   DiscrodRESTMock,
@@ -150,6 +153,40 @@ describe('cta/pollSummary', () => {
         content: t('poll.report.failed'),
       },
     });
+  });
+
+  it('should close the poll before publishing the summary', async () => {
+    aPoll.endDate = undefined;
+    await em.persist(aPoll).flush();
+    em.clear();
+    postSpy.mockImplementationOnce(async () => {
+      em.clear();
+      const poll = await em.findOneOrFail(Poll, {
+        id: aPoll.id,
+      });
+      expect(isPollClosed(poll.endDate)).toBe(true);
+      return {};
+    });
+
+    await pollSummary.handler(handlerOpts);
+
+    expect(postSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should restore the previous end date when publishing the summary fails', async () => {
+    const scheduledEndDate = new Date('2026-08-01T12:00:00.000Z');
+    aPoll.endDate = scheduledEndDate;
+    await em.persist(aPoll).flush();
+    em.clear();
+    postSpy.mockRejectedValueOnce(new Error('discord api error'));
+
+    await pollSummary.handler(handlerOpts);
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+    expect(poll.endDate).toEqual(scheduledEndDate);
   });
 
   it('should not update the end date of a poll that has already been published', async () => {
