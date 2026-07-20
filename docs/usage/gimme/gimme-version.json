@@ -28,7 +28,7 @@
         {
             "type": "type",
             "text": "/gimme version",
-            "msPerChar": 80,
+            "msPerChar": 150,
             "revealSuggestions": {
                 "suggestions": [
                     {
@@ -40,7 +40,7 @@
         },
         {
             "type": "wait",
-            "ms": 600
+            "ms": 1200
         },
         {
             "type": "pressEnter"
