@@ -5,6 +5,11 @@ buttons.
 
 ### Moderator flow
 
+All `/poll` draft and publication actions are moderator-only. The moderator
+check accepts members with at least one of these Discord permissions:
+Administrator, Manage Server, Manage Channels, Manage Messages, Kick Members,
+or Ban Members.
+
 1. Run `/poll create` in a server channel. The command opens a modal for:
    - poll title, 1-45 characters;
    - optional voter role (`Role des sondés`);
@@ -21,10 +26,7 @@ buttons.
 3. After publication, the draft is immutable: adding questions, adding choices,
    or publishing again returns an ephemeral error.
 
-Poll creation, draft updates, publication, and reports are moderator-only. The
-moderator check accepts members with at least one of these Discord permissions:
-Administrator, Manage Server, Manage Channels, Manage Messages, Kick Members,
-or Ban Members.
+![Moderator poll flow](./poll-moderator-flow.gif)
 
 ### Voter flow
 
@@ -36,6 +38,8 @@ or Ban Members.
 - Existing answers are pre-filled, so submitting the vote modal again updates
   the member's previous answers for that poll.
 - Voting is closed when `Poll.endDate` is set to a past or current time.
+
+![Vote on a poll](./poll-vote-flow.gif)
 
 ### Reports and closing
 
@@ -49,3 +53,24 @@ The **Compte rendu** button is moderator-only. When clicked, it:
 - disables mentions in report messages and escapes `@` in free-text answers;
 - splits reports over multiple Discord messages when the content exceeds the
   2,000 character message limit.
+
+![Poll report](./poll-report-flow.gif)
+
+### Examples
+
+```text
+/poll create
+→ title + first question
+→ Ajouter des choix (mercredi, jeudi, vendredi)
+→ Nouvelle question (avez vous des alergenes)
+→ Publier le sondage
+→ Je vote!
+→ Compte rendu
+```
+
+### Constraints
+
+- Guild-only: DMs and interactions without `guild_id` are not supported for the
+  poll workflow.
+- Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
+  faire 🤷** response for create, draft updates, publish, and reports.

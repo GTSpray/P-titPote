@@ -1,0 +1,465 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "poll-moderator-flow",
+  "title": "Poll — créer, choix, nouvelle question, publier",
+  "doc": "docs/usage/poll/poll.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 12,
+    "viewer": {
+      "name": "Modo",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/poll create",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/poll create",
+            "description": "créer un sondage"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Créer un sondage",
+          "components": [
+            {
+              "type": 18,
+              "label": "Titre du sondage",
+              "component": {
+                "type": 4,
+                "custom_id": "title",
+                "style": 1,
+                "required": true
+              }
+            },
+            {
+              "type": 18,
+              "label": "Role des sondés",
+              "component": {
+                "type": 6,
+                "custom_id": "role",
+                "required": false
+              }
+            },
+            {
+              "type": 18,
+              "label": "Question du sondage",
+              "component": {
+                "type": 4,
+                "custom_id": "question",
+                "style": 1,
+                "required": true
+              }
+            },
+            {
+              "type": 18,
+              "label": "Description",
+              "component": {
+                "type": 4,
+                "custom_id": "description",
+                "style": 1,
+                "required": false
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "fillModal",
+      "values": {
+        "title": "Repas de fin d'année",
+        "question": "Quel jour ?",
+        "description": "Votez pour la date qui vous arrange"
+      },
+      "msPerField": 130
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "submitModal"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "slashInvocation": {
+          "user": {
+            "name": "Modo",
+            "color": "#5865f2"
+          },
+          "command": "poll create"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "## Repas de fin d'année\n\n1. Quel jour ?",
+          "components": [
+            {
+              "type": 1,
+              "components": [
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Ajouter des choix"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Nouvelle question"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Publier le sondage"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 1400
+    },
+    {
+      "type": "clickButton",
+      "label": "Ajouter des choix"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Ajouter des choix",
+          "components": [
+            {
+              "type": 10,
+              "content": "# Quel jour ?"
+            },
+            {
+              "type": 18,
+              "label": "Choix n°1",
+              "component": {
+                "type": 4,
+                "custom_id": "choice1",
+                "style": 1,
+                "required": true
+              }
+            },
+            {
+              "type": 18,
+              "label": "Choix n°2",
+              "component": {
+                "type": 4,
+                "custom_id": "choice2",
+                "style": 1,
+                "required": true
+              }
+            },
+            {
+              "type": 18,
+              "label": "Choix n°3",
+              "component": {
+                "type": 4,
+                "custom_id": "choice3",
+                "style": 1,
+                "required": false
+              }
+            },
+            {
+              "type": 18,
+              "label": "Choix n°4",
+              "component": {
+                "type": 4,
+                "custom_id": "choice4",
+                "style": 1,
+                "required": false
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "fillModal",
+      "values": {
+        "choice1": "mercredi",
+        "choice2": "jeudi",
+        "choice3": "vendredi"
+      },
+      "msPerField": 130
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "submitModal"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "## Repas de fin d'année\n\n1. Quel jour ?\n    - mercredi\n    - jeudi\n    - vendredi",
+          "components": [
+            {
+              "type": 1,
+              "components": [
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Ajouter des choix"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Nouvelle question"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Publier le sondage"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 1400
+    },
+    {
+      "type": "clickButton",
+      "label": "Nouvelle question"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Ajouter une question",
+          "components": [
+            {
+              "type": 18,
+              "label": "Question du sondage",
+              "component": {
+                "type": 4,
+                "custom_id": "question",
+                "style": 1,
+                "required": true
+              }
+            },
+            {
+              "type": 18,
+              "label": "Description",
+              "component": {
+                "type": 4,
+                "custom_id": "description",
+                "style": 1,
+                "required": false
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "fillModal",
+      "values": {
+        "question": "avez vous des alergenes"
+      },
+      "msPerField": 130
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "submitModal"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "## Repas de fin d'année\n\n1. Quel jour ?\n    - mercredi\n    - jeudi\n    - vendredi\n2. avez vous des alergenes",
+          "components": [
+            {
+              "type": 1,
+              "components": [
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Ajouter des choix"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Nouvelle question"
+                },
+                {
+                  "type": 2,
+                  "style": 1,
+                  "label": "Publier le sondage"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 1600
+    },
+    {
+      "type": "clickButton",
+      "label": "Publier le sondage"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "15:10",
+            "deletedReply": true,
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 9,
+                    "components": [
+                      {
+                        "type": 10,
+                        "content": "# Oyé Oyé !\n-# Le staff réclame votre attention pour un sondage!"
+                      },
+                      {
+                        "type": 10,
+                        "content": "Repas de fin d'année"
+                      }
+                    ],
+                    "accessory": {
+                      "type": 11,
+                      "media": {
+                        "url": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote-sam.png"
+                      }
+                    }
+                  },
+                  {
+                    "type": 14,
+                    "divider": true,
+                    "spacing": 1
+                  },
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 2,
+                        "style": 1,
+                        "label": "Je vote!"
+                      },
+                      {
+                        "type": 2,
+                        "style": 2,
+                        "label": "Compte rendu"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 3000
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/poll",
+    "prefix": "poll-moderator-flow",
+    "video": true
+  }
+}
