@@ -18,6 +18,8 @@ Posts a public media gallery with the repository otter image:
 
 `https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png`
 
+![Show otter](./gimme-otter.gif)
+
 #### `/gimme emoji`
 
 Scans the current channel for custom Discord emojis and returns up to three of

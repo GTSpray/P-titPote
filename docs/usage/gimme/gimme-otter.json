@@ -1,0 +1,108 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "gimme-otter",
+  "title": "Gimme — image de loutre",
+  "doc": "docs/usage/gimme/gimme.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 8
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/gimme otter",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/gimme otter",
+            "description": "Affiche une image de loutre"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 600
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:10",
+            "slashInvocation": {
+              "user": {
+                "name": "You"
+              },
+              "command": "gimme otter"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 10,
+                    "content": "Voilà.. ce que j'ai trouvé"
+                  },
+                  {
+                    "type": 14,
+                    "divider": true,
+                    "spacing": 1
+                  },
+                  {
+                    "type": 12,
+                    "items": [
+                      {
+                        "description": "otter",
+                        "media": {
+                          "url": "https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/gimme",
+    "prefix": "gimme-otter",
+    "video": true
+  }
+}
