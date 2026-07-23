@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/scenario.schema.json",
-  "id": "alias-set",
-  "title": "Alias — définir un message",
+  "id": "alias-ls",
+  "title": "Alias — lister les alias",
   "doc": "docs/usage/alias/alias.md",
   "chrome": {
     "guild": {
@@ -34,56 +34,21 @@
     },
     {
       "type": "type",
-      "text": "/alias set",
+      "text": "/alias ls",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/alias set",
-            "description": "définit un alias message"
+            "name": "/alias ls",
+            "description": "liste les alias disponnibles sur ton serveur"
           }
         ]
       }
     },
     {
       "type": "wait",
-      "ms": 400
-    },
-    {
-      "type": "setSlashParams",
-      "params": [
-        {
-          "name": "alias",
-          "description": "alias du message"
-        },
-        {
-          "name": "message",
-          "description": "contenu du message"
-        }
-      ]
-    },
-    {
-      "type": "wait",
-      "ms": 800
-    },
-    {
-      "type": "typeSlashParam",
-      "param": "alias",
-      "text": "welcome"
-    },
-    {
-      "type": "wait",
       "ms": 600
-    },
-    {
-      "type": "typeSlashParam",
-      "param": "message",
-      "text": "Bienvenue sur le serveur !"
-    },
-    {
-      "type": "wait",
-      "ms": 800
     },
     {
       "type": "pressEnter"
@@ -104,7 +69,7 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "alias set"
+              "command": "alias ls"
             },
             "interaction": {
               "type": 4,
@@ -113,7 +78,16 @@
                 "components": [
                   {
                     "type": 10,
-                    "content": "Ok! C'est noté ;)"
+                    "content": "Voilà.. ce que j'ai trouvé"
+                  },
+                  {
+                    "type": 14,
+                    "divider": true,
+                    "spacing": 1
+                  },
+                  {
+                    "type": 10,
+                    "content": "* faq\n* rules\n* welcome"
                   }
                 ]
               }
@@ -126,7 +100,7 @@
   ],
   "output": {
     "directory": "docs/usage/alias",
-    "prefix": "alias-set",
+    "prefix": "alias-ls",
     "video": true
   }
 }

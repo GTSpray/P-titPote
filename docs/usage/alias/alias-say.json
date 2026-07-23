@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/scenario.schema.json",
-  "id": "alias-set",
-  "title": "Alias — définir un message",
+  "id": "alias-say",
+  "title": "Alias — poster un message stocké",
   "doc": "docs/usage/alias/alias.md",
   "chrome": {
     "guild": {
@@ -34,14 +34,14 @@
     },
     {
       "type": "type",
-      "text": "/alias set",
+      "text": "/alias say",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/alias set",
-            "description": "définit un alias message"
+            "name": "/alias say",
+            "description": "demande a p'titpote d'envoyer le message"
           }
         ]
       }
@@ -56,10 +56,6 @@
         {
           "name": "alias",
           "description": "alias du message"
-        },
-        {
-          "name": "message",
-          "description": "contenu du message"
         }
       ]
     },
@@ -71,15 +67,6 @@
       "type": "typeSlashParam",
       "param": "alias",
       "text": "welcome"
-    },
-    {
-      "type": "wait",
-      "ms": 600
-    },
-    {
-      "type": "typeSlashParam",
-      "param": "message",
-      "text": "Bienvenue sur le serveur !"
     },
     {
       "type": "wait",
@@ -104,7 +91,7 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "alias set"
+              "command": "alias say"
             },
             "interaction": {
               "type": 4,
@@ -113,7 +100,7 @@
                 "components": [
                   {
                     "type": 10,
-                    "content": "Ok! C'est noté ;)"
+                    "content": "Bienvenue sur le serveur !"
                   }
                 ]
               }
@@ -126,7 +113,7 @@
   ],
   "output": {
     "directory": "docs/usage/alias",
-    "prefix": "alias-set",
+    "prefix": "alias-say",
     "video": true
   }
 }
