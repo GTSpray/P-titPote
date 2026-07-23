@@ -25,6 +25,8 @@ Posts a public media gallery with the repository otter image:
 Scans the current channel for custom Discord emojis and returns up to three of
 them as a public media gallery.
 
+![Show emoji](./gimme-emoji.gif)
+
 Processing rules:
 
 1. Fetch the 10 most recent messages in the channel via the Discord REST API.
