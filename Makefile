@@ -18,7 +18,8 @@ else
 endif
 
 DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
-DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml 
+DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml
+DOC_STUDIO_CAPTURE_IMAGE := ghcr.io/gtspray/fake-discord-front/doc-studio-capture:latest
 
 os:
 	@echo "🫖 $(tB)P'titpote $(OS)$(tR)"
@@ -120,6 +121,17 @@ pretty: os
 ## Run shell inside bot container
 sh: os
 	$(DC_CMD) exec api bash
+
+## Regenerate usage documentation scenario GIFs
+docs-scenarios: os
+	docker pull $(DOC_STUDIO_CAPTURE_IMAGE)
+	@for dir in $$(find docs/usage -mindepth 1 -maxdepth 1 -type d | sort); do \
+		if ls "$$dir"/*.json >/dev/null 2>&1; then \
+			echo "→ $$dir"; \
+			docker run --rm -v "$(CURDIR):/work" $(DOC_STUDIO_CAPTURE_IMAGE) \
+				capture-dir "$$dir/" --format gif; \
+		fi; \
+	done
 
 ###
 # ci

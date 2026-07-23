@@ -82,7 +82,14 @@ make pretty
 
 # Open a shell in the app container
 make sh
+
+# Regenerate usage documentation scenario GIFs (doc-studio capture)
+make docs-scenarios
 ```
+
+`make docs-scenarios` pulls
+`ghcr.io/gtspray/fake-discord-front/doc-studio-capture:latest` and captures every
+`docs/usage/*/*.json` playback file into GIFs/PNGs next to those scenarios.
 
 Production or externally mutating commands:
 
@@ -111,6 +118,12 @@ npm run register
 ## Documentation
 
 The repository documents two audiences. Keep them separate.
+
+> **Reminder — document commands.** A Discord-visible slash command is not done
+> until its usage guide is up to date. When you add or change UX (copy, buttons,
+> modals, permissions, limits), update `docs/usage/<command>/`, the related
+> playback JSON scenarios, and regenerate GIFs with `make docs-scenarios`. User
+> docs and captures are part of the feature, same as code and tests.
 
 ### Audiences
 
@@ -150,9 +163,12 @@ The repository documents two audiences. Keep them separate.
 When a change affects documented behavior:
 
 1. Update the usage doc if Discord users will see different flows or messages.
-2. Update the technical doc if implementation, limits, or architecture changed.
-3. Update `README.md` links when adding a new doc file.
-4. Do not create standalone markdown files outside `docs/` unless the task explicitly requires it.
+2. Update or add playback JSON under `docs/usage/<command>/` when the Discord UX
+   changes, then run `make docs-scenarios`.
+3. Update the technical doc if implementation, limits, or architecture changed.
+4. Update `README.md` links when adding a new doc file.
+5. Do not create standalone markdown files outside `docs/` unless the task explicitly requires it.
+6. Treat missing usage docs for a new public command as a blocker, not a follow-up.
 
 ## Architecture map
 
@@ -178,7 +194,8 @@ When adding a slash command:
 2. Export the command declaration from the relevant `index.ts`.
 3. Ensure the root `src/commands/slash/index.ts` includes it in `slashcommands`.
 4. Add tests under the matching `tests/src/commands/` area when practical.
-5. Add or update `docs/usage/<command>/<command>.md` when the command has user-facing behavior.
+5. **Required:** add or update `docs/usage/<command>/<command>.md` for user-facing
+   behavior, plus playback JSON scenarios; regenerate GIFs with `make docs-scenarios`.
 6. Add or update a technical doc under `docs/` when the feature needs architecture or implementation notes beyond the usage guide.
 7. Link new docs from `README.md`.
 8. Build and test before proposing the change.
@@ -266,6 +283,7 @@ Before proposing a change, verify:
 
 - The implementation matches the existing command and module patterns.
 - New or changed behavior has tests where practical.
+- User-facing command changes include updated usage docs and scenarios when needed.
 - `make build` passes, or an equivalent local build was attempted.
 - `make test` passes, or failures are explained.
 - `make lint` passes, or formatting changes are provided.

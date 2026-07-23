@@ -109,7 +109,7 @@
       "type": "applyState",
       "layers": {
         "messages": [
-           {
+          {
             "author": {
               "name": "Alice",
               "color": "#ed4245"

@@ -34,6 +34,12 @@ The documentation is split for two audiences:
 These guides are for server members and moderators. They describe command
 workflows, permissions, and expected bot behavior — not the codebase.
 
+> **Document commands.** Every user-facing slash command must have an up-to-date
+> guide under [`docs/usage/`](docs/usage/). When you add or change a command’s
+> Discord UX (copy, buttons, modals, permissions, limits), update the matching
+> usage doc and its playback scenarios (JSON + GIFs via `make docs-scenarios`).
+> Undocumented commands are incomplete features.
+
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store and post reusable message aliases
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
@@ -145,10 +151,11 @@ make stop       # Stop the bot
 #### Development
 
 ```bash
-make dev        # Run in dev container
-make build      # Transpile TypeScript (dev mode)
-make test       # Run test suite
-make testw      # Run test suite in watch mode
+make dev             # Run in dev container
+make build           # Transpile TypeScript (dev mode)
+make test            # Run test suite
+make testw           # Run test suite in watch mode
+make docs-scenarios  # Regenerate usage doc scenario GIFs
 ```
 
 > When developing, after running `make dev`, run `make install` inside the
