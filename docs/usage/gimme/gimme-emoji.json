@@ -1,0 +1,201 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "gimme-emoji",
+  "title": "Gimme — emotes du salon",
+  "doc": "docs/usage/gimme/gimme.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 8
+  },
+  "emojis": [
+    {
+      "id": "861449",
+      "name": "shutseagullmeme",
+      "url": "https://cdn3.emoji.gg/emojis/861449-shutseagullmeme.png",
+      "animated": true
+    },
+    {
+      "id": "238528",
+      "name": "imout",
+      "url": "https://cdn3.emoji.gg/emojis/238528-imout.png",
+      "animated": true
+    }
+  ],
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alice",
+              "color": "#ed4245"
+            },
+            "content": "Loook! I have a custom emoji: <a:imout:238528>",
+            "timestamp": "14:08"
+          },
+          {
+            "author": {
+              "name": "Arthur",
+              "color": "#57f287"
+            },
+            "content": "me too <a:imout:238528>",
+            "timestamp": "14:09"
+          },
+          {
+            "author": {
+              "name": "Arthur",
+              "color": "#57f287"
+            },
+            "content": "Do you have this one? <a:shutseagullmeme:861449>",
+            "timestamp": "14:10"
+          },
+          {
+            "author": {
+              "name": "Alice",
+              "color": "#ed4245"
+            },
+            "content": "... no :(",
+            "timestamp": "14:12"
+          }
+        ]
+      },
+      "holdMs": 1800,
+      "responseDelayMs": 0
+    },
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/gimme emoji",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/gimme emoji",
+            "description": "Récupère les 3 dernières emotes dans les 10 derniers messages de ce chan"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 600
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+           {
+            "author": {
+              "name": "Alice",
+              "color": "#ed4245"
+            },
+            "content": "Loook! I have a custom emoji: <a:imout:238528>",
+            "timestamp": "14:08"
+          },
+          {
+            "author": {
+              "name": "Arthur",
+              "color": "#57f287"
+            },
+            "content": "me too <a:imout:238528>",
+            "timestamp": "14:09"
+          },
+          {
+            "author": {
+              "name": "Arthur",
+              "color": "#57f287"
+            },
+            "content": "Do you have this one? <a:shutseagullmeme:861449>",
+            "timestamp": "14:10"
+          },
+          {
+            "author": {
+              "name": "Alice",
+              "color": "#ed4245"
+            },
+            "content": "... no :(",
+            "timestamp": "14:12"
+          },
+          {
+            "author": {
+              "name": "Bot",
+              "bot": true
+            },
+            "timestamp": "14:15",
+            "slashInvocation": {
+              "user": {
+                "name": "You"
+              },
+              "command": "gimme emoji"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 10,
+                    "content": "Voilà.. ce que j'ai trouvé"
+                  },
+                  {
+                    "type": 14,
+                    "divider": true,
+                    "spacing": 1
+                  },
+                  {
+                    "type": 12,
+                    "items": [
+                      {
+                        "description": "shutseagullmeme",
+                        "media": {
+                          "url": "https://cdn3.emoji.gg/emojis/861449-shutseagullmeme.png"
+                        }
+                      },
+                      {
+                        "description": "imout",
+                        "media": {
+                          "url": "https://cdn3.emoji.gg/emojis/238528-imout.png"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/gimme",
+    "prefix": "gimme-emoji",
+    "video": true
+  }
+}
