@@ -1,88 +1,92 @@
 {
-    "$schema": "../schema/scenario.schema.json",
-    "id": "gimme-version",
-    "title": "Gimme — version du bot",
-    "doc": "docs/usage/gimme/gimme.md",
-    "chrome": {
-        "guild": {
-            "name": "P'tit Pote doc server"
-        },
-        "channel": {
-            "name": "général",
-            "type": "text"
-        },
-        "membersOnline": 8
+  "$schema": "../schema/scenario.schema.json",
+  "id": "gimme-version",
+  "title": "Gimme — version du bot",
+  "doc": "docs/usage/gimme/gimme.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
     },
-    "actions": [
-        {
-            "type": "wait",
-            "ms": 1500
-        },
-        {
-            "type": "focusInput"
-        },
-        {
-            "type": "wait",
-            "ms": 1200
-        },
-        {
-            "type": "type",
-            "text": "/gimme version",
-            "msPerChar": 150,
-            "revealSuggestions": {
-                "suggestions": [
-                    {
-                        "name": "version",
-                        "description": "Affiche la version de P'titPote Bot"
-                    }
-                ]
-            }
-        },
-        {
-            "type": "wait",
-            "ms": 1200
-        },
-        {
-            "type": "pressEnter"
-        },
-        {
-            "type": "applyState",
-            "layers": {
-                "messages": [
-                    {
-                        "author": {
-                            "name": "P'tit Pote",
-                            "bot": true,
-                            "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
-                        },
-                        "timestamp": "14:10",
-                        "slashInvocation": {
-                            "user": {
-                                "name": "You"
-                            },
-                            "command": "gimme version"
-                        },
-                        "interaction": {
-                            "type": 4,
-                            "data": {
-                                "flags": 32768,
-                                "components": [
-                                    {
-                                        "type": 10,
-                                        "content": "Hello here ✨!\nJe suis P'titPote v1.5.18."
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 8
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/gimme version",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/gimme version",
+            "description": "Affiche la version de P'titPote Bot"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 600
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
             },
-            "holdMs": 2000
-        }
-    ],
-    "output": {
-        "directory": "output/gimme",
-        "prefix": "gimme-version",
-        "video": true
+            "timestamp": "14:10",
+            "slashInvocation": {
+              "user": {
+                "name": "You"
+              },
+              "command": "gimme version"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 10,
+                    "content": "Hello here ✨! \nJe suis P'titPote v1.5.24."
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
     }
+  ],
+  "output": {
+    "directory": "docs/usage/gimme",
+    "prefix": "gimme-version",
+    "video": true
+  }
 }

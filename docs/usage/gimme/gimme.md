@@ -43,6 +43,8 @@ ce que j'ai trouvé** followed by the gallery.
 Posts a public text message with a random emoji and the value of
 `process.env.npm_package_version`, or `unknown` when that variable is unset.
 
+![Show version](./gimme-version.gif)
+
 ### Constraints
 
 - Requires a channel context; `/gimme emoji` returns HTTP 500 when
