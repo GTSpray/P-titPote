@@ -37,7 +37,7 @@ workflows, permissions, and expected bot behavior — not the codebase.
 > **Document commands.** Every user-facing slash command must have an up-to-date
 > guide under [`docs/usage/`](docs/usage/). When you add or change a command’s
 > Discord UX (copy, buttons, modals, permissions, limits), update the matching
-> usage doc and its playback scenarios (JSON + GIFs via `make docs-scenarios`).
+> usage doc and its playback scenarios (JSON + GIFs via `make docs`).
 > Undocumented commands are incomplete features.
 
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
@@ -155,7 +155,7 @@ make dev             # Run in dev container
 make build           # Transpile TypeScript (dev mode)
 make test            # Run test suite
 make testw           # Run test suite in watch mode
-make docs-scenarios  # Regenerate usage doc scenario GIFs
+make docs  # Regenerate usage doc scenario GIFs
 ```
 
 > When developing, after running `make dev`, run `make install` inside the

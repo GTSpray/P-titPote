@@ -143,8 +143,9 @@
           },
           {
             "author": {
-              "name": "Bot",
-              "bot": true
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
             },
             "timestamp": "14:15",
             "slashInvocation": {

@@ -123,7 +123,7 @@ sh: os
 	$(DC_CMD) exec api bash
 
 ## Regenerate usage documentation scenario GIFs
-docs-scenarios: os
+docs: os
 	docker pull $(DOC_STUDIO_CAPTURE_IMAGE)
 	@for dir in $$(find docs/usage -mindepth 1 -maxdepth 1 -type d | sort); do \
 		if ls "$$dir"/*.json >/dev/null 2>&1; then \
