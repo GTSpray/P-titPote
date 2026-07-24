@@ -153,9 +153,24 @@
       }
     },
     {
+      "type": "selectModalOption",
+      "field": "q1",
+      "option": "jeudi",
+      "options": [
+        {
+          "label": "mercredi"
+        },
+        {
+          "label": "jeudi"
+        },
+        {
+          "label": "vendredi"
+        }
+      ]
+    },
+    {
       "type": "fillModal",
       "values": {
-        "q1": "choice-jeu",
         "q2": "Non, aucune"
       },
       "msPerField": 160
