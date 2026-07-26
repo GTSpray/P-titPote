@@ -39,14 +39,14 @@ The `deletedAt` field is part of uniqueness constraints for guilds, aliases, and
 poll responses. This lets soft-deleted records keep historical values while
 active rows still enforce uniqueness.
 
-| Entity | Purpose |
-| --- | --- |
-| `DiscordGuild` | One row per Discord guild, owning aliases and polls. |
-| `MessageAliased` | Reusable alias text scoped to a guild and alias name. |
-| `Poll` | Poll title, optional voting role, publication date, and close date. |
-| `PollStep` | Ordered poll questions and optional descriptions. |
-| `PollChoice` | Ordered selectable answers for a poll question. |
-| `PollResp` | One member's answer for one poll step, either a choice or free text. |
+| Entity           | Purpose                                                              |
+| ---------------- | -------------------------------------------------------------------- |
+| `DiscordGuild`   | One row per Discord guild, owning aliases and polls.                 |
+| `MessageAliased` | Reusable alias text scoped to a guild and alias name.                |
+| `Poll`           | Poll title, optional voting role, publication date, and close date.  |
+| `PollStep`       | Ordered poll questions and optional descriptions.                    |
+| `PollChoice`     | Ordered selectable answers for a poll question.                      |
+| `PollResp`       | One member's answer for one poll step, either a choice or free text. |
 
 Command handlers must keep lookups guild-scoped. Alias handlers and poll CTA
 handlers use `em.fork()` and query through `DiscordGuild.guildId` before reading
