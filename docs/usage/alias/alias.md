@@ -23,14 +23,22 @@ or Ban Members.
    - Creating a new alias persists the guild and alias in MariaDB. Reusing an
      existing alias name updates its message in place.
    - Success replies publicly with **Ok! C'est noté ;)**.
+
+![Create alias](./alias-set.gif)
+
 2. **Post a stored message** with `/alias say alias:<name>`:
    - Looks up the alias for the current guild.
    - Posts the stored message publicly in the channel where the command runs.
    - Unknown aliases reply ephemerally with an error message.
+
+![Say alias](./alias-say.gif)
+
 3. **List configured aliases** with `/alias ls`:
    - Returns alias names sorted alphabetically for the current guild.
    - Only names are shown, not message contents.
    - An empty list replies ephemerally with **Ahem... j'ai rien trouvé... 🤷**.
+
+![List aliases](./alias-ls.gif)
 
 ### Constraints
 

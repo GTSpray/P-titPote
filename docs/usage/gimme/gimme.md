@@ -18,10 +18,14 @@ Posts a public media gallery with the repository otter image:
 
 `https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png`
 
+![Show otter](./gimme-otter.gif)
+
 #### `/gimme emoji`
 
 Scans the current channel for custom Discord emojis and returns up to three of
 them as a public media gallery.
+
+![Show emoji](./gimme-emoji.gif)
 
 Processing rules:
 
@@ -42,6 +46,8 @@ ce que j'ai trouvé** followed by the gallery.
 
 Posts a public text message with a random emoji and the value of
 `process.env.npm_package_version`, or `unknown` when that variable is unset.
+
+![Show version](./gimme-version.gif)
 
 ### Constraints
 
