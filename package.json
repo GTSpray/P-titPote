@@ -1,7 +1,7 @@
 {
   "name": "ptitpote",
   "private": true,
-  "version": "1.5.27",
+  "version": "1.5.28",
   "description": "a discord bot",
   "main": "api.js",
   "type": "module",
