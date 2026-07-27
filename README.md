@@ -167,6 +167,7 @@ These guides describe architecture, services, and implementation details:
 
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
+- [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
 
 Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
 
@@ -200,7 +201,8 @@ P-titPote/
 ├── docs/
 │   ├── usage/                   # End-user command guides
 │   ├── poll.md                  # Poll workflow technical guide
-│   └── gateway.md               # Gateway service technical guide
+│   ├── gateway.md               # Gateway service technical guide
+│   └── database.md              # Database and migration runbook
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
 ├── Makefile                     # Automation
@@ -227,15 +229,19 @@ verification depends on the raw request body handled by `verifyKeyMiddleware`.
 
 ### Database management
 
-Powered by [MikroORM Schema Generator](https://mikro-orm.io/docs/schema-generator):
+Use the Makefile targets for the common MariaDB/MikroORM tasks:
 
 ```bash
-make sh
-# Inside the shell:
-npx mikro-orm schema:create --dump   # Show SQL to create schema
-npx mikro-orm schema:update --dump   # Show SQL for incremental update
-npx mikro-orm schema:drop --dump     # Show SQL to drop schema
+make db-check   # Check whether migrations match the schema
+make db-up      # Apply pending migrations
+make db-down    # Roll back one migration step
+make db-dump    # Create a database dump
+make db-sh      # Open a shell in the database container
 ```
+
+The MikroORM CLI reads the compiled config from `dist/`, so build before running
+CLI commands manually. See [`docs/database.md`](docs/database.md) for the entity
+map, migration workflow, test database behavior, and troubleshooting notes.
 
 ---
 
