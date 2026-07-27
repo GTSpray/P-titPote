@@ -157,9 +157,7 @@ describe('cta/pollSummary', () => {
       guild_id,
     });
     const memberId = <string>req.body.member?.user.id;
-    let voteResponse:
-      | Awaited<ReturnType<typeof pollVote.handler>>
-      | undefined;
+    let voteResponse: Awaited<ReturnType<typeof pollVote.handler>> | undefined;
     postSpy.mockImplementationOnce(async () => {
       voteResponse = await pollVote.handler({
         ...handlerOpts,
