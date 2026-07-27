@@ -359,7 +359,7 @@
     {
       "type": "fillModal",
       "values": {
-        "question": "avez vous des alergenes"
+        "question": "avez vous des allergies"
       },
       "msPerField": 130
     },
@@ -383,7 +383,7 @@
           "type": 4,
           "data": {
             "flags": 64,
-            "content": "## Repas de fin d'année\n\n1. Quel jour ?\n    - mercredi\n    - jeudi\n    - vendredi\n2. avez vous des alergenes",
+            "content": "## Repas de fin d'année\n\n1. Quel jour ?\n    - mercredi\n    - jeudi\n    - vendredi\n2. avez vous des allergies",
             "components": [
               {
                 "type": 1,

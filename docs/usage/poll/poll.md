@@ -62,7 +62,7 @@ The **Compte rendu** button is moderator-only. When clicked, it:
 /poll create
 → title + first question
 → Ajouter des choix (mercredi, jeudi, vendredi)
-→ Nouvelle question (avez vous des alergenes)
+→ Nouvelle question (avez vous des allergies)
 → Publier le sondage
 → Je vote!
 → Compte rendu

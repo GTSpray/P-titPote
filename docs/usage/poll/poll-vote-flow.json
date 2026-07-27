@@ -140,7 +140,7 @@
             },
             {
               "type": 18,
-              "label": "avez vous des alergenes",
+              "label": "avez vous des allergies",
               "component": {
                 "type": 4,
                 "custom_id": "q2",
