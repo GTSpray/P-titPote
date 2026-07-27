@@ -1,3 +1,5 @@
+## [1.5.29](https://github.com/GTSpray/P-titPote/compare/v1.5.28...v1.5.29) (2026-07-27)
+
 ## [1.5.28](https://github.com/GTSpray/P-titPote/compare/v1.5.27...v1.5.28) (2026-07-27)
 
 ## [1.5.27](https://github.com/GTSpray/P-titPote/compare/v1.5.26...v1.5.27) (2026-07-27)
