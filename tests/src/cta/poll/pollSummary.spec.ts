@@ -14,6 +14,7 @@ import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMo
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
+  ComponentType,
   InteractionResponseType,
   MessageFlags,
   Routes,
@@ -33,6 +34,8 @@ import {
   DiscrodRESTMock,
   DiscrodRESTMockVerb,
 } from '../../../mocks/discordjs.js';
+import { pollVote } from '../../../../src/commands/cta/poll/pollVote.js';
+import { getModalLabelComponnents } from '../../../helpers/getModalLabelComponnents.js';
 
 describe('cta/pollSummary', () => {
   let guild_id: string;
@@ -128,6 +131,59 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
     expect(poll.endDate).toBeDateCloseTo(today, 1000);
+  });
+
+  it('should reject votes submitted while the summary is being posted', async () => {
+    aPoll.endDate = undefined;
+    await em.persist(aPoll).flush();
+    em.clear();
+    const voteData: CTAData = {
+      components: getModalLabelComponnents([
+        {
+          custom_id: firstStep.id,
+          type: ComponentType.StringSelect,
+          values: [firstChoice.id],
+        },
+        {
+          custom_id: secondStep.id,
+          type: ComponentType.TextInput,
+          value: 'Une réponse arrivée trop tard',
+        },
+      ]),
+      custom_id: `{"t":"cta","d":{"a":"pollVote", "pId": "${aPoll.id}"}}`,
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: voteData,
+      guild_id,
+    });
+    const memberId = <string>req.body.member?.user.id;
+    let voteResponse:
+      | Awaited<ReturnType<typeof pollVote.handler>>
+      | undefined;
+    postSpy.mockImplementationOnce(async () => {
+      voteResponse = await pollVote.handler({
+        ...handlerOpts,
+        req,
+        res,
+        additionalData: JSON.parse(voteData.custom_id),
+      });
+      return {};
+    });
+
+    await pollSummary.handler(handlerOpts);
+
+    expect(voteResponse).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('errors.voteClosed'),
+      },
+    });
+    em.clear();
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId },
+    });
+    expect(pollResps).toHaveLength(0);
   });
 
   it('should keep the poll open when publishing the summary fails', async () => {
