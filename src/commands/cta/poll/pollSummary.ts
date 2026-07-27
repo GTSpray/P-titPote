@@ -111,6 +111,13 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         },
       );
 
+      const previousEndDate = aPoll.endDate;
+      const shouldClosePoll = !isPollClosed(previousEndDate);
+      if (shouldClosePoll) {
+        aPoll.endDate = new Date();
+        await em.persist(aPoll).flush();
+      }
+
       const pollResps = await em.findAll(PollResp, {
         where: { pollStep: { poll: aPoll } },
         populate: ['pollStep', 'pollChoice'],
@@ -120,10 +127,6 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
           },
         },
       });
-
-      if (!isPollClosed(aPoll.endDate)) {
-        aPoll.endDate = new Date();
-      }
 
       const report = buildPollSummary(aPoll, pollResps);
       const chunks = splitStringIntoChunks(
@@ -142,6 +145,10 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
         }
       } catch (error) {
         logger.error(error);
+        if (shouldClosePoll) {
+          aPoll.endDate = previousEndDate;
+          await em.persist(aPoll).flush();
+        }
         return res.json(errorPayload(t('poll.report.failed')));
       }
 
