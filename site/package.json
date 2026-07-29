@@ -1,0 +1,17 @@
+{
+  "name": "ptitpote-user-docs",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.x"
+  },
+  "scripts": {
+    "prepare:docs": "node scripts/prepare-user-docs.mjs",
+    "dev": "npm run prepare:docs && vitepress dev",
+    "build": "npm run prepare:docs && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
