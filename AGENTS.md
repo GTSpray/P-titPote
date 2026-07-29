@@ -147,9 +147,11 @@ The repository documents two audiences. Keep them separate.
 - Describe workflows, permissions, buttons, modals, and user-visible limits.
 - Do not include source paths, database entities, dispatch details, or internal error handling.
 - Keep user-facing examples aligned with the bot copy. Existing bot messages are mostly French.
+- Keep `docs/usage/README.md` as the user-docs home (GitHub + VitePress landing page).
 - Place command guides at `docs/usage/<command>/<command>.md`
   (for example `docs/usage/poll/poll.md`).
-- When adding or changing user-visible command behavior, update the matching usage doc.
+- When adding or changing user-visible command behavior, update the matching usage doc
+  and link it from `docs/usage/README.md`.
 
 ### Technical documentation (`docs/`)
 
@@ -163,7 +165,8 @@ The repository documents two audiences. Keep them separate.
 ### README maintenance
 
 - Keep `README.md` split into a user section and a developer section.
-- Link new usage docs from the **Using the bot** section.
+- Link new usage docs from [`docs/usage/README.md`](docs/usage/README.md) and the
+  **Using the bot** section in `README.md`.
 - Link new technical docs from the **Technical documentation** section under **Developing P'tit Pote**.
 - Update the project tree in `README.md` when adding new top-level documentation folders.
 

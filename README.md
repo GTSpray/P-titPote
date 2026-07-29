@@ -36,6 +36,8 @@ workflows, permissions, and expected bot behavior — not the codebase.
 
 **Published docs:** [https://gtspray.github.io/P-titPote/](https://gtspray.github.io/P-titPote/)
 
+The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
+
 > **Document commands.** Every user-facing slash command must have an up-to-date
 > guide under [`docs/usage/`](docs/usage/). When you add or change a command’s
 > Discord UX (copy, buttons, modals, permissions, limits), update the matching
@@ -44,8 +46,7 @@ workflows, permissions, and expected bot behavior — not the codebase.
 > rebuild the site with `make docs-site` (GitHub Pages deploys from `site/` on
 > `main`; enable **Settings → Pages → GitHub Actions** if needed).
 
-Source markdown (also rendered on GitHub):
-
+- [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store and post reusable message aliases
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version

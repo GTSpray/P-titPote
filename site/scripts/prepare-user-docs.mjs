@@ -17,7 +17,7 @@ const usageRoot = join(repoRoot, 'docs', 'usage');
 const contentRoot = join(siteRoot, 'content');
 const publicRoot = join(contentRoot, 'public');
 const logoSource = join(repoRoot, 'assets', 'ptitpote.png');
-const readmeSource = join(repoRoot, 'README.md');
+const usageReadmeSource = join(usageRoot, 'README.md');
 const generatedNavPath = join(siteRoot, '.vitepress', 'generated-nav.json');
 
 const MEDIA_EXTENSIONS = new Set(['.gif', '.webm', '.png']);
@@ -50,6 +50,12 @@ function rewriteGifImagesToVideo(markdown, destDir) {
   );
 }
 
+function rewriteUsageHomeForSite(markdown) {
+  return markdown
+    .replace(/src="\.\.\/\.\.\/assets\/ptitpote\.png"/g, 'src="/ptitpote.png"')
+    .replace(/\(\.\/([a-z0-9-]+)\/\1\.md\)/g, '(/$1/)');
+}
+
 function copyMedia(commandDir, destDir) {
   for (const entry of readdirSync(commandDir, { withFileTypes: true })) {
     if (!entry.isFile()) continue;
@@ -67,44 +73,18 @@ function listCommands() {
     .sort();
 }
 
-function buildHomePage(commands) {
-  const readme = readFileSync(readmeSource, 'utf8');
-  const aboutMatch = readme.match(/## About\n\n([\s\S]*?)\n---\n/);
-  const aboutBody = aboutMatch
-    ? aboutMatch[1]
-        .replace(
-          /\nThe documentation is split for two audiences:[\s\S]*$/,
-          '\n',
-        )
-        .trim()
-    : "**P'tit Pote** is a Discord bot for polls, reusable message aliases, and a few utility commands.";
+function buildHomePage() {
+  if (!existsSync(usageReadmeSource)) {
+    throw new Error(`Missing usage home at ${usageReadmeSource}`);
+  }
 
-  const commandLinks = commands
-    .map((name) => {
-      const blurb = COMMAND_BLURBS[name] ?? `learn how to use \`/${name}\``;
-      return `- [\`/${name}\`](/${name}/) — ${blurb}`;
-    })
-    .join('\n');
-
+  const body = rewriteUsageHomeForSite(readFileSync(usageReadmeSource, 'utf8'));
   return `---
 sidebar: false
 aside: false
 ---
 
-<p align="center">
-  <img src="/ptitpote.png" width="150" alt="P'tit Pote Discord Bot" />
-</p>
-
-# P'tit Pote Discord Bot
-
-${aboutBody}
-
-## Using the bot
-
-These guides are for server members and moderators. They describe command
-workflows, permissions, and expected bot behavior.
-
-${commandLinks}
+${body.trim()}
 `;
 }
 
@@ -165,7 +145,7 @@ function main() {
   copyBrandAssets();
 
   const commands = listCommands();
-  writeFileSync(join(contentRoot, 'index.md'), buildHomePage(commands));
+  writeFileSync(join(contentRoot, 'index.md'), buildHomePage());
   mkdirSync(join(contentRoot, 'commands'), { recursive: true });
   writeFileSync(
     join(contentRoot, 'commands', 'index.md'),
