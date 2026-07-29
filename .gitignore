@@ -8,3 +8,6 @@ dist
 temp
 docker/database/dumps
 ptitpote.tar.gz
+site/.vitepress/dist
+site/.vitepress/cache
+site/content

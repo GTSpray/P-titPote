@@ -1,7 +1,7 @@
 services:
   api:
     container_name: ptitpote-api
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
@@ -14,7 +14,7 @@ services:
       - ${PWD}/logs:/app/logs
   gateway:
     container_name: ptitpote-gateway
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
@@ -30,7 +30,7 @@ services:
     container_name: ptitpote-database
     env_file:
       - .env
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./docker/database/dumps/sql:/docker-entrypoint-initdb.d:ro
       - ./docker/database/bin:/database/bin:ro
@@ -44,7 +44,7 @@ services:
       retries: 20
   localtunnel:
     container_name: ptitpote-lt
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/localtunnel/Dockerfile
