@@ -122,16 +122,22 @@ pretty: os
 sh: os
 	$(DC_CMD) exec api bash
 
-## Regenerate usage documentation scenario GIFs
+## Regenerate usage documentation scenario GIFs and WebMs
 docs: os
 	docker pull $(DOC_STUDIO_CAPTURE_IMAGE)
 	@for dir in $$(find docs/usage -mindepth 1 -maxdepth 1 -type d | sort); do \
 		if ls "$$dir"/*.json >/dev/null 2>&1; then \
 			echo "→ $$dir"; \
-			docker run --rm -v "$(CURDIR):/work" $(DOC_STUDIO_CAPTURE_IMAGE) \
-				capture-dir "$$dir/" --format gif; \
+			for fmt in gif webm; do \
+				docker run --rm -v "$(CURDIR):/work" $(DOC_STUDIO_CAPTURE_IMAGE) \
+					capture-dir "$$dir/" --format $$fmt; \
+			done; \
 		fi; \
 	done
+
+## Build user documentation site (VitePress)
+docs-site: os
+	cd site && npm ci && npm run build
 
 ###
 # ci
