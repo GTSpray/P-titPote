@@ -20,7 +20,8 @@ client.
 Production Compose starts a dedicated `gateway` container from the
 `docker/ptitpote/Dockerfile` `ptitpote` image with the entrypoint mode
 `gateway` (see `docker/ptitpote/entrypoint.sh` for `api`, `gateway`, and
-`both`):
+`both`; `both` runs `src/both.ts`, which starts the API and gateway in the
+same Node process):
 
 ```bash
 make start
