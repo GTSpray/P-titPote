@@ -1,4 +1,17 @@
 import { defineConfig } from 'vitepress';
+import generatedNav from './generated-nav.json';
+
+const commandSidebar = [
+  {
+    text: 'Commands',
+    items: [{ text: 'Overview', link: '/commands/' }, ...generatedNav.commands],
+  },
+];
+
+const commandSidebars = Object.fromEntries([
+  ['/commands/', commandSidebar],
+  ...generatedNav.commands.map((item) => [item.link, commandSidebar]),
+]);
 
 export default defineConfig({
   title: "P'tit Pote",
@@ -6,27 +19,29 @@ export default defineConfig({
   base: '/P-titPote/',
   srcDir: 'content',
   cleanUrls: true,
+  head: [
+    [
+      'link',
+      { rel: 'icon', type: 'image/png', href: '/P-titPote/ptitpote.png' },
+    ],
+  ],
   themeConfig: {
+    logo: {
+      src: '/ptitpote.png',
+      alt: "P'tit Pote",
+    },
+    siteTitle: "P'tit Pote",
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Poll', link: '/poll/' },
-      { text: 'Alias', link: '/alias/' },
-      { text: 'Gimme', link: '/gimme/' },
-      {
-        text: 'GitHub',
-        link: 'https://github.com/GTSpray/P-titPote',
-      },
-    ],
-    sidebar: [
       {
         text: 'Commands',
         items: [
-          { text: 'Poll', link: '/poll/' },
-          { text: 'Alias', link: '/alias/' },
-          { text: 'Gimme', link: '/gimme/' },
+          { text: 'Overview', link: '/commands/' },
+          ...generatedNav.commands,
         ],
       },
     ],
+    sidebar: commandSidebars,
     socialLinks: [
       {
         icon: 'github',
