@@ -18,17 +18,17 @@ client.
 ### Running the service
 
 Production Compose starts a dedicated `gateway` container from the
-`docker/ptitpote/Dockerfile` `ptitpote` image with the entrypoint mode
-`gateway` (see `docker/ptitpote/entrypoint.sh` for `api`, `gateway`, and
-`both`; `both` runs `src/both.ts`, which starts the API and gateway in the
-same Node process):
+`docker/ptitpote/Dockerfile` `gateway` target:
 
 ```bash
 make start
 make logs
 ```
 
-The published image `ghcr.io/gtspray/ptitpote` uses the same entrypoint:
+The CI-published image `ghcr.io/gtspray/ptitpote` is built from source for
+registry use only. It does not replace the current Compose deployment flow.
+Start it with the entrypoint mode `api`, `gateway`, or `both` (see
+`docker/ptitpote/entrypoint.sh` and `src/both.ts`):
 
 ```bash
 docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 gateway
