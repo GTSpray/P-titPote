@@ -18,11 +18,20 @@ client.
 ### Running the service
 
 Production Compose starts a dedicated `gateway` container from the
-`docker/ptitpote/Dockerfile` `gateway` target:
+`docker/ptitpote/Dockerfile` `ptitpote` image with the entrypoint mode
+`gateway` (see `docker/ptitpote/entrypoint.sh` for `api`, `gateway`, and
+`both`):
 
 ```bash
 make start
 make logs
+```
+
+The published image `ghcr.io/gtspray/ptitpote` uses the same entrypoint:
+
+```bash
+docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 gateway
+docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 both
 ```
 
 In development, `make dev` builds TypeScript and starts both `api` and

@@ -5,7 +5,8 @@ services:
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
-      target: api
+      target: ptitpote
+    command: ['api']
     depends_on:
       - database
     env_file:
@@ -18,7 +19,8 @@ services:
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
-      target: gateway
+      target: ptitpote
+    command: ['gateway']
     depends_on:
       - database
     env_file:
