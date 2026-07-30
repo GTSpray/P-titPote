@@ -93,9 +93,7 @@ make docs-site
 `make docs` pulls
 `ghcr.io/gtspray/fake-discord-front/doc-studio-capture:latest` and captures every
 `docs/usage/*/*.json` playback file into GIFs, WebMs, and PNGs next to those
-scenarios (one Playwright run per JSON, both video formats). If capture fails with
-`Unsupported video format "gif,webm"`, re-pull the image — an older
-`doc-studio-capture` only accepted a single `--format` value per run.
+scenarios.
 
 `make docs-site` installs and builds the VitePress site in `site/` from
 `docs/usage/` (WebM preferred with GIF fallback). Preview locally with

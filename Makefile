@@ -20,10 +20,6 @@ endif
 DC_CMD_DEV := $(DC_CMD) -f docker-compose.dev.yml
 DC_CMD_CI := $(DC_CMD_DEV) -f docker-compose.ci.yml
 DOC_STUDIO_CAPTURE_IMAGE := ghcr.io/gtspray/fake-discord-front/doc-studio-capture:latest
-# One Playwright run per scenario; requires capture image with multi-format support
-# (fake-discord-front PR #12+). Re-pull if you see "Unsupported video format gif,webm".
-DOC_CAPTURE_FORMATS := gif webm
-DOC_CAPTURE_FORMAT_ARGS := $(foreach f,$(DOC_CAPTURE_FORMATS),--format $(f))
 
 os:
 	@echo "🫖 $(tB)P'titpote $(OS)$(tR)"
@@ -134,7 +130,7 @@ docs: os
 		if ls "$$dir"/*.json >/dev/null 2>&1; then \
 			echo "→ $$dir"; \
 			docker run --rm -v "$(CURDIR):/work" $(DOC_STUDIO_CAPTURE_IMAGE) \
-				capture-dir "$$dir/" $(DOC_CAPTURE_FORMAT_ARGS); \
+				capture-dir "$$dir/" --format gif,webm; \
 		fi; \
 	done
 
