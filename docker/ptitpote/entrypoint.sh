@@ -5,13 +5,13 @@ MODE="${1:-api}"
 
 case "$MODE" in
   api)
-    exec node dist/src/api.js
+    exec npm run --silent start:api
     ;;
   gateway)
-    exec node dist/src/gateway.js
+    exec npm run --silent start:gateway
     ;;
   both)
-    exec node dist/src/both.js
+    exec npm run --silent start:both
     ;;
   *)
     echo "Usage: $0 <api|gateway|both>" >&2
