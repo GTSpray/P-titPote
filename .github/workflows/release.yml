@@ -9,6 +9,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -21,7 +22,29 @@ jobs:
         run: cp .env.sample .env
       - name: Build using Docker
         run: make bundle
+      - name: Get version before release
+        id: before
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Release
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get version after release
+        id: after
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Log in to GHCR
+        if: steps.before.outputs.version != steps.after.outputs.version
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Docker image
+        if: steps.before.outputs.version != steps.after.outputs.version
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/ptitpote/Dockerfile
+          target: ptitpote
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/ptitpote:${{ steps.after.outputs.version }}
