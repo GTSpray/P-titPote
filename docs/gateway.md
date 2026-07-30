@@ -25,6 +25,16 @@ make start
 make logs
 ```
 
+The CI-published image `ghcr.io/gtspray/ptitpote` is built from source for
+registry use only. It does not replace the current Compose deployment flow.
+Start it with the entrypoint mode `api`, `gateway`, or `both` (see
+`docker/ptitpote/entrypoint.sh` and `src/both.ts`):
+
+```bash
+docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 gateway
+docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 both
+```
+
 In development, `make dev` builds TypeScript and starts both `api` and
 `gateway`; the gateway process runs `npm run dev:gateway`, which watches the
 compiled `dist/src/gateway.js` entrypoint.
