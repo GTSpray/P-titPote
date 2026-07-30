@@ -41,4 +41,4 @@ COPY --from=ptitpoteprod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=ptitpotebuilder --chown=node:node /app/dist ./dist
 USER node
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["api"]
+CMD ["both"]
