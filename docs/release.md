@@ -42,11 +42,11 @@ but a Docker image is pushed only when semantic-release produces a new version.
 
 `docker/ptitpote/Dockerfile` contains two deployment styles:
 
-| Target            | Used by                          | Behavior                                         |
-| ----------------- | -------------------------------- | ------------------------------------------------ |
-| `api`             | `docker-compose.yml` `api`       | Downloads the GitHub release archive, then runs `npm run start:api`. |
-| `gateway`         | `docker-compose.yml` `gateway`   | Downloads the GitHub release archive, then runs `npm run start:gateway`. |
-| `ptitpotebuilder` | development and CI Compose files | Installs dev dependencies and builds local source. |
+| Target            | Used by                          | Behavior                                                                                   |
+| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
+| `api`             | `docker-compose.yml` `api`       | Downloads the GitHub release archive, then runs `npm run start:api`.                       |
+| `gateway`         | `docker-compose.yml` `gateway`   | Downloads the GitHub release archive, then runs `npm run start:gateway`.                   |
+| `ptitpotebuilder` | development and CI Compose files | Installs dev dependencies and builds local source.                                         |
 | `ptitpote`        | GHCR release image and QA build  | Builds local source, installs production dependencies, and uses the entrypoint mode below. |
 
 The Compose production flow (`make start`) still builds the service-specific
@@ -85,7 +85,7 @@ but does not apply migrations automatically; use the migration workflow in
 ## Operational checks
 
 - **Release ran but no image was pushed:** compare the `Get version before
-  release` and `Get version after release` steps. The GHCR login and image build
+release` and `Get version after release` steps. The GHCR login and image build
   are skipped when the version is unchanged.
 - **Pulling `latest` fails:** use the exact package version tag; the workflow
   publishes `ghcr.io/gtspray/ptitpote:<version>` only.
