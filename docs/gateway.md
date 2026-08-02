@@ -27,12 +27,13 @@ make logs
 
 The CI-published image `ghcr.io/gtspray/ptitpote` is built from source for
 registry use only. It does not replace the current Compose deployment flow.
-Start it with the entrypoint mode `api`, `gateway`, or `both` (see
-`docker/ptitpote/entrypoint.sh` and `src/both.ts`):
+Start it with an exact release version and the entrypoint mode `api`, `gateway`,
+or `both` (see `docker/ptitpote/entrypoint.sh`, `src/both.ts`, and
+[`docs/release.md`](release.md)):
 
 ```bash
-docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 gateway
-docker run --env-file .env ghcr.io/gtspray/ptitpote:1.5.30 both
+docker run --env-file .env ghcr.io/gtspray/ptitpote:<version> gateway
+docker run --env-file .env ghcr.io/gtspray/ptitpote:<version> both
 ```
 
 In development, `make dev` builds TypeScript and starts both `api` and

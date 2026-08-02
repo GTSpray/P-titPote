@@ -168,6 +168,7 @@ These guides describe architecture, services, and implementation details:
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
+- [`docs/release.md`](docs/release.md) — semantic-release, GHCR image publishing, and container runbook
 
 Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
 
@@ -202,7 +203,8 @@ P-titPote/
 │   ├── usage/                   # End-user command guides
 │   ├── poll.md                  # Poll workflow technical guide
 │   ├── gateway.md               # Gateway service technical guide
-│   └── database.md              # Database and migration runbook
+│   ├── database.md              # Database and migration runbook
+│   └── release.md               # Release and container image runbook
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
 ├── Makefile                     # Automation
