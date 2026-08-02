@@ -53,6 +53,8 @@ jobs:
           file: docker/ptitpote/Dockerfile
           target: ptitpote
           platforms: linux/amd64
+          provenance: false
+          sbom: false
           push: true
           tags: ghcr.io/gtspray/ptitpote:${{ steps.after.outputs.version }}-amd64
       - name: Publish Docker image (linux/arm64)
@@ -63,5 +65,7 @@ jobs:
           file: docker/ptitpote/Dockerfile
           target: ptitpote
           platforms: linux/arm64
+          provenance: false
+          sbom: false
           push: true
           tags: ghcr.io/gtspray/ptitpote:${{ steps.after.outputs.version }}-arm64
