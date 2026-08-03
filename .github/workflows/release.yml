@@ -47,7 +47,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Docker image (linux/amd64)
         if: steps.before.outputs.version != steps.after.outputs.version
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/ptitpote/Dockerfile
@@ -59,7 +59,7 @@ jobs:
           tags: ghcr.io/gtspray/ptitpote:${{ steps.after.outputs.version }}-amd64
       - name: Publish Docker image (linux/arm64)
         if: steps.before.outputs.version != steps.after.outputs.version
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/ptitpote/Dockerfile
