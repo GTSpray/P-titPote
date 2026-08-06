@@ -34,7 +34,7 @@ jobs:
         run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         if: steps.before.outputs.version != steps.after.outputs.version
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
         if: steps.before.outputs.version != steps.after.outputs.version
         uses: docker/setup-buildx-action@v3
