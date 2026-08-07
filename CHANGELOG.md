@@ -1,3 +1,9 @@
+## [1.7.6](https://github.com/GTSpray/P-titPote/compare/v1.7.5...v1.7.6) (2026-08-07)
+
+### :bug: Fixes
+
+* **release:** restore changelog notes with conventionalcommits v10 ([#242](https://github.com/GTSpray/P-titPote/issues/242)) ([d99d2c5](https://github.com/GTSpray/P-titPote/commit/d99d2c5be85b132f7085dd3026cd81cf85ca34fa))
+
 ## [1.7.5](https://github.com/GTSpray/P-titPote/compare/v1.7.4...v1.7.5) (2026-08-07)
 
 ### :repeat: Chore
