@@ -14,14 +14,17 @@ runtime image to GitHub Container Registry when a new release is cut.
    `ptitpote.tar.gz` from `dist/src`.
 5. `npx semantic-release` reads `.releaserc.json`, updates release metadata, and
    uploads `ptitpote.tar.gz` to the GitHub release as **JS distribution**.
-6. If `package.json` changed version during semantic-release, the workflow logs
-   in to GHCR with `GITHUB_TOKEN` and pushes:
+6. If `package.json` changed version during semantic-release, the workflow sets
+   up QEMU and Docker Buildx, logs in to GHCR with `GITHUB_TOKEN`, and builds
+   two architecture-specific images (not a single multi-arch manifest):
 
    ```text
-   ghcr.io/gtspray/ptitpote:<version>
+   ghcr.io/gtspray/ptitpote:<version>-amd64   # linux/amd64
+   ghcr.io/gtspray/ptitpote:<version>-arm64   # linux/arm64
    ```
 
-The workflow publishes only the exact release tag. It does not publish `latest`.
+There is no unprefixed `ghcr.io/gtspray/ptitpote:<version>` tag and no
+`latest` tag. Pull the suffix that matches the host CPU.
 
 ## Versioning rules
 
@@ -54,13 +57,14 @@ The Compose production flow (`make start`) still builds the service-specific
 `https://github.com/GTSpray/P-titPote/releases/download/v<package-version>/ptitpote.tar.gz`,
 so the matching GitHub release asset must exist and be reachable.
 
-The published GHCR image uses the `ptitpote` target. Its entrypoint accepts one
-mode:
+The published GHCR images use the `ptitpote` target. Pick the arch suffix for
+the machine that will run the container (`-amd64` or `-arm64`). The entrypoint
+accepts one mode:
 
 ```bash
-docker run --env-file .env ghcr.io/gtspray/ptitpote:<version> api
-docker run --env-file .env ghcr.io/gtspray/ptitpote:<version> gateway
-docker run --env-file .env ghcr.io/gtspray/ptitpote:<version> both
+docker run --env-file .env ghcr.io/gtspray/ptitpote:<version>-amd64 api
+docker run --env-file .env ghcr.io/gtspray/ptitpote:<version>-amd64 gateway
+docker run --env-file .env ghcr.io/gtspray/ptitpote:<version>-arm64 both
 ```
 
 If no mode is provided, the image defaults to `both`, which imports
@@ -85,10 +89,14 @@ but does not apply migrations automatically; use the migration workflow in
 ## Operational checks
 
 - **Release ran but no image was pushed:** compare the `Get version before
-release` and `Get version after release` steps. The GHCR login and image build
-  are skipped when the version is unchanged.
-- **Pulling `latest` fails:** use the exact package version tag; the workflow
-  publishes `ghcr.io/gtspray/ptitpote:<version>` only.
+  release` and `Get version after release` steps. The GHCR login and image
+  builds are skipped when the version is unchanged.
+- **Pulling `latest` or `<version>` fails:** use an arch-specific tag such as
+  `ghcr.io/gtspray/ptitpote:<version>-amd64` or
+  `ghcr.io/gtspray/ptitpote:<version>-arm64`. The workflow does not publish
+  `latest` or an unprefixed version tag.
+- **Wrong-arch image on pull:** choose `-amd64` or `-arm64` to match the host;
+  the two tags are separate single-platform images.
 - **Container exits immediately:** verify the entrypoint mode is one of `api`,
   `gateway`, or `both`, then check required environment variables.
 - **Compose build cannot download the release archive:** confirm
