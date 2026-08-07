@@ -89,7 +89,7 @@ but does not apply migrations automatically; use the migration workflow in
 ## Operational checks
 
 - **Release ran but no image was pushed:** compare the `Get version before
-  release` and `Get version after release` steps. The GHCR login and image
+release` and `Get version after release` steps. The GHCR login and image
   builds are skipped when the version is unchanged.
 - **Pulling `latest` or `<version>` fails:** use an arch-specific tag such as
   `ghcr.io/gtspray/ptitpote:<version>-amd64` or
