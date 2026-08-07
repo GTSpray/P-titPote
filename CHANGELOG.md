@@ -1,72 +1,234 @@
 ## [1.7.5](https://github.com/GTSpray/P-titPote/compare/v1.7.4...v1.7.5) (2026-08-07)
 
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group across 1 directory with 5 updates ([#236](https://github.com/GTSpray/P-titPote/issues/236)) ([dfb0410](https://github.com/GTSpray/P-titPote/commit/dfb041077c990c704438935b9b4cb953574c029b))
+
 ## [1.7.4](https://github.com/GTSpray/P-titPote/compare/v1.7.3...v1.7.4) (2026-08-07)
+
+### :bug: Fixes
+
+* emit combined Docker entrypoint ([#241](https://github.com/GTSpray/P-titPote/issues/241)) ([9dbfbb8](https://github.com/GTSpray/P-titPote/commit/9dbfbb89dbdd3279e3f98d7f6ca17e033b7486ed))
 
 ## [1.7.3](https://github.com/GTSpray/P-titPote/compare/v1.7.2...v1.7.3) (2026-08-07)
 
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.1.1 to 26.1.2 ([#239](https://github.com/GTSpray/P-titPote/issues/239)) ([7f38f2e](https://github.com/GTSpray/P-titPote/commit/7f38f2e7f405c4d1d530a2d8d75f1a2b334d32b1))
+
 ## [1.7.2](https://github.com/GTSpray/P-titPote/compare/v1.7.1...v1.7.2) (2026-08-06)
+
+### :repeat: Chore
+
+* **deps:** bump discord-api-types from 0.38.51 to 0.38.52 ([#240](https://github.com/GTSpray/P-titPote/issues/240)) ([ad7cb5c](https://github.com/GTSpray/P-titPote/commit/ad7cb5c7095e07653ef42ddf96cfaed9db83d6cf))
+* **deps:** bump docker/build-push-action from 6 to 7 ([#235](https://github.com/GTSpray/P-titPote/issues/235)) ([faf1a17](https://github.com/GTSpray/P-titPote/commit/faf1a173463196402b38ec2fcef155b9834f1f23))
+* **deps:** bump docker/login-action from 3 to 4 ([#234](https://github.com/GTSpray/P-titPote/issues/234)) ([644d556](https://github.com/GTSpray/P-titPote/commit/644d5562d39af1b6500811ef4a32261abb967330))
+* **deps:** bump docker/setup-buildx-action from 3 to 4 ([#237](https://github.com/GTSpray/P-titPote/issues/237)) ([10f3763](https://github.com/GTSpray/P-titPote/commit/10f376364f25ba45db9ad61780668423e0f386a8))
+* **deps:** bump docker/setup-qemu-action from 3 to 4 ([#238](https://github.com/GTSpray/P-titPote/issues/238)) ([b190a01](https://github.com/GTSpray/P-titPote/commit/b190a01c99566959280f7a6090ce9f7a3e13c45d))
 
 ## [1.7.1](https://github.com/GTSpray/P-titPote/compare/v1.7.0...v1.7.1) (2026-08-02)
 
+### :bug: Fixes
+
+* **release:** disable Docker provenance and SBOM attestations ([#233](https://github.com/GTSpray/P-titPote/issues/233)) ([74d2815](https://github.com/GTSpray/P-titPote/commit/74d2815c3a2b5c1eb8113b3dc39916715e263c30))
+
 ## [1.7.0](https://github.com/GTSpray/P-titPote/compare/v1.6.2...v1.7.0) (2026-08-02)
+
+### :sparkles: Features
+
+* **docker:** publish per-arch GHCR tags on release ([#232](https://github.com/GTSpray/P-titPote/issues/232)) ([eed9587](https://github.com/GTSpray/P-titPote/commit/eed9587724aef3d920b5d90ad8aa390048c091f3))
 
 ## [1.6.2](https://github.com/GTSpray/P-titPote/compare/v1.6.1...v1.6.2) (2026-07-30)
 
+### :bug: Fixes
+
+* **release:** repository name must be lowercase ([37938af](https://github.com/GTSpray/P-titPote/commit/37938af227297917a0c077e4552496b3d0125e5d))
+
 ## [1.6.1](https://github.com/GTSpray/P-titPote/compare/v1.6.0...v1.6.1) (2026-07-30)
+
+### :bug: Fixes
+
+* **release:** publish Docker image in release workflow ([#230](https://github.com/GTSpray/P-titPote/issues/230)) ([aef2bec](https://github.com/GTSpray/P-titPote/commit/aef2bec9e5acea8f226072d274f476cbb2455669))
 
 ## [1.6.0](https://github.com/GTSpray/P-titPote/compare/v1.5.30...v1.6.0) (2026-07-30)
 
+### :sparkles: Features
+
+* **docker:** publish ptitpote image to GHCR on release ([#229](https://github.com/GTSpray/P-titPote/issues/229)) ([e0d9b17](https://github.com/GTSpray/P-titPote/commit/e0d9b17be140450a41b6d144b7e7581f531fb548))
+
 ## [1.5.30](https://github.com/GTSpray/P-titPote/compare/v1.5.29...v1.5.30) (2026-07-27)
+
+### :bug: Fixes
+
+* poll summary close race ([#218](https://github.com/GTSpray/P-titPote/issues/218)) ([062c97d](https://github.com/GTSpray/P-titPote/commit/062c97df734b92d7feca048bb77673cdf04f1f1d))
 
 ## [1.5.29](https://github.com/GTSpray/P-titPote/compare/v1.5.28...v1.5.29) (2026-07-27)
 
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/changelog from 6.0.3 to 7.0.0 ([#220](https://github.com/GTSpray/P-titPote/issues/220)) ([669b91f](https://github.com/GTSpray/P-titPote/commit/669b91f363600b1f4bcede4ff3c10f1daff3e6d9))
+
 ## [1.5.28](https://github.com/GTSpray/P-titPote/compare/v1.5.27...v1.5.28) (2026-07-27)
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/git from 10.0.1 to 11.0.1 ([#221](https://github.com/GTSpray/P-titPote/issues/221)) ([6381451](https://github.com/GTSpray/P-titPote/commit/638145161bf2c13af7f13cdccaef11f49997bf92))
 
 ## [1.5.27](https://github.com/GTSpray/P-titPote/compare/v1.5.26...v1.5.27) (2026-07-27)
 
+### :repeat: Chore
+
+* **deps:** bump discord.js from 14.26.5 to 14.27.0 ([#222](https://github.com/GTSpray/P-titPote/issues/222)) ([1b64757](https://github.com/GTSpray/P-titPote/commit/1b64757759497baa210cc10442e06348d6e8bc8f))
+
 ## [1.5.26](https://github.com/GTSpray/P-titPote/compare/v1.5.25...v1.5.26) (2026-07-27)
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.9.5 to 3.9.6 ([#223](https://github.com/GTSpray/P-titPote/issues/223)) ([338afd3](https://github.com/GTSpray/P-titPote/commit/338afd35fe4080dfc8541024e73f143ba9af2012))
 
 ## [1.5.25](https://github.com/GTSpray/P-titPote/compare/v1.5.24...v1.5.25) (2026-07-27)
 
+### :memo: Documentation
+
+* add database migration runbook ([#219](https://github.com/GTSpray/P-titPote/issues/219)) ([22fa001](https://github.com/GTSpray/P-titPote/commit/22fa0014cb6b7bd17a6b550e6012402cf45e85d9))
+* automate usage guides with doc-studio scenario captures ([#226](https://github.com/GTSpray/P-titPote/issues/226)) ([d89d9be](https://github.com/GTSpray/P-titPote/commit/d89d9be750e28e2c4dc1305247b0ede233fe2c3b))
+
+### :repeat: Chore
+
+* **deps:** bump discord-api-types from 0.38.50 to 0.38.51 ([#224](https://github.com/GTSpray/P-titPote/issues/224)) ([2653323](https://github.com/GTSpray/P-titPote/commit/26533239b5883901395f605017d2d7c535e0de41))
+
 ## [1.5.24](https://github.com/GTSpray/P-titPote/compare/v1.5.23...v1.5.24) (2026-07-20)
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group across 1 directory with 5 updates ([#213](https://github.com/GTSpray/P-titPote/issues/213)) ([8108127](https://github.com/GTSpray/P-titPote/commit/81081270b4aa53b98f8d46195a36b49f39e7f250))
 
 ## [1.5.23](https://github.com/GTSpray/P-titPote/compare/v1.5.22...v1.5.23) (2026-07-20)
 
+### :memo: Documentation
+
+* add poll technical workflow guide ([#211](https://github.com/GTSpray/P-titPote/issues/211)) ([8e56c3b](https://github.com/GTSpray/P-titPote/commit/8e56c3bc6b4ddcf0aef04fe53206ab0caea289b4))
+
+### :repeat: Chore
+
+* **deps:** bump actions/setup-node from 6 to 7 ([#212](https://github.com/GTSpray/P-titPote/issues/212)) ([8ba2120](https://github.com/GTSpray/P-titPote/commit/8ba21202479c6595087bf024e73ddfd1c90d4d36))
+
 ## [1.5.22](https://github.com/GTSpray/P-titPote/compare/v1.5.21...v1.5.22) (2026-07-20)
+
+### :repeat: Chore
+
+* **deps:** bump discord-api-types from 0.38.49 to 0.38.50 ([#214](https://github.com/GTSpray/P-titPote/issues/214)) ([828989d](https://github.com/GTSpray/P-titPote/commit/828989d83feaf5eb0c9cbe9ccd91c5ef265c0e66))
 
 ## [1.5.21](https://github.com/GTSpray/P-titPote/compare/v1.5.20...v1.5.21) (2026-07-20)
 
+### :repeat: Chore
+
+* **deps:** bump node-mocks-http from 1.18.0 to 1.18.1 ([#215](https://github.com/GTSpray/P-titPote/issues/215)) ([277eef1](https://github.com/GTSpray/P-titPote/commit/277eef1ed156e5fcbbfad1102e3c986d9b95d114))
+
 ## [1.5.20](https://github.com/GTSpray/P-titPote/compare/v1.5.19...v1.5.20) (2026-07-20)
+
+### :repeat: Chore
+
+* **deps:** bump semantic-release from 25.0.5 to 25.0.8 ([#216](https://github.com/GTSpray/P-titPote/issues/216)) ([d34f333](https://github.com/GTSpray/P-titPote/commit/d34f33329c3db063871e0e9f07e1090ae7880d49))
 
 ## [1.5.19](https://github.com/GTSpray/P-titPote/compare/v1.5.18...v1.5.19) (2026-07-20)
 
+### :memo: Documentation
+
+* add Discord Gateway workflow runbook ([#204](https://github.com/GTSpray/P-titPote/issues/204)) ([63c89a6](https://github.com/GTSpray/P-titPote/commit/63c89a698744e81120b8171dfe03bb47268d71fb))
+
+### :repeat: Chore
+
+* **deps:** bump ws from 8.21.0 to 8.21.1 ([#217](https://github.com/GTSpray/P-titPote/issues/217)) ([cc0e44a](https://github.com/GTSpray/P-titPote/commit/cc0e44a7e3ecbf7d3b7ab479c4742b0e40c5dc67))
+
 ## [1.5.18](https://github.com/GTSpray/P-titPote/compare/v1.5.17...v1.5.18) (2026-07-13)
+
+### :bug: Fixes
+
+* **pollSummary:** poll summary failure closing polls ([#210](https://github.com/GTSpray/P-titPote/issues/210)) ([918addf](https://github.com/GTSpray/P-titPote/commit/918addf86d585b10b6241efacfab3e91385067fe))
 
 ## [1.5.17](https://github.com/GTSpray/P-titPote/compare/v1.5.16...v1.5.17) (2026-07-13)
 
+### :repeat: Chore
+
+* **deps:** bump vitest from 4.1.9 to 4.1.10 ([#205](https://github.com/GTSpray/P-titPote/issues/205)) ([7c760fb](https://github.com/GTSpray/P-titPote/commit/7c760fba71c7f8b14ffdc27e3788eacf8f307d1b))
+
 ## [1.5.16](https://github.com/GTSpray/P-titPote/compare/v1.5.15...v1.5.16) (2026-07-13)
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.9.4 to 3.9.5 ([#206](https://github.com/GTSpray/P-titPote/issues/206)) ([d3b255d](https://github.com/GTSpray/P-titPote/commit/d3b255d590e85ef90039b168d3f1fecc2e3a80e8))
 
 ## [1.5.15](https://github.com/GTSpray/P-titPote/compare/v1.5.14...v1.5.15) (2026-07-13)
 
+### :repeat: Chore
+
+* **deps:** bump discord.js from 14.26.4 to 14.26.5 ([#207](https://github.com/GTSpray/P-titPote/issues/207)) ([73bdf3e](https://github.com/GTSpray/P-titPote/commit/73bdf3e49b02704daeb5b7cdd056b493128ba07b))
+
 ## [1.5.14](https://github.com/GTSpray/P-titPote/compare/v1.5.13...v1.5.14) (2026-07-13)
+
+### :repeat: Chore
+
+* **deps:** bump typescript from 6.0.3 to 7.0.2 ([#208](https://github.com/GTSpray/P-titPote/issues/208)) ([b21404f](https://github.com/GTSpray/P-titPote/commit/b21404f5b22ff091b78ecd7242063e7f457e4ac7))
 
 ## [1.5.13](https://github.com/GTSpray/P-titPote/compare/v1.5.12...v1.5.13) (2026-07-13)
 
+### :repeat: Chore
+
+* **deps:** bump node-mocks-http from 1.17.2 to 1.18.0 ([#209](https://github.com/GTSpray/P-titPote/issues/209)) ([dd38776](https://github.com/GTSpray/P-titPote/commit/dd38776ae032635055c939951e8a2187744cddac))
+
 ## [1.5.12](https://github.com/GTSpray/P-titPote/compare/v1.5.11...v1.5.12) (2026-07-08)
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.9.1 to 3.9.4 ([#200](https://github.com/GTSpray/P-titPote/issues/200)) ([76e17d1](https://github.com/GTSpray/P-titPote/commit/76e17d115bb7a5499662b66b4bbe7b9aff7a4cfc))
 
 ## [1.5.11](https://github.com/GTSpray/P-titPote/compare/v1.5.10...v1.5.11) (2026-07-08)
 
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.0.1 to 26.1.1 ([#201](https://github.com/GTSpray/P-titPote/issues/201)) ([3423a7d](https://github.com/GTSpray/P-titPote/commit/3423a7d329f05a6c3a2e1fa3635ddc87c5091606))
+
 ## [1.5.10](https://github.com/GTSpray/P-titPote/compare/v1.5.9...v1.5.10) (2026-07-08)
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/github from 12.0.8 to 12.0.9 ([#202](https://github.com/GTSpray/P-titPote/issues/202)) ([fc312e9](https://github.com/GTSpray/P-titPote/commit/fc312e9c7f55f1d8cf6deca73100178bd9a9c072))
 
 ## [1.5.9](https://github.com/GTSpray/P-titPote/compare/v1.5.8...v1.5.9) (2026-07-08)
 
+### :repeat: Chore
+
+* **deps:** bump conventional-changelog-conventionalcommits from 10.2.0 to 10.2.1 ([#203](https://github.com/GTSpray/P-titPote/issues/203)) ([61cae68](https://github.com/GTSpray/P-titPote/commit/61cae68bc95032dacc995fd567b2f5df1a6501f8))
+
 ## [1.5.8](https://github.com/GTSpray/P-titPote/compare/v1.5.7...v1.5.8) (2026-06-30)
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.8.4 to 3.9.1 ([#199](https://github.com/GTSpray/P-titPote/issues/199)) ([bb2665d](https://github.com/GTSpray/P-titPote/commit/bb2665d2ef5f85577936744801a9aecea16282bb))
 
 ## [1.5.7](https://github.com/GTSpray/P-titPote/compare/v1.5.6...v1.5.7) (2026-06-30)
 
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group across 1 directory with 5 updates ([#196](https://github.com/GTSpray/P-titPote/issues/196)) ([3ecaef0](https://github.com/GTSpray/P-titPote/commit/3ecaef03b9f3173dddb354efb69c83cbd594069c))
+
 ## [1.5.6](https://github.com/GTSpray/P-titPote/compare/v1.5.5...v1.5.6) (2026-06-30)
 
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.0.0 to 26.0.1 ([#197](https://github.com/GTSpray/P-titPote/issues/197)) ([b563cc6](https://github.com/GTSpray/P-titPote/commit/b563cc66017108b4619ed3fd5bcedfc29f09c937))
+
 ## [1.5.5](https://github.com/GTSpray/P-titPote/compare/v1.5.4...v1.5.5) (2026-06-30)
+
+### :memo: Documentation
+
+* document alias and gimme workflows ([#195](https://github.com/GTSpray/P-titPote/issues/195)) ([f42a1b3](https://github.com/GTSpray/P-titPote/commit/f42a1b3e55638fb22c5238a43501c473b4e51681))
+* document poll workflow ([#189](https://github.com/GTSpray/P-titPote/issues/189)) ([d76ff27](https://github.com/GTSpray/P-titPote/commit/d76ff278d5c4182683e6d7545505c455fd0e8cc7))
+
+### :repeat: Chore
+
+* **deps:** bump conventional-changelog-conventionalcommits from 9.3.1 to 10.2.0 ([#198](https://github.com/GTSpray/P-titPote/issues/198)) ([73019a5](https://github.com/GTSpray/P-titPote/commit/73019a520531aeae0ead458c35b13d82890139b5))
 
 ## [1.5.4](https://github.com/GTSpray/P-titPote/compare/v1.5.3...v1.5.4) (2026-06-22)
 
