@@ -1,3 +1,13 @@
+## [1.7.7](https://github.com/GTSpray/P-titPote/compare/v1.7.6...v1.7.7) (2026-08-07)
+
+### :bug: Fixes
+
+* **logger:** surface file transport errors to stdout instead of silent crash ([#243](https://github.com/GTSpray/P-titPote/issues/243)) ([4ec61b4](https://github.com/GTSpray/P-titPote/commit/4ec61b427668efa9df65c8231499ece056ea856b))
+
+### :memo: Documentation
+
+* add release container runbook ([#231](https://github.com/GTSpray/P-titPote/issues/231)) ([72c4a92](https://github.com/GTSpray/P-titPote/commit/72c4a921bc4770c3b82377d5c0daabd607d11c80))
+
 ## [1.7.6](https://github.com/GTSpray/P-titPote/compare/v1.7.5...v1.7.6) (2026-08-07)
 
 ### :bug: Fixes
