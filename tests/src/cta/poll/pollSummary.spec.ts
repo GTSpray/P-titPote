@@ -4,6 +4,7 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
+import { LockMode } from '@mikro-orm/core';
 import { pollSummary } from '../../../../src/commands/cta/poll/pollSummary.js';
 import {
   CTAData,
@@ -131,6 +132,22 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
     expect(poll.endDate).toBeDateCloseTo(today, 1000);
+  });
+
+  it('should lock the poll while closing it for the summary', async () => {
+    const findOneOrFailSpy = vi.spyOn(
+      SqlEntityManager.prototype,
+      'findOneOrFail',
+    );
+
+    await pollSummary.handler(handlerOpts);
+
+    expect(findOneOrFailSpy).toHaveBeenCalledWith(
+      Poll,
+      { server: { guildId: guild_id }, id: aPoll.id },
+      expect.objectContaining({ lockMode: LockMode.PESSIMISTIC_WRITE }),
+    );
+    findOneOrFailSpy.mockRestore();
   });
 
   it('should keep the poll open when publishing the summary fails', async () => {

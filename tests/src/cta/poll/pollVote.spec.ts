@@ -5,6 +5,7 @@ import {
   AbstractSqlPlatform,
   NotFoundError,
 } from '@mikro-orm/mariadb';
+import { LockMode } from '@mikro-orm/core';
 import { pollVote } from '../../../../src/commands/cta/poll/pollVote.js';
 import {
   ModalHandlerOptions,
@@ -112,6 +113,22 @@ describe('cta/pollVote', () => {
         content: <string>aSecondStepCmp.value,
       }),
     ]);
+  });
+
+  it('should lock the poll while recording votes', async () => {
+    const findOneOrFailSpy = vi.spyOn(
+      SqlEntityManager.prototype,
+      'findOneOrFail',
+    );
+
+    await pollVote.handler(handlerOpts);
+
+    expect(findOneOrFailSpy).toHaveBeenCalledWith(
+      Poll,
+      { id: aPoll.id, server: { guildId: guild_id } },
+      expect.objectContaining({ lockMode: LockMode.PESSIMISTIC_WRITE }),
+    );
+    findOneOrFailSpy.mockRestore();
   });
 
   it('should not create a PollResp for a poll from another guild', async () => {
