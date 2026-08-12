@@ -1,3 +1,9 @@
+## [1.7.10](https://github.com/GTSpray/P-titPote/compare/v1.7.9...v1.7.10) (2026-08-12)
+
+### :repeat: Chore
+
+* **deps:** bump semantic-release from 25.0.8 to 25.0.9 ([#248](https://github.com/GTSpray/P-titPote/issues/248)) ([1f1e9df](https://github.com/GTSpray/P-titPote/commit/1f1e9df0bb056044ef8906bdd2c73641cc8460af))
+
 ## [1.7.9](https://github.com/GTSpray/P-titPote/compare/v1.7.8...v1.7.9) (2026-08-12)
 
 ### :repeat: Chore
