@@ -1,3 +1,13 @@
+## [1.7.8](https://github.com/GTSpray/P-titPote/compare/v1.7.7...v1.7.8) (2026-08-12)
+
+### :memo: Documentation
+
+* add logging observability guide ([#244](https://github.com/GTSpray/P-titPote/issues/244)) ([fd03e1a](https://github.com/GTSpray/P-titPote/commit/fd03e1a2de51a84207ff8c233e3dbd8baf66de55))
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group with 5 updates ([#245](https://github.com/GTSpray/P-titPote/issues/245)) ([c51026c](https://github.com/GTSpray/P-titPote/commit/c51026c581af858713f55167ccab6e752f99393f))
+
 ## [1.7.7](https://github.com/GTSpray/P-titPote/compare/v1.7.6...v1.7.7) (2026-08-07)
 
 ### :bug: Fixes
