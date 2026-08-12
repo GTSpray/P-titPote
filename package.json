@@ -65,7 +65,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^26.1.2",
     "conventional-changelog-conventionalcommits": "^10.2.1",
-    "discord-api-types": "^0.38.52",
+    "discord-api-types": "^0.38.53",
     "node-mocks-http": "^1.18.1",
     "nodemon": "^3.1.14",
     "prettier": "3.9.6",
