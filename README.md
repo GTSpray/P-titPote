@@ -165,6 +165,7 @@ make docs  # Regenerate usage doc scenario GIFs
 
 These guides describe architecture, services, and implementation details:
 
+- [`docs/interactions.md`](docs/interactions.md) — Discord HTTP interaction dispatch, handlers, and troubleshooting
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
@@ -202,6 +203,7 @@ P-titPote/
 │   └── migrations/              # Database migrations
 ├── docs/
 │   ├── usage/                   # End-user command guides
+│   ├── interactions.md          # HTTP interactions dispatch guide
 │   ├── poll.md                  # Poll workflow technical guide
 │   ├── gateway.md               # Gateway service technical guide
 │   ├── database.md              # Database and migration runbook
@@ -219,17 +221,14 @@ P-titPote/
 #### Request flow
 
 - `GET /health` returns an empty JSON response for service health checks.
-- `POST /interactions` is the Discord interactions endpoint. It verifies
-  Discord signatures with `PUBLIC_KEY` before dispatching anything.
-- Slash commands are dispatched from `data.name` through
-  `src/commands/slash/index.ts`.
-- Buttons and modal submissions use a JSON `custom_id`, for example
-  `{"t":"cta","d":{"a":"pollPub","pId":"..."}}`, and are dispatched through
-  `src/commands/cta/index.ts`.
+- `POST /interactions` verifies Discord signatures with `PUBLIC_KEY` before
+  dispatching slash commands, buttons, or modal submissions.
 - Request IDs are added to `x-request-id` and included in structured logs.
 
 Keep `express.json()` after the `/interactions` route. Discord signature
 verification depends on the raw request body handled by `verifyKeyMiddleware`.
+See [`docs/interactions.md`](docs/interactions.md) for dispatch registries, CTA
+`custom_id` routing, permission checks, and troubleshooting.
 
 ### Database management
 
