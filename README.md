@@ -244,8 +244,11 @@ make db-sh      # Open a shell in the database container
 ```
 
 The MikroORM CLI reads the compiled config from `dist/`, so build before running
-CLI commands manually. See [`docs/database.md`](docs/database.md) for the entity
-map, migration workflow, test database behavior, and troubleshooting notes.
+CLI commands manually. Pending migrations also run automatically when the API
+process starts (`api` or `both`; `orm.migrator.up()` in `initORM`). The
+dedicated `gateway` process does not migrate. See
+[`docs/database.md`](docs/database.md) for the entity map, migration workflow,
+test database behavior, and troubleshooting notes.
 
 ---
 

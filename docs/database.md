@@ -9,9 +9,13 @@ gateway event handlers do not persist data.
 
 - `src/mikro-orm.config.ts` is the shared MikroORM config for application and CLI
   commands.
-- `src/db/db.ts` initializes one cached `MikroORM` instance. HTTP interaction
-  handlers receive that instance from `src/api.ts` and fork an entity manager for
-  request-scoped work.
+- `src/db/db.ts` initializes one cached `MikroORM` instance and, by default,
+  applies pending migrations with `orm.migrator.up()` before returning. Only
+  `src/api.ts` calls `initORM` (so `both` mode migrates once via the API
+  import). The gateway process does **not** run migrations, which avoids
+  concurrent `migrator.up()` when Compose starts separate `api` and `gateway`
+  containers. The API waits for that init before listening. HTTP interaction
+  handlers fork an entity manager for request-scoped work.
 - Production and development Compose files run MariaDB `12.0.2-noble` as the
   `database` service. Data is persisted in the `mysqldbdata` volume.
 - The app connects with the `.env` database variables:
@@ -66,10 +70,16 @@ make db-sh      # Open a shell in the database container
 
 Operational notes:
 
-- Application startup initializes MikroORM but does not automatically run
-  migrations. Apply migrations as a separate deploy step with `make db-up`.
-- `make db-check`, `make db-up`, and `make db-down` execute the MikroORM CLI in
-  the `api` container, so they use the same `.env` database settings as the app.
+- Application startup applies pending migrations automatically via
+  `orm.migrator.up()` inside `initORM`, but only from the API process (`api`
+  mode, or `both` because it imports `api`). The dedicated `gateway` process
+  never migrates, so parallel Compose containers cannot deadlock on DDL. Tests
+  pass `migrate: false` and keep using SchemaGenerator instead.
+- A `gateway`-only process therefore assumes the schema is already up to date
+  (for example after an `api`/`both` start or `make db-up`).
+- `make db-check`, `make db-up`, and `make db-down` remain available for manual
+  inspection and ops; they execute the MikroORM CLI in the `api` container with
+  the same `.env` database settings as the app.
 - Migrations are not wrapped in a transaction (`transactional: false` in the
   config). Review destructive or multi-step migrations carefully and prefer
   additive changes when possible.
@@ -100,9 +110,9 @@ Vitest uses a separate MariaDB service named `dbtest` from
 - The test config lives in `tests/mkro-orm-test.config.ts`.
 - It connects to database `ptitpotetest` with the test credentials from Compose.
 - `tests/vitest.initdb.ts` drops and recreates the schema before the suite using
-  MikroORM's schema generator, not the migration runner.
-- `tests/vitest.setup.ts` initializes the cached ORM once and closes it after the
-  suite.
+  MikroORM's schema generator, not the migration runner (`initORM(..., false)`).
+- `tests/vitest.setup.ts` initializes the cached ORM once (also without
+  migrations) and closes it after the suite.
 
 This keeps tests isolated from the development database, but it also means a
 migration can be wrong even when entity-based tests pass. Run `make db-check`
