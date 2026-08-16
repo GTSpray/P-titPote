@@ -1,3 +1,13 @@
+## [1.8.0](https://github.com/GTSpray/P-titPote/compare/v1.7.11...v1.8.0) (2026-08-16)
+
+### :sparkles: Features
+
+* run MikroORM migrations on API startup ([#251](https://github.com/GTSpray/P-titPote/issues/251)) ([b2e9db1](https://github.com/GTSpray/P-titPote/commit/b2e9db1127d93732c17cbb3f5cfe70cac4d8567c))
+
+### :memo: Documentation
+
+* add interactions dispatch guide ([#250](https://github.com/GTSpray/P-titPote/issues/250)) ([a183779](https://github.com/GTSpray/P-titPote/commit/a1837794c82ee036a5a65121453940c9af770690))
+
 ## [1.7.11](https://github.com/GTSpray/P-titPote/compare/v1.7.10...v1.7.11) (2026-08-12)
 
 ### :repeat: Chore
