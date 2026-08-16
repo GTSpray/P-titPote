@@ -138,10 +138,17 @@ app.post(
 
 app.use(express.json()); // after interaction route to prevent We recommend disabling middleware for interaction routes so that req.body is a raw buffer.
 
-app.listen(PORT, (err) => {
-  if (err) {
+orm
+  .then(() => {
+    app.listen(PORT, (err) => {
+      if (err) {
+        logger.error('startup error', err);
+        return;
+      }
+      logger.info(`startup success`, { port: PORT });
+    });
+  })
+  .catch((err) => {
     logger.error('startup error', err);
-    return;
-  }
-  logger.info(`startup success`, { port: PORT });
-});
+    process.exit(1);
+  });

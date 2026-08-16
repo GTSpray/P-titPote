@@ -82,9 +82,11 @@ The image contains the Node.js app only. Provide these external dependencies:
   under `logs/`.
 - Network access to Discord APIs and to MariaDB.
 
-Run migrations before serving traffic. Application startup initializes MikroORM
-but does not apply migrations automatically; use the migration workflow in
-[`docs/database.md`](database.md).
+Application startup applies pending migrations automatically from the API
+process before it listens (`api` mode, or `both` via the API import). The
+dedicated `gateway` process does not migrate, to avoid concurrent migrators
+when Compose runs both services. Manual migration CLI targets remain available;
+see [`docs/database.md`](database.md).
 
 ## Operational checks
 
@@ -101,5 +103,7 @@ release` and `Get version after release` steps. The GHCR login and image
   `gateway`, or `both`, then check required environment variables.
 - **Compose build cannot download the release archive:** confirm
   `package.json` points to a version with a matching GitHub release asset.
-- **Database tables are missing:** apply migrations separately with
-  `make db-up` or the equivalent MikroORM command before starting the app.
+- **Database tables are missing:** confirm an `api` or `both` process reached
+  startup successfully (migrations run during API `initORM`, not from
+  `gateway`). Use `make db-up` or the MikroORM CLI if you need to apply
+  migrations outside a normal API start.

@@ -4,17 +4,23 @@ export interface DBServices {
   em: EntityManager;
 }
 
-let cache: DBServices;
-export async function initORM(options: Options): Promise<DBServices> {
-  if (cache) {
-    return cache;
+let cache: Promise<DBServices> | undefined;
+
+export function initORM(options: Options, migrate = true): Promise<DBServices> {
+  if (!cache) {
+    cache = (async () => {
+      const orm = await MikroORM.init(options);
+      if (migrate) {
+        await orm.migrator.up();
+      }
+      return {
+        orm,
+        em: orm.em,
+      };
+    })().catch((err) => {
+      cache = undefined;
+      throw err;
+    });
   }
-
-  const orm = await MikroORM.init(options);
-
-  // save to cache before returning
-  return (cache = {
-    orm,
-    em: orm.em,
-  });
+  return cache;
 }
