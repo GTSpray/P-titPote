@@ -12,6 +12,7 @@ import {
 import { logger } from './logger.js';
 import { GWSEvent } from './gateway/gatewaytypes.js';
 import { discordapi } from './utils/discordapi.js';
+import { notifyBotOwner } from './utils/notifyBotOwner.js';
 import { t } from './i18n/index.js';
 
 gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
@@ -53,6 +54,11 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
   };
   gateway.send(data);
 });
+
+gateway.once(GatewayDispatchEvents.Ready, () => {
+  void notifyBotOwner(t('startup.dm.gateway'));
+});
+
 gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
   logger.debug('gateway', { shard, debugmsg, meta });
 });

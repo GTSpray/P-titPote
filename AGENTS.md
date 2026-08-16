@@ -50,6 +50,7 @@ Common environment variables include:
 - `APP_ID`
 - `BOT_TOKEN`
 - `PUBLIC_KEY`
+- `BOT_OWNER_ID` optional Discord user ID for startup DM notifications
 - `LOCALTUNNEL_SUBDOMAIN` for local tunnel development, when needed
 
 Use `.env.sample` as documentation only. Do not add real credentials to it.

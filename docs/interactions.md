@@ -19,6 +19,10 @@ the request path used by command authors and operators.
 6. Handlers receive the Express `req`/`res` objects and the shared database
    services initialized from `src/mikro-orm.config.ts`.
 
+When Express successfully starts listening, the API process optionally DMs
+`BOT_OWNER_ID` via `src/utils/notifyBotOwner.ts` with a message distinct from
+the gateway startup DM.
+
 Unknown command names, CTA action names, modal IDs, or interaction types return a
 400 response with a translated error key. Unexpected CTA parsing failures return
 the shared unknown-error response and log the request ID.
