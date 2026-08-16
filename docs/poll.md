@@ -15,16 +15,16 @@ message or posts a report.
 
 ## Entry points
 
-| Interaction          | Handler                                | Purpose                                                    |
-| -------------------- | -------------------------------------- | ---------------------------------------------------------- |
-| `/poll create`       | `src/commands/slash/poll/create.ts`    | Opens the first poll creation modal.                       |
-| `pollCreate` modal   | `src/commands/cta/poll/pollCreate.ts`  | Creates the draft poll, then appends questions or choices. |
-| `pollAddQ` button    | `src/commands/cta/poll/pollAddQ.ts`    | Opens a modal for the next question.                       |
-| `pollAddC` button    | `src/commands/cta/poll/pollAddC.ts`    | Opens a modal for choices on the latest question.          |
-| `pollPub` button     | `src/commands/cta/poll/pollPub.ts`     | Publishes the public voting message.                       |
-| `pollResp` button    | `src/commands/cta/poll/pollResp.ts`    | Opens the voting modal for a member.                       |
-| `pollVote` modal     | `src/commands/cta/poll/pollVote.ts`    | Stores or updates the member's answers.                    |
-| `pollSummary` button | `src/commands/cta/poll/pollSummary.ts` | Posts the public report and closes the poll on success.    |
+| Interaction          | Handler                                | Purpose                                                                      |
+| -------------------- | -------------------------------------- | ---------------------------------------------------------------------------- |
+| `/poll create`       | `src/commands/slash/poll/create.ts`    | Opens the first poll creation modal.                                         |
+| `pollCreate` modal   | `src/commands/cta/poll/pollCreate.ts`  | Creates the draft poll, then appends questions or choices.                   |
+| `pollAddQ` button    | `src/commands/cta/poll/pollAddQ.ts`    | Opens a modal for the next question.                                         |
+| `pollAddC` button    | `src/commands/cta/poll/pollAddC.ts`    | Opens a modal for choices on the latest question.                            |
+| `pollPub` button     | `src/commands/cta/poll/pollPub.ts`     | Publishes the public voting message.                                         |
+| `pollResp` button    | `src/commands/cta/poll/pollResp.ts`    | Opens the voting modal for a member.                                         |
+| `pollVote` modal     | `src/commands/cta/poll/pollVote.ts`    | Stores or updates the member's answers.                                      |
+| `pollSummary` button | `src/commands/cta/poll/pollSummary.ts` | Closes the poll, posts the public report, and rolls back on publish failure. |
 
 Component routing uses JSON `custom_id` values with the shape
 `{"t":"cta","d":{"a":"pollCreate","pId":"..."}}`. The HTTP interactions
@@ -89,16 +89,20 @@ paragraph text inputs.
 The **Compte rendu** button is moderator-only. `pollSummary`:
 
 1. loads the poll, steps, choices, and all responses;
-2. sets `endDate` to now only when the poll is still open;
-3. builds report markdown with participant counts, choice totals and rounded
+2. stores the previous `endDate`;
+3. sets and flushes `endDate` to now when the poll is still open;
+4. builds report markdown with participant counts, choice totals and rounded
    percentages, chronological free-text answers, and the closing timestamp;
-4. splits the report into messages under Discord's 2,000 character limit;
-5. posts every chunk to the current channel with `allowed_mentions: { parse: [] }`;
-6. flushes the updated `endDate` only after all report messages are posted.
+5. splits the report into messages under Discord's 2,000 character limit;
+6. posts every chunk to the current channel with `allowed_mentions: { parse: [] }`;
+7. if Discord posting fails, restores the previous `endDate` and returns the
+   translated failure message.
 
-This ordering is intentional: if Discord rejects report publication, the handler
-returns the translated failure message and the poll remains open. This prevents
-a failed report attempt from silently closing voting.
+Closing before posting is intentional: while the report is being sent, voters can
+no longer change the persisted result that the report was built from. The
+rollback is equally important: if Discord rejects report publication, the
+handler restores the previous close state so a failed report attempt does not
+silently close voting.
 
 Free-text answers are passed through `unMention`, which inserts a zero-width
 space after every `@`, before reports are posted.
@@ -121,5 +125,5 @@ space after every `@`, before reports are posted.
 
 Relevant tests live under `tests/src/commands/slashs/poll/` and
 `tests/src/cta/poll/`. The report failure guarantee is covered in
-`tests/src/cta/poll/pollSummary.spec.ts` by asserting that `endDate` is not
-persisted when Discord report posting fails.
+`tests/src/cta/poll/pollSummary.spec.ts` by asserting that `endDate` is closed
+before posting and restored when Discord report posting fails.
