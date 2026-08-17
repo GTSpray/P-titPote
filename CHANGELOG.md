@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/GTSpray/P-titPote/compare/v1.8.1...v1.9.0) (2026-08-17)
+
+### :sparkles: Features
+
+* DM BOT_OWNER_ID on API and gateway startup ([#252](https://github.com/GTSpray/P-titPote/issues/252)) ([a2452b2](https://github.com/GTSpray/P-titPote/commit/a2452b2454d2f93d0e28e5a9978784930ffe8a21))
+
 ## [1.8.1](https://github.com/GTSpray/P-titPote/compare/v1.8.0...v1.8.1) (2026-08-17)
 
 ### :repeat: Chore
