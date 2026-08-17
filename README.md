@@ -71,6 +71,8 @@ Get your application credentials from the Discord Developer Portal:
 - **APP_ID**
 - **BOT_TOKEN**
 - **PUBLIC_KEY**
+- **BOT_OWNER_ID** (optional — your Discord user ID; receives a DM when the
+  API and/or gateway start)
 
 Copy `.env.sample` to `.env` and fill in your values:
 
@@ -78,6 +80,7 @@ Copy `.env.sample` to `.env` and fill in your values:
 APP_ID=your_app_id
 BOT_TOKEN=your_bot_token
 PUBLIC_KEY=your_public_key
+BOT_OWNER_ID=your_discord_user_id # optional
 LOCALTUNNEL_SUBDOMAIN=your_subdomain # optional for development
 ```
 

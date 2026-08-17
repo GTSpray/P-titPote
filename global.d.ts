@@ -6,6 +6,7 @@ declare global {
       APP_ID: string;
       PUBLIC_KEY: string;
       BOT_TOKEN: string;
+      BOT_OWNER_ID?: string;
       LOCALTUNNEL_SUBDOMAIN: string;
       APP_PORT?: string;
 

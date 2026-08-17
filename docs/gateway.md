@@ -55,6 +55,12 @@ Required environment:
   client.
 - `APP_ID` should match the bot application ID. The reaction handler uses it to
   distinguish the bot's own reaction from member reactions.
+- `BOT_OWNER_ID` (optional) is the Discord user ID that receives a private
+  message once when the gateway emits `Ready`. The API process sends a
+  different DM when Express starts listening. Both use
+  `src/utils/notifyBotOwner.ts` (`POST /users/@me/channels` then
+  `POST /channels/{id}/messages`). Skipped when unset; failures are logged and
+  do not stop startup.
 - `LOG_LEVEL=debug` enables detailed gateway lifecycle logs.
 
 ### Connection lifecycle
