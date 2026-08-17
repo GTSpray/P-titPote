@@ -56,7 +56,11 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
 });
 
 gateway.once(GatewayDispatchEvents.Ready, () => {
-  void notifyBotOwner(t('startup.dm.gateway'));
+  void notifyBotOwner(
+    t('startup.dm.gateway', {
+      version: process.env.npm_package_version ?? 'unknown',
+    }),
+  );
 });
 
 gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {

@@ -147,7 +147,11 @@ orm
         return;
       }
       logger.info(`startup success`, { port: PORT });
-      void notifyBotOwner(t('startup.dm.api'));
+      void notifyBotOwner(
+        t('startup.dm.api', {
+          version: process.env.npm_package_version ?? 'unknown',
+        }),
+      );
     });
   })
   .catch((err) => {

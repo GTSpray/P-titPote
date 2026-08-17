@@ -66,8 +66,8 @@ export const fr = {
   'gateway.activity.name': '🫖 Teapot Simulator',
   'gateway.activity.state': 'Autour du cou de Lila',
   'startup.noTokenEnv': 'no APP_ID provided in env',
-  'startup.dm.api': "P'titPote API démarrée ✅",
-  'startup.dm.gateway': "P'titPote Gateway connectée ✅",
+  'startup.dm.api': "P'titPote API v{version} démarrée ✅",
+  'startup.dm.gateway': "P'titPote Gateway v{version} connectée ✅",
   'register.success': 'success',
   'register.endProcess': 'end process',
 } as const;
