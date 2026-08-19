@@ -74,15 +74,15 @@ restart: os
 
 ## Migrate database up to the latest version
 db-up: os
-	$(DC_CMD) run api npx mikro-orm migration:up | $(JQC)
+	$(DC_CMD) run --entrypoint "" api npx mikro-orm migration:up | $(JQC)
 
 ## Migrate database one step down
 db-down: os
-	$(DC_CMD) run api npx mikro-orm migration:down | $(JQC)
+	$(DC_CMD) run --entrypoint "" api npx mikro-orm migration:down | $(JQC)
 
 ## Check if database schema is up to date
 db-check: os
-	$(DC_CMD) run api npx mikro-orm migration:check | $(JQC)
+	$(DC_CMD) run --entrypoint "" api npx mikro-orm migration:check | $(JQC)
 
 ## Create a database dump
 db-dump: os
@@ -98,25 +98,25 @@ db-sh: os
 
 ## Intall dev dependecies
 install: os
-	$(DC_CMD_DEV) run api npm ci
+	$(DC_CMD_DEV) run --entrypoint "" api npm ci
 
 ## Run containers as developpement mode
 dev: os
-	$(DC_CMD_DEV) run api npm run build
-	$(DC_CMD_DEV) up -d --remove-orphans
+	$(DC_CMD_DEV) run --build --entrypoint "" api npm run build
+	$(DC_CMD_DEV) up -d --build --remove-orphans
 
 ## Build with watch mode (need containers as developpement mode)
 tsc: os
-	$(DC_CMD_DEV) run api rm -Rf dist/*
-	$(DC_CMD_DEV) run api npm run build -- -w
+	$(DC_CMD_DEV) run --entrypoint "" api rm -Rf dist/*
+	$(DC_CMD_DEV) run --entrypoint "" api npm run build -- -w
 
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
-	$(DC_CMD_DEV) run api npx vitest dev
+	$(DC_CMD_DEV) run --entrypoint "" api npx vitest dev
 
 ## Format all files with Prettier (need containers as developpement mode)
 pretty: os
-	$(DC_CMD_CI) run api npx prettier . --write
+	$(DC_CMD_CI) run --entrypoint "" api npx prettier . --write
 
 ## Run shell inside bot container
 sh: os
@@ -139,20 +139,20 @@ docs: os
 
 ## Run containers as ci mode
 ci: os
-	$(DC_CMD_CI) run api npm ci
-	$(DC_CMD_CI) run api npm run build
+	$(DC_CMD_CI) run --entrypoint "" api npm ci
+	$(DC_CMD_CI) run --entrypoint "" api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
 
 ## Lint all files with Prettier
 lint: os
-	$(DC_CMD_CI) run api npx prettier . --check
+	$(DC_CMD_CI) run --entrypoint "" api npx prettier . --check
 
 ## Run tests (need containers as developpement mode)
 test: os
-	$(DC_CMD_CI) run api npm --silent test
+	$(DC_CMD_CI) run --entrypoint "" api npm --silent test
 
 ## Create the archive of built sources
 bundle: os
-	$(DC_CMD_CI) run api npm ci
-	$(DC_CMD_CI) run api npm run bundle
+	$(DC_CMD_CI) run --entrypoint "" api npm ci
+	$(DC_CMD_CI) run --entrypoint "" api npm run bundle
 	
