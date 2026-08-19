@@ -41,24 +41,25 @@ The explicit commit analyzer rules are:
 Release notes group additional commit types such as `docs`, `ci`, and `style`,
 but a Docker image is pushed only when semantic-release produces a new version.
 
-## Container targets
+## Container image
 
-`docker/ptitpote/Dockerfile` contains two deployment styles:
+`docker/ptitpote/Dockerfile` builds the application from source for production.
+The default image stage compiles TypeScript, keeps production dependencies only,
+and uses `docker/ptitpote/entrypoint.sh` to start one of three modes.
 
-| Target            | Used by                          | Behavior                                                                                   |
-| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `api`             | `docker-compose.yml` `api`       | Downloads the GitHub release archive, then runs `npm run start:api`.                       |
-| `gateway`         | `docker-compose.yml` `gateway`   | Downloads the GitHub release archive, then runs `npm run start:gateway`.                   |
-| `ptitpotebuilder` | development and CI Compose files | Installs dev dependencies and builds local source.                                         |
-| `ptitpote`        | GHCR release image and QA build  | Builds local source, installs production dependencies, and uses the entrypoint mode below. |
+A separate `ptitpotebuilder` target is used only by development and CI Compose files; it
+installs dev dependencies and is meant for local volume-mounted workflows.
 
-The Compose production flow (`make start`) still builds the service-specific
-`api` and `gateway` targets locally. Those targets download
-`https://github.com/GTSpray/P-titPote/releases/download/v<package-version>/ptitpote.tar.gz`,
-so the matching GitHub release asset must exist and be reachable.
+Production Compose (`make start`) builds the same image for `api` and `gateway`,
+passing the mode to the entrypoint:
 
-The published GHCR images use the `ptitpote` target. Pick the arch suffix for
-the machine that will run the container (`-amd64` or `-arm64`). The entrypoint
+```yaml
+command: ['api']      # api service
+command: ['gateway']  # gateway service
+```
+
+The published GHCR images use the default production stage. Pick the arch suffix
+for the machine that will run the container (`-amd64` or `-arm64`). The entrypoint
 accepts one mode:
 
 ```bash
@@ -101,8 +102,6 @@ release` and `Get version after release` steps. The GHCR login and image
   the two tags are separate single-platform images.
 - **Container exits immediately:** verify the entrypoint mode is one of `api`,
   `gateway`, or `both`, then check required environment variables.
-- **Compose build cannot download the release archive:** confirm
-  `package.json` points to a version with a matching GitHub release asset.
 - **Database tables are missing:** confirm an `api` or `both` process reached
   startup successfully (migrations run during API `initORM`, not from
   `gateway`). Use `make db-up` or the MikroORM CLI if you need to apply

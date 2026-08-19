@@ -17,8 +17,8 @@ client.
 
 ### Running the service
 
-Production Compose starts a dedicated `gateway` container from the
-`docker/ptitpote/Dockerfile` `gateway` target:
+Production Compose starts a dedicated `gateway` container from the same
+`docker/ptitpote/Dockerfile` image as `api`, with `command: ['gateway']`:
 
 ```bash
 make start

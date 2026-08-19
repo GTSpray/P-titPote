@@ -16,4 +16,4 @@ jobs:
       - name: Lint
         run: make lint
       - name: Build Docker image
-        run: docker build -f docker/ptitpote/Dockerfile --target ptitpote -t ptitpote:ci .
+        run: docker build -f docker/ptitpote/Dockerfile -t ptitpote:ci .
