@@ -24,6 +24,7 @@ services:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
       target: ptitpotebuilder
+    entrypoint: []
     depends_on:
       database:
         condition: service_healthy
@@ -51,6 +52,7 @@ services:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
       target: ptitpotebuilder
+    entrypoint: []
     depends_on:
       database:
         condition: service_healthy

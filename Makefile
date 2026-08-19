@@ -102,8 +102,8 @@ install: os
 
 ## Run containers as developpement mode
 dev: os
-	$(DC_CMD_DEV) run api npm run build
-	$(DC_CMD_DEV) up -d --remove-orphans
+	$(DC_CMD_DEV) run --build api npm run build
+	$(DC_CMD_DEV) up -d --build --remove-orphans
 
 ## Build with watch mode (need containers as developpement mode)
 tsc: os

@@ -9,6 +9,7 @@ services:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
       target: ptitpotebuilder
+    entrypoint: []
     volumes:
       - ${PWD}:/app/
   localtunnel:
