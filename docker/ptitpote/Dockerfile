@@ -1,4 +1,5 @@
 FROM node:26-slim AS ptitpotebase
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false
 WORKDIR /app
 RUN apt update && apt install -y wget tar jq python3 make g++
 COPY package*.json ./
