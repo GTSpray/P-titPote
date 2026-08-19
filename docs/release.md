@@ -54,8 +54,8 @@ Production Compose (`make start`) builds the same image for `api` and `gateway`,
 passing the mode to the entrypoint:
 
 ```yaml
-command: ['api']      # api service
-command: ['gateway']  # gateway service
+command: ['api'] # api service
+command: ['gateway'] # gateway service
 ```
 
 The published GHCR images use the default production stage. Pick the arch suffix

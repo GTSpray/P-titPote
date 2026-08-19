@@ -43,6 +43,7 @@ services:
       - ${PWD}/global.d.ts:/app/global.d.ts
       - ${PWD}/tsconfig.json:/app/tsconfig.json
       - ${PWD}/vitest.config.ts:/app/vitest.config.ts
+      - ${PWD}/docs:/app/docs
       - ${PWD}/src:/app/src
       - ${PWD}/tests:/app/tests
       - ${PWD}/.prettierrc:/app/.prettierrc
