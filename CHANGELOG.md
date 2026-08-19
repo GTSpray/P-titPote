@@ -1,3 +1,9 @@
+## [1.9.2](https://github.com/GTSpray/P-titPote/compare/v1.9.1...v1.9.2) (2026-08-19)
+
+### :zap: Refactor
+
+* **docker:** build prod image from source instead of release download ([#255](https://github.com/GTSpray/P-titPote/issues/255)) ([86a758f](https://github.com/GTSpray/P-titPote/commit/86a758f76ef1cd8f8936b150c050eec2150ec0d9))
+
 ## [1.9.1](https://github.com/GTSpray/P-titPote/compare/v1.9.0...v1.9.1) (2026-08-19)
 
 ### :repeat: Chore
