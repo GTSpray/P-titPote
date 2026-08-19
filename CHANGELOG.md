@@ -1,3 +1,9 @@
+## [1.9.1](https://github.com/GTSpray/P-titPote/compare/v1.9.0...v1.9.1) (2026-08-19)
+
+### :repeat: Chore
+
+* **deps:** bump conventional-changelog-conventionalcommits from 10.2.1 to 10.3.0 ([#253](https://github.com/GTSpray/P-titPote/issues/253)) ([35e62f2](https://github.com/GTSpray/P-titPote/commit/35e62f23144b9150ff66084ca3fa6bc3a84cf898))
+
 ## [1.9.0](https://github.com/GTSpray/P-titPote/compare/v1.8.1...v1.9.0) (2026-08-17)
 
 ### :sparkles: Features
