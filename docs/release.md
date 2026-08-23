@@ -87,13 +87,13 @@ If no mode is provided, the image defaults to `both`, which imports
 
 Use the path that matches the target environment:
 
-| Path                  | Command or workflow                 | Image/runtime behavior                                      |
-| --------------------- | ----------------------------------- | ----------------------------------------------------------- |
-| Local production      | `make start`                        | Builds the default production stage and starts `api` + `gateway` containers. |
-| Local development     | `make dev`                          | Builds `ptitpotebuilder`, bind-mounts source, and runs watch entrypoints. |
-| CI quality gate       | `.github/workflows/qa.yml`          | Runs `make ci`, tests, lint, then builds the production image once. |
-| Release archive       | `make bundle` in `release.yml`      | Builds TypeScript in the CI Compose stack and uploads `ptitpote.tar.gz`. |
-| Published GHCR image  | Docker Buildx steps in `release.yml` | Builds the default production stage separately for `linux/amd64` and `linux/arm64`. |
+| Path                 | Command or workflow                  | Image/runtime behavior                                                              |
+| -------------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
+| Local production     | `make start`                         | Builds the default production stage and starts `api` + `gateway` containers.        |
+| Local development    | `make dev`                           | Builds `ptitpotebuilder`, bind-mounts source, and runs watch entrypoints.           |
+| CI quality gate      | `.github/workflows/qa.yml`           | Runs `make ci`, tests, lint, then builds the production image once.                 |
+| Release archive      | `make bundle` in `release.yml`       | Builds TypeScript in the CI Compose stack and uploads `ptitpote.tar.gz`.            |
+| Published GHCR image | Docker Buildx steps in `release.yml` | Builds the default production stage separately for `linux/amd64` and `linux/arm64`. |
 
 Because the production image builds from the repository checkout, Docker layer
 caching depends on the source tree and `package*.json` files at build time. The
