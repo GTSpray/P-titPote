@@ -1,3 +1,13 @@
+## [1.9.3](https://github.com/GTSpray/P-titPote/compare/v1.9.2...v1.9.3) (2026-08-24)
+
+### :memo: Documentation
+
+* clarify container image build workflow ([#256](https://github.com/GTSpray/P-titPote/issues/256)) ([824cc05](https://github.com/GTSpray/P-titPote/commit/824cc059dc1f35c3311e0e05dea123045f9de473))
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group with 5 updates ([#257](https://github.com/GTSpray/P-titPote/issues/257)) ([e6e813a](https://github.com/GTSpray/P-titPote/commit/e6e813a2c8d22a266ccb3e5471a1557280253b35))
+
 ## [1.9.2](https://github.com/GTSpray/P-titPote/compare/v1.9.1...v1.9.2) (2026-08-19)
 
 ### :zap: Refactor
