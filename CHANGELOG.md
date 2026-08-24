@@ -1,3 +1,9 @@
+## [1.9.6](https://github.com/GTSpray/P-titPote/compare/v1.9.5...v1.9.6) (2026-08-24)
+
+### :repeat: Chore
+
+* **deps:** bump uuid from 14.0.1 to 14.0.2 ([#259](https://github.com/GTSpray/P-titPote/issues/259)) ([d1dca59](https://github.com/GTSpray/P-titPote/commit/d1dca59c0cfb1b8fc32514cf56c58ee7895163e0))
+
 ## [1.9.5](https://github.com/GTSpray/P-titPote/compare/v1.9.4...v1.9.5) (2026-08-24)
 
 ### :repeat: Chore
