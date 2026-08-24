@@ -1,3 +1,9 @@
+## [1.9.5](https://github.com/GTSpray/P-titPote/compare/v1.9.4...v1.9.5) (2026-08-24)
+
+### :repeat: Chore
+
+* **deps:** bump conventional-changelog-conventionalcommits from 10.3.0 to 10.4.0 ([#258](https://github.com/GTSpray/P-titPote/issues/258)) ([0417849](https://github.com/GTSpray/P-titPote/commit/0417849c372036d045c87de8b302af0ad1ad97ae))
+
 ## [1.9.4](https://github.com/GTSpray/P-titPote/compare/v1.9.3...v1.9.4) (2026-08-24)
 
 ### :repeat: Chore
