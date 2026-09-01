@@ -7,7 +7,7 @@ server and post them on demand.
 
 Aliases avoid retyping recurring announcements, welcome messages, or FAQ
 replies. Each alias maps a short lowercase identifier to a stored message body
-scoped to one Discord guild.
+on your server.
 
 ### Moderator flow
 
@@ -20,8 +20,7 @@ or Ban Members.
    - `alias`: lowercase letters and digits only (`/^[a-z0-9]+$/`), 1–50
      characters;
    - `message`: stored content, 1–500 characters.
-   - Creating a new alias persists the guild and alias in MariaDB. Reusing an
-     existing alias name updates its message in place.
+   - Reusing an existing alias name updates its message.
    - Success replies publicly with **Ok! C'est noté ;)**.
 
 ![Create alias](./alias-set.gif)
@@ -42,10 +41,10 @@ or Ban Members.
 
 ### Constraints
 
-- Guild-only: DMs and interactions without `guild_id` fail the moderator check
-  or cannot reach the database layer.
-- Aliases are unique per guild (`server` + `alias`).
-- Invalid alias or message payloads return HTTP 400 with validation details.
+- Guild-only: aliases are managed per Discord server.
+- Alias names are unique per server.
+- Alias names must use lowercase letters and digits only.
+- Alias messages can contain up to 500 characters.
 - Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
   faire 🤷** response before any subcommand runs.
 
@@ -62,13 +61,3 @@ Updating an existing alias:
 ```text
 /alias set alias:welcome message:Nouveau message de bienvenue.
 ```
-
-### Implementation map
-
-- Slash command declaration, moderator gate, and subcommand dispatch:
-  `src/commands/slash/alias/index.ts`.
-- Subcommand handlers: `src/commands/slash/alias/set.ts`, `say.ts`, `ls.ts`.
-- Moderator permission check: `src/commands/assert/assertInteractionUserIsModerator.ts`.
-- Persistence model: `MessageAliased` linked to `DiscordGuild` in
-  `src/db/entities/`.
-- Shared response helpers: `src/commands/commonMessages.ts`.

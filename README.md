@@ -169,6 +169,8 @@ make docs  # Regenerate usage doc scenario GIFs
 These guides describe architecture, services, and implementation details:
 
 - [`docs/interactions.md`](docs/interactions.md) — Discord HTTP interaction dispatch, handlers, and troubleshooting
+- [`docs/alias.md`](docs/alias.md) — alias command validation, persistence, permissions, and troubleshooting
+- [`docs/gimme.md`](docs/gimme.md) — gimme utility command dispatch, emoji extraction, and troubleshooting
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
@@ -207,6 +209,8 @@ P-titPote/
 ├── docs/
 │   ├── usage/                   # End-user command guides
 │   ├── interactions.md          # HTTP interactions dispatch guide
+│   ├── alias.md                 # Alias command technical guide
+│   ├── gimme.md                 # Gimme command technical guide
 │   ├── poll.md                  # Poll workflow technical guide
 │   ├── gateway.md               # Gateway service technical guide
 │   ├── database.md              # Database and migration runbook
