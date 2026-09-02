@@ -22,10 +22,10 @@ MikroORM.
 
 The documentation is split for two audiences:
 
-| Audience       | Goal                                        | Where to look                    |
-| -------------- | ------------------------------------------- | -------------------------------- |
-| **Bot users**  | Learn how to use slash commands on a server | [`docs/usage/`](docs/usage/)     |
-| **Developers** | Set up, run, test, and extend the bot       | This README and [`docs/`](docs/) |
+| Audience       | Goal                                        | Where to look                                                                         |
+| -------------- | ------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Bot users**  | Learn how to use slash commands on a server | [User docs site](https://gtspray.github.io/P-titPote/) / [`docs/usage/`](docs/usage/) |
+| **Developers** | Set up, run, test, and extend the bot       | This README and [`docs/`](docs/)                                                      |
 
 ---
 
@@ -34,12 +34,19 @@ The documentation is split for two audiences:
 These guides are for server members and moderators. They describe command
 workflows, permissions, and expected bot behavior — not the codebase.
 
+**Published docs:** [https://gtspray.github.io/P-titPote/](https://gtspray.github.io/P-titPote/)
+
+The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
+
 > **Document commands.** Every user-facing slash command must have an up-to-date
 > guide under [`docs/usage/`](docs/usage/). When you add or change a command’s
 > Discord UX (copy, buttons, modals, permissions, limits), update the matching
-> usage doc and its playback scenarios (JSON + GIFs via `make docs`).
-> Undocumented commands are incomplete features.
+> usage doc and its playback scenarios (JSON + GIF/WebM via `make docs`).
+> Undocumented commands are incomplete features. After changing guides or media,
+> rebuild the site with `make docs-site` (GitHub Pages deploys from `site/` on
+> `main`; enable **Settings → Pages → GitHub Actions** if needed).
 
+- [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store and post reusable message aliases
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
@@ -158,11 +165,15 @@ make dev             # Run in dev container
 make build           # Transpile TypeScript (dev mode)
 make test            # Run test suite
 make testw           # Run test suite in watch mode
-make docs  # Regenerate usage doc scenario GIFs
+make docs       # Regenerate usage doc scenario GIFs and WebMs
+make docs-site  # Build the VitePress user docs site
 ```
 
 > When developing, after running `make dev`, run `make install` inside the
 > development container to install dev dependencies before running tests.
+
+Preview the user docs locally with `cd site && npm run dev` (after `npm ci` in
+`site/`).
 
 ### Technical documentation
 
@@ -216,6 +227,7 @@ P-titPote/
 │   ├── database.md              # Database and migration runbook
 │   ├── logging.md               # Logging and observability guide
 │   └── release.md               # Release and container image runbook
+├── site/                        # VitePress user docs (GitHub Pages)
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
 ├── Makefile                     # Automation
