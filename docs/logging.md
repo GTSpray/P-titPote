@@ -79,12 +79,38 @@ docker run --env-file .env -v "$PWD/logs:/app/logs" \
 pipes JSON lines through `jq`. Rotating files are still useful for retention
 across container restarts.
 
+## Startup owner notifications
+
+`BOT_OWNER_ID` is an optional operational check for single-maintainer
+deployments. When it is set to a Discord user ID, the bot sends that user a DM
+after each runtime entrypoint reaches its own ready point:
+
+| Entrypoint | Trigger                                                                          | Message                                 |
+| ---------- | -------------------------------------------------------------------------------- | --------------------------------------- |
+| `api`      | Express starts listening after `initORM()` completes and pending migrations run. | `P'titPote API v<version> démarrée`     |
+| `gateway`  | The first Gateway `Ready` dispatch is received.                                  | `P'titPote Gateway v<version> démarrée` |
+| `both`     | Imports `api` and `gateway` in one process, so both notifications may be sent.   | Both messages above.                    |
+
+The shared helper in `src/utils/notifyBotOwner.ts` opens or reuses a Discord DM
+channel with `POST /users/@me/channels`, then sends the translated message with
+`POST /channels/{channelId}/messages`. The startup path intentionally fires the
+helper without awaiting it, so a closed DM, missing permission, or transient
+Discord error is logged as `notifyBotOwner failed` and does not make the process
+unhealthy.
+
 ## Troubleshooting
 
 - **No file logs are written:** confirm the `logs/` directory exists and is
   writable by the container user. File transport failures are surfaced on stdout
   as JSON with `msg: "Winston transport error (...)"` and `err.code` such as
   `EACCES` or `ENOENT`.
+- **No startup DM is received:** confirm `BOT_OWNER_ID` is set to a user ID, not
+  a guild ID, role ID, or username. For the API message, verify startup reached
+  `startup success` after database migrations. For the Gateway message, verify a
+  `Ready` dispatch arrived and the bot can create a DM with that user.
+- **Only one startup DM is received:** check which entrypoint is running. A
+  `gateway`-only process never sends the API message, and an `api`-only process
+  never sends the Gateway message.
 - **A Discord request failed but the user only has an error response:** ask for
   the `x-request-id` response header, then search logs for that `reqId`.
 - **Gateway behavior is missing:** run with `LOG_LEVEL=debug` and search for

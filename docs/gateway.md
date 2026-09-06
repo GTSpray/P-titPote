@@ -60,7 +60,8 @@ Required environment:
   different DM when Express starts listening. Both use
   `src/utils/notifyBotOwner.ts` (`POST /users/@me/channels` then
   `POST /channels/{id}/messages`). Skipped when unset; failures are logged and
-  do not stop startup.
+  do not stop startup. See [`docs/logging.md`](logging.md#startup-owner-notifications)
+  for the full runbook.
 - `LOG_LEVEL=debug` enables detailed gateway lifecycle logs.
 
 ### Connection lifecycle
