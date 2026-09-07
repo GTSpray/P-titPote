@@ -21,7 +21,8 @@ the request path used by command authors and operators.
 
 When Express successfully starts listening, the API process optionally DMs
 `BOT_OWNER_ID` via `src/utils/notifyBotOwner.ts` with a message distinct from
-the gateway startup DM.
+the gateway startup DM. See [`docs/logging.md`](logging.md#startup-owner-notifications)
+for the notification flow and troubleshooting.
 
 Unknown command names, CTA action names, modal IDs, or interaction types return a
 400 response with a translated error key. Unexpected CTA parsing failures return
