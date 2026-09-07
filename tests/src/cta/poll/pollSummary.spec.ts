@@ -14,6 +14,7 @@ import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMo
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import {
+  ComponentType,
   InteractionResponseType,
   MessageFlags,
   Routes,
@@ -27,15 +28,14 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
-import {
-  formatDiscordTimestamp,
-  isPollClosed,
-} from '../../../../src/utils/pollDates.js';
+import { formatDiscordTimestamp } from '../../../../src/utils/pollDates.js';
 import { REST } from 'discord.js';
 import {
   DiscrodRESTMock,
   DiscrodRESTMockVerb,
 } from '../../../mocks/discordjs.js';
+import { pollVote } from '../../../../src/commands/cta/poll/pollVote.js';
+import { getModalLabelComponnents } from '../../../helpers/getModalLabelComponnents.js';
 
 describe('cta/pollSummary', () => {
   let guild_id: string;
@@ -155,22 +155,82 @@ describe('cta/pollSummary', () => {
     });
   });
 
-  it('should close the poll before publishing the summary', async () => {
+  it('should keep a concurrent vote waiting while publishing the summary', async () => {
     aPoll.endDate = undefined;
     await em.persist(aPoll).flush();
     em.clear();
-    postSpy.mockImplementationOnce(async () => {
-      em.clear();
-      const poll = await em.findOneOrFail(Poll, {
-        id: aPoll.id,
-      });
-      expect(isPollClosed(poll.endDate)).toBe(true);
-      return {};
+
+    let resolvePost!: (value: unknown) => void;
+    const postStarted = new Promise<void>((resolve) => {
+      postSpy.mockImplementationOnce(
+        () =>
+          new Promise((postResolve) => {
+            resolvePost = postResolve;
+            resolve();
+          }),
+      );
     });
 
-    await pollSummary.handler(handlerOpts);
+    const summaryPromise = pollSummary.handler(handlerOpts);
+    await postStarted;
 
+    const voteData: CTAData = {
+      components: getModalLabelComponnents([
+        {
+          custom_id: firstStep.id,
+          type: ComponentType.StringSelect,
+          values: [firstChoice.id],
+        },
+        {
+          custom_id: secondStep.id,
+          type: ComponentType.TextInput,
+          value: 'A response while the report is in flight',
+        },
+      ]),
+      custom_id: JSON.stringify({
+        t: 'cta',
+        d: {
+          a: 'pollVote',
+          pId: aPoll.id,
+        },
+      }),
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: voteData,
+      guild_id,
+    });
+    const memberId = <string>req.body.member?.user.id;
+    const votePromise = pollVote.handler({
+      ...handlerOpts,
+      req,
+      res,
+      additionalData: JSON.parse(voteData.custom_id),
+    });
+
+    await expect(
+      Promise.race([
+        votePromise.then(() => 'resolved'),
+        new Promise((resolve) => setTimeout(() => resolve('pending'), 100)),
+      ]),
+    ).resolves.toBe('pending');
+
+    resolvePost({});
+    await summaryPromise;
+    const voteResponse = await votePromise;
+
+    expect(voteResponse).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('errors.voteClosed'),
+      },
+    });
+    em.clear();
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId, pollStep: { poll: { id: aPoll.id } } },
+    });
     expect(postSpy).toHaveBeenCalledTimes(1);
+    expect(pollResps).toHaveLength(0);
   });
 
   it('should restore the previous end date when publishing the summary fails', async () => {
@@ -187,6 +247,96 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
     expect(poll.endDate).toEqual(scheduledEndDate);
+  });
+
+  it('should keep a concurrent vote waiting until a failed summary reopens the poll', async () => {
+    aPoll.endDate = undefined;
+    await em.persist(aPoll).flush();
+    em.clear();
+
+    let rejectPost!: (reason?: unknown) => void;
+    const postStarted = new Promise<void>((resolve) => {
+      postSpy.mockImplementationOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectPost = reject;
+            resolve();
+          }),
+      );
+    });
+
+    const summaryPromise = pollSummary.handler(handlerOpts);
+    await postStarted;
+
+    const voteData: CTAData = {
+      components: getModalLabelComponnents([
+        {
+          custom_id: firstStep.id,
+          type: ComponentType.StringSelect,
+          values: [firstChoice.id],
+        },
+        {
+          custom_id: secondStep.id,
+          type: ComponentType.TextInput,
+          value: 'A response while the report is in flight',
+        },
+      ]),
+      custom_id: JSON.stringify({
+        t: 'cta',
+        d: {
+          a: 'pollVote',
+          pId: aPoll.id,
+        },
+      }),
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: voteData,
+      guild_id,
+    });
+    const memberId = <string>req.body.member?.user.id;
+    const votePromise = pollVote.handler({
+      ...handlerOpts,
+      req,
+      res,
+      additionalData: JSON.parse(voteData.custom_id),
+    });
+
+    await expect(
+      Promise.race([
+        votePromise.then(() => 'resolved'),
+        new Promise((resolve) => setTimeout(() => resolve('pending'), 100)),
+      ]),
+    ).resolves.toBe('pending');
+
+    rejectPost(new Error('discord api error'));
+
+    const summaryResponse = await summaryPromise;
+    const voteResponse = await votePromise;
+
+    expect(summaryResponse).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('poll.report.failed'),
+      },
+    });
+    expect(voteResponse).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('poll.vote.success'),
+      },
+    });
+
+    em.clear();
+    const poll = await em.findOneOrFail(Poll, {
+      id: aPoll.id,
+    });
+    const pollResps = await em.findAll(PollResp, {
+      where: { memberId, pollStep: { poll: { id: poll.id } } },
+    });
+    expect(poll.endDate).toBeFalsy();
+    expect(pollResps).toHaveLength(2);
   });
 
   it('should not update the end date of a poll that has already been published', async () => {
