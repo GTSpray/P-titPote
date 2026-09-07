@@ -1,3 +1,13 @@
+## [1.9.9](https://github.com/GTSpray/P-titPote/compare/v1.9.8...v1.9.9) (2026-09-07)
+
+### :memo: Documentation
+
+* add alias and gimme technical guides ([#261](https://github.com/GTSpray/P-titPote/issues/261)) ([00eff06](https://github.com/GTSpray/P-titPote/commit/00eff06fff3cb22c27a2ad4a5ff8d2dfdf41a1d9))
+
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.4.0 to 26.4.1 ([#269](https://github.com/GTSpray/P-titPote/issues/269)) ([7fd0b5e](https://github.com/GTSpray/P-titPote/commit/7fd0b5e5f40615b124e8bb177240196670a47841))
+
 ## [1.9.8](https://github.com/GTSpray/P-titPote/compare/v1.9.7...v1.9.8) (2026-09-01)
 
 ### :repeat: Chore
