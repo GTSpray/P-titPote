@@ -1,3 +1,13 @@
+## [1.9.14](https://github.com/GTSpray/P-titPote/compare/v1.9.13...v1.9.14) (2026-09-08)
+
+### :memo: Documentation
+
+* document startup owner notifications ([#264](https://github.com/GTSpray/P-titPote/issues/264)) ([3804ef6](https://github.com/GTSpray/P-titPote/commit/3804ef68622728bb58edfb88ce194fb290e1732c))
+
+### :repeat: Chore
+
+* bump mariadb images ([#271](https://github.com/GTSpray/P-titPote/issues/271)) ([5db275c](https://github.com/GTSpray/P-titPote/commit/5db275ca1dacf50e2b734b3b09603af19aa7be28))
+
 ## [1.9.13](https://github.com/GTSpray/P-titPote/compare/v1.9.12...v1.9.13) (2026-09-07)
 
 ### :repeat: Chore
