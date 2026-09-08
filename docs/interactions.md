@@ -55,6 +55,12 @@ Handlers that branch on subcommands should validate `req.body.data` before using
 it. Existing commands use Zod and return `errors.invalidCommandPayload` or
 `errors.invalidSubcommand` for malformed payloads.
 
+Slash and subcommand option values must be resolved **by name**, never by array
+index: Discord does not guarantee option order, and omitted optional options are
+absent from the array. Use `slashOptionsSchema`, `optionsByName`, or
+`getOptionValue` from `src/commands/options.ts` (same spirit as the modal helpers
+in `src/commands/modals.ts`).
+
 ## CTA buttons and modals
 
 Buttons and modals share the CTA registry in `src/commands/cta/index.ts`.

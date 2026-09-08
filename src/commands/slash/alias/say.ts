@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { Response } from 'express';
 import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
+import { slashOptionsSchema } from '../../options.js';
 import {
   ComponentType,
   InteractionResponseType,
@@ -20,28 +21,27 @@ export interface aliasSayCommandData {
 
 export type aliasSaySubCommandData = {
   name: 'say';
-  options: [SubCommandOption<'alias', string>];
+  options: Array<SubCommandOption<'alias', string>>;
   type: number;
 };
 
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-});
+const ValidAliasMessage = slashOptionsSchema(
+  z.object({
+    alias: z
+      .string()
+      .regex(/^[a-z0-9]+$/)
+      .min(1)
+      .max(50),
+  }),
+);
 
 export const say = async (
   { req, res, dbServices }: CommandHandlerOptions<aliasSayCommandData>,
   subcommand: aliasSaySubCommandData,
 ): Promise<Response | null> => {
   const guildId = req.body.guild_id;
-  const [alias] = subcommand.options;
 
-  const AliasMessageInput = ValidAliasMessage.safeParse({
-    alias: alias.value,
-  });
+  const AliasMessageInput = ValidAliasMessage.safeParse(subcommand.options);
 
   if (!AliasMessageInput.success) {
     const issues = AliasMessageInput.error.issues;

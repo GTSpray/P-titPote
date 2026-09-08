@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { Response } from 'express';
 import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
+import { slashOptionsSchema } from '../../options.js';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
@@ -17,33 +18,30 @@ export interface aliasSetCommandData {
 
 export type aliasSetSubCommandData = {
   name: 'set';
-  options: [
-    SubCommandOption<'alias', string>,
-    SubCommandOption<'message', string>,
-  ];
+  options: Array<
+    SubCommandOption<'alias', string> | SubCommandOption<'message', string>
+  >;
   type: number;
 };
 
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-  message: z.string().min(1).max(500),
-});
+const ValidAliasMessage = slashOptionsSchema(
+  z.object({
+    alias: z
+      .string()
+      .regex(/^[a-z0-9]+$/)
+      .min(1)
+      .max(50),
+    message: z.string().min(1).max(500),
+  }),
+);
 
 export const set = async (
   { req, res, dbServices }: CommandHandlerOptions<aliasSetCommandData>,
   subcommand: aliasSetSubCommandData,
 ): Promise<Response | null> => {
   const guildId = req.body.guild_id;
-  const [alias, msg] = subcommand.options;
 
-  const AliasMessageInput = ValidAliasMessage.safeParse({
-    alias: alias.value,
-    message: msg.value,
-  });
+  const AliasMessageInput = ValidAliasMessage.safeParse(subcommand.options);
 
   if (!AliasMessageInput.success) {
     const issues = AliasMessageInput.error.issues;
