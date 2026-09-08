@@ -3,7 +3,7 @@ services:
     ports:
       - '3306:3306'
   dbtest:
-    image: mariadb:12.0.2-noble
+    image: mariadb:12.3.3-noble
     container_name: ptitpote-database-test
     environment:
       MARIADB_DATABASE: 'ptitpotetest'

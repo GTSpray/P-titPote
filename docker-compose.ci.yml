@@ -14,5 +14,5 @@ services:
       - ${PWD}:/app/
   localtunnel:
     restart: no
-    image: mariadb:12.0.2-noble
+    image: mariadb:12.3.3-noble
     command: 'ls'
