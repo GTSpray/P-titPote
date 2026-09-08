@@ -1,3 +1,13 @@
+## [1.9.15](https://github.com/GTSpray/P-titPote/compare/v1.9.14...v1.9.15) (2026-09-08)
+
+### :bug: Fixes
+
+* parse slash options by name instead of order ([#272](https://github.com/GTSpray/P-titPote/issues/272)) ([acf83ee](https://github.com/GTSpray/P-titPote/commit/acf83ee9f84926bb1a0259a9f9bd8cd8063e51af))
+
+### :memo: Documentation
+
+* add end user documentation site ([#227](https://github.com/GTSpray/P-titPote/issues/227)) ([d66c9ae](https://github.com/GTSpray/P-titPote/commit/d66c9ae31d9b249aed82ea609deef706bdea2875))
+
 ## [1.9.14](https://github.com/GTSpray/P-titPote/compare/v1.9.13...v1.9.14) (2026-09-08)
 
 ### :memo: Documentation
