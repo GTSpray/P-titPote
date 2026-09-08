@@ -17,22 +17,37 @@ Administrator, Manage Server, Manage Channels, Manage Messages, Kick Members,
 or Ban Members.
 
 1. **Define or update an alias** with `/alias set`:
-   - `alias`: lowercase letters and digits only (`/^[a-z0-9]+$/`), 1–50
-     characters;
-   - `message`: stored content, 1–500 characters.
+   - Opens a modal with:
+     - `alias`: lowercase letters and digits only (`/^[a-z0-9]+$/`), 1–50
+       characters;
+     - `message`: stored content, 1–500 characters.
+   - Fill the fields and submit the modal.
    - Reusing an existing alias name updates its message.
    - Success replies publicly with **Ok! C'est noté ;)**.
 
 ![Create alias](./alias-set.gif)
 
-2. **Post a stored message** with `/alias say alias:<name>`:
-   - Looks up the alias for the current guild.
+2. **Post a stored message** with `/alias say`:
+   - Opens a modal with a select listing the current guild aliases.
+   - Choose an alias and submit.
    - Posts the stored message publicly in the channel where the command runs.
-   - Unknown aliases reply ephemerally with an error message.
+   - If no aliases exist, replies ephemerally with **Ahem... j'ai rien
+     trouvé... 🤷**.
 
 ![Say alias](./alias-say.gif)
 
-3. **List configured aliases** with `/alias ls`:
+3. **Remove an alias** with `/alias rm`:
+   - Opens a modal with a select listing the current guild aliases.
+   - Choose an alias and submit to soft-delete it (it disappears from
+     `/alias ls` and `/alias say`).
+   - The same alias name can be created again later with `/alias set`.
+   - If no aliases exist, replies ephemerally with **Ahem... j'ai rien
+     trouvé... 🤷**.
+   - Success replies publicly with **Ok! C'est noté ;)**.
+
+![Remove alias](./alias-rm.gif)
+
+4. **List configured aliases** with `/alias ls`:
    - Returns alias names sorted alphabetically for the current guild.
    - Only names are shown, not message contents.
    - An empty list replies ephemerally with **Ahem... j'ai rien trouvé... 🤷**.
@@ -42,22 +57,26 @@ or Ban Members.
 ### Constraints
 
 - Guild-only: aliases are managed per Discord server.
-- Alias names are unique per server.
+- Alias names are unique per server among active aliases.
 - Alias names must use lowercase letters and digits only.
 - Alias messages can contain up to 500 characters.
+- `/alias say` and `/alias rm` select menus can list at most 25 aliases
+  (Discord limit). Beyond that, the bot replies with a temporary “too many”
+  message.
 - Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
   faire 🤷** response before any subcommand runs.
 
 ### Examples
 
 ```text
-/alias set alias:welcome message:Bienvenue sur le serveur !
-/alias say alias:welcome
+/alias set  → modal: alias=welcome, message=Bienvenue sur le serveur !
+/alias say  → modal: choose welcome from the select
+/alias rm   → modal: choose welcome from the select
 /alias ls
 ```
 
 Updating an existing alias:
 
 ```text
-/alias set alias:welcome message:Nouveau message de bienvenue.
+/alias set  → modal: alias=welcome, message=Nouveau message de bienvenue.
 ```

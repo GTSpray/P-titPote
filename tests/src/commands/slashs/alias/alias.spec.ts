@@ -7,11 +7,13 @@ import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
 import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import * as setModule from '../../../../../src/commands/slash/alias/set.js';
 import * as sayModule from '../../../../../src/commands/slash/alias/say.js';
+import * as rmModule from '../../../../../src/commands/slash/alias/rm.js';
 import * as lsModule from '../../../../../src/commands/slash/alias/ls.js';
 import { DBServices } from '../../../../../src/db/db.js';
 import { initORM } from '../../../../initORM.js';
 import { type aliasSetSubCommandData } from '../../../../../src/commands/slash/alias/set.js';
 import { type aliasSaySubCommandData } from '../../../../../src/commands/slash/alias/say.js';
+import { type aliasRmSubCommandData } from '../../../../../src/commands/slash/alias/rm.js';
 import { type aliasLsSubCommandData } from '../../../../../src/commands/slash/alias/ls.js';
 import {
   ApplicationIntegrationType,
@@ -50,18 +52,7 @@ describe('/alias', () => {
   describe('set subcommand', () => {
     const subcommand: aliasSetSubCommandData = {
       name: 'set',
-      options: [
-        {
-          name: 'alias',
-          type: 3,
-          value: 'welcome',
-        },
-        {
-          name: 'message',
-          type: 3,
-          value: "Bienvenue sur le serveur de test de p'tit pote !!!!",
-        },
-      ],
+      options: [],
       type: 1,
     };
     const data: setModule.aliasSetCommandData = {
@@ -91,16 +82,7 @@ describe('/alias', () => {
           expect.objectContaining({
             name: subcommand.name,
             description: t('alias.sub.set.description'),
-            options: [
-              {
-                description: t('alias.option.alias'),
-                name: 'alias',
-              },
-              {
-                description: t('alias.option.message'),
-                name: 'message',
-              },
-            ].map((e) => expect.objectContaining(e)),
+            options: [],
           }),
         ]),
       });
@@ -163,13 +145,7 @@ describe('/alias', () => {
   describe('say subcommand', () => {
     const subcommand: aliasSaySubCommandData = {
       name: 'say',
-      options: [
-        {
-          name: 'alias',
-          type: 3,
-          value: 'welcome',
-        },
-      ],
+      options: [],
       type: 1,
     };
     const data: sayModule.aliasSayCommandData = {
@@ -199,12 +175,7 @@ describe('/alias', () => {
           expect.objectContaining({
             name: subcommand.name,
             description: t('alias.sub.say.description'),
-            options: [
-              {
-                description: t('alias.option.alias'),
-                name: 'alias',
-              },
-            ].map((e) => expect.objectContaining(e)),
+            options: [],
           }),
         ]),
       });
@@ -257,6 +228,99 @@ describe('/alias', () => {
       }) as typeof handlerOpts.res;
 
       vi.spyOn(sayModule, 'say').mockResolvedValue(fakeResp);
+
+      const response = await alias.handler(handlerOpts);
+
+      expect(response).toStrictEqual(fakeResp);
+    });
+  });
+
+  describe('rm subcommand', () => {
+    const subcommand: aliasRmSubCommandData = {
+      name: 'rm',
+      options: [],
+      type: 1,
+    };
+    const data: rmModule.aliasRmCommandData = {
+      id: randomDiscordId19(),
+      name: 'alias',
+      options: [subcommand],
+      type: 1,
+    };
+
+    beforeEach(async () => {
+      const { req, res } = getInteractionCommandHttpMock({
+        data,
+        permissions: admin_permissions,
+      });
+      const dbServices = await initORM();
+      handlerOpts = {
+        req,
+        res,
+        dbServices,
+      };
+    });
+
+    it('should be declared as subcommand', () => {
+      const declaration = alias.builder.setName(subcommand.name);
+      expect(declaration.toJSON()).toMatchObject({
+        options: expect.arrayContaining([
+          expect.objectContaining({
+            name: subcommand.name,
+            description: t('alias.sub.rm.description'),
+            options: [],
+          }),
+        ]),
+      });
+    });
+
+    it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {
+      using spy = vi.spyOn(rmModule, 'rm').mockResolvedValue(handlerOpts.res);
+
+      const { req, res } = getInteractionCommandHttpMock({
+        data,
+        permissions: default_member_permissions,
+      });
+
+      const fakeOpts = {
+        ...handlerOpts,
+        req,
+        res,
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      const response = await alias.handler(fakeOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.Ephemeral,
+          content: t('common.notAllowed'),
+        },
+      });
+      expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should call "rm" handler', async () => {
+      using spy = vi.spyOn(rmModule, 'rm').mockResolvedValue(handlerOpts.res);
+
+      const fakeOpts = {
+        ...handlerOpts,
+        dbServices: 'fakeDbServices', // because toHaveBeenCalledWith hang with MikroORM instance
+      } as unknown as typeof handlerOpts;
+
+      await alias.handler(fakeOpts);
+
+      expect(spy).toHaveBeenCalledWith(fakeOpts, subcommand);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return "rm" handler result', async () => {
+      const fakeResp = (<unknown>{
+        perceval: "j'aime les fruits en sirop",
+      }) as typeof handlerOpts.res;
+
+      vi.spyOn(rmModule, 'rm').mockResolvedValue(fakeResp);
 
       const response = await alias.handler(handlerOpts);
 

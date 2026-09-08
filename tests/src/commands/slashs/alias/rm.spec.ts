@@ -1,8 +1,8 @@
 import {
-  aliasSayCommandData,
-  aliasSaySubCommandData,
-  say,
-} from '../../../../../src/commands/slash/alias/say.js';
+  aliasRmCommandData,
+  aliasRmSubCommandData,
+  rm,
+} from '../../../../../src/commands/slash/alias/rm.js';
 import {
   ComponentType,
   InteractionResponseType,
@@ -23,20 +23,20 @@ import {
 import { ALIAS_SELECT_LIMIT } from '../../../../../src/commands/slash/alias/openAliasSelectModal.js';
 import { t } from '../../../../../src/i18n/index.js';
 
-describe('/alias say', () => {
+describe('/alias rm', () => {
   let guild_id: string;
-  let handlerOpts: CommandHandlerOptions<aliasSayCommandData>;
+  let handlerOpts: CommandHandlerOptions<aliasRmCommandData>;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
 
-  const subcommand: aliasSaySubCommandData = {
-    name: 'say',
+  const subcommand: aliasRmSubCommandData = {
+    name: 'rm',
     options: [],
     type: 1,
   };
 
-  const data: aliasSayCommandData = {
+  const data: aliasRmCommandData = {
     id: randomDiscordId19(),
     name: 'alias',
     options: [subcommand],
@@ -57,7 +57,7 @@ describe('/alias say', () => {
   });
 
   it('should respond not found when no aliases exist', async () => {
-    const response = await say(handlerOpts, subcommand);
+    const response = await rm(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -68,7 +68,7 @@ describe('/alias say', () => {
     });
   });
 
-  it('should respond with say modal listing current aliases', async () => {
+  it('should respond with rm modal listing current aliases', async () => {
     const guild = new DiscordGuild(guild_id);
     const welcome = new MessageAliased('welcome', 'Bienvenue');
     const rules = new MessageAliased('rules', 'Règles du serveur');
@@ -76,16 +76,16 @@ describe('/alias say', () => {
     guild.messageAliaseds.add(rules);
     await em.persist(guild).flush();
 
-    const response = await say(handlerOpts, subcommand);
+    const response = await rm(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.Modal,
       data: {
         custom_id: JSON.stringify({
           t: 'cta',
-          d: { a: 'aliasSay' },
+          d: { a: 'aliasRm' },
         }),
-        title: t('alias.modal.say.title'),
+        title: t('alias.modal.rm.title'),
         components: [
           {
             type: ComponentType.Label,
@@ -115,7 +115,7 @@ describe('/alias say', () => {
     }
     await em.persist(guild).flush();
 
-    const response = await say(handlerOpts, subcommand);
+    const response = await rm(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,

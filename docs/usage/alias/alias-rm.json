@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/scenario.schema.json",
-  "id": "alias-say",
-  "title": "Alias — poster un message stocké",
+  "id": "alias-rm",
+  "title": "Alias — supprimer un message stocké",
   "doc": "docs/usage/alias/alias.md",
   "chrome": {
     "guild": {
@@ -34,14 +34,14 @@
     },
     {
       "type": "type",
-      "text": "/alias say",
+      "text": "/alias rm",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/alias say",
-            "description": "demande a p'titpote d'envoyer le message"
+            "name": "/alias rm",
+            "description": "supprime un alias message"
           }
         ]
       }
@@ -63,7 +63,7 @@
           "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
         },
         "data": {
-          "title": "Poster un alias",
+          "title": "Supprimer un alias",
           "components": [
             {
               "type": 18,
@@ -125,7 +125,7 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "alias say"
+              "command": "alias rm"
             },
             "interaction": {
               "type": 4,
@@ -134,7 +134,7 @@
                 "components": [
                   {
                     "type": 10,
-                    "content": "Bienvenue sur le serveur !"
+                    "content": "Ok! C'est noté ;)"
                   }
                 ]
               }
@@ -147,7 +147,7 @@
   ],
   "output": {
     "directory": "docs/usage/alias",
-    "prefix": "alias-say",
+    "prefix": "alias-rm",
     "video": true
   }
 }

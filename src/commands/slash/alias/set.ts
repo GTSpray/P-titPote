@@ -1,12 +1,10 @@
-import * as z from 'zod';
 import { Response } from 'express';
-import { CommandHandlerOptions, SubCommandOption } from '../../commands.js';
-import { slashOptionsSchema } from '../../options.js';
-import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
-import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
-import { logger } from '../../../logger.js';
-import { okComponnents } from '../../commonMessages.js';
+import { CommandHandlerOptions } from '../../commands.js';
+import {
+  ComponentType,
+  InteractionResponseType,
+  TextInputStyle,
+} from 'discord-api-types/v10';
 import { t } from '../../../i18n/index.js';
 
 export interface aliasSetCommandData {
@@ -18,76 +16,52 @@ export interface aliasSetCommandData {
 
 export type aliasSetSubCommandData = {
   name: 'set';
-  options: Array<
-    SubCommandOption<'alias', string> | SubCommandOption<'message', string>
-  >;
+  options: [];
   type: number;
 };
 
-const ValidAliasMessage = slashOptionsSchema(
-  z.object({
-    alias: z
-      .string()
-      .regex(/^[a-z0-9]+$/)
-      .min(1)
-      .max(50),
-    message: z.string().min(1).max(500),
-  }),
-);
-
 export const set = async (
-  { req, res, dbServices }: CommandHandlerOptions<aliasSetCommandData>,
-  subcommand: aliasSetSubCommandData,
+  { req, res }: CommandHandlerOptions<aliasSetCommandData>,
+  _subcommand: aliasSetSubCommandData,
 ): Promise<Response | null> => {
   const guildId = req.body.guild_id;
-
-  const AliasMessageInput = ValidAliasMessage.safeParse(subcommand.options);
-
-  if (!AliasMessageInput.success) {
-    const issues = AliasMessageInput.error.issues;
-    logger.debug('zod errors', { issues });
-    return res
-      .status(400)
-      .json({ error: t('errors.invalidSubcommandPayload'), issues });
-  }
-
-  if (dbServices && guildId) {
-    let guild: DiscordGuild;
-
-    const em = dbServices.orm.em.fork();
-
-    guild =
-      (await em.findOne(
-        DiscordGuild,
-        { guildId },
-        { populate: ['messageAliaseds'] },
-      )) || new DiscordGuild(guildId);
-
-    let messageAliased = guild.messageAliaseds.find(
-      (aliasedMsg: MessageAliased) =>
-        aliasedMsg.alias === AliasMessageInput.data.alias,
-    );
-
-    if (!messageAliased) {
-      messageAliased = new MessageAliased(
-        AliasMessageInput.data.alias,
-        AliasMessageInput.data.message,
-      );
-      guild.messageAliaseds.add(messageAliased);
-      await em.persist(guild).flush();
-    }
-
-    messageAliased.message = AliasMessageInput.data.message;
-
-    await em.persist(messageAliased).flush();
+  if (guildId) {
     return res.json({
-      type: InteractionResponseType.ChannelMessageWithSource,
+      type: InteractionResponseType.Modal,
       data: {
-        flags: MessageFlags.IsComponentsV2,
-        components: [...okComponnents()],
+        custom_id: JSON.stringify({
+          t: 'cta',
+          d: { a: 'aliasSet' },
+        }),
+        title: t('alias.modal.set.title'),
+        components: [
+          {
+            type: ComponentType.Label,
+            label: t('alias.modal.label.alias'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: 'alias',
+              style: TextInputStyle.Short,
+              min_length: 1,
+              max_length: 50,
+              required: true,
+            },
+          },
+          {
+            type: ComponentType.Label,
+            label: t('alias.modal.label.message'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: 'message',
+              style: TextInputStyle.Paragraph,
+              min_length: 1,
+              max_length: 500,
+              required: true,
+            },
+          },
+        ],
       },
     });
   }
-
   return null;
 };

@@ -48,7 +48,7 @@ The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
 
 - [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
-- [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store and post reusable message aliases
+- [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store, post, and remove reusable message aliases
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
 
 ---
