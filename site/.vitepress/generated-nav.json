@@ -1,0 +1,16 @@
+{
+  "commands": [
+    {
+      "text": "/alias",
+      "link": "/alias/"
+    },
+    {
+      "text": "/gimme",
+      "link": "/gimme/"
+    },
+    {
+      "text": "/poll",
+      "link": "/poll/"
+    }
+  ]
+}
