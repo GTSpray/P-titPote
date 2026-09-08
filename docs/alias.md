@@ -31,6 +31,10 @@ The root handler validates the command payload with Zod before switching on the
 subcommand name. Invalid root payloads return `errors.invalidCommandPayload`;
 unknown subcommands return `errors.invalidSubcommand`.
 
+`set` and `say` parse option values with `slashOptionsSchema` (name-keyed map,
+then Zod). Option order in the Discord payload does not matter; missing required
+options fail validation with `errors.invalidSubcommandPayload`.
+
 ## Permissions
 
 `assertInteractionUserIsModerator(req.body)` gates all `/alias` subcommands. It

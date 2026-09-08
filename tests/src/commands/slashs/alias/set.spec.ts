@@ -92,6 +92,68 @@ describe('/alias set', () => {
     });
   });
 
+  it('should accept options regardless of order', async () => {
+    const reordered: aliasSetSubCommandData = {
+      name: 'set',
+      options: [msgOpts, aliasOpts],
+      type: 1,
+    };
+
+    const response = await set(handlerOpts, reordered);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.IsComponentsV2,
+        components: [
+          {
+            type: ComponentType.TextDisplay,
+            content: t('common.ok'),
+          },
+        ],
+      },
+    });
+
+    em.clear();
+    const msgs = await em.findAll(MessageAliased, {
+      where: { server: { guildId: guild_id } },
+    });
+    expect(msgs).toEqual([
+      expectedMessageAliased({
+        alias: aliasOpts.value,
+        message: msgOpts.value,
+      }),
+    ]);
+  });
+
+  it('should respond error when a required option is missing', async () => {
+    const incomplete: aliasSetSubCommandData = {
+      name: 'set',
+      options: [aliasOpts],
+      type: 1,
+    };
+
+    const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
+      data: {
+        id: randomDiscordId19(),
+        name: 'alias',
+        options: [incomplete],
+        type: 1,
+      },
+    });
+
+    const response = await set({ ...handlerOpts, req, res }, incomplete);
+
+    expect(response).toMeetApiResponse(400, {
+      error: t('errors.invalidSubcommandPayload'),
+      issues: expect.arrayContaining([
+        expect.objectContaining({
+          path: ['message'],
+        }),
+      ]),
+    });
+  });
+
   it('should save discord server', async () => {
     await set(handlerOpts, subcommand);
 
