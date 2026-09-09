@@ -24,6 +24,21 @@ export default defineConfig({
       'link',
       { rel: 'icon', type: 'image/png', href: '/P-titPote/ptitpote.png' },
     ],
+    [
+      'link',
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    ],
+    [
+      'link',
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: '',
+      },
+    ],
   ],
   themeConfig: {
     logo: {

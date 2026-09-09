@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800&family=Syne:wght@600;700;800&display=swap');
+
+:root {
+  --pote-teal: #2fbfb0;
+  --pote-teal-deep: #1a9f92;
+  --pote-yellow: #f4c84a;
+  --pote-ink: #1f2a2e;
+  --pote-mist: #eef8f6;
+
+  --vp-font-family-base: 'Source Sans 3', 'Segoe UI', sans-serif;
+  --vp-font-family-heading: 'Syne', 'Source Sans 3', sans-serif;
+
+  --vp-c-brand-1: var(--pote-teal-deep);
+  --vp-c-brand-2: var(--pote-teal);
+  --vp-c-brand-3: #56d4c6;
+  --vp-c-brand-soft: rgb(47 191 176 / 14%);
+
+  --vp-c-bg: #f7fcfb;
+  --vp-c-bg-alt: var(--pote-mist);
+  --vp-c-bg-soft: #e8f6f3;
+  --vp-c-text-1: var(--pote-ink);
+  --vp-button-brand-bg: var(--pote-teal-deep);
+  --vp-button-brand-hover-bg: var(--pote-teal);
+  --vp-button-brand-active-bg: #14877c;
+}
+
+.dark {
+  --vp-c-bg: #10181a;
+  --vp-c-bg-alt: #152022;
+  --vp-c-bg-soft: #1b2a2d;
+  --vp-c-text-1: #e8f6f3;
+  --vp-c-brand-1: #5ed9cb;
+  --vp-c-brand-2: #3cc9bb;
+  --vp-c-brand-3: #2fbfb0;
+  --vp-c-brand-soft: rgb(94 217 203 / 16%);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.VPNavBarTitle .title {
+  font-family: var(--vp-font-family-heading);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.VPNavBar .VPImage.logo {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.VPNavBar .VPImage.logo:hover {
+  transform: rotate(-12deg) scale(1.12);
+}
+
+.VPContent {
+  position: relative;
+}
+
+.VPDoc:not(.has-sidebar) {
+  padding-top: 24px;
+}
+
+/* Soft floating blobs — homepage only */
+.Layout.pote-is-home::before,
+.Layout.pote-is-home::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  width: min(42vw, 420px);
+  height: min(42vw, 420px);
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0.28;
+  pointer-events: none;
+  animation: pote-blob 18s ease-in-out infinite;
+}
+
+.Layout.pote-is-home::before {
+  top: -8%;
+  left: -6%;
+  background: radial-gradient(circle, #9aefe4 0%, transparent 70%);
+}
+
+.Layout.pote-is-home::after {
+  right: -4%;
+  bottom: 8%;
+  background: radial-gradient(circle, #ffe08a 0%, transparent 70%);
+  animation-delay: -7s;
+  opacity: 0.16;
+}
+
+.dark .Layout.pote-is-home::before {
+  opacity: 0.1;
+}
+
+.dark .Layout.pote-is-home::after {
+  opacity: 0.07;
+}
+
+@keyframes pote-blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, 18px) scale(1.08);
+  }
+}
+
+/* Teapots drifting in the void */
+.pote-parade {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgb(20 40 55 / 8%), transparent 45%),
+    radial-gradient(ellipse at 80% 70%, rgb(40 20 60 / 6%), transparent 50%);
+}
+
+.dark .pote-parade {
+  background:
+    radial-gradient(ellipse at 15% 25%, rgb(60 140 160 / 7%), transparent 40%),
+    radial-gradient(ellipse at 85% 65%, rgb(80 40 120 / 6%), transparent 48%);
+}
+
+.pote-parade__face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgb(90 220 210 / 16%));
+  will-change: transform;
+  pointer-events: none;
+}
+
+.dark .pote-parade__face {
+  filter: drop-shadow(0 0 16px rgb(120 240 230 / 18%));
+}
+
+.VPNav,
+.VPLocalNav,
+.VPSidebar,
+.VPContent {
+  position: relative;
+  z-index: 1;
+}
+
+/* Home */
+.Layout.pote-is-home .VPDoc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--vp-nav-height, 64px));
+  padding: 0 24px;
+}
+
+.Layout.pote-is-home .VPDoc .container,
+.Layout.pote-is-home .VPDoc .content,
+.Layout.pote-is-home .VPDoc .content-container,
+.Layout.pote-is-home .VPDoc .vp-doc {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.pote-home {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.pote-home__title {
+  margin: 0;
+  text-align: center;
+  font-family: var(--vp-font-family-heading);
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  background: linear-gradient(
+    120deg,
+    var(--pote-teal-deep) 0%,
+    #3cc9a0 50%,
+    #e2a820 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pote-title-in 0.7s ease both;
+}
+
+.dark .pote-home__title {
+  background: linear-gradient(120deg, #7ee8db 0%, #f4c84a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.pote-home__lead {
+  margin: 18px auto 0;
+  max-width: 40rem;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.55;
+  color: var(--pote-teal-deep);
+  animation: pote-fade-up 0.7s ease 0.1s both;
+}
+
+.dark .pote-home__lead {
+  color: #5ed9cb;
+}
+
+@keyframes pote-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pote-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Docs content polish */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  font-family: var(--vp-font-family-heading);
+  letter-spacing: 0.01em;
+}
+
+.vp-doc video {
+  border-radius: 0;
+  box-shadow: 0 12px 28px rgb(26 159 146 / 12%);
+}
+
+.vp-doc img:not(.pote-parade__face) {
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgb(26 159 146 / 12%);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.vp-doc img:not(.pote-parade__face):hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 16px 36px rgb(26 159 146 / 18%);
+}
+
+.vp-doc a {
+  transition: color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .Layout.pote-is-home::before,
+  .Layout.pote-is-home::after,
+  .pote-parade {
+    display: none;
+  }
+}
