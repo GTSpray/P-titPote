@@ -25,8 +25,7 @@ subcommands:
 `set` takes no slash options and responds with `InteractionResponseType.Modal`
 (text inputs). `say` and `rm` also take no slash options: they load active guild
 aliases and open a modal with a `StringSelect` (`openAliasSelectModal`). Empty
-lists return the shared ephemeral `notFoundPayload()`; more than 25 aliases
-(Discord select limit) return ephemeral `errors.tooMany`.
+lists return the shared ephemeral `notFoundPayload()`.
 
 Modal submits are routed through the CTA registry in `src/commands/cta/index.ts`:
 
@@ -98,7 +97,9 @@ alias queries guild-scoped through `DiscordGuild.guildId` or
 
 When the guild row does not exist, `aliasSet` creates it and attaches the new
 alias. When the alias already exists for that guild, `aliasSet` updates the
-existing row instead of creating a duplicate. Success returns an
+existing row instead of creating a duplicate. Creating a new alias is rejected
+with ephemeral `errors.tooMany` when the guild already has 20 active aliases
+active aliases; updates of an existing name still succeed. Success returns an
 InteractionResponse with Components V2 and the shared `common.ok` text.
 
 `aliasSay` and `aliasRm` read the selected value from the modal `StringSelect`
@@ -134,15 +135,14 @@ Slash openers live under `tests/src/commands/slashs/alias/`:
 - `alias.spec.ts` covers command declaration, moderator gating, dispatch, and
   malformed root payloads.
 - `set.spec.ts` covers modal response shape for create/update.
-- `say.spec.ts` and `rm.spec.ts` cover select modal options, empty list, and
-  the 25-option Discord limit.
+- `say.spec.ts` and `rm.spec.ts` cover select modal options and empty list.
 - `ls.spec.ts` covers sorting, guild scoping, soft-delete filtering, and empty
   results.
 
 CTA submit handlers live under `tests/src/cta/alias/`:
 
-- `aliasSet.spec.ts` covers validation, guild creation, insert, update, and
-  duplicate prevention.
+- `aliasSet.spec.ts` covers validation, guild creation, insert, update,
+  duplicate prevention, and the 20-alias create limit.
 - `aliasSay.spec.ts` covers guild-scoped lookup, not-found behavior, and
   validation.
 - `aliasRm.spec.ts` covers soft-delete, not-found, guild scoping, and

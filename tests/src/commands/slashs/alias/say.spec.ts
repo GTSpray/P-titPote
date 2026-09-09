@@ -20,7 +20,6 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
-import { ALIAS_SELECT_LIMIT } from '../../../../../src/commands/slash/alias/openAliasSelectModal.js';
 import { t } from '../../../../../src/i18n/index.js';
 
 describe('/alias say', () => {
@@ -102,26 +101,6 @@ describe('/alias say', () => {
             },
           },
         ],
-      },
-    });
-  });
-
-  it('should respond too many when aliases exceed select limit', async () => {
-    const guild = new DiscordGuild(guild_id);
-    for (let i = 0; i < ALIAS_SELECT_LIMIT + 1; i++) {
-      guild.messageAliaseds.add(
-        new MessageAliased(`alias${String(i).padStart(2, '0')}`, `msg ${i}`),
-      );
-    }
-    await em.persist(guild).flush();
-
-    const response = await say(handlerOpts, subcommand);
-
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.Ephemeral,
-        content: t('errors.tooMany'),
       },
     });
   });

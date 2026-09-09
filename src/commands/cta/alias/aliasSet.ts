@@ -10,8 +10,15 @@ import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
-import { notAllowed, okComponnents } from '../../commonMessages.js';
+import {
+  errorPayload,
+  notAllowed,
+  okComponnents,
+} from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+
+/** Max active aliases per guild. */
+export const ALIAS_LIMIT = 20;
 
 const ValidAliasMessage = z.object({
   alias: z
@@ -69,6 +76,9 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
       );
 
       if (!messageAliased) {
+        if (guild.messageAliaseds.length >= ALIAS_LIMIT) {
+          return res.json(errorPayload(t('errors.tooMany')));
+        }
         messageAliased = new MessageAliased(
           AliasMessageInput.data.alias,
           AliasMessageInput.data.message,

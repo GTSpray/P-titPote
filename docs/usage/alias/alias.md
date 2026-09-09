@@ -60,9 +60,9 @@ or Ban Members.
 - Alias names are unique per server among active aliases.
 - Alias names must use lowercase letters and digits only.
 - Alias messages can contain up to 500 characters.
-- `/alias say` and `/alias rm` select menus can list at most 25 aliases
-  (Discord limit). Beyond that, the bot replies with a temporary “too many”
-  message.
+- A server can store at most 20 active aliases. Creating another one replies
+  ephemerally with **Ahem... ca fait beaucoup là. Non?**; updating an existing
+  alias still works.
 - Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
   faire 🤷** response before any subcommand runs.
 

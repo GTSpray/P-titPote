@@ -25,6 +25,7 @@ import {
 } from 'discord-api-types/v10';
 import { expectedMessageAliased } from '../../../epectedEntities/expectedMessageAliased.js';
 import { MessageAliased } from '../../../../src/db/entities/MessageAliased.entity.js';
+import { ALIAS_LIMIT } from '../../../../src/commands/cta/alias/aliasSet.js';
 import {
   getModalLabelComponnents,
   PartialComponentSingle,
@@ -244,6 +245,63 @@ describe('cta/aliasSet', () => {
           }),
         ]);
       });
+    });
+
+    it('should reject creating a new alias when the guild is at the limit', async () => {
+      for (let i = 0; i < ALIAS_LIMIT; i++) {
+        guild.messageAliaseds.add(
+          new MessageAliased(`alias${String(i).padStart(2, '0')}`, `msg ${i}`),
+        );
+      }
+      await em.persist(guild).flush();
+
+      const response = await aliasSet.handler(handlerOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.Ephemeral,
+          content: t('errors.tooMany'),
+        },
+      });
+
+      em.clear();
+      const msgs = await em.findAll(MessageAliased, {
+        where: { server: { guildId: guild_id } },
+      });
+      expect(msgs).toBeArrayOfSize(ALIAS_LIMIT);
+    });
+
+    it('should still update an existing alias when the guild is at the limit', async () => {
+      for (let i = 0; i < ALIAS_LIMIT - 1; i++) {
+        guild.messageAliaseds.add(
+          new MessageAliased(`alias${String(i).padStart(2, '0')}`, `msg ${i}`),
+        );
+      }
+      const existing = new MessageAliased(aliasCmp.value, 'old message');
+      guild.messageAliaseds.add(existing);
+      await em.persist(guild).flush();
+
+      const response = await aliasSet.handler(handlerOpts);
+
+      expect(response).toMeetApiResponse(200, {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.IsComponentsV2,
+          components: [
+            {
+              type: ComponentType.TextDisplay,
+              content: t('common.ok'),
+            },
+          ],
+        },
+      });
+
+      em.clear();
+      const msg = await em.findOneOrFail(MessageAliased, {
+        id: existing.id,
+      });
+      expect(msg.message).toBe(messageCmp.value);
     });
   });
 
