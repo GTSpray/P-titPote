@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/GTSpray/P-titPote/compare/v1.9.15...v1.10.0) (2026-09-09)
+
+### :sparkles: Features
+
+* register slash commands on API startup ([#274](https://github.com/GTSpray/P-titPote/issues/274)) ([1d4b635](https://github.com/GTSpray/P-titPote/commit/1d4b6356f07856fe1950d640062f712118f8406c))
+
 ## [1.9.15](https://github.com/GTSpray/P-titPote/compare/v1.9.14...v1.9.15) (2026-09-08)
 
 ### :bug: Fixes
