@@ -72,15 +72,20 @@
                 "type": 3,
                 "custom_id": "alias",
                 "placeholder": "Choisis un alias...",
-                "required": true,
                 "options": [
                   {
                     "label": "rules",
-                    "value": "rules"
+                    "value": "rules",
+                    "emoji": {
+                      "name": "▪️"
+                    }
                   },
                   {
                     "label": "welcome",
-                    "value": "welcome"
+                    "value": "welcome",
+                    "emoji": {
+                      "name": "▪️"
+                    }
                   }
                 ]
               }
