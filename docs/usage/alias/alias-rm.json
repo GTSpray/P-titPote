@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/scenario.schema.json",
-  "id": "alias-set",
-  "title": "Alias — définir un message",
+  "id": "alias-rm",
+  "title": "Alias — supprimer un message stocké",
   "doc": "docs/usage/alias/alias.md",
   "chrome": {
     "guild": {
@@ -34,14 +34,14 @@
     },
     {
       "type": "type",
-      "text": "/alias set",
+      "text": "/alias rm",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/alias set",
-            "description": "définit un alias message"
+            "name": "/alias rm",
+            "description": "supprime un alias message"
           }
         ]
       }
@@ -63,28 +63,31 @@
           "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
         },
         "data": {
-          "title": "Définir un alias",
+          "title": "Supprimer un alias",
           "components": [
             {
               "type": 18,
               "label": "alias du message",
-              "description": "Caractères alphanumérique minuscule uniquement, 1 à 50 caractères",
               "component": {
-                "type": 4,
+                "type": 3,
                 "custom_id": "alias",
-                "style": 1,
-                "required": true
-              }
-            },
-            {
-              "type": 18,
-              "label": "contenu du message",
-              "description": "Texte libre, 1 à 500 caractères",
-              "component": {
-                "type": 4,
-                "custom_id": "message",
-                "style": 2,
-                "required": true
+                "placeholder": "Choisis un alias...",
+                "options": [
+                  {
+                    "label": "rules",
+                    "value": "rules",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  },
+                  {
+                    "label": "welcome",
+                    "value": "welcome",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -92,12 +95,17 @@
       }
     },
     {
-      "type": "fillModal",
-      "values": {
-        "alias": "welcome",
-        "message": "Bienvenue sur le serveur !"
-      },
-      "msPerField": 130
+      "type": "selectModalOption",
+      "field": "alias",
+      "option": "welcome",
+      "options": [
+        {
+          "label": "rules"
+        },
+        {
+          "label": "welcome"
+        }
+      ]
     },
     {
       "type": "wait",
@@ -122,7 +130,7 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "alias set"
+              "command": "alias rm"
             },
             "interaction": {
               "type": 4,
@@ -144,7 +152,7 @@
   ],
   "output": {
     "directory": "docs/usage/alias",
-    "prefix": "alias-set",
+    "prefix": "alias-rm",
     "video": true
   }
 }

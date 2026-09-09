@@ -13,5 +13,5 @@ workflows, permissions, and expected bot behavior — not the codebase.
 ## Commands
 
 - [`/poll`](./poll/poll.md) — create polls, vote, and view reports
-- [`/alias`](./alias/alias.md) — store and post reusable message aliases
+- [`/alias`](./alias/alias.md) — store, post, and remove reusable message aliases
 - [`/gimme`](./gimme/gimme.md) — otter image, emoji gallery, and version

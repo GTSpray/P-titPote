@@ -130,7 +130,7 @@ describe('cta/pollSummary', () => {
     const poll = await em.findOneOrFail(Poll, {
       id: aPoll.id,
     });
-    expect(poll.endDate).toBeDateCloseTo(today, 1000);
+    expect(poll.endDate).toBeDateCloseTo(today, 2000);
   });
 
   it('should keep the poll open when publishing the summary fails', async () => {

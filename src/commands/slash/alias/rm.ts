@@ -3,28 +3,28 @@ import { CommandHandlerOptions } from '../../commands.js';
 import { t } from '../../../i18n/index.js';
 import { openAliasSelectModal } from './openAliasSelectModal.js';
 
-export interface aliasSayCommandData {
+export interface aliasRmCommandData {
   id: string;
   name: string;
-  options: [aliasSaySubCommandData];
+  options: [aliasRmSubCommandData];
   type: number;
 }
 
-export type aliasSaySubCommandData = {
-  name: 'say';
+export type aliasRmSubCommandData = {
+  name: 'rm';
   options: [];
   type: number;
 };
 
-export const say = async (
-  { req, res, dbServices }: CommandHandlerOptions<aliasSayCommandData>,
-  _subcommand: aliasSaySubCommandData,
+export const rm = async (
+  { req, res, dbServices }: CommandHandlerOptions<aliasRmCommandData>,
+  _subcommand: aliasRmSubCommandData,
 ): Promise<Response | null> => {
   return openAliasSelectModal({
     res,
     dbServices,
     guildId: req.body.guild_id,
-    ctaAction: 'aliasSay',
-    title: t('alias.modal.say.title'),
+    ctaAction: 'aliasRm',
+    title: t('alias.modal.rm.title'),
   });
 };

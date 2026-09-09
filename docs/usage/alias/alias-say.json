@@ -48,32 +48,71 @@
     },
     {
       "type": "wait",
-      "ms": 400
+      "ms": 800
     },
     {
-      "type": "setSlashParams",
-      "params": [
+      "type": "pressEnter"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Poster un alias",
+          "components": [
+            {
+              "type": 18,
+              "label": "alias du message",
+              "component": {
+                "type": 3,
+                "custom_id": "alias",
+                "placeholder": "Choisis un alias...",
+                "options": [
+                  {
+                    "label": "rules",
+                    "value": "rules",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  },
+                  {
+                    "label": "welcome",
+                    "value": "welcome",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "selectModalOption",
+      "field": "alias",
+      "option": "welcome",
+      "options": [
         {
-          "name": "alias",
-          "description": "alias du message"
+          "label": "rules"
+        },
+        {
+          "label": "welcome"
         }
       ]
     },
     {
       "type": "wait",
-      "ms": 800
+      "ms": 700
     },
     {
-      "type": "typeSlashParam",
-      "param": "alias",
-      "text": "welcome"
-    },
-    {
-      "type": "wait",
-      "ms": 800
-    },
-    {
-      "type": "pressEnter"
+      "type": "submitModal"
     },
     {
       "type": "applyState",

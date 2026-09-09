@@ -1,67 +1,36 @@
 import {
+  aliasSetCommandData,
   aliasSetSubCommandData,
   set,
 } from '../../../../../src/commands/slash/alias/set.js';
 import {
   ComponentType,
   InteractionResponseType,
-  MessageFlags,
+  TextInputStyle,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
-import {
-  getRandomString,
-  randomDiscordId19,
-} from '../../../../mocks/discord-api/utils.js';
-import {
-  CommandHandlerOptions,
-  SubCommandOption,
-} from '../../../../../src/commands/commands.js';
-import { aliasSetCommandData } from '../../../../../src/commands/slash/alias/set.js';
+import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
+import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
-import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
-import { MessageAliased } from '../../../../../src/db/entities/MessageAliased.entity.js';
-import {
-  SqlEntityManager,
-  AbstractSqlDriver,
-  AbstractSqlConnection,
-  AbstractSqlPlatform,
-  QueryOrder,
-} from '@mikro-orm/mariadb';
-import { expectedDiscordGuild } from '../../../../epectedEntities/expectedDiscordGuild.js';
-import { expectedMessageAliased } from '../../../../epectedEntities/expectedMessageAliased.js';
 import { t } from '../../../../../src/i18n/index.js';
 
 describe('/alias set', () => {
-  let guild_id: string;
   let handlerOpts: CommandHandlerOptions<aliasSetCommandData>;
-
-  const aliasOpts: SubCommandOption<'alias', string> = {
-    name: 'alias',
-    type: 3,
-    value: 'welcome',
-  };
-  const msgOpts: SubCommandOption<'message', string> = {
-    name: 'message',
-    type: 3,
-    value: "Bienvenue sur le serveur de test de p'tit pote !!!!",
-  };
 
   const subcommand: aliasSetSubCommandData = {
     name: 'set',
-    options: [aliasOpts, msgOpts],
+    options: [],
     type: 1,
   };
 
-  let em: SqlEntityManager<
-    AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
-  >;
+  const data: aliasSetCommandData = {
+    id: randomDiscordId19(),
+    name: 'alias',
+    options: [subcommand],
+    type: 1,
+  };
+
   beforeEach(async () => {
-    const data: aliasSetCommandData = {
-      id: randomDiscordId19(),
-      name: 'alias',
-      options: [subcommand],
-      type: 1,
-    };
     const { req, res } = getInteractionCommandHttpMock({ data });
     const dbServices = await initORM();
     handlerOpts = {
@@ -69,359 +38,48 @@ describe('/alias set', () => {
       res,
       dbServices,
     };
-
-    guild_id = <string>req.body.guild_id;
-    const { orm } = await initORM();
-    em = orm.em.fork();
   });
 
-  it('should respond success message', async () => {
+  it('should respond with set modal', async () => {
     const response = await set(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
+      type: InteractionResponseType.Modal,
       data: {
-        flags: MessageFlags.IsComponentsV2,
+        custom_id: JSON.stringify({
+          t: 'cta',
+          d: { a: 'aliasSet' },
+        }),
+        title: t('alias.modal.set.title'),
         components: [
           {
-            type: ComponentType.TextDisplay,
-            content: t('common.ok'),
-          },
-        ],
-      },
-    });
-  });
-
-  it('should accept options regardless of order', async () => {
-    const reordered: aliasSetSubCommandData = {
-      name: 'set',
-      options: [msgOpts, aliasOpts],
-      type: 1,
-    };
-
-    const response = await set(handlerOpts, reordered);
-
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.IsComponentsV2,
-        components: [
-          {
-            type: ComponentType.TextDisplay,
-            content: t('common.ok'),
-          },
-        ],
-      },
-    });
-
-    em.clear();
-    const msgs = await em.findAll(MessageAliased, {
-      where: { server: { guildId: guild_id } },
-    });
-    expect(msgs).toEqual([
-      expectedMessageAliased({
-        alias: aliasOpts.value,
-        message: msgOpts.value,
-      }),
-    ]);
-  });
-
-  it('should respond error when a required option is missing', async () => {
-    const incomplete: aliasSetSubCommandData = {
-      name: 'set',
-      options: [aliasOpts],
-      type: 1,
-    };
-
-    const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
-      data: {
-        id: randomDiscordId19(),
-        name: 'alias',
-        options: [incomplete],
-        type: 1,
-      },
-    });
-
-    const response = await set({ ...handlerOpts, req, res }, incomplete);
-
-    expect(response).toMeetApiResponse(400, {
-      error: t('errors.invalidSubcommandPayload'),
-      issues: expect.arrayContaining([
-        expect.objectContaining({
-          path: ['message'],
-        }),
-      ]),
-    });
-  });
-
-  it('should save discord server', async () => {
-    await set(handlerOpts, subcommand);
-
-    em.clear();
-    const server = await em.findOneOrFail(DiscordGuild, {
-      guildId: guild_id,
-    });
-
-    expect(server).toEqual(
-      expectedDiscordGuild({
-        guildId: guild_id,
-      }),
-    );
-  });
-
-  it('should save aliased message', async () => {
-    await set(handlerOpts, subcommand);
-
-    em.clear();
-    const msgs = await em.findAll(MessageAliased, {
-      where: { server: { guildId: guild_id } },
-    });
-    expect(msgs).toEqual([
-      expectedMessageAliased({
-        alias: aliasOpts.value,
-        message: msgOpts.value,
-      }),
-    ]);
-  });
-
-  describe('on existing server', () => {
-    let guild: DiscordGuild;
-    beforeEach(async () => {
-      guild = new DiscordGuild(guild_id);
-      await em.persist(guild).flush();
-    });
-
-    it('should not duplicate discord server', async () => {
-      await set(handlerOpts, subcommand);
-
-      em.clear();
-
-      const servers = await em.findAll(DiscordGuild, {
-        where: { guildId: guild_id },
-      });
-
-      expect(servers).toEqual([
-        expectedDiscordGuild({
-          guildId: guild_id,
-        }),
-      ]);
-    });
-
-    describe('on existing aliased message', () => {
-      let messageAliased: MessageAliased;
-      beforeEach(async () => {
-        messageAliased = new MessageAliased(aliasOpts.value, 'old message');
-        guild.messageAliaseds.add(messageAliased);
-        await em.persist(guild).persist(messageAliased).flush();
-      });
-
-      it('should not create duplicate aliased message', async () => {
-        await set(handlerOpts, subcommand);
-
-        em.clear();
-
-        const msgs = await em.findAll(MessageAliased, {
-          where: { server: { guildId: guild_id } },
-        });
-        expect(msgs).toBeArrayOfSize(1);
-      });
-
-      it('should update existing aliased message', async () => {
-        await set(handlerOpts, subcommand);
-
-        em.clear();
-
-        const msg = await em.findOneOrFail(MessageAliased, {
-          id: messageAliased.id,
-        });
-
-        expect(msg).toEqual(
-          expectedMessageAliased({
-            message: msgOpts.value,
-          }),
-        );
-      });
-
-      it('should allow to create another aliased message on this server', async () => {
-        const anotherAliasOpts: SubCommandOption<'alias', string> = {
-          name: 'alias',
-          type: 3,
-          value: 'anotheralias',
-        };
-        const anotherAliasSubCommand: aliasSetSubCommandData = {
-          name: 'set',
-          options: [anotherAliasOpts, msgOpts],
-          type: 1,
-        };
-
-        const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>(
-          {
-            guild_id,
-            data: {
-              id: randomDiscordId19(),
-              name: 'alias',
-              options: [anotherAliasSubCommand],
-              type: 1,
+            type: ComponentType.Label,
+            label: t('alias.modal.label.alias'),
+            description: t('alias.modal.description.alias'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: 'alias',
+              style: TextInputStyle.Short,
+              min_length: 1,
+              max_length: 50,
+              required: true,
             },
           },
-        );
-
-        await set({ ...handlerOpts, req, res }, anotherAliasSubCommand);
-
-        em.clear();
-
-        const msgs = await em.findAll(MessageAliased, {
-          where: { server: { guildId: guild_id } },
-          orderBy: { alias: QueryOrder.ASC },
-        });
-
-        expect(msgs).toEqual([
-          expectedMessageAliased({
-            alias: anotherAliasOpts.value,
-            message: msgOpts.value,
-          }),
-          expectedMessageAliased({
-            alias: messageAliased.alias,
-            message: messageAliased.message,
-          }),
-        ]);
-      });
-    });
-  });
-
-  it.each([
-    [
-      'too_small',
-      {
-        inclusive: true,
-        message: 'Too small: expected string to have >=1 characters',
-        minimum: 1,
-        origin: 'string',
-        path: ['alias'],
-      },
-      '',
-    ],
-    [
-      'invalid_format',
-      {
-        format: 'regex',
-        message: 'Invalid string: must match pattern /^[a-z0-9]+$/',
-        origin: 'string',
-        path: ['alias'],
-        pattern: '/^[a-z0-9]+$/',
-      },
-      '#@!ù',
-    ],
-
-    [
-      'too_big',
-      {
-        inclusive: true,
-        maximum: 50,
-        message: 'Too big: expected string to have <=50 characters',
-        origin: 'string',
-        path: ['alias'],
-      },
-
-      getRandomString({ length: 51, letter: true, number: false }),
-    ],
-  ])('should respond error on %s "alias"', async (code, issue, badAlias) => {
-    const badsubcommand: aliasSetSubCommandData = {
-      name: 'set',
-      options: [
-        {
-          name: 'alias',
-          type: 3,
-          value: badAlias,
-        },
-        msgOpts,
-      ],
-      type: 1,
-    };
-
-    const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
-      data: {
-        id: randomDiscordId19(),
-        name: 'alias',
-        options: [badsubcommand],
-        type: 1,
-      },
-    });
-
-    const response = await set({ ...handlerOpts, req, res }, badsubcommand);
-
-    expect(response).toMeetApiResponse(400, {
-      error: t('errors.invalidSubcommandPayload'),
-      issues: expect.arrayContaining([
-        {
-          code,
-          ...issue,
-        },
-      ]),
-    });
-  });
-
-  it.each([
-    [
-      'too_small',
-      {
-        inclusive: true,
-        message: 'Too small: expected string to have >=1 characters',
-        minimum: 1,
-        origin: 'string',
-        path: ['message'],
-      },
-      '',
-    ],
-
-    [
-      'too_big',
-      {
-        inclusive: true,
-        maximum: 500,
-        message: 'Too big: expected string to have <=500 characters',
-        origin: 'string',
-        path: ['message'],
-      },
-
-      getRandomString({ length: 501, letter: true, number: false }),
-    ],
-  ])(
-    'should respond error on %s "message"',
-    async (code, issue, badMessage) => {
-      const badsubcommand: aliasSetSubCommandData = {
-        name: 'set',
-        options: [
-          aliasOpts,
           {
-            name: 'message',
-            type: 3,
-            value: badMessage,
+            type: ComponentType.Label,
+            label: t('alias.modal.label.message'),
+            description: t('alias.modal.description.message'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: 'message',
+              style: TextInputStyle.Paragraph,
+              min_length: 1,
+              max_length: 500,
+              required: true,
+            },
           },
         ],
-        type: 1,
-      };
-
-      const { req, res } = getInteractionCommandHttpMock<aliasSetCommandData>({
-        data: {
-          id: randomDiscordId19(),
-          name: 'alias',
-          options: [badsubcommand],
-          type: 1,
-        },
-      });
-
-      const response = await set({ ...handlerOpts, req, res }, badsubcommand);
-
-      expect(response).toMeetApiResponse(400, {
-        error: t('errors.invalidSubcommandPayload'),
-        issues: expect.arrayContaining([
-          {
-            code,
-            ...issue,
-          },
-        ]),
-      });
-    },
-  );
+      },
+    });
+  });
 });

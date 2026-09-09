@@ -10,6 +10,7 @@ import { SlashCommandBuilder } from 'discord.js';
 
 import { aliasSetCommandData, set } from './set.js';
 import { aliasSayCommandData, say } from './say.js';
+import { aliasRmCommandData, rm } from './rm.js';
 import { aliasLsCommandData, ls } from './ls.js';
 import { Response } from 'express';
 import { logger } from '../../../logger.js';
@@ -29,32 +30,13 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.UserInstall,
   )
   .addSubcommand((subcommand) =>
-    subcommand
-      .setName('set')
-      .setDescription(t('alias.sub.set.description'))
-      .addStringOption((opt) =>
-        opt
-          .setName('alias')
-          .setDescription(t('alias.option.alias'))
-          .setRequired(true),
-      )
-      .addStringOption((opt) =>
-        opt
-          .setName('message')
-          .setDescription(t('alias.option.message'))
-          .setRequired(true),
-      ),
+    subcommand.setName('set').setDescription(t('alias.sub.set.description')),
   )
   .addSubcommand((subcommand) =>
-    subcommand
-      .setName('say')
-      .setDescription(t('alias.sub.say.description'))
-      .addStringOption((opt) =>
-        opt
-          .setName('alias')
-          .setDescription(t('alias.option.alias'))
-          .setRequired(true),
-      ),
+    subcommand.setName('say').setDescription(t('alias.sub.say.description')),
+  )
+  .addSubcommand((subcommand) =>
+    subcommand.setName('rm').setDescription(t('alias.sub.rm.description')),
   )
   .addSubcommand((subcommand) =>
     subcommand.setName('ls').setDescription(t('alias.sub.ls.description')),
@@ -73,7 +55,10 @@ const ValidCommandPayload = z.object({
 });
 
 export type aliasDataOpts =
-  aliasSetCommandData | aliasSayCommandData | aliasLsCommandData;
+  | aliasSetCommandData
+  | aliasSayCommandData
+  | aliasRmCommandData
+  | aliasLsCommandData;
 export const alias: SlashCommandDeclaration<aliasDataOpts> = {
   builder,
   handler: async function (handlerOpts) {
@@ -104,6 +89,9 @@ export const alias: SlashCommandDeclaration<aliasDataOpts> = {
         break;
       case 'say':
         result = await say(<any>handlerOpts, <any>req.body.data?.options[0]);
+        break;
+      case 'rm':
+        result = await rm(<any>handlerOpts, <any>req.body.data?.options[0]);
         break;
       case 'ls':
         result = await ls(<any>handlerOpts);
