@@ -13,8 +13,8 @@ exceptions.
   bridge. SQL queries are emitted as `info` messages named `new sql query`.
 - `src/gateway.ts` and `src/gateway/*` use the same logger for Gateway
   lifecycle, payload, and Discord dispatch diagnostics.
-- `src/register.ts` logs slash-command registration payloads and outcomes. Run it
-  only through the documented registration workflow.
+- `src/utils/registerSlashCommands.ts` logs slash-command registration payloads
+  and outcomes. It runs on API startup and via `make register` / `npm run register`.
 
 Each log event is JSON formatted with common fields:
 

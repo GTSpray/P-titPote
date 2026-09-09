@@ -113,7 +113,9 @@ make stop
 make register
 ```
 
-Only run `make register` when the user explicitly asks for slash commands to be registered, because it updates the Discord application configuration.
+Only run `make register` when the user explicitly asks for a manual re-register.
+Slash commands are already registered automatically when the API starts; a manual
+run still updates the Discord application configuration.
 
 Useful npm scripts inside an already prepared Node environment:
 
@@ -191,7 +193,9 @@ Primary source files:
 
 - `src/api.ts` - Express HTTP server and Discord interactions endpoint.
 - `src/gateway.ts` - Discord gateway entrypoint.
-- `src/register.ts` - slash-command registration entrypoint.
+- `src/register.ts` - CLI entrypoint for manual slash-command registration
+  (`make register` / `npm run register`). The same logic also runs on API startup
+  via `src/utils/registerSlashCommands.ts`.
 - `src/logger.ts` - Winston logging setup.
 - `src/mikro-orm.config.ts` - MikroORM/MariaDB configuration.
 - `src/commands/` - command types, shared command response helpers, and slash-command modules.

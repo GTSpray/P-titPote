@@ -93,8 +93,8 @@ only the names, not message bodies. Empty results use the shared ephemeral
 - The command depends on the API process database connection; if all alias
   subcommands fail after dispatch, check MariaDB connectivity and API startup
   migration logs.
-- Discord registration is not automatic after code changes. Run `make register`
-  only when intentionally updating Discord application commands.
+- Slash commands are registered automatically when the API starts. Use
+  `make register` to re-register manually without restarting the API.
 - Aliases are public when posted with `/alias say`; avoid adding features that
   echo stored message bodies in list or error responses.
 - Very large reusable announcements must fit the current 500-character

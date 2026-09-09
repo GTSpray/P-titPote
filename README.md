@@ -153,8 +153,8 @@ above.
 #### Production
 
 ```bash
-make start      # Start the bot (prod)
-make register   # Register slash commands
+make start      # Start the bot (prod; registers slash commands on API startup)
+make register   # Re-register slash commands manually
 make stop       # Stop the bot
 ```
 
@@ -209,7 +209,7 @@ P-titPote/
 ├── src/
 │   ├── api.ts                   # Express server
 │   ├── gateway.ts               # Discord WS gateway entrypoint
-│   ├── register.ts              # Register commands
+│   ├── register.ts              # Manual register CLI (also on API startup)
 │   ├── logger.ts                # Winston logging setup
 │   ├── mikro-orm.config.ts      # MikroORM/MariaDB config
 │   ├── commands/                # Discord slash commands
