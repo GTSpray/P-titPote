@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/GTSpray/P-titPote/compare/v1.10.0...v1.11.0) (2026-09-09)
+
+### :sparkles: Features
+
+* **alias:** use modals for set/say and add rm ([#273](https://github.com/GTSpray/P-titPote/issues/273)) ([26c0a56](https://github.com/GTSpray/P-titPote/commit/26c0a56dcf34dc099d53586e47384e994d7fba54))
+
 ## [1.10.0](https://github.com/GTSpray/P-titPote/compare/v1.9.15...v1.10.0) (2026-09-09)
 
 ### :sparkles: Features
