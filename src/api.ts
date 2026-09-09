@@ -14,6 +14,7 @@ import { slashcommands } from './commands/slash/index.js';
 import { cta } from './commands/cta/index.js';
 import { t } from './i18n/index.js';
 import { notifyBotOwner } from './utils/notifyBotOwner.js';
+import { registerSlashCommands } from './utils/registerSlashCommands.js';
 
 import config from './mikro-orm.config.js';
 import { initORM } from './db/db.js';
@@ -147,6 +148,7 @@ orm
         return;
       }
       logger.info(`startup success`, { port: PORT });
+      void registerSlashCommands();
       void notifyBotOwner(
         t('startup.dm.api', {
           version: process.env.npm_package_version ?? 'unknown',

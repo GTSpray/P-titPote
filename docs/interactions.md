@@ -32,7 +32,8 @@ the shared unknown-error response and log the request ID.
 
 Slash commands are declared as `SlashCommandDeclaration` values:
 
-- `builder` is a Discord.js slash-command builder used by `src/register.ts`.
+- `builder` is a Discord.js slash-command builder used by
+  `src/utils/registerSlashCommands.ts` (API startup and `make register`).
 - `handler` receives `CommandHandlerOptions<Data>` and returns an Express
   `Response`.
 
