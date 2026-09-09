@@ -38,6 +38,7 @@ export const set = async (
           {
             type: ComponentType.Label,
             label: t('alias.modal.label.alias'),
+            description: t('alias.modal.description.alias'),
             component: {
               type: ComponentType.TextInput,
               custom_id: 'alias',
@@ -50,6 +51,7 @@ export const set = async (
           {
             type: ComponentType.Label,
             label: t('alias.modal.label.message'),
+            description: t('alias.modal.description.message'),
             component: {
               type: ComponentType.TextInput,
               custom_id: 'message',

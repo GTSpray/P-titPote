@@ -18,9 +18,10 @@ or Ban Members.
 
 1. **Define or update an alias** with `/alias set`:
    - Opens a modal with:
-     - `alias`: lowercase letters and digits only (`/^[a-z0-9]+$/`), 1–50
-       characters;
-     - `message`: stored content, 1–500 characters.
+     - `alias`: lowercase letters and digits only (`a-z`, `0-9`), 1–50
+       characters (hint shown under the field);
+     - `message`: stored content, 1–500 characters (hint shown under the
+       field).
    - Fill the fields and submit the modal.
    - Reusing an existing alias name updates its message.
    - Success replies publicly with **Ok! C'est noté ;)**.

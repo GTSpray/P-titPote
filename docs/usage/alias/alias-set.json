@@ -68,6 +68,7 @@
             {
               "type": 18,
               "label": "alias du message",
+              "description": "Caractères alphanumérique minuscule uniquement, 1 à 50 caractères",
               "component": {
                 "type": 4,
                 "custom_id": "alias",
@@ -78,6 +79,7 @@
             {
               "type": 18,
               "label": "contenu du message",
+              "description": "Texte libre, 1 à 500 caractères",
               "component": {
                 "type": 4,
                 "custom_id": "message",

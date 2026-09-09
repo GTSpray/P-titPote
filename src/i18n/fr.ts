@@ -32,6 +32,9 @@ export const fr = {
   'alias.modal.rm.title': 'Supprimer un alias',
   'alias.modal.label.alias': 'alias du message',
   'alias.modal.label.message': 'contenu du message',
+  'alias.modal.description.alias':
+    'Caractères alphanumérique minuscule uniquement, 1 à 50 caractères',
+  'alias.modal.description.message': 'Texte libre, 1 à 500 caractères',
   'alias.modal.select.placeholder': 'Choisis un alias...',
   'alias.say.notFound': 'Ahem... il n\'y pas d\'alias "{alias}" 🤷',
   'alias.rm.notFound': 'Ahem... il n\'y pas d\'alias "{alias}" 🤷',
