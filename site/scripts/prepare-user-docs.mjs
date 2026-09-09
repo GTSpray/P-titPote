@@ -16,17 +16,9 @@ const repoRoot = join(siteRoot, '..');
 const usageRoot = join(repoRoot, 'docs', 'usage');
 const contentRoot = join(siteRoot, 'content');
 const publicRoot = join(contentRoot, 'public');
-const logoSource = join(repoRoot, 'assets', 'ptitpote.png');
-const usageReadmeSource = join(usageRoot, 'README.md');
 const generatedNavPath = join(siteRoot, '.vitepress', 'generated-nav.json');
 
 const MEDIA_EXTENSIONS = new Set(['.gif', '.webm', '.png']);
-
-const COMMAND_BLURBS = {
-  poll: 'create polls, vote, and view reports',
-  alias: 'store and post reusable message aliases',
-  gimme: 'otter image, emoji gallery, and version',
-};
 
 function stripImplementationMap(markdown) {
   return markdown.replace(/\n### Implementation map\n[\s\S]*$/, '\n');
@@ -50,12 +42,6 @@ function rewriteGifImagesToVideo(markdown, destDir) {
   );
 }
 
-function rewriteUsageHomeForSite(markdown) {
-  return markdown
-    .replace(/src="\.\.\/\.\.\/assets\/ptitpote\.png"/g, 'src="/ptitpote.png"')
-    .replace(/\(\.\/([a-z0-9-]+)\/\1\.md\)/g, '(/$1/)');
-}
-
 function copyMedia(commandDir, destDir) {
   for (const entry of readdirSync(commandDir, { withFileTypes: true })) {
     if (!entry.isFile()) continue;
@@ -74,27 +60,24 @@ function listCommands() {
 }
 
 function buildHomePage() {
-  if (!existsSync(usageReadmeSource)) {
-    throw new Error(`Missing usage home at ${usageReadmeSource}`);
-  }
-
-  const body = rewriteUsageHomeForSite(readFileSync(usageReadmeSource, 'utf8'));
   return `---
 sidebar: false
 aside: false
+pageClass: pote-is-home
 ---
 
-${body.trim()}
+<div class="pote-home">
+  <h1 class="pote-home__title">P'tit Pote</h1>
+  <p class="pote-home__lead">
+    A Discord bot for polls, reusable message aliases, and a few utilities —
+    guides for server members and moderators.
+  </p>
+</div>
 `;
 }
 
 function buildCommandsIndex(commands) {
-  const items = commands
-    .map((name) => {
-      const blurb = COMMAND_BLURBS[name] ?? `guide for \`/${name}\``;
-      return `- [\`/${name}\`](/${name}/) — ${blurb}`;
-    })
-    .join('\n');
+  const items = commands.map((name) => `- [\`/${name}\`](/${name}/)`).join('\n');
 
   return `# Commands
 
@@ -132,10 +115,11 @@ function prepareCommand(commandName) {
 
 function copyBrandAssets() {
   mkdirSync(publicRoot, { recursive: true });
-  if (!existsSync(logoSource)) {
-    throw new Error(`Missing brand logo at ${logoSource}`);
+  const assetsDir = join(repoRoot, 'assets');
+  for (const entry of readdirSync(assetsDir)) {
+    if (!entry.startsWith('ptitpote') || !entry.endsWith('.png')) continue;
+    cpSync(join(assetsDir, entry), join(publicRoot, entry));
   }
-  cpSync(logoSource, join(publicRoot, 'ptitpote.png'));
 }
 
 function main() {

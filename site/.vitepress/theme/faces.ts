@@ -1,0 +1,21 @@
+/** All teapot mood PNGs under site public/ (copied from assets/). */
+export const POTE_FACES = [
+  'ptitpote.png',
+  'ptitpote-happy.png',
+  'ptitpote-rofl.png',
+  'ptitpote-blush.png',
+  'ptitpote-think.png',
+  'ptitpote-sleepy.png',
+  'ptitpote-surprised.png',
+  'ptitpote-chad.png',
+  'ptitpote-bored.png',
+  'ptitpote-pout.png',
+  'ptitpote-sad.png',
+  'ptitpote-angry.png',
+  'ptitpote-offended.png',
+  'ptitpote-upset.png',
+  'ptitpote-exhausted.png',
+  'ptitpote-scared.png',
+  'ptitpote-scary.png',
+  'ptitpote-sam.png',
+] as const;
