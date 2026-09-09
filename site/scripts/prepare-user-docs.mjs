@@ -77,7 +77,9 @@ pageClass: pote-is-home
 }
 
 function buildCommandsIndex(commands) {
-  const items = commands.map((name) => `- [\`/${name}\`](/${name}/)`).join('\n');
+  const items = commands
+    .map((name) => `- [\`/${name}\`](/${name}/)`)
+    .join('\n');
 
   return `# Commands
 

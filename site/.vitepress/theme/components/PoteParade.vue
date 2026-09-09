@@ -150,10 +150,7 @@ function separate(list: Actor[]) {
 function isFarOutside(actor: Actor) {
   const m = actor.size + 48;
   return (
-    actor.x < -m ||
-    actor.y < -m ||
-    actor.x > viewW + m ||
-    actor.y > viewH + m
+    actor.x < -m || actor.y < -m || actor.x > viewW + m || actor.y > viewH + m
   );
 }
 
