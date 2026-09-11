@@ -1,3 +1,13 @@
+## [1.12.0](https://github.com/GTSpray/P-titPote/compare/v1.11.0...v1.12.0) (2026-09-11)
+
+### :sparkles: Features
+
+* **gateway:** persist DiscordGuild on GUILD_CREATE via findOrCreate ([#276](https://github.com/GTSpray/P-titPote/issues/276)) ([2a379fb](https://github.com/GTSpray/P-titPote/commit/2a379fbf3e164ec39fa28b8fe34e1c798ddcd012))
+
+### :memo: Documentation
+
+* **site:** restyle homepage with floating teapot parade ([#275](https://github.com/GTSpray/P-titPote/issues/275)) ([4db257f](https://github.com/GTSpray/P-titPote/commit/4db257f8cf9eb259ec6b714bcf2186c25adade4e))
+
 ## [1.11.0](https://github.com/GTSpray/P-titPote/compare/v1.10.0...v1.11.0) (2026-09-09)
 
 ### :sparkles: Features
