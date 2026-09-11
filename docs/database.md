@@ -1,21 +1,24 @@
 # Database and migration workflow
 
 P'tit Pote stores guild-scoped command state in MariaDB through MikroORM. The
-database is used by the alias command family and the poll workflow; the gateway
-service depends on the database container for startup ordering, but current
-gateway event handlers do not persist data.
+database is used by the alias command family, the poll workflow, and the
+gateway `GuildCreate` handler (which ensures a `DiscordGuild` row exists).
 
 ## Runtime architecture
 
 - `src/mikro-orm.config.ts` is the shared MikroORM config for application and CLI
   commands.
 - `src/db/db.ts` initializes one cached `MikroORM` instance and, by default,
-  applies pending migrations with `orm.migrator.up()` before returning. Only
-  `src/api.ts` calls `initORM` (so `both` mode migrates once via the API
-  import). The gateway process does **not** run migrations, which avoids
-  concurrent `migrator.up()` when Compose starts separate `api` and `gateway`
-  containers. The API waits for that init before listening. HTTP interaction
-  handlers fork an entity manager for request-scoped work.
+  applies pending migrations with `orm.migrator.up()` before returning.
+  `src/api.ts` calls `initORM` with migrations enabled (so `both` mode
+  migrates once via the API import). The gateway process also calls `initORM`
+  but with `migrate: false`, which avoids concurrent `migrator.up()` when
+  Compose starts separate `api` and `gateway` containers. The API waits for
+  that init before listening. HTTP interaction handlers and the gateway
+  `GuildCreate` handler fork an entity manager for scoped work.
+- `src/db/services/discordGuild.service.ts` exposes `findOrCreateGuild` used by
+  gateway `GuildCreate` and by CTA handlers that need a guild row
+  (`aliasSet`, `pollCreate`).
 - Production and development Compose files run MariaDB `12.0.2-noble` as the
   `database` service. Data is persisted in the `mysqldbdata` volume.
 - The app connects with the `.env` database variables:
@@ -52,9 +55,11 @@ active rows still enforce uniqueness.
 | `PollChoice`     | Ordered selectable answers for a poll question.                      |
 | `PollResp`       | One member's answer for one poll step, either a choice or free text. |
 
-Command handlers must keep lookups guild-scoped. Alias handlers and poll CTA
-handlers use `em.fork()` and query through `DiscordGuild.guildId` before reading
-or mutating records.
+Command handlers must keep lookups guild-scoped. Prefer
+`findOrCreateGuild` from `discordGuild.service.ts` when a handler needs an
+existing-or-new `DiscordGuild`. Alias handlers and poll CTA handlers use
+`em.fork()` and query through `DiscordGuild.guildId` before reading or
+mutating records.
 
 ## Migration workflow
 

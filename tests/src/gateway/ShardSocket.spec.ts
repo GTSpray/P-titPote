@@ -29,6 +29,7 @@ const fakeLatency = async (min: number, max: number) => {
 };
 
 const intents =
+  GatewayIntentBits.Guilds |
   GatewayIntentBits.GuildMessageReactions |
   GatewayIntentBits.GuildMessages |
   GatewayIntentBits.DirectMessages;
@@ -94,10 +95,7 @@ describe('ShardSocket', () => {
           browser: 'PtitPote',
           device: 'PtitPote',
         },
-        intents:
-          GatewayIntentBits.GuildMessageReactions |
-          GatewayIntentBits.GuildMessages |
-          GatewayIntentBits.DirectMessages,
+        intents,
       },
     };
     expect(server.getSpy()).toBeCalledWith(s(identityPayload));
@@ -243,10 +241,7 @@ describe('ShardSocket', () => {
               browser: 'PtitPote',
               device: 'PtitPote',
             },
-            intents:
-              GatewayIntentBits.GuildMessageReactions |
-              GatewayIntentBits.GuildMessages |
-              GatewayIntentBits.DirectMessages,
+            intents,
           },
         };
         expect(server.getSpy()).toBeCalledWith(s(identityPayload));
