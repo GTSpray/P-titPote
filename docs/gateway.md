@@ -78,7 +78,8 @@ Required environment:
    - shard tuple `[shardId, shardCount]`;
    - `compress: false`;
    - `large_threshold: 250`;
-   - intents for guild message reactions, guild messages, and direct messages.
+   - intents for guilds, guild message reactions, guild messages, and direct
+     messages.
 6. On `Ready`, the shard stores `session_id` and `resume_gateway_url`, and the
    top-level gateway sends an online presence using the translated
    `gateway.activity.*` strings.
@@ -108,12 +109,16 @@ The shard heartbeat loop is source-tested in
 Current top-level behavior in `src/gateway.ts`:
 
 - `Ready`: sends the bot presence (`Playing`, online).
-- `GuildCreate` and `GuildDelete`: logs guild lifecycle dispatches.
+- `GuildCreate`: when the guild payload is available, idempotently persists a
+  `DiscordGuild` row via `findOrCreateGuild` in
+  `src/db/services/discordGuild.service.ts` (covers first join and Ready
+  backfill). Unavailable payloads are logged and skipped. `GuildDelete` is
+  still log-only.
 - `MessageCreate`: when Discord reports an application-command message whose
   interaction metadata name is `poll c`, the bot adds a `✉️` reaction to that
   message with `PUT /channels/{channel.id}/messages/{message.id}/reactions`.
-- `MessageReactionAdd`: logs the reaction. If a non-bot user adds `✉️`, the bot
-  removes that user's reaction through Discord REST.
+- `MessageReactionAdd`: If a non-bot user adds `✉️`, the bot removes that
+  user's reaction through Discord REST.
 
 ### Constraints and troubleshooting
 
@@ -133,11 +138,14 @@ Current top-level behavior in `src/gateway.ts`:
 
 ### Implementation map
 
-- Gateway process entrypoint: `src/gateway.ts`.
+- Gateway process entrypoint: `src/gateway.ts` (initializes MikroORM with
+  `migrate: false` before connecting).
 - Shared gateway instance and `BOT_TOKEN` startup check: `src/gateway/index.ts`.
 - Shard discovery and public `send()` method: `src/gateway/GatewaySocket.ts`.
 - WebSocket identify, heartbeat, resume, and dispatch handling:
   `src/gateway/ShardSocket.ts`.
 - Gateway event typings: `src/gateway/gatewaytypes.ts`.
-- Tests: `tests/src/gateway/GatewaySocket.spec.ts` and
-  `tests/src/gateway/ShardSocket.spec.ts`.
+- Guild persistence helper: `src/db/services/discordGuild.service.ts`.
+- Tests: `tests/src/gateway/GatewaySocket.spec.ts`,
+  `tests/src/gateway/ShardSocket.spec.ts`, and
+  `tests/src/db/services/discordGuild.service.spec.ts`.

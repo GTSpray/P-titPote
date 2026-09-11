@@ -6,8 +6,8 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
+import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
@@ -63,12 +63,8 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
 
-      const guild =
-        (await em.findOne(
-          DiscordGuild,
-          { guildId },
-          { populate: ['messageAliaseds'] },
-        )) || new DiscordGuild(guildId);
+      const guild = await findOrCreateGuild(em, guildId);
+      await em.populate(guild, ['messageAliaseds']);
 
       let messageAliased = guild.messageAliaseds.find(
         (aliasedMsg: MessageAliased) =>

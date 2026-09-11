@@ -14,54 +14,11 @@ import { GWSEvent } from './gateway/gatewaytypes.js';
 import { discordapi } from './utils/discordapi.js';
 import { notifyBotOwner } from './utils/notifyBotOwner.js';
 import { t } from './i18n/index.js';
+import config from './mikro-orm.config.js';
+import { initORM } from './db/db.js';
+import { findOrCreateGuild } from './db/services/discordGuild.service.js';
 
-gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
-  const { emoji, user_id } = event;
-  logger.info('emoji recat', { user_id, emoji });
-});
-
-gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
-  logger.debug('gateway', { shard, debugmsg, meta });
-});
-
-gateway.on(GWSEvent.Payload, (shard, meta) => {
-  logger.debug('gateway payload', { shard, meta });
-});
-
-gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
-  logger.info('gateway guild_create', { shard, event });
-});
-
-gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
-  logger.info('gateway guild_delete', { shard, event });
-});
-
-gateway.on(GatewayDispatchEvents.Ready, () => {
-  const data: GatewayUpdatePresence = {
-    op: GatewayOpcodes.PresenceUpdate,
-    d: {
-      since: Date.now(),
-      activities: [
-        {
-          name: t('gateway.activity.name'),
-          state: t('gateway.activity.state'),
-          type: ActivityType.Playing,
-        },
-      ],
-      status: PresenceUpdateStatus.Online,
-      afk: false,
-    },
-  };
-  gateway.send(data);
-});
-
-gateway.once(GatewayDispatchEvents.Ready, () => {
-  void notifyBotOwner(
-    t('startup.dm.gateway', {
-      version: process.env.npm_package_version ?? 'unknown',
-    }),
-  );
-});
+const dbServices = initORM(config, false);
 
 gateway.on(GWSEvent.Debug, (shard, debugmsg, meta?) => {
   logger.debug('gateway', { shard, debugmsg, meta });
@@ -72,7 +29,22 @@ gateway.on(GWSEvent.Payload, (shard, meta) => {
 });
 
 gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
-  logger.info('gateway guild_create', { shard, event });
+  void (async () => {
+    const guildId = event.id;
+    try {
+      const { orm } = await dbServices;
+      const em = orm.em.fork();
+      await findOrCreateGuild(em, guildId);
+      await em.flush();
+      logger.info('gateway guild_create persisted', { shard, guildId });
+    } catch (err) {
+      logger.error('gateway guild_create persist failed', {
+        shard,
+        guildId,
+        err,
+      });
+    }
+  })();
 });
 
 gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
@@ -125,8 +97,16 @@ gateway.on(GatewayDispatchEvents.Ready, () => {
   gateway.send(data);
 });
 
-gateway
-  .connect()
+gateway.once(GatewayDispatchEvents.Ready, () => {
+  void notifyBotOwner(
+    t('startup.dm.gateway', {
+      version: process.env.npm_package_version ?? 'unknown',
+    }),
+  );
+});
+
+dbServices
+  .then(() => gateway.connect())
   .then(() => {
     logger.debug('gateway connected');
   })

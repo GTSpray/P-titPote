@@ -12,10 +12,10 @@ import {
   getInputComponnentsByPrefix,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { DiscordGuild } from '../../../db/entities/DiscordGuild.entity.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollStep } from '../../../db/entities/PollStep.entity.js';
 import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
+import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { doNotUpdatePublishedPoll, notAllowed } from '../../commonMessages.js';
@@ -67,10 +67,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
           data,
           'question',
         );
-        let aGuild: DiscordGuild;
-        aGuild =
-          (await em.findOne(DiscordGuild, { guildId })) ||
-          new DiscordGuild(guildId);
+        const aGuild = await findOrCreateGuild(em, guildId);
         aPoll = new Poll(
           `${title?.component.value}`,
           role?.component.values[0],

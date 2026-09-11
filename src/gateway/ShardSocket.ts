@@ -384,6 +384,7 @@ export class ShardSocket {
                     device: 'PtitPote',
                   },
                   intents:
+                    GatewayIntentBits.Guilds |
                     GatewayIntentBits.GuildMessageReactions |
                     GatewayIntentBits.GuildMessages |
                     GatewayIntentBits.DirectMessages,
