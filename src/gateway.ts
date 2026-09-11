@@ -30,14 +30,6 @@ gateway.on(GWSEvent.Payload, (shard, meta) => {
 
 gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
   void (async () => {
-    if ('unavailable' in event && event.unavailable) {
-      logger.info('gateway guild_create unavailable', {
-        shard,
-        guildId: event.id,
-      });
-      return;
-    }
-
     const guildId = event.id;
     try {
       const { orm } = await dbServices;
