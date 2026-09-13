@@ -61,6 +61,12 @@ existing-or-new `DiscordGuild`. Alias handlers and poll CTA handlers use
 `em.fork()` and query through `DiscordGuild.guildId` before reading or
 mutating records.
 
+`findOrCreateGuild` is intentionally a small entity-manager helper: it looks up
+an active `DiscordGuild` by `guildId`, persists a new managed entity when none
+exists, and leaves `flush()` to the caller. This lets CTA handlers flush the
+guild row with the rest of their command state, while the gateway `GuildCreate`
+handler flushes immediately after the backfill row is created.
+
 ## Migration workflow
 
 Use the Makefile targets from the repository root when Docker is available:

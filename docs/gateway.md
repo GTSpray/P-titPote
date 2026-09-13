@@ -109,11 +109,13 @@ The shard heartbeat loop is source-tested in
 Current top-level behavior in `src/gateway.ts`:
 
 - `Ready`: sends the bot presence (`Playing`, online).
-- `GuildCreate`: when the guild payload is available, idempotently persists a
-  `DiscordGuild` row via `findOrCreateGuild` in
-  `src/db/services/discordGuild.service.ts` (covers first join and Ready
-  backfill). Unavailable payloads are logged and skipped. `GuildDelete` is
-  still log-only.
+- `GuildCreate`: idempotently persists a `DiscordGuild` row for `event.id` via
+  `findOrCreateGuild` in `src/db/services/discordGuild.service.ts` (covers first
+  join and Ready backfill). The handler forks an entity manager, flushes the
+  row, logs `gateway guild_create persisted`, and logs
+  `gateway guild_create persist failed` without disconnecting the shard if the
+  database write fails. `GuildDelete` is still log-only; leaving a guild does
+  not soft-delete `DiscordGuild` or command state.
 - `MessageCreate`: when Discord reports an application-command message whose
   interaction metadata name is `poll c`, the bot adds a `✉️` reaction to that
   message with `PUT /channels/{channel.id}/messages/{message.id}/reactions`.
@@ -129,6 +131,13 @@ Current top-level behavior in `src/gateway.ts`:
 - If gateway behavior is missing but slash commands still work, check that the
   `gateway` container is running; interaction handling only proves the `api`
   service is healthy.
+- A `gateway`-only process initializes MikroORM with `migrate: false`, so make
+  sure migrations were already applied by an `api`/`both` start or `make db-up`
+  before relying on `GuildCreate` persistence.
+- If `gateway guild_create persist failed` appears, inspect database
+  connectivity and schema state. Alias and poll creation can still create the
+  same guild row later through `findOrCreateGuild`, but the gateway log points
+  at a broader persistence problem.
 - Use `make logs` and search for gateway messages such as `gateway error`,
   `GatewaySocket.connect`, `starting connection`, `opened connection`,
   `send identify packet`, `heartbit acknowledged`, or
