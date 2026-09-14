@@ -25,6 +25,7 @@ import { MessageAliased } from '../../../../src/db/entities/MessageAliased.entit
 import {
   getModalLabelComponnents,
   PartialComponentList,
+  PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 import {
   admin_permissions,
@@ -40,6 +41,7 @@ describe('cta/aliasSay', () => {
   let handlerOpts: ModalHandlerOptions<any>;
   let data: CTAData;
   let aliasCmp: PartialComponentList;
+  let aliasTextCmp: PartialComponentSingle;
   let messageAliased: MessageAliased;
 
   beforeEach(async () => {
@@ -47,6 +49,11 @@ describe('cta/aliasSay', () => {
       custom_id: 'alias',
       type: ComponentType.StringSelect,
       values: ['welcome'],
+    };
+    aliasTextCmp = {
+      custom_id: 'alias',
+      type: ComponentType.TextInput,
+      value: 'welcome',
     };
 
     data = {
@@ -79,6 +86,37 @@ describe('cta/aliasSay', () => {
 
   it('should respond with aliased message content', async () => {
     const response = await aliasSay.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.IsComponentsV2,
+        components: [
+          {
+            type: ComponentType.TextDisplay,
+            content: messageAliased.message,
+          },
+        ],
+      },
+    });
+  });
+
+  it('should respond with aliased message content from a text input modal', async () => {
+    const textData: CTAData = {
+      components: getModalLabelComponnents([aliasTextCmp]),
+      custom_id: `{"t":"cta","d":{"a":"aliasSay"}}`,
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: textData,
+      permissions: admin_permissions,
+    });
+
+    const response = await aliasSay.handler({
+      ...handlerOpts,
+      req,
+      res,
+      additionalData: JSON.parse(textData.custom_id),
+    });
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,

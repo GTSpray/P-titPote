@@ -25,6 +25,7 @@ import { MessageAliased } from '../../../../src/db/entities/MessageAliased.entit
 import {
   getModalLabelComponnents,
   PartialComponentList,
+  PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 import {
   admin_permissions,
@@ -40,6 +41,7 @@ describe('cta/aliasRm', () => {
   let handlerOpts: ModalHandlerOptions<any>;
   let data: CTAData;
   let aliasCmp: PartialComponentList;
+  let aliasTextCmp: PartialComponentSingle;
   let messageAliased: MessageAliased;
 
   beforeEach(async () => {
@@ -47,6 +49,11 @@ describe('cta/aliasRm', () => {
       custom_id: 'alias',
       type: ComponentType.StringSelect,
       values: ['welcome'],
+    };
+    aliasTextCmp = {
+      custom_id: 'alias',
+      type: ComponentType.TextInput,
+      value: 'welcome',
     };
 
     data = {
@@ -107,6 +114,43 @@ describe('cta/aliasRm', () => {
     expect(deleted?.deletedAt.getTime()).not.toBe(
       new Date('1970-01-01T00:00:00.000Z').getTime(),
     );
+  });
+
+  it('should soft delete aliased message from a text input modal', async () => {
+    const textData: CTAData = {
+      components: getModalLabelComponnents([aliasTextCmp]),
+      custom_id: `{"t":"cta","d":{"a":"aliasRm"}}`,
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: textData,
+      permissions: admin_permissions,
+    });
+
+    const response = await aliasRm.handler({
+      ...handlerOpts,
+      req,
+      res,
+      additionalData: JSON.parse(textData.custom_id),
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.IsComponentsV2,
+        components: [
+          {
+            type: ComponentType.TextDisplay,
+            content: t('common.ok'),
+          },
+        ],
+      },
+    });
+
+    em.clear();
+    const active = await em.findOne(MessageAliased, {
+      id: messageAliased.id,
+    });
+    expect(active).toBeNull();
   });
 
   it('should display a temporary message indicating that the command cannot be executed if the user is not a moderator', async () => {

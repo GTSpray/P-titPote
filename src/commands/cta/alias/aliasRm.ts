@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
+  ComponentSimple,
   ComponentSelect,
   CTAData,
   getInputComponnentById,
@@ -24,6 +25,21 @@ const ValidAliasMessage = z.object({
     .max(50),
 });
 
+function getAliasInputValue(data: CTAData | undefined): unknown {
+  const aliasInput = getInputComponnentById<ComponentSelect | ComponentSimple>(
+    data,
+    'alias',
+  );
+
+  if (!aliasInput) {
+    return undefined;
+  }
+
+  return 'values' in aliasInput.component
+    ? aliasInput.component.values[0]
+    : aliasInput.component.value;
+}
+
 export const aliasRm: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
     try {
@@ -36,10 +52,8 @@ export const aliasRm: ModalHandlerDelcaration<CTAData> = {
     const guildId = req.body.guild_id;
     const { data } = req.body;
 
-    const aliasInput = getInputComponnentById<ComponentSelect>(data, 'alias');
-
     const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.values[0],
+      alias: getAliasInputValue(data),
     });
 
     if (!AliasMessageInput.success) {

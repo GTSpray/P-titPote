@@ -2,8 +2,14 @@ import type { DBServices } from '../../../db/db.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { notFoundPayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
+import {
+  ComponentType,
+  InteractionResponseType,
+  TextInputStyle,
+} from 'discord-api-types/v10';
 import { Response } from 'express';
+
+export const ALIAS_SELECT_OPTIONS_LIMIT = 25;
 
 export async function openAliasSelectModal({
   res,
@@ -32,6 +38,27 @@ export async function openAliasSelectModal({
     return res.json(notFoundPayload());
   }
 
+  const aliasInput =
+    messageAliaseds.length > ALIAS_SELECT_OPTIONS_LIMIT
+      ? {
+          type: ComponentType.TextInput,
+          custom_id: 'alias',
+          style: TextInputStyle.Short,
+          min_length: 1,
+          max_length: 50,
+          required: true,
+        }
+      : {
+          type: ComponentType.StringSelect,
+          custom_id: 'alias',
+          placeholder: t('alias.modal.select.placeholder'),
+          required: true,
+          options: messageAliaseds.map(({ alias }) => ({
+            label: alias,
+            value: alias,
+          })),
+        };
+
   return res.json({
     type: InteractionResponseType.Modal,
     data: {
@@ -44,16 +71,7 @@ export async function openAliasSelectModal({
         {
           type: ComponentType.Label,
           label: t('alias.modal.label.alias'),
-          component: {
-            type: ComponentType.StringSelect,
-            custom_id: 'alias',
-            placeholder: t('alias.modal.select.placeholder'),
-            required: true,
-            options: messageAliaseds.map(({ alias }) => ({
-              label: alias,
-              value: alias,
-            })),
-          },
+          component: aliasInput,
         },
       ],
     },

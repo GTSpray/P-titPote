@@ -1,4 +1,5 @@
 import {
+  ALIAS_SELECT_OPTIONS_LIMIT,
   aliasSayCommandData,
   aliasSaySubCommandData,
   say,
@@ -7,6 +8,7 @@ import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
+  TextInputStyle,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
@@ -98,6 +100,43 @@ describe('/alias say', () => {
                 { label: 'rules', value: 'rules' },
                 { label: 'welcome', value: 'welcome' },
               ],
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  it('should respond with a text input modal when legacy aliases exceed select option limit', async () => {
+    const guild = new DiscordGuild(guild_id);
+    for (let i = 0; i <= ALIAS_SELECT_OPTIONS_LIMIT; i++) {
+      guild.messageAliaseds.add(
+        new MessageAliased(`alias${String(i).padStart(2, '0')}`, `msg ${i}`),
+      );
+    }
+    await em.persist(guild).flush();
+
+    const response = await say(handlerOpts, subcommand);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.Modal,
+      data: {
+        custom_id: JSON.stringify({
+          t: 'cta',
+          d: { a: 'aliasSay' },
+        }),
+        title: t('alias.modal.say.title'),
+        components: [
+          {
+            type: ComponentType.Label,
+            label: t('alias.modal.label.alias'),
+            component: {
+              type: ComponentType.TextInput,
+              custom_id: 'alias',
+              style: TextInputStyle.Short,
+              min_length: 1,
+              max_length: 50,
+              required: true,
             },
           },
         ],

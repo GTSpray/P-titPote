@@ -30,6 +30,8 @@ or Ban Members.
 
 2. **Post a stored message** with `/alias say`:
    - Opens a modal with a select listing the current guild aliases.
+   - If the server has more aliases than Discord can show in one select,
+     the modal asks you to type the alias name instead.
    - Choose an alias and submit.
    - Posts the stored message publicly in the channel where the command runs.
    - If no aliases exist, replies ephemerally with **Ahem... j'ai rien
@@ -39,6 +41,8 @@ or Ban Members.
 
 3. **Remove an alias** with `/alias rm`:
    - Opens a modal with a select listing the current guild aliases.
+   - If the server has more aliases than Discord can show in one select,
+     the modal asks you to type the alias name instead.
    - Choose an alias and submit to soft-delete it (it disappears from
      `/alias ls` and `/alias say`).
    - The same alias name can be created again later with `/alias set`.
@@ -71,8 +75,8 @@ or Ban Members.
 
 ```text
 /alias set  → modal: alias=welcome, message=Bienvenue sur le serveur !
-/alias say  → modal: choose welcome from the select
-/alias rm   → modal: choose welcome from the select
+/alias say  → modal: choose welcome from the select (or type welcome on large legacy servers)
+/alias rm   → modal: choose welcome from the select (or type welcome on large legacy servers)
 /alias ls
 ```
 

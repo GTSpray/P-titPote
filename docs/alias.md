@@ -24,8 +24,10 @@ subcommands:
 
 `set` takes no slash options and responds with `InteractionResponseType.Modal`
 (text inputs). `say` and `rm` also take no slash options: they load active guild
-aliases and open a modal with a `StringSelect` (`openAliasSelectModal`). Empty
-lists return the shared ephemeral `notFoundPayload()`.
+aliases and open a modal with a `StringSelect` (`openAliasSelectModal`). Discord
+caps String Selects at 25 options, so guilds with more legacy aliases get a
+text-input modal instead. Empty lists return the shared ephemeral
+`notFoundPayload()`.
 
 Modal submits are routed through the CTA registry in `src/commands/cta/index.ts`:
 
@@ -102,9 +104,9 @@ with ephemeral `errors.tooMany` when the guild already has 20 active aliases
 active aliases; updates of an existing name still succeed. Success returns an
 InteractionResponse with Components V2 and the shared `common.ok` text.
 
-`aliasSay` and `aliasRm` read the selected value from the modal `StringSelect`
-(`component.values[0]`), validate the same alias key shape, then look up one
-active alias for the current guild.
+`aliasSay` and `aliasRm` read the value from the modal `StringSelect`
+(`component.values[0]`) or fallback text input (`component.value`), validate the
+same alias key shape, then look up one active alias for the current guild.
 
 `aliasSay`: a match is posted publicly as a Components V2 text display. A miss
 returns an ephemeral `alias.say.notFound` response.
@@ -135,7 +137,8 @@ Slash openers live under `tests/src/commands/slashs/alias/`:
 - `alias.spec.ts` covers command declaration, moderator gating, dispatch, and
   malformed root payloads.
 - `set.spec.ts` covers modal response shape for create/update.
-- `say.spec.ts` and `rm.spec.ts` cover select modal options and empty list.
+- `say.spec.ts` and `rm.spec.ts` cover select modal options, the text-input
+  fallback for legacy alias counts, and empty list.
 - `ls.spec.ts` covers sorting, guild scoping, soft-delete filtering, and empty
   results.
 
