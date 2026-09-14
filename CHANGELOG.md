@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/GTSpray/P-titPote/compare/v1.12.0...v1.12.1) (2026-09-14)
+
+### :repeat: Chore
+
+* **deps:** bump actions/deploy-pages from 4 to 5 ([#278](https://github.com/GTSpray/P-titPote/issues/278)) ([19fc5bf](https://github.com/GTSpray/P-titPote/commit/19fc5bfc2bd4a9e251dd0b082095dad0a54c25d0))
+
 ## [1.12.0](https://github.com/GTSpray/P-titPote/compare/v1.11.0...v1.12.0) (2026-09-11)
 
 ### :sparkles: Features
