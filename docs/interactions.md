@@ -48,9 +48,35 @@ export const slashcommands = {
 ```
 
 `slashcommandsRegister` sets each command name from the registry key before
-serializing builders for Discord registration. Adding or renaming a command
-therefore requires updating the registry and running the explicit registration
-workflow only when you intend to mutate Discord application commands.
+serializing builders for Discord registration.
+
+### Registration workflow
+
+Slash command registration mutates the Discord application command list with
+`PUT /applications/{APP_ID}/commands`. The same helper is used in two places:
+
+- API startup: after `initORM()` finishes, Express starts listening, logs
+  `startup success`, then fires `registerSlashCommands()` without awaiting it.
+  Registration failures are logged as `register error` but do not stop the API
+  from serving `/health` or `/interactions`.
+- Manual run: `make register` / `npm run register` executes `src/register.ts`
+  and runs only the registration helper.
+
+Adding or renaming a command requires updating the registry. In normal
+deployments, the next API startup applies the command list automatically. Use
+the manual registration target only when you intentionally want to update
+Discord commands outside an API restart.
+
+Operational constraints:
+
+- `APP_ID` and `BOT_TOKEN` must both be set; `discordapi` needs the bot token at
+  import time, and the registration helper throws when `APP_ID` is missing.
+- The helper logs the command names at `info` level and the serialized payload at
+  `debug` level. Avoid copying debug payloads into public issues if command
+  metadata could expose in-progress behavior.
+- Discord REST errors are swallowed after logging so a transient registration
+  failure should be remediated by fixing the cause and restarting the API or
+  running `make register`.
 
 Handlers that branch on subcommands should validate `req.body.data` before using
 it. Existing commands use Zod and return `errors.invalidCommandPayload` or
@@ -136,6 +162,9 @@ placeholders unchanged, so missing params are visible during testing.
 - Set `LOG_LEVEL=debug` to log interaction payloads and Zod validation details.
 - If slash commands return unknown-command errors, check the command name in
   `req.body.data.name` and the `slashcommands` registry.
+- If a newly deployed slash command is missing in Discord, search startup logs
+  for `register`, `success`, `end process`, or `register error`; successful API
+  health does not prove command registration succeeded.
 - If buttons or modals return unknown-modal errors, inspect the JSON
   `custom_id`, the exact prefix, and the `d.a` action key.
 - If a handler fails before business logic runs, confirm `PUBLIC_KEY` is set and
