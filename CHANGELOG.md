@@ -1,3 +1,9 @@
+## [1.12.2](https://github.com/GTSpray/P-titPote/compare/v1.12.1...v1.12.2) (2026-09-14)
+
+### :repeat: Chore
+
+* **deps:** bump actions/upload-pages-artifact from 3 to 5 ([#279](https://github.com/GTSpray/P-titPote/issues/279)) ([6bfc922](https://github.com/GTSpray/P-titPote/commit/6bfc922dadac87ca80dc61177036757b49fb1636))
+
 ## [1.12.1](https://github.com/GTSpray/P-titPote/compare/v1.12.0...v1.12.1) (2026-09-14)
 
 ### :repeat: Chore
