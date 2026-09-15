@@ -14,6 +14,7 @@ import { unMention } from '../../../utils/unMention.js';
 import { splitStringIntoChunks } from '../../../utils/splitStringIntoChunks.js';
 import { Routes } from 'discord-api-types/v10';
 import { discordapi } from '../../../utils/discordapi.js';
+import { LockMode } from '@mikro-orm/core';
 
 const DISCORD_MESSAGE_LENGTH_LIMIT = 2000;
 
@@ -103,30 +104,36 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
     const channelId = req.body.channel?.id;
     if (dbServices && guildId && channelId) {
       const em = dbServices.orm.em.fork();
-      const aPoll = await em.findOneOrFail(
-        Poll,
-        { server: { guildId }, id: pollId },
-        {
-          populate: ['steps', 'steps.choices'],
-        },
-      );
+      const { aPoll, pollResps, previousEndDate, shouldClosePoll } =
+        await em.transactional(async (tx) => {
+          const aPoll = await tx.findOneOrFail(
+            Poll,
+            { server: { guildId }, id: pollId },
+            {
+              populate: ['steps', 'steps.choices'],
+              lockMode: LockMode.PESSIMISTIC_WRITE,
+            },
+          );
 
-      const previousEndDate = aPoll.endDate;
-      const shouldClosePoll = !isPollClosed(previousEndDate);
-      if (shouldClosePoll) {
-        aPoll.endDate = new Date();
-        await em.persist(aPoll).flush();
-      }
+          const previousEndDate = aPoll.endDate;
+          const shouldClosePoll = !isPollClosed(previousEndDate);
+          if (shouldClosePoll) {
+            aPoll.endDate = new Date();
+            await tx.persist(aPoll).flush();
+          }
 
-      const pollResps = await em.findAll(PollResp, {
-        where: { pollStep: { poll: aPoll } },
-        populate: ['pollStep', 'pollChoice'],
-        orderBy: {
-          pollStep: {
-            order: 'asc',
-          },
-        },
-      });
+          const pollResps = await tx.findAll(PollResp, {
+            where: { pollStep: { poll: aPoll } },
+            populate: ['pollStep', 'pollChoice'],
+            orderBy: {
+              pollStep: {
+                order: 'asc',
+              },
+            },
+          });
+
+          return { aPoll, pollResps, previousEndDate, shouldClosePoll };
+        });
 
       const report = buildPollSummary(aPoll, pollResps);
       const chunks = splitStringIntoChunks(
@@ -146,13 +153,18 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
       } catch (error) {
         logger.error(error);
         if (shouldClosePoll) {
-          aPoll.endDate = previousEndDate;
-          await em.persist(aPoll).flush();
+          await em.transactional(async (tx) => {
+            const poll = await tx.findOneOrFail(
+              Poll,
+              { server: { guildId }, id: pollId },
+              { lockMode: LockMode.PESSIMISTIC_WRITE },
+            );
+            poll.endDate = previousEndDate;
+            await tx.persist(poll).flush();
+          });
         }
         return res.json(errorPayload(t('poll.report.failed')));
       }
-
-      await em.persist(aPoll).flush();
 
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
