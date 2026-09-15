@@ -1,0 +1,81 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "remind-status",
+  "title": "Remind — statut du rappel",
+  "doc": "docs/usage/remind/remind.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "idée-barbecue",
+      "type": "text"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Alex",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/remind status",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/remind status",
+            "description": "Affiche le rappel actif sur ce fil"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "Rappel actif : remontée après 3 jour(s) d'inactivité (par <@123456789012345678>)"
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/remind",
+    "prefix": "remind-status",
+    "video": true
+  }
+}
