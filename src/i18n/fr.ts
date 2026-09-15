@@ -141,6 +141,27 @@ export const fr = {
   'trigger.channel.notFound': 'Ahem... je ne trouve pas ce salon 🤷',
   'trigger.channel.unavailable':
     'Ahem... je ne peux pas publier dans ce salon 🤷',
+  'remind.description': 'Rappel pour remonter un fil oublié',
+  'remind.menu.chooseAction': 'Que veux-tu faire ?',
+  'remind.menu.placeholder': 'Choisis une action...',
+  'remind.action.on': 'Activer',
+  'remind.action.status': 'Statut',
+  'remind.action.off': 'Désactiver',
+  'remind.modal.days.title': 'Activer le rappel',
+  'remind.modal.days.label': "Jours d'inactivité",
+  'remind.modal.days.description': 'Nombre entier de 1 à 30',
+  'remind.days.invalid': 'Ahem... indique un nombre de jours entre 1 et 30 🤷',
+  'remind.on.success':
+    "Ok! Je remonterai ce fil s'il reste silencieux {days} jour(s) ;)",
+  'remind.on.alreadyExists': 'Ahem... il y a déjà un rappel sur ce fil 🤷',
+  'remind.on.notThread': 'Ahem... cette commande ne marche que dans un fil 🤷',
+  'remind.on.archived':
+    'Ahem... ce fil est archivé, je ne peux pas y mettre de rappel 🤷',
+  'remind.status.active':
+    "Rappel actif : remontée après {days} jour(s) d'inactivité (par <@{ownerId}>)",
+  'remind.status.inactive': 'Ahem... pas de rappel sur ce fil 🤷',
+  'remind.off.success': 'Ok! Plus de rappel sur ce fil ;)',
+  'remind.bump.message': '⬆️',
 } as const;
 
 export type TranslationKey = keyof typeof fr;

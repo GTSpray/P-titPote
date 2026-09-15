@@ -18,6 +18,7 @@ import { PollResp } from './db/entities/PollResp.entity.js';
 import { GuildTrigger } from './db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from './db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from './db/entities/TriggerRole.entity.js';
+import { ThreadRemind } from './db/entities/ThreadRemind.entity.js';
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
@@ -60,6 +61,7 @@ const config: Options = defineConfig({
     GuildTrigger,
     TriggerMessage,
     TriggerRole,
+    ThreadRemind,
   ],
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),

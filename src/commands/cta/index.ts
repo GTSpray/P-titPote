@@ -17,6 +17,8 @@ import { trigCreateWelMsg } from './trigger/trigCreateWelMsg.js';
 import { trigUpdateWelMsg } from './trigger/trigUpdateWelMsg.js';
 import { trigCreateWelRole } from './trigger/trigCreateWelRole.js';
 import { trigUpdateWelRole } from './trigger/trigUpdateWelRole.js';
+import { remindMenu } from './remind/remindMenu.js';
+import { remindOn } from './remind/remindOn.js';
 
 export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   aliasRm,
@@ -37,4 +39,6 @@ export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   trigUpdateWelMsg,
   trigCreateWelRole,
   trigUpdateWelRole,
+  remindMenu,
+  remindOn,
 };
