@@ -3,6 +3,7 @@ import { DiscordGuild } from '../../src/db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../src/db/entities/MessageAliased.entity.js';
 import { Poll } from '../../src/db/entities/Poll.entity.js';
 import { GuildTrigger } from '../../src/db/entities/GuildTrigger.entity.js';
+import { ThreadRemind } from '../../src/db/entities/ThreadRemind.entity.js';
 
 export const expectedDiscordGuild = (
   opts: Partial<DiscordGuild>,
@@ -16,6 +17,7 @@ export const expectedDiscordGuild = (
     messageAliaseds: expect.any(Collection<MessageAliased>),
     polls: expect.any(Collection<Poll>),
     triggers: expect.any(Collection<GuildTrigger>),
+    threadReminds: expect.any(Collection<ThreadRemind>),
     ...opts,
   };
 };
