@@ -16,9 +16,9 @@
 
 ## About
 
-**P'tit Pote** is a Discord bot for polls, reusable message aliases, and a few
-utility commands. It is built with TypeScript, Express, Discord.js, MariaDB, and
-MikroORM.
+**P'tit Pote** is a Discord bot for polls, reusable message aliases, thread
+reminders, and a few utility commands. It is built with TypeScript, Express,
+Discord.js, MariaDB, and MikroORM.
 
 The documentation is split for two audiences:
 
@@ -49,6 +49,7 @@ The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
 - [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store, post, and remove reusable message aliases
+- [`docs/usage/remind/remind.md`](docs/usage/remind/remind.md) — bump forgotten threads after idle days
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
 
 ---
@@ -183,6 +184,7 @@ These guides describe architecture, services, and implementation details:
 - [`docs/alias.md`](docs/alias.md) — alias command validation, persistence, permissions, and troubleshooting
 - [`docs/gimme.md`](docs/gimme.md) — gimme utility command dispatch, emoji extraction, and troubleshooting
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
+- [`docs/remind.md`](docs/remind.md) — thread idle reminders, hourly loop, and soft-delete cleanup
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
 - [`docs/logging.md`](docs/logging.md) — Winston log format, transports, correlation, and troubleshooting
@@ -223,6 +225,7 @@ P-titPote/
 │   ├── alias.md                 # Alias command technical guide
 │   ├── gimme.md                 # Gimme command technical guide
 │   ├── poll.md                  # Poll workflow technical guide
+│   ├── remind.md                # Thread remind technical guide
 │   ├── gateway.md               # Gateway service technical guide
 │   ├── database.md              # Database and migration runbook
 │   ├── logging.md               # Logging and observability guide
