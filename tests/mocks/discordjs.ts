@@ -52,7 +52,11 @@ export class DiscrodRESTMock {
     if (!DiscrodRESTMock.results.has(key)) {
       throw Error('no existing result');
     }
-    return Promise.resolve(DiscrodRESTMock.results.get(key));
+    const result = DiscrodRESTMock.results.get(key);
+    if (result instanceof Error) {
+      return Promise.reject(result);
+    }
+    return Promise.resolve(result);
   }
 
   setToken() {
