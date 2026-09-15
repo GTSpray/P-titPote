@@ -1,0 +1,110 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "remind-off",
+  "title": "Remind — désactiver un rappel",
+  "doc": "docs/usage/remind/remind.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "événements",
+      "type": "text"
+    },
+    "thread": {
+      "name": "idée-barbecue",
+      "active": true,
+      "startedBy": "Alex"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Alex",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "applyState",
+      "holdMs": 2200,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "On a fixé la date, le fil n'a plus besoin d'être remonté.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Ok, tu peux couper le rappel alors.",
+            "timestamp": "12:16"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1000
+    },
+    {
+      "type": "type",
+      "text": "/remind off",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/remind off",
+            "description": "Désactive le rappel sur ce fil"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "Ok! Plus de rappel sur ce fil ;)"
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/remind",
+    "prefix": "remind-off",
+    "video": true
+  }
+}

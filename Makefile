@@ -106,9 +106,12 @@ dev: os
 	$(DC_CMD_DEV) up -d --build --remove-orphans
 
 ## Build with watch mode (need containers as developpement mode)
+## TypeScript 7's native watcher (fanotify) does not see host edits on Docker
+## bind mounts; drive rebuilds with nodemon polling instead of `tsc -w`.
 tsc: os
-	$(DC_CMD_DEV) run --entrypoint "" api rm -Rf dist/*
-	$(DC_CMD_DEV) run --entrypoint "" api npm run build -- -w
+	$(DC_CMD_DEV) run --entrypoint "" api \
+		npx nodemon -L -q --watch src --watch tsconfig.json --watch global.d.ts \
+		--ext ts,json --exec "npm run build"
 
 ## Run tests with watch mode (need containers as developpement mode)
 testw: os
