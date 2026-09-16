@@ -36,9 +36,12 @@ rejected.
 
 ## Persistence
 
-- Entity `ThreadRemind`: `server`, `threadId`, `ownerUserId`, `idleDays`.
+- Entity `ThreadRemind`: `server`, `threadId`, `ownerUserId`, `idleDays`,
+  `nextTickAt`, optional `lastBumpMessageId`.
 - Unique on `(threadId, deletedAt)` so one active reminder per thread.
+- Index on `nextTickAt` for the hourly due query.
 - Soft-delete sets `deletedAt` (EntityBase filter).
+- `/remind on` sets `nextTickAt` to now so the next loop tick can evaluate it.
 
 ## Hourly loop
 
@@ -47,17 +50,22 @@ rejected.
 - `REMIND_INTERVAL_MS` = 1 hour.
 - `startRemindLoop` runs an immediate tick then `setInterval` from `src/api.ts`.
 - `runRemindTick(em)` (exported for tests):
-  1. Load active `ThreadRemind` rows with `server`.
+  1. Load due `ThreadRemind` rows (`nextTickAt <= now`) with `server`.
   2. Group by `guildId`.
-  3. `GET Routes.userGuildMember(guildId)` — on 404 / unknown guild|member, soft-delete the whole batch.
-  4. Else `GET` last message (`limit=1`); skip if younger than `idleDays`; soft-delete on missing channel; unarchive if needed; `POST` `remind.bump.message` (`⬆️`).
+  3. `GET Routes.guild(guildId)` — on 404 / unknown guild, soft-delete the whole batch
+     (do not use `userGuildMember`: OAuth-only, bots get 20001).
+  4. Per thread:
+     - `GET` last message (`limit=1`); if still recent, try `DELETE` previous
+       `lastBumpMessageId` (ignore 404), clear it, set
+       `nextTickAt = lastMessageAt + idleDays` and return; soft-delete on missing channel.
+     - When bumping: try `DELETE` previous `lastBumpMessageId` (ignore 404 if a mod already removed it), unarchive if needed, `POST` `remind.bump.message` (`⬆️`), store the new message id and set `nextTickAt = bumpAt + idleDays`.
 
 Errors are isolated per guild and per thread.
 
 ## Tests
 
 - `tests/src/commands/slashs/remind/` — on / status / off / router.
-- `tests/src/utils/remindLoop.spec.ts` — guild leave, idle skip, bump, unarchive, isolation.
+- `tests/src/utils/remindLoop.spec.ts` — guild leave, nextTick filter, idle reschedule, bump, previous bump delete, unarchive, isolation.
 - `tests/src/utils/remindConstants.spec.ts` — age helper.
 
 ## Troubleshooting

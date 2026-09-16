@@ -57,5 +57,8 @@ rights get **Ahem... je ne suis pas habilité à le faire 🤷**.
 ### Automatic bump
 
 When the idle threshold is reached, the bot posts **⬆️** in the thread (and
-unarchives the thread first if needed). No scenario video covers the hourly
+unarchives the thread first if needed). If a previous bump message from the bot
+is still there, it is removed before the new one is posted. If someone writes in
+the thread before the next bump is due, the bot removes the last **⬆️** (if still
+present) and waits again from that activity. No scenario video covers the hourly
 check — only the slash commands above.

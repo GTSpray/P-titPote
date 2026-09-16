@@ -1,5 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import {
+  RESTJSONErrorCodes,
   Routes,
   type APIMessage,
   type APIThreadChannel,
@@ -8,9 +9,20 @@ import { ThreadRemind } from '../db/entities/ThreadRemind.entity.js';
 import { discordapi } from './discordapi.js';
 import { logger } from '../logger.js';
 import { t } from '../i18n/index.js';
-import { isOlderThanIdleDays, REMIND_INTERVAL_MS } from './remindConstants.js';
+import {
+  computeNextTickAt,
+  isOlderThanIdleDays,
+  REMIND_INTERVAL_MS,
+} from './remindConstants.js';
 
 export { REMIND_INTERVAL_MS };
+
+const DISCORD_NOT_FOUND_CODES = new Set<number>([
+  RESTJSONErrorCodes.UnknownChannel,
+  RESTJSONErrorCodes.UnknownGuild,
+  RESTJSONErrorCodes.UnknownMember,
+  RESTJSONErrorCodes.UnknownMessage,
+]);
 
 function isDiscordNotFound(error: unknown): boolean {
   if (!error || typeof error !== 'object') {
@@ -20,12 +32,13 @@ function isDiscordNotFound(error: unknown): boolean {
   if (err.status === 404) {
     return true;
   }
-  return [10003, 10004, 10007].includes(err.code ?? -1);
+  return DISCORD_NOT_FOUND_CODES.has(err.code ?? -1);
 }
 
 async function isBotInGuild(guildId: string): Promise<boolean> {
   try {
-    await discordapi.get(Routes.userGuildMember(guildId));
+    // Bot token: GET /guilds/{id}. userGuildMember is OAuth-only (20001 for bots).
+    await discordapi.get(Routes.guild(guildId));
     return true;
   } catch (error) {
     if (isDiscordNotFound(error)) {
@@ -37,6 +50,28 @@ async function isBotInGuild(guildId: string): Promise<boolean> {
 
 function softDeleteRemind(remind: ThreadRemind): void {
   remind.deletedAt = new Date();
+}
+
+async function deletePreviousBump(remind: ThreadRemind): Promise<void> {
+  if (!remind.lastBumpMessageId) {
+    return;
+  }
+
+  try {
+    await discordapi.delete(
+      Routes.channelMessage(remind.threadId, remind.lastBumpMessageId),
+    );
+  } catch (error) {
+    if (!isDiscordNotFound(error)) {
+      logger.warn('remind previous bump delete failed', {
+        threadId: remind.threadId,
+        messageId: remind.lastBumpMessageId,
+        error,
+      });
+    }
+  }
+
+  remind.lastBumpMessageId = null;
 }
 
 async function processThreadRemind(
@@ -62,7 +97,11 @@ async function processThreadRemind(
     }
 
     const lastMessageAt = new Date(messages[0].timestamp);
+
     if (!isOlderThanIdleDays(lastMessageAt, remind.idleDays, now)) {
+      await deletePreviousBump(remind);
+      remind.nextTickAt = computeNextTickAt(lastMessageAt, remind.idleDays);
+      await em.flush();
       return;
     }
 
@@ -76,12 +115,22 @@ async function processThreadRemind(
       });
     }
 
-    await discordapi.post(Routes.channelMessages(remind.threadId), {
-      body: {
-        content: t('remind.bump.message'),
-        allowed_mentions: { parse: [] },
+    await deletePreviousBump(remind);
+
+    const posted = (await discordapi.post(
+      Routes.channelMessages(remind.threadId),
+      {
+        body: {
+          content: t('remind.bump.message'),
+          allowed_mentions: { parse: [] },
+        },
       },
-    });
+    )) as APIMessage;
+
+    const bumpAt = posted.timestamp ? new Date(posted.timestamp) : now;
+    remind.lastBumpMessageId = posted.id;
+    remind.nextTickAt = computeNextTickAt(bumpAt, remind.idleDays);
+    await em.flush();
   } catch (error) {
     if (isDiscordNotFound(error)) {
       softDeleteRemind(remind);
@@ -104,7 +153,7 @@ export async function runRemindTick(
 ): Promise<void> {
   const reminds = await em.find(
     ThreadRemind,
-    {},
+    { nextTickAt: { $lte: now } },
     {
       populate: ['server'],
     },
