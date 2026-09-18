@@ -1,3 +1,13 @@
+## [1.12.7](https://github.com/GTSpray/P-titPote/compare/v1.12.6...v1.12.7) (2026-09-18)
+
+### :bug: Fixes
+
+* **database:** use YYYY-MM-DD in dump tar filenames ([#286](https://github.com/GTSpray/P-titPote/issues/286)) ([e9d980c](https://github.com/GTSpray/P-titPote/commit/e9d980cfa8823867a127f7516aca02b2fe337f98))
+
+### :memo: Documentation
+
+* clarify startup registration and guild persistence ([#277](https://github.com/GTSpray/P-titPote/issues/277)) ([cc73b46](https://github.com/GTSpray/P-titPote/commit/cc73b46a008254d06f3ab36730f203026304a425))
+
 ## [1.12.6](https://github.com/GTSpray/P-titPote/compare/v1.12.5...v1.12.6) (2026-09-14)
 
 ### :repeat: Chore
