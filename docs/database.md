@@ -97,6 +97,35 @@ Operational notes:
 - Schema generator dumps are useful for review, but committed schema changes
   should be represented as migrations under `src/migrations/`.
 
+## Database dumps
+
+`make db-dump` executes `/database/bin/db-dump` inside the `database` container.
+The Compose mount maps `./docker/database/dumps` on the host to
+`/database/dumps` in the container, so generated files stay outside the database
+volume and are ignored by Git.
+
+Each run creates or updates these files:
+
+| Path under `docker/database/dumps/`   | Contents                                                                                 |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `sql/1_<database>_structure.sql`      | Schema-only dump from `mariadb-dump --no-data`.                                          |
+| `sql/2_<database>_data.sql`           | Data-only dump with one insert per line and foreign key checks disabled around the load. |
+| `<YYYY-MM-DD>_<HH:MM:SS>-dump.tar.gz` | Archive of the SQL files from that run.                                                  |
+
+Constraints and restore notes:
+
+- The SQL file names are stable and are overwritten by the next dump for the
+  same database name. Keep the timestamped tarball when you need to retain a
+  point-in-time snapshot.
+- Do not commit dump artifacts. `docker/database/dumps` is ignored because the
+  files may contain server data.
+- There is no dedicated restore Make target. `make db-sh` opens a MariaDB shell
+  as root for manual inspection or import.
+- Compose also mounts `docker/database/dumps/sql` into
+  `/docker-entrypoint-initdb.d`. The MariaDB image only reads that directory
+  when initializing an empty data directory, so replaying those SQL files through
+  the entrypoint requires a fresh database volume.
+
 Example local inspection flow:
 
 ```bash
@@ -143,3 +172,5 @@ when changing entities or migrations.
   `src/migrations/`, rebuild, then rerun `make db-check`.
 - **Unexpected duplicate-key errors:** inspect soft-deleted rows. Active
   uniqueness depends on the `deletedAt` sentinel value from `EntityBase`.
+- **Dump output is missing:** ensure the `database` container is running and the
+  host `docker/database/dumps` directory is writable by Docker.
