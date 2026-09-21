@@ -1,3 +1,9 @@
+## [1.12.10](https://github.com/GTSpray/P-titPote/compare/v1.12.9...v1.12.10) (2026-09-21)
+
+### :repeat: Chore
+
+* **deps:** bump vitest from 5.0.0 to 5.0.1 ([#290](https://github.com/GTSpray/P-titPote/issues/290)) ([6c21792](https://github.com/GTSpray/P-titPote/commit/6c21792b7a0c695bcde3bcaa92351cacee77e6c2))
+
 ## [1.12.9](https://github.com/GTSpray/P-titPote/compare/v1.12.8...v1.12.9) (2026-09-21)
 
 ### :repeat: Chore
