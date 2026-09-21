@@ -1,3 +1,9 @@
+## [1.12.9](https://github.com/GTSpray/P-titPote/compare/v1.12.8...v1.12.9) (2026-09-21)
+
+### :repeat: Chore
+
+* **deps:** bump zod from 4.6.2 to 4.6.5 ([#291](https://github.com/GTSpray/P-titPote/issues/291)) ([580e6db](https://github.com/GTSpray/P-titPote/commit/580e6dba320c8f0555a75b93779f9fbadee74747))
+
 ## [1.12.8](https://github.com/GTSpray/P-titPote/compare/v1.12.7...v1.12.8) (2026-09-21)
 
 ### :memo: Documentation
