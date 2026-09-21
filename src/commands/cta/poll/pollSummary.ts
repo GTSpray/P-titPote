@@ -14,6 +14,7 @@ import { unMention } from '../../../utils/unMention.js';
 import { splitStringIntoChunks } from '../../../utils/splitStringIntoChunks.js';
 import { Routes } from 'discord-api-types/v10';
 import { discordapi } from '../../../utils/discordapi.js';
+import { LockMode } from '@mikro-orm/core';
 
 const DISCORD_MESSAGE_LENGTH_LIMIT = 2000;
 
@@ -103,64 +104,69 @@ export const pollSummary: ModalHandlerDelcaration<CTAData> = {
     const channelId = req.body.channel?.id;
     if (dbServices && guildId && channelId) {
       const em = dbServices.orm.em.fork();
-      const aPoll = await em.findOneOrFail(
-        Poll,
-        { server: { guildId }, id: pollId },
-        {
-          populate: ['steps', 'steps.choices'],
-        },
-      );
-
-      const previousEndDate = aPoll.endDate;
-      const shouldClosePoll = !isPollClosed(previousEndDate);
-      if (shouldClosePoll) {
-        aPoll.endDate = new Date();
-        await em.persist(aPoll).flush();
-      }
-
-      const pollResps = await em.findAll(PollResp, {
-        where: { pollStep: { poll: aPoll } },
-        populate: ['pollStep', 'pollChoice'],
-        orderBy: {
-          pollStep: {
-            order: 'asc',
+      const responsePayload = await em.transactional(async (tx) => {
+        const aPoll = await tx.findOneOrFail(
+          Poll,
+          { server: { guildId }, id: pollId },
+          {
+            populate: ['steps', 'steps.choices'],
+            lockMode: LockMode.PESSIMISTIC_WRITE,
           },
-        },
-      });
+        );
 
-      const report = buildPollSummary(aPoll, pollResps);
-      const chunks = splitStringIntoChunks(
-        report,
-        DISCORD_MESSAGE_LENGTH_LIMIT,
-      );
-      try {
-        const url = Routes.channelMessages(channelId);
-        for (const content of chunks) {
-          await discordapi.post(url, {
-            body: {
-              content,
-              allowed_mentions: { parse: [] },
-            },
-          });
-        }
-      } catch (error) {
-        logger.error(error);
+        const previousEndDate = aPoll.endDate;
+        const shouldClosePoll = !isPollClosed(previousEndDate);
         if (shouldClosePoll) {
-          aPoll.endDate = previousEndDate;
-          await em.persist(aPoll).flush();
+          aPoll.endDate = new Date();
+          await tx.persist(aPoll).flush();
         }
-        return res.json(errorPayload(t('poll.report.failed')));
-      }
 
-      await em.persist(aPoll).flush();
+        const pollResps = await tx.findAll(PollResp, {
+          where: { pollStep: { poll: aPoll } },
+          populate: ['pollStep', 'pollChoice'],
+          orderBy: {
+            pollStep: {
+              order: 'asc',
+            },
+          },
+        });
 
-      return res.json({
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.Ephemeral,
-          content: t('poll.report.sent', { count: chunks.length }),
-        },
+        const report = buildPollSummary(aPoll, pollResps);
+        const chunks = splitStringIntoChunks(
+          report,
+          DISCORD_MESSAGE_LENGTH_LIMIT,
+        );
+        try {
+          const url = Routes.channelMessages(channelId);
+          for (const content of chunks) {
+            await discordapi.post(url, {
+              body: {
+                content,
+                allowed_mentions: { parse: [] },
+              },
+            });
+          }
+        } catch (error) {
+          logger.error(error);
+          if (shouldClosePoll) {
+            aPoll.endDate = previousEndDate;
+            await tx.persist(aPoll).flush();
+          }
+          return errorPayload(t('poll.report.failed'));
+        }
+
+        await tx.persist(aPoll).flush();
+
+        return {
+          type: InteractionResponseType.ChannelMessageWithSource,
+          data: {
+            flags: MessageFlags.Ephemeral,
+            content: t('poll.report.sent', { count: chunks.length }),
+          },
+        };
       });
+
+      return res.json(responsePayload);
     }
 
     return res.status(500).json({ error: t('errors.unknown') });

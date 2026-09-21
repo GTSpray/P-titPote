@@ -30,6 +30,7 @@ import {
 import { PollResp } from '../../../../src/db/entities/PollResp.entity.js';
 import { expectedPollResp } from '../../../epectedEntities/expectedPollResp.js';
 import { t } from '../../../../src/i18n/index.js';
+import { LockMode } from '@mikro-orm/core';
 
 describe('cta/pollVote', () => {
   let guild_id: string;
@@ -112,6 +113,31 @@ describe('cta/pollVote', () => {
         content: <string>aSecondStepCmp.value,
       }),
     ]);
+  });
+
+  it('should lock the poll row while recording votes', async () => {
+    const flush = vi.fn(async () => undefined);
+    const tx = {
+      findOneOrFail: vi.fn(async () => aPoll),
+      findAll: vi.fn(async () => []),
+      persist: vi.fn(() => ({ flush })),
+    };
+    const transactional = vi.fn(async (work) => work(tx));
+    vi.spyOn(handlerOpts.dbServices!.orm.em, 'fork').mockReturnValueOnce({
+      transactional,
+    } as any);
+
+    await pollVote.handler(handlerOpts);
+
+    expect(transactional).toHaveBeenCalledTimes(1);
+    expect(tx.findOneOrFail).toHaveBeenCalledWith(
+      Poll,
+      { id: aPoll.id, server: { guildId: guild_id } },
+      expect.objectContaining({
+        lockMode: LockMode.PESSIMISTIC_WRITE,
+      }),
+    );
+    expect(flush).toHaveBeenCalledTimes(1);
   });
 
   it('should not create a PollResp for a poll from another guild', async () => {
