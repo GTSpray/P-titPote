@@ -1,3 +1,13 @@
+## [1.12.8](https://github.com/GTSpray/P-titPote/compare/v1.12.7...v1.12.8) (2026-09-21)
+
+### :memo: Documentation
+
+* document database dump workflow ([#287](https://github.com/GTSpray/P-titPote/issues/287)) ([d5cfaca](https://github.com/GTSpray/P-titPote/commit/d5cfacadeefd32835ade9c353a3e025c4bab6325))
+
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.5.1 to 26.6.1 ([#292](https://github.com/GTSpray/P-titPote/issues/292)) ([470adf5](https://github.com/GTSpray/P-titPote/commit/470adf588770f7c3b74be1e0ce4bfdf5b3c64005))
+
 ## [1.12.7](https://github.com/GTSpray/P-titPote/compare/v1.12.6...v1.12.7) (2026-09-18)
 
 ### :bug: Fixes
