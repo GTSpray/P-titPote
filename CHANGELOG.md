@@ -1,3 +1,9 @@
+## [1.12.14](https://github.com/GTSpray/P-titPote/compare/v1.12.13...v1.12.14) (2026-09-21)
+
+### :bug: Fixes
+
+* **poll:** summary/vote race ([#293](https://github.com/GTSpray/P-titPote/issues/293)) ([ccfa457](https://github.com/GTSpray/P-titPote/commit/ccfa4579c50cfd278eeb4b75a2feeb40c2d40416))
+
 ## [1.12.13](https://github.com/GTSpray/P-titPote/compare/v1.12.12...v1.12.13) (2026-09-21)
 
 ### :repeat: Chore
