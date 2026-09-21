@@ -36,6 +36,7 @@ import {
   DiscrodRESTMock,
   DiscrodRESTMockVerb,
 } from '../../../mocks/discordjs.js';
+import { LockMode } from '@mikro-orm/core';
 
 describe('cta/pollSummary', () => {
   let guild_id: string;
@@ -131,6 +132,31 @@ describe('cta/pollSummary', () => {
       id: aPoll.id,
     });
     expect(poll.endDate).toBeDateCloseTo(today, 2000);
+  });
+
+  it('should lock the poll row while publishing the summary', async () => {
+    const flush = vi.fn(async () => undefined);
+    const tx = {
+      findOneOrFail: vi.fn(async () => aPoll),
+      findAll: vi.fn(async () => []),
+      persist: vi.fn(() => ({ flush })),
+    };
+    const transactional = vi.fn(async (work) => work(tx));
+    vi.spyOn(handlerOpts.dbServices!.orm.em, 'fork').mockReturnValueOnce({
+      transactional,
+    } as any);
+
+    await pollSummary.handler(handlerOpts);
+
+    expect(transactional).toHaveBeenCalledTimes(1);
+    expect(tx.findOneOrFail).toHaveBeenCalledWith(
+      Poll,
+      { server: { guildId: guild_id }, id: aPoll.id },
+      expect.objectContaining({
+        lockMode: LockMode.PESSIMISTIC_WRITE,
+      }),
+    );
+    expect(flush).toHaveBeenCalledTimes(2);
   });
 
   it('should keep the poll open when publishing the summary fails', async () => {
