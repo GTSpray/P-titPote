@@ -60,7 +60,7 @@ stop: os
 
 ## Follow bot container logs
 logs: os
-	$(DC_CMD) logs -f  --no-log-prefix api gateway | $(JQC)
+	$(DC_CMD) logs -f  --no-log-prefix -n 200 api gateway | $(JQC)
 
 ## Install slash commands on discord
 register: os
