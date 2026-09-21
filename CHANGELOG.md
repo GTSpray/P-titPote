@@ -1,3 +1,9 @@
+## [1.12.13](https://github.com/GTSpray/P-titPote/compare/v1.12.12...v1.12.13) (2026-09-21)
+
+### :repeat: Chore
+
+* **makefile:** limit make logs to last 200 lines ([#294](https://github.com/GTSpray/P-titPote/issues/294)) ([f2d0314](https://github.com/GTSpray/P-titPote/commit/f2d03145554057d7c66da74b63e2fa7534251d5c))
+
 ## [1.12.12](https://github.com/GTSpray/P-titPote/compare/v1.12.11...v1.12.12) (2026-09-21)
 
 ### :repeat: Chore
