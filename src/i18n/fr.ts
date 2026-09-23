@@ -90,6 +90,8 @@ export const fr = {
     "Ok! Je remonterai ce fil s'il reste silencieux {days} jour(s) ;)",
   'remind.on.alreadyExists': 'Ahem... il y a déjà un rappel sur ce fil 🤷',
   'remind.on.notThread': 'Ahem... cette commande ne marche que dans un fil 🤷',
+  'remind.on.archived':
+    'Ahem... ce fil est archivé, je ne peux pas y mettre de rappel 🤷',
   'remind.status.active':
     "Rappel actif : remontée après {days} jour(s) d'inactivité (par <@{ownerId}>)",
   'remind.status.inactive': 'Ahem... pas de rappel sur ce fil 🤷',

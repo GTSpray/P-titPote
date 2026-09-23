@@ -1,6 +1,3 @@
-
-
-
 const s = 1000;
 const m = 60 * s;
 const h = 60 * m;

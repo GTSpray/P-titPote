@@ -58,21 +58,27 @@ rejected.
      - `GET` last message (`limit=1`); if still recent, try `DELETE` previous
        `lastBumpMessageId` (ignore 404), clear it, set
        `nextTickAt = lastMessageAt + idleDays` and return; soft-delete on missing channel.
-     - When bumping: try `DELETE` previous `lastBumpMessageId` (ignore 404 if a mod already removed it), unarchive if needed, `POST` `remind.bump.message` (`⬆️`), store the new message id and set `nextTickAt = bumpAt + idleDays`.
+     - When bumping: if the thread is archived, soft-delete and return (no
+       unarchive). Otherwise try `DELETE` previous `lastBumpMessageId` (ignore
+       404 if a mod already removed it), `POST` `remind.bump.message` (`⬆️`),
+       store the new message id and set `nextTickAt = bumpAt + idleDays`.
 
 Errors are isolated per guild and per thread.
 
 ## Tests
 
-- `tests/src/commands/slashs/remind/` — on / status / off / router.
-- `tests/src/utils/remindLoop.spec.ts` — guild leave, nextTick filter, idle reschedule, bump, previous bump delete, unarchive, isolation.
+- `tests/src/commands/slashs/remind/` — on / status / off / router (including
+  refuse archived on `/remind on`).
+- `tests/src/utils/remindLoop.spec.ts` — guild leave, nextTick filter, idle
+  reschedule, bump, previous bump delete, archived soft-delete, isolation.
 - `tests/src/utils/remindConstants.spec.ts` — age helper.
 
 ## Troubleshooting
 
-| Symptom                     | Likely cause                                                                                                             |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| “ne marche que dans un fil” | Command run outside a thread.                                                                                            |
-| “déjà un rappel”            | Active row for `threadId`; run `/remind off` first.                                                                      |
-| No bumps                    | Threshold not reached; bot missing Manage Threads for archived threads; bot left guild (rows soft-deleted on next tick). |
-| Off refused                 | Caller is neither owner nor moderator.                                                                                   |
+| Symptom                     | Likely cause                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------- |
+| “ne marche que dans un fil” | Command run outside a thread.                                                               |
+| “fil est archivé”           | `/remind on` on an archived thread, or loop soft-deleted after archive.                     |
+| “déjà un rappel”            | Active row for `threadId`; run `/remind off` first.                                         |
+| No bumps                    | Threshold not reached; thread archived (soft-deleted); bot left guild (batch soft-deleted). |
+| Off refused                 | Caller is neither owner nor moderator.                                                      |

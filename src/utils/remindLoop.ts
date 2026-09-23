@@ -110,9 +110,12 @@ async function processThreadRemind(
     )) as APIThreadChannel;
 
     if (channel.thread_metadata?.archived) {
-      await discordapi.patch(Routes.channel(remind.threadId), {
-        body: { archived: false },
+      softDeleteRemind(remind);
+      await em.flush();
+      logger.info('remind soft-deleted: thread archived', {
+        threadId: remind.threadId,
       });
+      return;
     }
 
     await deletePreviousBump(remind);
