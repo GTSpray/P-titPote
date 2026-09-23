@@ -29,6 +29,9 @@ If a reminder is already active on that thread, the bot replies **Ahem... il y a
 déjà un rappel sur ce fil 🤷**. Turn it off first if you need a different
 `days` value.
 
+On an **archived** thread, `/remind on` is refused with **Ahem... ce fil est
+archivé, je ne peux pas y mettre de rappel 🤷**.
+
 ![Activate remind](./remind-on.gif)
 
 ### Status
@@ -56,9 +59,10 @@ rights get **Ahem... je ne suis pas habilité à le faire 🤷**.
 
 ### Automatic bump
 
-When the idle threshold is reached, the bot posts **⬆️** in the thread (and
-unarchives the thread first if needed). If a previous bump message from the bot
-is still there, it is removed before the new one is posted. If someone writes in
-the thread before the next bump is due, the bot removes the last **⬆️** (if still
-present) and waits again from that activity. No scenario video covers the hourly
-check — only the slash commands above.
+When the idle threshold is reached, the bot posts **⬆️** in the thread. If a
+previous bump message from the bot is still there, it is removed before the new
+one is posted. If someone writes in the thread before the next bump is due, the
+bot removes the last **⬆️** (if still present) and waits again from that
+activity. If the thread has been **archived**, the reminder is removed instead
+of bumping. No scenario video covers the hourly check — only the slash commands
+above.

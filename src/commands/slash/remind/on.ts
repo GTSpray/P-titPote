@@ -4,7 +4,10 @@ import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import { logger } from '../../../logger.js';
 import { errorPayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { isThreadChannel } from '../../../utils/isThreadChannel.js';
+import {
+  isArchivedThreadChannel,
+  isThreadChannel,
+} from '../../../utils/isThreadChannel.js';
 import {
   REMIND_DAYS_MAX,
   REMIND_DAYS_MIN,
@@ -35,6 +38,10 @@ export const on = async (
 ): Promise<Response | null> => {
   if (!isThreadChannel(req.body.channel)) {
     return res.json(errorPayload(t('remind.on.notThread')));
+  }
+
+  if (isArchivedThreadChannel(req.body.channel)) {
+    return res.json(errorPayload(t('remind.on.archived')));
   }
 
   const daysRaw = getOptionValue<number>(subcommand.options, 'days');

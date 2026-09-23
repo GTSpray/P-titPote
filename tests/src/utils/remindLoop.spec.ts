@@ -40,8 +40,8 @@ describe('remindLoop', () => {
     await em.persist([guild, remind]).flush();
   });
 
-  it('should export a 1 hour interval', () => {
-    expect(REMIND_INTERVAL_MS).toBe(60 * 1000);
+  it('should export a 10 minutes interval', () => {
+    expect(REMIND_INTERVAL_MS).toBe(60 * 10000);
   });
 
   it('should soft-delete all guild reminds when the bot left the guild', async () => {
@@ -334,7 +334,7 @@ describe('remindLoop', () => {
     expect(saved.lastBumpMessageId).toBe(nextBumpId);
   });
 
-  it('should unarchive before posting when the thread is archived', async () => {
+  it('should soft-delete when the thread is archived', async () => {
     DiscrodRESTMock.register(
       {
         verb: DiscrodRESTMockVerb.get,
@@ -364,32 +364,17 @@ describe('remindLoop', () => {
         thread_metadata: { archived: true },
       },
     );
-    DiscrodRESTMock.register(
-      {
-        verb: DiscrodRESTMockVerb.patch,
-        fullRoute: Routes.channel(thread_id),
-      },
-      {},
-    );
-    DiscrodRESTMock.register(
-      {
-        verb: DiscrodRESTMockVerb.post,
-        fullRoute: Routes.channelMessages(thread_id),
-      },
-      {
-        id: randomDiscordId19(),
-        timestamp: '2026-09-11T12:00:00.000Z',
-      },
-    );
 
     const patchSpy = vi.spyOn(REST.prototype, 'patch');
     const postSpy = vi.spyOn(REST.prototype, 'post');
     await runRemindTick(em, now);
 
-    expect(patchSpy).toHaveBeenCalledWith(Routes.channel(thread_id), {
-      body: { archived: false },
-    });
-    expect(postSpy).toHaveBeenCalled();
+    expect(patchSpy).not.toHaveBeenCalled();
+    expect(postSpy).not.toHaveBeenCalled();
+    em.clear();
+    expect(await em.find(ThreadRemind, { threadId: thread_id })).toHaveLength(
+      0,
+    );
   });
 
   it('should soft-delete when the channel is missing', async () => {
