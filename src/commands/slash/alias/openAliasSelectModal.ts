@@ -1,9 +1,13 @@
-import type { DBServices } from '../../../db/db.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { notFoundPayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
 import { Response } from 'express';
+import type { DBServices } from '../../../db/db.js';
+import { MessageAliasedLister } from '../../../db/model/index.js';
+import {
+  ListAliasesQuery,
+  ListAliasesQueryHandler,
+} from '../../../domain/alias/listAliasesQuery.js';
 
 export async function openAliasSelectModal({
   res,
@@ -22,13 +26,11 @@ export async function openAliasSelectModal({
     return null;
   }
 
-  const em = dbServices.orm.em.fork();
-  const messageAliaseds = await em.findAll(MessageAliased, {
-    where: { server: { guildId } },
-    orderBy: { alias: 'asc' },
-  });
+  const aliases = await new ListAliasesQueryHandler(
+    MessageAliasedLister,
+  ).handle(new ListAliasesQuery(guildId));
 
-  if (messageAliaseds.length === 0) {
+  if (aliases.length === 0) {
     return res.json(notFoundPayload());
   }
 
@@ -49,7 +51,7 @@ export async function openAliasSelectModal({
             custom_id: 'alias',
             placeholder: t('alias.modal.select.placeholder'),
             required: true,
-            options: messageAliaseds.map(({ alias }) => ({
+            options: aliases.map(({ alias }) => ({
               label: alias,
               value: alias,
             })),

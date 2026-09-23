@@ -3,8 +3,8 @@ import {
   AbstractSqlDriver,
   AbstractSqlConnection,
   AbstractSqlPlatform,
-  NotFoundError,
 } from '@mikro-orm/mariadb';
+import { NotFoundError } from '../../../../src/cqrs/errors.js';
 import { pollCreate } from '../../../../src/commands/cta/poll/pollCreate.js';
 import {
   CTAData,
