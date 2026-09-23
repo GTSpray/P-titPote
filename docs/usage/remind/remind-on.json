@@ -203,7 +203,7 @@
             "name": "Alex",
             "color": "#57F287"
           },
-          "command": "remind on days:3"
+          "command": "remind on"
         }
       }
     },
