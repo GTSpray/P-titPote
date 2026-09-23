@@ -5,8 +5,12 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
+import { MessageAliasedLister } from '../../../db/model/index.js';
+import {
+  ListAliasesQuery,
+  ListAliasesQueryHandler,
+} from '../../../domain/alias/listAliasesQuery.js';
 
 export interface aliasLsCommandData {
   id: string;
@@ -28,34 +32,31 @@ export const ls = async ({
 }: CommandHandlerOptions<aliasLsCommandData>): Promise<Response | null> => {
   const guildId = req.body.guild_id;
 
-  if (dbServices && guildId) {
-    const em = dbServices.orm.em.fork();
-
-    const messageAliaseds = await em.findAll(MessageAliased, {
-      where: { server: { guildId } },
-      orderBy: { alias: 'asc' },
-    });
-
-    let components = [];
-    if (messageAliaseds.length == 0) {
-      return res.json(notFoundPayload());
-    } else {
-      components = [
-        ...foundItComponnents(),
-        {
-          type: ComponentType.TextDisplay,
-          content: messageAliaseds.map((e) => `* ${e.alias}`).join('\n'),
-        },
-      ];
-    }
-    return res.json({
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.IsComponentsV2,
-        components,
-      },
-    });
+  if (!dbServices || !guildId) {
+    return null;
   }
 
-  return null;
+  const aliases = await new ListAliasesQueryHandler(
+    MessageAliasedLister,
+  ).handle(new ListAliasesQuery(guildId));
+
+  let components = [];
+  if (aliases.length == 0) {
+    return res.json(notFoundPayload());
+  } else {
+    components = [
+      ...foundItComponnents(),
+      {
+        type: ComponentType.TextDisplay,
+        content: aliases.map((alias) => `* ${alias.alias}`).join('\n'),
+      },
+    ];
+  }
+  return res.json({
+    type: InteractionResponseType.ChannelMessageWithSource,
+    data: {
+      flags: MessageFlags.IsComponentsV2,
+      components,
+    },
+  });
 };

@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
   ComponentSelect,
@@ -6,7 +5,6 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
@@ -15,14 +13,15 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-});
+import { BadRequestError } from '../../../cqrs/errors.js';
+import {
+  MessageAliasedRemover,
+  MessageAliasedTryFinder,
+} from '../../../db/model/index.js';
+import {
+  RemoveAliasCommand,
+  RemoveAliasCommandHandler,
+} from '../../../domain/alias/removeAliasCommand.js';
 
 export const aliasRm: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
@@ -35,52 +34,50 @@ export const aliasRm: ModalHandlerDelcaration<CTAData> = {
 
     const guildId = req.body.guild_id;
     const { data } = req.body;
-
     const aliasInput = getInputComponnentById<ComponentSelect>(data, 'alias');
 
-    const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.values[0],
-    });
-
-    if (!AliasMessageInput.success) {
-      const issues = AliasMessageInput.error.issues;
-      logger.debug('zod errors', { issues });
-      return res
-        .status(400)
-        .json({ error: t('errors.invalidSubcommandPayload'), issues });
+    if (!dbServices || !guildId) {
+      return res.status(500).json({
+        error: t('errors.unmetResult'),
+      });
     }
 
-    if (dbServices && guildId) {
-      const em = dbServices.orm.em.fork();
+    try {
+      const command = new RemoveAliasCommand(
+        { alias: aliasInput?.component.values[0] },
+        guildId,
+      );
+      const removed = await new RemoveAliasCommandHandler({
+        ...MessageAliasedTryFinder,
+        ...MessageAliasedRemover,
+      }).handle(command);
 
-      const messageAliased = await em.findOne(MessageAliased, {
-        server: { guildId },
-        alias: AliasMessageInput.data.alias,
-      });
-
-      if (messageAliased) {
-        messageAliased.deletedAt = new Date();
-        await em.persist(messageAliased).flush();
-        return res.json({
-          type: InteractionResponseType.ChannelMessageWithSource,
-          data: {
-            flags: MessageFlags.IsComponentsV2,
-            components: [...okComponnents()],
-          },
-        });
+      if (!removed) {
+        return res.json(
+          errorPayload(
+            t('alias.rm.notFound', {
+              alias: command.alias,
+            }),
+          ),
+        );
       }
 
-      return res.json(
-        errorPayload(
-          t('alias.rm.notFound', {
-            alias: AliasMessageInput.data.alias,
-          }),
-        ),
-      );
+      return res.json({
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          flags: MessageFlags.IsComponentsV2,
+          components: [...okComponnents()],
+        },
+      });
+    } catch (error) {
+      if (error instanceof BadRequestError) {
+        const issues = error.details ?? [];
+        logger.debug('zod errors', { issues });
+        return res
+          .status(400)
+          .json({ error: t('errors.invalidSubcommandPayload'), issues });
+      }
+      throw error;
     }
-
-    return res.status(500).json({
-      error: t('errors.unmetResult'),
-    });
   },
 };

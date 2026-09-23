@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
   ComponentSimple,
@@ -6,8 +5,6 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
-import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
@@ -16,18 +13,19 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import { BadRequestError, TooManyError } from '../../../cqrs/errors.js';
+import {
+  DiscordGuildPersister,
+  DiscordGuildTryFinder,
+  MessageAliasedLister,
+  MessageAliasedPersister,
+} from '../../../db/model/index.js';
+import {
+  SetAliasCommand,
+  SetAliasCommandHandler,
+} from '../../../domain/alias/setAliasCommand.js';
 
-/** Max active aliases per guild. */
-export const ALIAS_LIMIT = 20;
-
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-  message: z.string().min(1).max(500),
-});
+export { ALIAS_LIMIT } from '../../../domain/alias/aliasQuotaComputer.js';
 
 export const aliasSet: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
@@ -47,45 +45,25 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
       'message',
     );
 
-    const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.value,
-      message: messageInput?.component.value,
-    });
-
-    if (!AliasMessageInput.success) {
-      const issues = AliasMessageInput.error.issues;
-      logger.debug('zod errors', { issues });
-      return res
-        .status(400)
-        .json({ error: t('errors.invalidSubcommandPayload'), issues });
+    if (!dbServices || !guildId) {
+      return res.status(500).json({
+        error: t('errors.unmetResult'),
+      });
     }
 
-    if (dbServices && guildId) {
-      const em = dbServices.orm.em.fork();
-
-      const guild = await findOrCreateGuild(em, guildId);
-      await em.populate(guild, ['messageAliaseds']);
-
-      let messageAliased = guild.messageAliaseds.find(
-        (aliasedMsg: MessageAliased) =>
-          aliasedMsg.alias === AliasMessageInput.data.alias,
+    try {
+      const command = new SetAliasCommand(
+        {
+          alias: aliasInput?.component.value,
+          message: messageInput?.component.value,
+        },
+        guildId,
       );
-
-      if (!messageAliased) {
-        if (guild.messageAliaseds.length >= ALIAS_LIMIT) {
-          return res.json(errorPayload(t('errors.tooMany')));
-        }
-        messageAliased = new MessageAliased(
-          AliasMessageInput.data.alias,
-          AliasMessageInput.data.message,
-        );
-        guild.messageAliaseds.add(messageAliased);
-        await em.persist(guild).flush();
-      }
-
-      messageAliased.message = AliasMessageInput.data.message;
-
-      await em.persist(messageAliased).flush();
+      const handler = new SetAliasCommandHandler(
+        { ...DiscordGuildTryFinder, ...DiscordGuildPersister },
+        { ...MessageAliasedLister, ...MessageAliasedPersister },
+      );
+      await handler.handle(command);
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
@@ -93,10 +71,18 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
           components: [...okComponnents()],
         },
       });
+    } catch (error) {
+      if (error instanceof TooManyError) {
+        return res.json(errorPayload(t('errors.tooMany')));
+      }
+      if (error instanceof BadRequestError) {
+        const issues = error.details ?? [];
+        logger.debug('zod errors', { issues });
+        return res
+          .status(400)
+          .json({ error: t('errors.invalidSubcommandPayload'), issues });
+      }
+      throw error;
     }
-
-    return res.status(500).json({
-      error: t('errors.unmetResult'),
-    });
   },
 };

@@ -198,10 +198,14 @@ Primary source files:
   via `src/utils/registerSlashCommands.ts`.
 - `src/logger.ts` - Winston logging setup.
 - `src/mikro-orm.config.ts` - MikroORM/MariaDB configuration.
-- `src/commands/` - command types, shared command response helpers, and slash-command modules.
+- `src/commands/` - Discord adapters, shared response helpers, and slash-command modules.
 - `src/commands/slash/` - slash-command declarations and handlers.
-- `src/db/` - database services and base entities.
-- `src/db/entities/` - MikroORM entities.
+- `src/cqrs/` - generic command/query contracts, payload validation, and errors.
+- `src/domain/` - command, query, and business handlers. No ORM imports.
+- `src/entities/` - plain entity types shared outside the ORM.
+- `src/db/` - database services, model-layer repositories, and base entities.
+- `src/db/entities/` - MikroORM models. Only the model layer imports these.
+- `src/db/model/` - Finder, Lister, Persister, and `withTransaction`.
 - `src/migrations/` - database migrations.
 - `src/gateway/` - gateway socket implementation and related types.
 - `src/utils/` - shared utility functions.

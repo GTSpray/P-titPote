@@ -68,6 +68,11 @@ subcommand or CTA handler logic is not applied.
 
 ## Persistence model
 
+Alias reads and writes go through command and query handlers in
+`src/domain/alias/`. Those handlers see plain `MessageAliased` entities.
+`src/db/model/messageAliased.ts` is the MikroORM implementation behind
+`TryFinder`, `Lister`, `Persister`, and `Remover`. See [`cqrs.md`](cqrs.md).
+
 Alias state is stored in MariaDB through MikroORM:
 
 - `DiscordGuild.guildId` identifies the Discord server.

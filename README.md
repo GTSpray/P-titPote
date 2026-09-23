@@ -179,6 +179,7 @@ Preview the user docs locally with `cd site && npm run dev` (after `npm ci` in
 
 These guides describe architecture, services, and implementation details:
 
+- [`docs/cqrs.md`](docs/cqrs.md) — command/query layers, model contracts, and ORM boundary
 - [`docs/interactions.md`](docs/interactions.md) — Discord HTTP interaction dispatch, handlers, and troubleshooting
 - [`docs/alias.md`](docs/alias.md) — alias command validation, persistence, permissions, and troubleshooting
 - [`docs/gimme.md`](docs/gimme.md) — gimme utility command dispatch, emoji extraction, and troubleshooting
@@ -212,13 +213,17 @@ P-titPote/
 │   ├── register.ts              # Manual register CLI (also on API startup)
 │   ├── logger.ts                # Winston logging setup
 │   ├── mikro-orm.config.ts      # MikroORM/MariaDB config
-│   ├── commands/                # Discord slash commands
+│   ├── commands/                # Discord slash commands and CTA adapters
+│   ├── domain/                  # Command, query, and business handlers
+│   ├── cqrs/                    # Shared command/query contracts
+│   ├── entities/                # Plain entity types
 │   ├── gateway/                 # WS handlers
-│   ├── db/                      # Database entities
+│   ├── db/                      # MikroORM models and model-layer repositories
 │   ├── utils/                   # Helper utils
 │   └── migrations/              # Database migrations
 ├── docs/
 │   ├── usage/                   # End-user command guides
+│   ├── cqrs.md                  # CQRS-friendly layering
 │   ├── interactions.md          # HTTP interactions dispatch guide
 │   ├── alias.md                 # Alias command technical guide
 │   ├── gimme.md                 # Gimme command technical guide
