@@ -70,6 +70,29 @@ describe('/remind on', () => {
     });
   });
 
+  it('should refuse on an archived thread', async () => {
+    const subcommand = await setup(2);
+    handlerOpts.req.body.channel.thread_metadata = {
+      archived: true,
+      auto_archive_duration: 1440,
+      archive_timestamp: '2026-09-01T00:00:00.000Z',
+    };
+    const response = await on(handlerOpts, subcommand);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('remind.on.archived'),
+      },
+    });
+
+    em.clear();
+    expect(await em.find(ThreadRemind, { threadId: thread_id })).toHaveLength(
+      0,
+    );
+  });
+
   it('should create a ThreadRemind', async () => {
     const subcommand = await setup(3);
     const response = await on(handlerOpts, subcommand);
