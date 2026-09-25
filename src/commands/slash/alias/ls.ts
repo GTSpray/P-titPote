@@ -5,8 +5,10 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
+import { ListMessageAliasesQuery } from '../../../queries/listMessageAliases.query.js';
+import { ListMessageAliasesQueryHandler } from '../../../handlers/listMessageAliases.queryHandler.js';
+import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
 
 export interface aliasLsCommandData {
   id: string;
@@ -30,11 +32,13 @@ export const ls = async ({
 
   if (dbServices && guildId) {
     const em = dbServices.orm.em.fork();
+    const handler = new ListMessageAliasesQueryHandler(
+      createMessageAliasedLister(em),
+    );
 
-    const messageAliaseds = await em.findAll(MessageAliased, {
-      where: { server: { guildId } },
-      orderBy: { alias: 'asc' },
-    });
+    const messageAliaseds = await handler.handle(
+      new ListMessageAliasesQuery(guildId),
+    );
 
     let components = [];
     if (messageAliaseds.length == 0) {

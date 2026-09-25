@@ -10,19 +10,14 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-});
+import { GetMessageAliasQuery } from '../../../queries/getMessageAlias.query.js';
+import { GetMessageAliasQueryHandler } from '../../../handlers/getMessageAlias.queryHandler.js';
+import { MessageAliasNotFoundError } from '../../../errors/messageAlias.errors.js';
+import { createMessageAliasedFinder } from '../../../repositories/messageAliased/messageAliased.finder.js';
 
 export const aliasSay: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
@@ -38,27 +33,20 @@ export const aliasSay: ModalHandlerDelcaration<CTAData> = {
 
     const aliasInput = getInputComponnentById<ComponentSelect>(data, 'alias');
 
-    const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.values[0],
-    });
-
-    if (!AliasMessageInput.success) {
-      const issues = AliasMessageInput.error.issues;
-      logger.debug('zod errors', { issues });
-      return res
-        .status(400)
-        .json({ error: t('errors.invalidSubcommandPayload'), issues });
-    }
-
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
+      const handler = new GetMessageAliasQueryHandler(
+        createMessageAliasedFinder(em),
+      );
 
-      const messageAliased = await em.findOne(MessageAliased, {
-        server: { guildId },
-        alias: AliasMessageInput.data.alias,
-      });
+      try {
+        const query = new GetMessageAliasQuery({
+          guildId,
+          alias: aliasInput?.component.values[0],
+        });
 
-      if (messageAliased) {
+        const messageAliased = await handler.handle(query);
+
         return res.json({
           type: InteractionResponseType.ChannelMessageWithSource,
           data: {
@@ -71,15 +59,21 @@ export const aliasSay: ModalHandlerDelcaration<CTAData> = {
             ],
           },
         });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          const issues = error.issues;
+          logger.debug('zod errors', { issues });
+          return res
+            .status(400)
+            .json({ error: t('errors.invalidSubcommandPayload'), issues });
+        }
+        if (error instanceof MessageAliasNotFoundError) {
+          return res.json(
+            errorPayload(t('alias.say.notFound', { alias: error.alias })),
+          );
+        }
+        throw error;
       }
-
-      return res.json(
-        errorPayload(
-          t('alias.say.notFound', {
-            alias: AliasMessageInput.data.alias,
-          }),
-        ),
-      );
     }
 
     return res.status(500).json({

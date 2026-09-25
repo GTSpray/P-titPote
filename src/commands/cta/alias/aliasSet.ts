@@ -6,8 +6,6 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
-import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
@@ -16,18 +14,14 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import { SetMessageAliasCommand } from '../../../cmds/setMessageAlias.command.js';
+import { SetMessageAliasCommandHandler } from '../../../handlers/setMessageAlias.commandHandler.js';
+import { MessageAliasComputer } from '../../../handlers/messageAlias.computer.js';
+import { MessageAliasLimitReachedError } from '../../../errors/messageAlias.errors.js';
+import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
+import { createMessageAliasedPersister } from '../../../repositories/messageAliased/messageAliased.persister.js';
 
-/** Max active aliases per guild. */
-export const ALIAS_LIMIT = 20;
-
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-  message: z.string().min(1).max(500),
-});
+export { ALIAS_LIMIT } from '../../../handlers/messageAlias.computer.js';
 
 export const aliasSet: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
@@ -47,52 +41,44 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
       'message',
     );
 
-    const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.value,
-      message: messageInput?.component.value,
-    });
-
-    if (!AliasMessageInput.success) {
-      const issues = AliasMessageInput.error.issues;
-      logger.debug('zod errors', { issues });
-      return res
-        .status(400)
-        .json({ error: t('errors.invalidSubcommandPayload'), issues });
-    }
-
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
-
-      const guild = await findOrCreateGuild(em, guildId);
-      await em.populate(guild, ['messageAliaseds']);
-
-      let messageAliased = guild.messageAliaseds.find(
-        (aliasedMsg: MessageAliased) =>
-          aliasedMsg.alias === AliasMessageInput.data.alias,
+      const handler = new SetMessageAliasCommandHandler(
+        em,
+        createMessageAliasedLister(em),
+        createMessageAliasedPersister(em),
+        new MessageAliasComputer(),
       );
 
-      if (!messageAliased) {
-        if (guild.messageAliaseds.length >= ALIAS_LIMIT) {
+      try {
+        const command = new SetMessageAliasCommand({
+          guildId,
+          alias: aliasInput?.component.value,
+          message: messageInput?.component.value,
+        });
+
+        await handler.handle(command);
+
+        return res.json({
+          type: InteractionResponseType.ChannelMessageWithSource,
+          data: {
+            flags: MessageFlags.IsComponentsV2,
+            components: [...okComponnents()],
+          },
+        });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          const issues = error.issues;
+          logger.debug('zod errors', { issues });
+          return res
+            .status(400)
+            .json({ error: t('errors.invalidSubcommandPayload'), issues });
+        }
+        if (error instanceof MessageAliasLimitReachedError) {
           return res.json(errorPayload(t('errors.tooMany')));
         }
-        messageAliased = new MessageAliased(
-          AliasMessageInput.data.alias,
-          AliasMessageInput.data.message,
-        );
-        guild.messageAliaseds.add(messageAliased);
-        await em.persist(guild).flush();
+        throw error;
       }
-
-      messageAliased.message = AliasMessageInput.data.message;
-
-      await em.persist(messageAliased).flush();
-      return res.json({
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.IsComponentsV2,
-          components: [...okComponnents()],
-        },
-      });
     }
 
     return res.status(500).json({
