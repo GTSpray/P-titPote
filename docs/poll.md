@@ -84,6 +84,28 @@ so submitting again updates the previous answers.
 Choice questions render as string selects. Questions without choices render as
 paragraph text inputs.
 
+## Vote/report consistency
+
+Vote submission and report generation both serialize on the `Poll` row:
+
+- `pollVote` runs in `em.transactional`, loads the guild-scoped poll with
+  `LockMode.PESSIMISTIC_WRITE`, checks the current `endDate` and voter role,
+  then creates or updates the member's `PollResp` rows in the same transaction.
+- `pollSummary` also runs in `em.transactional`, locks the same poll row, closes
+  the poll when it is still open, flushes that close, then reads responses and
+  posts the report.
+
+This shared lock is the boundary between voting and reporting. If a vote is
+already being recorded, the report waits and includes the committed response. If
+the report closes the poll first, a concurrent vote waits for the report
+transaction and then sees the closed `endDate` instead of writing a response.
+
+Keep the close, response read, and Discord report posting in the same locked
+transaction unless another consistency boundary replaces it. The lock is held
+while report chunks are posted so stored responses cannot change after the
+report content is built. If Discord rejects a report message, `pollSummary`
+restores the previous `endDate` before returning the failure response.
+
 ## Reports and closing behavior
 
 The **Compte rendu** button is moderator-only. `pollSummary`:
@@ -127,3 +149,8 @@ Relevant tests live under `tests/src/commands/slashs/poll/` and
 `tests/src/cta/poll/`. The report failure guarantee is covered in
 `tests/src/cta/poll/pollSummary.spec.ts` by asserting that `endDate` is closed
 before posting and restored when Discord report posting fails.
+
+The vote/report race guard is covered by the lock assertions in
+`tests/src/cta/poll/pollVote.spec.ts` and
+`tests/src/cta/poll/pollSummary.spec.ts`; both handlers must request
+`LockMode.PESSIMISTIC_WRITE` on the same guild-scoped `Poll` lookup.
