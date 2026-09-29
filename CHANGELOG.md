@@ -1,3 +1,9 @@
+## [1.12.20](https://github.com/GTSpray/P-titPote/compare/v1.12.19...v1.12.20) (2026-09-29)
+
+### :white_check_mark: Tests
+
+* silence dotenv injected env logs in vitest ([#302](https://github.com/GTSpray/P-titPote/issues/302)) ([a2bae34](https://github.com/GTSpray/P-titPote/commit/a2bae3441d638fb559a651dd15486770a6e6a640))
+
 ## [1.12.19](https://github.com/GTSpray/P-titPote/compare/v1.12.18...v1.12.19) (2026-09-29)
 
 ### :repeat: Chore
