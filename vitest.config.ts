@@ -11,6 +11,9 @@ export default defineConfig({
     globals: true,
     include: ['tests/**/*.spec.ts'],
     setupFiles: ['tests/vitest.setup.ts'],
+    env: {
+      DOTENV_CONFIG_QUIET: 'true',
+    },
     reporters: process.env.GITHUB_ACTIONS
       ? [
           'dot',
