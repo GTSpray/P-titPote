@@ -1,3 +1,9 @@
+## [1.12.15](https://github.com/GTSpray/P-titPote/compare/v1.12.14...v1.12.15) (2026-09-29)
+
+### :repeat: Chore
+
+* **deps:** bump @types/node from 26.6.1 to 26.6.2 ([#301](https://github.com/GTSpray/P-titPote/issues/301)) ([e3d51cd](https://github.com/GTSpray/P-titPote/commit/e3d51cdda1b49b1121b5b93f85c69abb69747017))
+
 ## [1.12.14](https://github.com/GTSpray/P-titPote/compare/v1.12.13...v1.12.14) (2026-09-21)
 
 ### :bug: Fixes
