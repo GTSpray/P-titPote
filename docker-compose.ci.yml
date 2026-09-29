@@ -5,6 +5,7 @@ services:
       LOG_LEVEL: 'info'
       GITHUB_ACTIONS: 1
       GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}
+      DOTENV_CONFIG_QUIET: true
     build:
       context: .
       dockerfile: docker/ptitpote/Dockerfile
