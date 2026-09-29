@@ -1,3 +1,9 @@
+## [1.12.18](https://github.com/GTSpray/P-titPote/compare/v1.12.17...v1.12.18) (2026-09-29)
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/npm from 13.1.5 to 13.2.0 ([#298](https://github.com/GTSpray/P-titPote/issues/298)) ([7340624](https://github.com/GTSpray/P-titPote/commit/7340624f3bccefe5f83cf8429edbccccf0480d2c))
+
 ## [1.12.17](https://github.com/GTSpray/P-titPote/compare/v1.12.16...v1.12.17) (2026-09-29)
 
 ### :repeat: Chore
