@@ -1,3 +1,9 @@
+## [1.12.16](https://github.com/GTSpray/P-titPote/compare/v1.12.15...v1.12.16) (2026-09-29)
+
+### :repeat: Chore
+
+* **deps:** bump morgan from 1.12.0 to 1.12.1 ([#300](https://github.com/GTSpray/P-titPote/issues/300)) ([eab6478](https://github.com/GTSpray/P-titPote/commit/eab647884ef1fc829cbf1806687f51a4304f91c3))
+
 ## [1.12.15](https://github.com/GTSpray/P-titPote/compare/v1.12.14...v1.12.15) (2026-09-29)
 
 ### :repeat: Chore
