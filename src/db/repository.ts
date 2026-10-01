@@ -1,8 +1,3 @@
-/**
- * Generic repository contracts (ports), independent of any ORM.
- * See Archi.md - "4. Model layer - data access".
- */
-
 export interface Finder<Entity, Criteria> {
   findOrFail(criteria: Criteria): Promise<Entity>;
 }
