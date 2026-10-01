@@ -45,8 +45,10 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
       const em = dbServices.orm.em.fork();
       const handler = new SetMessageAliasQueryHandler(
         em,
-        createMessageAliasedLister(em),
-        createMessageAliasedPersister(em),
+        {
+          ...createMessageAliasedLister(em),
+          ...createMessageAliasedPersister(em),
+        },
         new MessageAliasComputer(),
       );
 

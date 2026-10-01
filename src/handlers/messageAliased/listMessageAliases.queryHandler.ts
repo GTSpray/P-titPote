@@ -1,14 +1,17 @@
-import { Lister } from '../../db/repository.js';
+import type { Lister } from '../../db/repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { ListMessageAliasesQuery } from '../../queries/listMessageAliases.query.js';
-import { MessageAliasedListCriteria } from '../../repositories/messageAliased/messageAliased.lister.js';
+import type { MessageAliasedListCriteria } from '../../repositories/messageAliased/messageAliased.lister.js';
+
+export type MessageAliasListRepository = Lister<
+  MessageAliasEntity,
+  MessageAliasedListCriteria
+>;
 
 export class ListMessageAliasesQueryHandler {
-  constructor(
-    private lister: Lister<MessageAliasEntity, MessageAliasedListCriteria>,
-  ) {}
+  constructor(private messageAliasRepository: MessageAliasListRepository) {}
 
   async handle(query: ListMessageAliasesQuery): Promise<MessageAliasEntity[]> {
-    return this.lister.list({ guildId: query.guildId });
+    return this.messageAliasRepository.list({ guildId: query.guildId });
   }
 }

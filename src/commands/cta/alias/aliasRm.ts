@@ -36,11 +36,10 @@ export const aliasRm: ModalHandlerDelcaration<CTAData> = {
 
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
-      const handler = new RemoveMessageAliasQueryHandler(
-        em,
-        createMessageAliasedFinder(em),
-        createMessageAliasedRemover(em),
-      );
+      const handler = new RemoveMessageAliasQueryHandler(em, {
+        ...createMessageAliasedFinder(em),
+        ...createMessageAliasedRemover(em),
+      });
 
       try {
         const query = new RemoveMessageAliasQuery({
