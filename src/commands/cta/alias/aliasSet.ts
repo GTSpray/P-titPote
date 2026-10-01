@@ -15,13 +15,13 @@ import {
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { SetMessageAliasQuery } from '../../../queries/setMessageAlias.query.js';
-import { SetMessageAliasQueryHandler } from '../../../handlers/setMessageAlias.queryHandler.js';
-import { MessageAliasComputer } from '../../../handlers/messageAlias.computer.js';
+import { SetMessageAliasQueryHandler } from '../../../handlers/messageAliased/setMessageAlias.queryHandler.js';
+import { MessageAliasComputer } from '../../../handlers/messageAliased/messageAlias.computer.js';
 import { MessageAliasLimitReachedError } from '../../../errors/messageAlias.errors.js';
 import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
 import { createMessageAliasedPersister } from '../../../repositories/messageAliased/messageAliased.persister.js';
 
-export { ALIAS_LIMIT } from '../../../handlers/messageAlias.computer.js';
+export { ALIAS_LIMIT } from '../../../handlers/messageAliased/messageAlias.computer.js';
 
 export const aliasSet: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {

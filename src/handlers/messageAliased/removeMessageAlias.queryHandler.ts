@@ -1,7 +1,7 @@
 import type { EntityManager } from '@mikro-orm/core';
-import { Finder, Remover } from '../db/repository.js';
-import { MessageAliasEntity } from '../entities/messageAlias.entity.js';
-import { RemoveMessageAliasQuery } from '../queries/removeMessageAlias.query.js';
+import { Finder, Remover } from '../../db/repository.js';
+import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
+import { RemoveMessageAliasQuery } from '../../queries/removeMessageAlias.query.js';
 
 export class RemoveMessageAliasQueryHandler {
   constructor(

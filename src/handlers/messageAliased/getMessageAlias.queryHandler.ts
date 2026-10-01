@@ -1,6 +1,6 @@
-import { Finder } from '../db/repository.js';
-import { MessageAliasEntity } from '../entities/messageAlias.entity.js';
-import { GetMessageAliasQuery } from '../queries/getMessageAlias.query.js';
+import { Finder } from '../../db/repository.js';
+import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
+import { GetMessageAliasQuery } from '../../queries/getMessageAlias.query.js';
 
 export class GetMessageAliasQueryHandler {
   constructor(

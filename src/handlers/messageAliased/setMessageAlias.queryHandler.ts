@@ -1,10 +1,10 @@
 import type { EntityManager } from '@mikro-orm/core';
-import { findOrCreateGuild } from '../db/services/discordGuild.service.js';
-import { Lister, Persister } from '../db/repository.js';
-import { MessageAliasEntity } from '../entities/messageAlias.entity.js';
-import { SetMessageAliasQuery } from '../queries/setMessageAlias.query.js';
+import { findOrCreateGuild } from '../../db/services/discordGuild.service.js';
+import { Lister, Persister } from '../../db/repository.js';
+import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
+import { SetMessageAliasQuery } from '../../queries/setMessageAlias.query.js';
 import { MessageAliasComputer } from './messageAlias.computer.js';
-import { MessageAliasedListCriteria } from '../repositories/messageAliased/messageAliased.lister.js';
+import { MessageAliasedListCriteria } from '../../repositories/messageAliased/messageAliased.lister.js';
 
 export class SetMessageAliasQueryHandler {
   constructor(

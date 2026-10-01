@@ -7,7 +7,7 @@ import {
 } from 'discord-api-types/v10';
 import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
 import { ListMessageAliasesQuery } from '../../../queries/listMessageAliases.query.js';
-import { ListMessageAliasesQueryHandler } from '../../../handlers/listMessageAliases.queryHandler.js';
+import { ListMessageAliasesQueryHandler } from '../../../handlers/messageAliased/listMessageAliases.queryHandler.js';
 import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
 
 export interface aliasLsCommandData {

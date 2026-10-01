@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
-import { MessageAliasEntity } from '../entities/messageAlias.entity.js';
-import { SetMessageAliasQuery } from '../queries/setMessageAlias.query.js';
-import { MessageAliasLimitReachedError } from '../errors/messageAlias.errors.js';
+import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
+import { SetMessageAliasQuery } from '../../queries/setMessageAlias.query.js';
+import { MessageAliasLimitReachedError } from '../../errors/messageAlias.errors.js';
 
 /** Max active aliases per guild. */
 export const ALIAS_LIMIT = 20;

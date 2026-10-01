@@ -15,7 +15,7 @@ import {
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { RemoveMessageAliasQuery } from '../../../queries/removeMessageAlias.query.js';
-import { RemoveMessageAliasQueryHandler } from '../../../handlers/removeMessageAlias.queryHandler.js';
+import { RemoveMessageAliasQueryHandler } from '../../../handlers/messageAliased/removeMessageAlias.queryHandler.js';
 import { MessageAliasNotFoundError } from '../../../errors/messageAlias.errors.js';
 import { createMessageAliasedFinder } from '../../../repositories/messageAliased/messageAliased.finder.js';
 import { createMessageAliasedRemover } from '../../../repositories/messageAliased/messageAliased.remover.js';

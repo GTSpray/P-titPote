@@ -15,7 +15,7 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { GetMessageAliasQuery } from '../../../queries/getMessageAlias.query.js';
-import { GetMessageAliasQueryHandler } from '../../../handlers/getMessageAlias.queryHandler.js';
+import { GetMessageAliasQueryHandler } from '../../../handlers/messageAliased/getMessageAlias.queryHandler.js';
 import { MessageAliasNotFoundError } from '../../../errors/messageAlias.errors.js';
 import { createMessageAliasedFinder } from '../../../repositories/messageAliased/messageAliased.finder.js';
 

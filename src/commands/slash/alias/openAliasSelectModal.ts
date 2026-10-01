@@ -4,7 +4,7 @@ import { t } from '../../../i18n/index.js';
 import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
 import { Response } from 'express';
 import { ListMessageAliasesQuery } from '../../../queries/listMessageAliases.query.js';
-import { ListMessageAliasesQueryHandler } from '../../../handlers/listMessageAliases.queryHandler.js';
+import { ListMessageAliasesQueryHandler } from '../../../handlers/messageAliased/listMessageAliases.queryHandler.js';
 import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
 
 export async function openAliasSelectModal({
