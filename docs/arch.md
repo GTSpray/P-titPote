@@ -7,12 +7,12 @@ The running example below is a classic `User` CRUD, fully backed by a database.
 
 ## Patterns in play
 
-| Pattern                                            | Where it applies                                                                                                                       |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **Query object**                                   | A `Query` encapsulates a request (read or write) as a validated object passed to a handler                                             |
-| **Repository pattern**                             | `Finder`/`TryFinder`/`Lister`/`Persister`/`Remover`                                                                                    |
-| **Ports & Adapters / hexagonal architecture**      | The generic interfaces (`Finder<Entity>`...) are the _ports_; their concrete implementations are the _adapters_ that plug into the ORM |
-| **Layered / Service Layer**                        | Handler → QueryHandler → business layer → Repository, in strictly descending layers                                                    |
+| Pattern                                       | Where it applies                                                                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Query object**                              | A `Query` encapsulates a request (read or write) as a validated object passed to a handler                                             |
+| **Repository pattern**                        | `Finder`/`TryFinder`/`Lister`/`Persister`/`Remover`                                                                                    |
+| **Ports & Adapters / hexagonal architecture** | The generic interfaces (`Finder<Entity>`...) are the _ports_; their concrete implementations are the _adapters_ that plug into the ORM |
+| **Layered / Service Layer**                   | Handler → QueryHandler → business layer → Repository, in strictly descending layers                                                    |
 
 ```mermaid
 flowchart TD
