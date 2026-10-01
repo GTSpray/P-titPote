@@ -15,6 +15,7 @@ import { cta } from './commands/cta/index.js';
 import { t } from './i18n/index.js';
 import { notifyBotOwner } from './utils/notifyBotOwner.js';
 import { registerSlashCommands } from './utils/registerSlashCommands.js';
+import { startRemindLoop } from './utils/remindLoop.js';
 
 import config from './mikro-orm.config.js';
 import { initORM } from './db/db.js';
@@ -141,7 +142,7 @@ app.post(
 app.use(express.json()); // after interaction route to prevent We recommend disabling middleware for interaction routes so that req.body is a raw buffer.
 
 orm
-  .then(() => {
+  .then((dbServices) => {
     app.listen(PORT, (err) => {
       if (err) {
         logger.error('startup error', err);
@@ -154,6 +155,7 @@ orm
           version: process.env.npm_package_version ?? 'unknown',
         }),
       );
+      startRemindLoop(() => dbServices.orm.em.fork());
     });
   })
   .catch((err) => {

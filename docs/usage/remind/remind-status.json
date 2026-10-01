@@ -1,0 +1,125 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "remind-status",
+  "title": "Remind — statut du rappel",
+  "doc": "docs/usage/remind/remind.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "événements",
+      "type": "text"
+    },
+    "thread": {
+      "name": "idée-barbecue",
+      "active": true,
+      "startedBy": "Alex"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Alex",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "applyState",
+      "holdMs": 2200,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Idées pour le barbecue :",
+            "timestamp": "12:14"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Brochettes, salade, et desserts à prévoir.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Je mets un rappel au cas où le fil tombe dans l'oubli.",
+            "timestamp": "12:16"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1000
+    },
+    {
+      "type": "type",
+      "text": "/remind status",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/remind status",
+            "description": "Affiche le rappel actif sur ce fil"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "showEphemeral",
+      "ephemeral": {
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "type": 4,
+        "data": {
+          "flags": 64,
+          "content": "Rappel actif : remontée après 3 jour(s) d'inactivité (par <@123456789012345678>)"
+        },
+        "slashInvocation": {
+          "user": {
+            "name": "Alex",
+            "color": "#57F287"
+          },
+          "command": "remind status"
+        }
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/remind",
+    "prefix": "remind-status",
+    "video": true
+  }
+}
