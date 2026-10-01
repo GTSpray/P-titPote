@@ -12,33 +12,55 @@ import {
   getInputComponnentsByPrefix,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { Poll } from '../../../db/entities/Poll.entity.js';
-import { PollStep } from '../../../db/entities/PollStep.entity.js';
-import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
-import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
-import { doNotUpdatePublishedPoll, notAllowed } from '../../commonMessages.js';
+import {
+  doNotUpdatePublishedPoll,
+  errorPayload,
+  notAllowed,
+} from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
+import {
+  PollAlreadyPublishedError,
+  TooManyError,
+} from '../../../cqrs/errors.js';
+import type { Poll } from '../../../entities/poll.js';
+import {
+  DiscordGuildPersister,
+  DiscordGuildTryFinder,
+  PollFinder,
+  PollPersister,
+} from '../../../db/model/index.js';
+import {
+  CreatePollCommand,
+  CreatePollCommandHandler,
+} from '../../../domain/poll/createPollCommand.js';
+import {
+  AppendPollDraftCommand,
+  AppendPollDraftCommandHandler,
+} from '../../../domain/poll/appendPollDraftCommand.js';
 
-const getSummary = (aPoll: Poll) => {
+const getSummary = (poll: Poll) => {
+  const steps = [...poll.steps].sort((a, b) => a.order - b.order);
   const summaryLines = [
-    `## ${aPoll.title}`,
-    ...(aPoll.endDate
+    `## ${poll.title}`,
+    ...(poll.endDate
       ? [
           t('poll.publish.endDate', {
-            date: formatDiscordTimestamp(aPoll.endDate),
-            relative: formatDiscordTimestamp(aPoll.endDate, 'R'),
+            date: formatDiscordTimestamp(poll.endDate),
+            relative: formatDiscordTimestamp(poll.endDate, 'R'),
           }),
         ]
       : []),
     '',
-    ...aPoll.steps.reduce(
-      (acc: string[], aStep) => [
+    ...steps.reduce(
+      (acc: string[], step) => [
         ...acc,
-        `${aStep.order + 1}. ${aStep.question}`,
-        ...aStep.choices.map((aChoice) => `    - ${aChoice.label}`),
+        `${step.order + 1}. ${step.question}`,
+        ...[...step.choices]
+          .sort((a, b) => a.order - b.order)
+          .map((choice) => `    - ${choice.label}`),
       ],
       [],
     ),
@@ -57,92 +79,82 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
     const guildId = req.body.guild_id;
     const { data } = req.body;
     if (dbServices && guildId) {
-      const em = dbServices.orm.em.fork();
-      const pollId = (<any>additionalData).d.pId;
-      let aPoll: Poll;
-      if (!pollId) {
-        const title = getInputComponnentById<ComponentSimple>(data, 'title');
-        const role = getInputComponnentById<ComponentSelect>(data, 'role');
-        const question = getInputComponnentById<ComponentSimple>(
-          data,
-          'question',
-        );
-        const aGuild = await findOrCreateGuild(em, guildId);
-        aPoll = new Poll(
-          `${title?.component.value}`,
-          role?.component.values[0],
-        );
-        aGuild.polls.add(aPoll);
-        const firstStep = new PollStep(`${question?.component.value}`, 0);
-        const qDesc = getInputComponnentById<ComponentSimple>(
-          data,
-          'description',
-        );
-        firstStep.description = <string>qDesc?.component.value ?? null;
-        aPoll.steps.add(firstStep);
-        await em.persist(aGuild).flush();
-      } else {
-        aPoll = await em.findOneOrFail(
-          Poll,
-          { id: pollId, server: { guildId } },
-          {
-            populate: ['steps', 'steps.choices'],
-          },
-        );
-
-        if (aPoll.publicationDate !== null) {
-          return res.json(doNotUpdatePublishedPoll());
-        }
-
-        const newQuestion = getInputComponnentById<ComponentSimple>(
-          data,
-          'question',
-        );
-        if (newQuestion) {
-          const newStep = new PollStep(
-            `${newQuestion?.component.value}`,
-            aPoll.steps.count(),
+      const pollId = (<any>additionalData).d.pId as string | undefined;
+      let poll: Poll;
+      try {
+        if (!pollId) {
+          const title = getInputComponnentById<ComponentSimple>(data, 'title');
+          const role = getInputComponnentById<ComponentSelect>(data, 'role');
+          const question = getInputComponnentById<ComponentSimple>(
+            data,
+            'question',
           );
           const qDesc = getInputComponnentById<ComponentSimple>(
             data,
             'description',
           );
-          newStep.description = <string>qDesc?.component.value ?? null;
-          aPoll.steps.add(newStep);
-        }
-
-        const newChoices = getInputComponnentsByPrefix<ComponentSimple>(
-          data,
-          'choice',
-        );
-        if (newChoices.length > 0) {
-          const lastStep = aPoll.steps.reduce(
-            (_obj, current) => current,
-            aPoll.steps[0],
+          poll = await new CreatePollCommandHandler(
+            { ...DiscordGuildTryFinder, ...DiscordGuildPersister },
+            { ...PollPersister, ...PollFinder },
+          ).handle(
+            new CreatePollCommand(
+              {
+                title: `${title?.component.value}`,
+                role: role?.component.values[0] ?? null,
+                question: `${question?.component.value}`,
+                description: qDesc?.component.value ?? null,
+              },
+              guildId,
+            ),
           );
-          const l = lastStep.choices.count();
-          newChoices
-            .map((e) => `${e.component.value}`.trim())
-            .filter((e) => e !== '')
-            .forEach((e, i) => {
-              const newChoice = new PollChoice(e, l + i);
-              lastStep.choices.add(newChoice);
-            });
+        } else {
+          const newQuestion = getInputComponnentById<ComponentSimple>(
+            data,
+            'question',
+          );
+          const qDesc = getInputComponnentById<ComponentSimple>(
+            data,
+            'description',
+          );
+          const newChoices = getInputComponnentsByPrefix<ComponentSimple>(
+            data,
+            'choice',
+          ).map((choice) => `${choice.component.value}`);
+          poll = await new AppendPollDraftCommandHandler({
+            ...PollFinder,
+            ...PollPersister,
+          }).handle(
+            new AppendPollDraftCommand(
+              {
+                pollId,
+                question: newQuestion ? `${newQuestion.component.value}` : null,
+                description: qDesc?.component.value ?? null,
+                choices: newChoices,
+              },
+              guildId,
+            ),
+          );
         }
-
-        await em.persist(aPoll).flush();
+      } catch (error) {
+        if (error instanceof PollAlreadyPublishedError) {
+          return res.json(doNotUpdatePublishedPoll());
+        }
+        if (error instanceof TooManyError) {
+          return res.json(errorPayload(t('errors.tooMany')));
+        }
+        throw error;
       }
 
-      const lastStep = aPoll.steps.reduce(
-        (_obj, current) => current,
-        aPoll.steps[0],
-      );
+      const lastStep = [...poll.steps].sort((a, b) => a.order - b.order).at(-1);
+      if (!lastStep) {
+        return res.status(500).json({ error: t('errors.unknown') });
+      }
 
       return res.json({
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           flags: MessageFlags.Ephemeral,
-          content: getSummary(aPoll),
+          content: getSummary(poll),
           components: [
             {
               type: ComponentType.ActionRow,
@@ -167,7 +179,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                     t: 'cta',
                     d: {
                       a: 'pollAddQ',
-                      pId: aPoll.id,
+                      pId: poll.id,
                     },
                   }),
                 },
@@ -179,7 +191,7 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
                     t: 'cta',
                     d: {
                       a: 'pollPub',
-                      pId: aPoll.id,
+                      pId: poll.id,
                     },
                   }),
                 },

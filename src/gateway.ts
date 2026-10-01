@@ -16,7 +16,14 @@ import { notifyBotOwner } from './utils/notifyBotOwner.js';
 import { t } from './i18n/index.js';
 import config from './mikro-orm.config.js';
 import { initORM } from './db/db.js';
-import { findOrCreateGuild } from './db/services/discordGuild.service.js';
+import {
+  DiscordGuildPersister,
+  DiscordGuildTryFinder,
+} from './db/model/index.js';
+import {
+  EnsureGuildCommand,
+  EnsureGuildCommandHandler,
+} from './domain/guild/ensureGuildCommand.js';
 
 const dbServices = initORM(config, false);
 
@@ -32,10 +39,11 @@ gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
   void (async () => {
     const guildId = event.id;
     try {
-      const { orm } = await dbServices;
-      const em = orm.em.fork();
-      await findOrCreateGuild(em, guildId);
-      await em.flush();
+      await dbServices;
+      await new EnsureGuildCommandHandler({
+        ...DiscordGuildTryFinder,
+        ...DiscordGuildPersister,
+      }).handle(new EnsureGuildCommand({ guildId }));
       logger.info('gateway guild_create persisted', { shard, guildId });
     } catch (err) {
       logger.error('gateway guild_create persist failed', {

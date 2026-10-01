@@ -15,10 +15,14 @@ gateway `GuildCreate` handler (which ensures a `DiscordGuild` row exists).
   but with `migrate: false`, which avoids concurrent `migrator.up()` when
   Compose starts separate `api` and `gateway` containers. The API waits for
   that init before listening. HTTP interaction handlers and the gateway
-  `GuildCreate` handler fork an entity manager for scoped work.
-- `src/db/services/discordGuild.service.ts` exposes `findOrCreateGuild` used by
-  gateway `GuildCreate` and by CTA handlers that need a guild row
-  (`aliasSet`, `pollCreate`).
+  `GuildCreate` handler call command handlers. `withTransaction` forks an
+  entity manager for that work.
+- `src/db/model/` is the only application code that queries MikroORM.
+  Discord handlers and `src/domain/` pass plain entities from `src/entities/`
+  and an opaque `Transaction`. See [`docs/cqrs.md`](cqrs.md).
+- `src/db/services/discordGuild.service.ts` still exposes `findOrCreateGuild`
+  for the service test. Gateway `GuildCreate` uses `EnsureGuildCommandHandler`
+  instead.
 - Production and development Compose files run MariaDB `12.0.2-noble` as the
   `database` service. Data is persisted in the `mysqldbdata` volume.
 - The app connects with the `.env` database variables:
@@ -55,17 +59,14 @@ active rows still enforce uniqueness.
 | `PollChoice`     | Ordered selectable answers for a poll question.                      |
 | `PollResp`       | One member's answer for one poll step, either a choice or free text. |
 
-Command handlers must keep lookups guild-scoped. Prefer
-`findOrCreateGuild` from `discordGuild.service.ts` when a handler needs an
-existing-or-new `DiscordGuild`. Alias handlers and poll CTA handlers use
-`em.fork()` and query through `DiscordGuild.guildId` before reading or
-mutating records.
+Command handlers must keep lookups guild-scoped. They call model-layer
+finders with `guildId` and never import MikroORM entity classes. Alias and
+poll writes go through `withTransaction` so several repositories share one
+session. `DiscordGuildPersister` flushes inside the model layer.
 
-`findOrCreateGuild` is intentionally a small entity-manager helper: it looks up
-an active `DiscordGuild` by `guildId`, persists a new managed entity when none
-exists, and leaves `flush()` to the caller. This lets CTA handlers flush the
-guild row with the rest of their command state, while the gateway `GuildCreate`
-handler flushes immediately after the backfill row is created.
+`findOrCreateGuild` stays as the entity-manager helper covered by its service
+test: it looks up an active `DiscordGuild` by `guildId`, persists a new managed
+entity when none exists, and leaves `flush()` to the caller.
 
 ## Migration workflow
 
