@@ -14,8 +14,8 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { SetMessageAliasCommand } from '../../../cmds/setMessageAlias.command.js';
-import { SetMessageAliasCommandHandler } from '../../../handlers/setMessageAlias.commandHandler.js';
+import { SetMessageAliasQuery } from '../../../queries/setMessageAlias.query.js';
+import { SetMessageAliasQueryHandler } from '../../../handlers/setMessageAlias.queryHandler.js';
 import { MessageAliasComputer } from '../../../handlers/messageAlias.computer.js';
 import { MessageAliasLimitReachedError } from '../../../errors/messageAlias.errors.js';
 import { createMessageAliasedLister } from '../../../repositories/messageAliased/messageAliased.lister.js';
@@ -43,7 +43,7 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
 
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
-      const handler = new SetMessageAliasCommandHandler(
+      const handler = new SetMessageAliasQueryHandler(
         em,
         createMessageAliasedLister(em),
         createMessageAliasedPersister(em),
@@ -51,13 +51,13 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
       );
 
       try {
-        const command = new SetMessageAliasCommand({
+        const query = new SetMessageAliasQuery({
           guildId,
           alias: aliasInput?.component.value,
           message: messageInput?.component.value,
         });
 
-        await handler.handle(command);
+        await handler.handle(query);
 
         return res.json({
           type: InteractionResponseType.ChannelMessageWithSource,

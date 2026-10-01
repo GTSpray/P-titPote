@@ -1,26 +1,23 @@
-# CQRS-friendly architecture
+# Query-driven layered architecture
 
 Strict layered separation using generic contracts (interfaces) reused throughout the code,
 which makes each layer independently testable/mockable.
 
 The running example below is a classic `User` CRUD, fully backed by a database.
 
-## Why "not pure CQRS"
-
-What's really at play is a combination of several patterns:
+## Patterns in play
 
 | Pattern                                            | Where it applies                                                                                                                       |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **CQS** (Command-Query Separation, Bertrand Meyer) | Each `Command`/`Query` makes explicit whether the operation reads or writes                                                            |
-| **Command pattern (GoF)**                          | `Command` encapsulates a request as an object passed to a handler                                                                      |
+| **Query object**                                   | A `Query` encapsulates a request (read or write) as a validated object passed to a handler                                             |
 | **Repository pattern**                             | `Finder`/`TryFinder`/`Lister`/`Persister`/`Remover`                                                                                    |
 | **Ports & Adapters / hexagonal architecture**      | The generic interfaces (`Finder<Entity>`...) are the _ports_; their concrete implementations are the _adapters_ that plug into the ORM |
-| **Layered / Service Layer**                        | Handler → CommandHandler → business layer → Repository, in strictly descending layers                                                  |
+| **Layered / Service Layer**                        | Handler → QueryHandler → business layer → Repository, in strictly descending layers                                                    |
 
 ```mermaid
 flowchart TD
-    A["Input (HTTP body / SQS payload / Event)"] --> B["Command / Query (validation)"]
-    B --> C["CommandHandler / QueryHandler (orchestration)"]
+    A["Input (HTTP body / SQS payload / Event)"] --> B["Query (validation)"]
+    B --> C["QueryHandler (orchestration)"]
     C --> D["Business layer (Computer / Notifier / Assert / Subscriber)"]
     C --> E["Model layer (Finder / Lister / Persister...)"]
     E --> F["ORM model (whichever one)"]
@@ -28,14 +25,18 @@ flowchart TD
     E --> H["modelToEntity (Model -> Entity)"]
 ```
 
-Only the model layer (sections 4-5) knows about the ORM. Everything else (Command, CommandHandler,
+Only the model layer (sections 4-5) knows about the ORM. Everything else (Query, QueryHandler,
 business layer) only handles `Entity` objects and an opaque `Transaction` type — the ORM is
 therefore interchangeable without touching the rest of the code.
 
-## 1. Command / Query — input validation
+There is a single input taxon: **Query**. A query may read state, write state, or both; the
+distinction is expressed by which repository ports the handler uses (`Finder`/`Lister` vs
+`Persister`/`Remover`), not by a separate `Command` type.
 
-A `Command` (write) or a `Query` (read) is a class that validates and carries data, without any
-business logic.
+## 1. Query — input validation
+
+A `Query` is a class that validates and carries data, without any business logic. It can represent
+a read (`GetUserQuery`) or a write (`CreateUserQuery` / `SetMessageAliasQuery`).
 
 ```typescript
 type CreateUserPayload = {
@@ -56,7 +57,7 @@ const schema: JSONSchemaType<CreateUserPayload> = {
   required: ['email', 'firstName', 'lastName', 'organisationId'],
 };
 
-class CreateUserCommand {
+class CreateUserQuery {
   email: string;
   firstName: string;
   lastName: string;
@@ -78,17 +79,17 @@ class CreateUserCommand {
 - AJV or Zod validation (`validatePayload`) directly in the constructor → impossible to get an
   invalid instance.
 - Can also carry the call context (`callerId`, `roles`) for authorization.
-- `Query` follows the same principle but for read parameters (usually no strict validation,
-  just a typed container) — e.g. `GetUserQuery { id: string }` or
+- Read queries follow the same principle — e.g. `GetUserQuery { id: string }` or
   `ListUsersQuery { organisationId: string; offset?: number; limit?: number }`.
 
-## 2. CommandHandler / QueryHandler — orchestration
+## 2. QueryHandler — orchestration
 
 The handler never contains business rules or SQL. It receives its dependencies via constructor
-injection (no DI container) and orchestrates: read → business computation → transactional write.
+injection (no DI container) and orchestrates: read → business computation → transactional write
+(when the query mutates state).
 
 ```typescript
-class CreateUserCommandHandler {
+class CreateUserQueryHandler {
   constructor(
     private userRepository: Persister<User>,
     private organisationRepository: Finder<Organisation>,
@@ -96,12 +97,12 @@ class CreateUserCommandHandler {
     private userNotifier: Notifier<User>,
   ) {}
 
-  async handle(command: CreateUserCommand): Promise<User> {
+  async handle(query: CreateUserQuery): Promise<User> {
     const organisation = await this.organisationRepository.findOrFail({
-      id: command.organisationId,
+      id: query.organisationId,
     });
 
-    const user = this.buildUser(command);
+    const user = this.buildUser(query);
     const computedUser = await this.userComputer.compute(user, organisation);
 
     await this.userRepository.persist(computedUser);
@@ -111,13 +112,13 @@ class CreateUserCommandHandler {
     return computedUser;
   }
 
-  private buildUser(command: CreateUserCommand): User {
+  private buildUser(query: CreateUserQuery): User {
     return {
       id: uuid(),
-      email: command.email,
-      firstName: command.firstName,
-      lastName: command.lastName,
-      organisationId: command.organisationId,
+      email: query.email,
+      firstName: query.firstName,
+      lastName: query.lastName,
+      organisationId: query.organisationId,
       status: UserStatus.PENDING,
       createdDate: new Date(),
       updatedDate: new Date(),
@@ -126,7 +127,7 @@ class CreateUserCommandHandler {
 }
 ```
 
-The read counterpart follows the exact same principle, but without a write or transaction:
+A read-only query follows the exact same principle, but without a write or transaction:
 
 ```typescript
 class GetUserQueryHandler {
@@ -151,22 +152,27 @@ Key points:
 const createUserHandler: HandlerFunction = async (req, res) => {
   await assertRequestHasOneOfRole(req, Role.ROLE_ADMIN);
 
-  const command = new CreateUserCommand(req.body, req.callerId);
-  const handler = new CreateUserCommandHandler(
+  const query = new CreateUserQuery(req.body, req.callerId);
+  const handler = new CreateUserQueryHandler(
     UserPersister,
     OrganisationFinder,
     new UserComputer(),
     userNotifierService,
   );
 
-  const result = await handler.handle(command);
+  const result = await handler.handle(query);
   res.status(201).send(result);
 };
 ```
 
+A simple CRUD endpoint (`GET`, `DELETE`) that needs no business computation nor a multi-repository
+transaction can just use the `@viaco/handlers` helpers (`getHandler`, `listHandler`,
+`removeHandler`) directly with a `Finder`/`Lister`/`Remover`, without going through an explicit
+Query — an explicit QueryHandler is only worth it when the complexity justifies it (see section 4).
+
 ## 3. Business layer — pure logic, no SQL
 
-Always injected into the `CommandHandler`, never hardcoded inside it. Only handles `Entity`
+Always injected into the `QueryHandler`, never hardcoded inside it. Only handles `Entity`
 objects (pure TS types in `src/entities/`), never a `Model`/record specific to the ORM.
 
 | Contract                    | Role                                              | Abstract shape                                                                                        |
@@ -199,10 +205,10 @@ class NotifyManagersOnUserCreationSubscriber implements Subscriber<User> {
 ```
 
 `Subscriber` is the mechanism used to chain side effects after a standard HTTP action, without
-having to write a full `CommandHandler` — it's the bridge between the simple CRUD pattern and
-full CQRS. For example, a `DELETE /users/:id` endpoint based on `removeHandler` can trigger a
-`Subscriber<User>` that purges associated data (sessions, pending invitations...) within the same
-transaction as the deletion.
+having to write a full `QueryHandler` — it's the bridge between the simple CRUD pattern and
+full orchestration. For example, a `DELETE /users/:id` endpoint based on `removeHandler` can
+trigger a `Subscriber<User>` that purges associated data (sessions, pending invitations...)
+within the same transaction as the deletion.
 
 ## 4. Model layer — data access
 
@@ -279,10 +285,10 @@ const UserRemover: Remover<User> = {
 };
 ```
 
-Composition inside a `CommandHandler`: via type intersection or spreading literal objects:
+Composition inside a `QueryHandler`: via type intersection or spreading literal objects:
 
 ```typescript
-new SomeCommandHandler(
+new SomeQueryHandler(
     { ...UserPersister, ...UserTryFinder }, // satisfies Persister<User> & TryFinder<User, ...>
     ...
 );
@@ -326,12 +332,12 @@ const userRecordToEntity = (record: UserRecord): User => ({
 ```
 
 Replacing the ORM therefore only requires rewriting: the table definition, the mapper, and the
-body of the `Finder`/`Lister`/`Persister`/... functions — without touching the `Command`,
-`CommandHandler`, the business layer, or the HTTP handlers/consumers.
+body of the `Finder`/`Lister`/`Persister`/... functions — without touching the `Query`,
+`QueryHandler`, the business layer, or the HTTP handlers/consumers.
 
 ## Why this split
 
-- **Testability**: each `CommandHandler` dependency is a 1-2 method interface → easy to stub in unit tests.
+- **Testability**: each `QueryHandler` dependency is a 1-2 method interface → easy to stub in unit tests.
 - **ORM framework isolation**: the business layer and HTTP handlers never know which ORM is used, only pure TS `Entity` objects — the ORM is an implementation detail confined to the model layer.
 - **Composability**: the same contracts (`Finder`, `Persister`, etc.) are reused identically across all domains (users, organisations, projects...), so the pattern generalizes without reinventing an abstraction per domain.
-- **Explicit transactionality**: the optional `transaction?: Transaction` on every write method lets the `CommandHandler` guarantee multi-repository atomicity without the model layer needing to know about it upfront.
+- **Explicit transactionality**: the optional `transaction?: Transaction` on every write method lets the `QueryHandler` guarantee multi-repository atomicity without the model layer needing to know about it upfront.

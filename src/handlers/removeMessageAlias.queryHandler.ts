@@ -1,9 +1,9 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { Finder, Remover } from '../db/repository.js';
 import { MessageAliasEntity } from '../entities/messageAlias.entity.js';
-import { RemoveMessageAliasCommand } from '../cmds/removeMessageAlias.command.js';
+import { RemoveMessageAliasQuery } from '../queries/removeMessageAlias.query.js';
 
-export class RemoveMessageAliasCommandHandler {
+export class RemoveMessageAliasQueryHandler {
   constructor(
     private em: EntityManager,
     private finder: Finder<
@@ -13,10 +13,10 @@ export class RemoveMessageAliasCommandHandler {
     private remover: Remover<MessageAliasEntity>,
   ) {}
 
-  async handle(command: RemoveMessageAliasCommand): Promise<void> {
+  async handle(query: RemoveMessageAliasQuery): Promise<void> {
     const existing = await this.finder.findOrFail({
-      guildId: command.guildId,
-      alias: command.alias,
+      guildId: query.guildId,
+      alias: query.alias,
     });
 
     await this.remover.remove(existing);

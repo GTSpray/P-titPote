@@ -9,7 +9,7 @@ const SetMessageAliasSchema = z.object({
   message: z.string().min(1).max(500),
 });
 
-export class SetMessageAliasCommand {
+export class SetMessageAliasQuery {
   guildId: string;
   alias: string;
   message: string;

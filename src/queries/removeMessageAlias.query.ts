@@ -8,7 +8,7 @@ const RemoveMessageAliasSchema = z.object({
     .max(50),
 });
 
-export class RemoveMessageAliasCommand {
+export class RemoveMessageAliasQuery {
   guildId: string;
   alias: string;
 
