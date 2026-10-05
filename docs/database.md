@@ -156,7 +156,8 @@ Vitest uses a separate MariaDB service named `dbtest` from
 
 This keeps tests isolated from the development database, but it also means a
 migration can be wrong even when entity-based tests pass. Run `make db-check`
-when changing entities or migrations.
+when changing entities or migrations. See [`docs/testing.md`](testing.md) for
+the full Vitest setup, shared mocks, and test troubleshooting guide.
 
 ## Troubleshooting
 

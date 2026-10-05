@@ -185,6 +185,7 @@ These guides describe architecture, services, and implementation details:
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
+- [`docs/testing.md`](docs/testing.md) — Vitest setup, database isolation, mocks, and troubleshooting
 - [`docs/logging.md`](docs/logging.md) — Winston log format, transports, correlation, and troubleshooting
 - [`docs/release.md`](docs/release.md) — semantic-release, GHCR image publishing, and container runbook
 
@@ -200,7 +201,9 @@ make testw  # watch mode
 ```
 
 When adding features or fixing bugs, add matching `.test.ts` files under
-`tests/` and keep the suite green before proposing major changes.
+`tests/` and keep the suite green before proposing major changes. See
+[`docs/testing.md`](docs/testing.md) for the test database setup, shared mocks,
+custom matchers, CI reporter behavior, and common troubleshooting notes.
 
 ### Project structure
 
@@ -225,6 +228,7 @@ P-titPote/
 │   ├── poll.md                  # Poll workflow technical guide
 │   ├── gateway.md               # Gateway service technical guide
 │   ├── database.md              # Database and migration runbook
+│   ├── testing.md               # Vitest and test infrastructure guide
 │   ├── logging.md               # Logging and observability guide
 │   └── release.md               # Release and container image runbook
 ├── site/                        # VitePress user docs (GitHub Pages)
