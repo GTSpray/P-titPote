@@ -1,3 +1,13 @@
+## [1.12.21](https://github.com/GTSpray/P-titPote/compare/v1.12.20...v1.12.21) (2026-10-05)
+
+### :memo: Documentation
+
+* **poll:** document vote/report locking ([#296](https://github.com/GTSpray/P-titPote/issues/296)) ([c5a9c16](https://github.com/GTSpray/P-titPote/commit/c5a9c16d7bcfc97c92145d4161d900e3b88f077a))
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group with 5 updates ([#305](https://github.com/GTSpray/P-titPote/issues/305)) ([1e53b54](https://github.com/GTSpray/P-titPote/commit/1e53b54be8536cf940f6793c356d8fa57257001b))
+
 ## [1.12.20](https://github.com/GTSpray/P-titPote/compare/v1.12.19...v1.12.20) (2026-09-29)
 
 ### :white_check_mark: Tests
