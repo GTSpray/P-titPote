@@ -1,3 +1,9 @@
+## [1.12.22](https://github.com/GTSpray/P-titPote/compare/v1.12.21...v1.12.22) (2026-10-05)
+
+### :repeat: Chore
+
+* **deps:** bump discord-api-types from 0.38.55 to 0.38.56 ([#306](https://github.com/GTSpray/P-titPote/issues/306)) ([1675312](https://github.com/GTSpray/P-titPote/commit/1675312ad2e8862c874ce1bb8c08a1aa271ea833))
+
 ## [1.12.21](https://github.com/GTSpray/P-titPote/compare/v1.12.20...v1.12.21) (2026-10-05)
 
 ### :memo: Documentation
