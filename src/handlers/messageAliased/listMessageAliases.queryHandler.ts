@@ -1,4 +1,4 @@
-import type { Lister } from '../../db/repository.js';
+import type { Lister } from '../../repositories/repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { ListMessageAliasesQuery } from '../../queries/listMessageAliases.query.js';
 import type { MessageAliasedListCriteria } from '../../repositories/messageAliased/messageAliased.lister.js';

@@ -1,7 +1,7 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { MessageAliased } from '../../db/entities/MessageAliased.entity.js';
 import { DiscordGuild } from '../../db/entities/DiscordGuild.entity.js';
-import type { Persister } from '../../db/repository.js';
+import type { Persister } from '../repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 
 export function createMessageAliasedPersister(

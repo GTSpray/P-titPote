@@ -1,5 +1,5 @@
 import type { EntityManager } from '@mikro-orm/core';
-import type { Finder, Remover } from '../../db/repository.js';
+import type { Finder, Remover } from '../../repositories/repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { RemoveMessageAliasQuery } from '../../queries/removeMessageAlias.query.js';
 import type { MessageAliasedCriteria } from '../../repositories/messageAliased/messageAliased.finder.js';

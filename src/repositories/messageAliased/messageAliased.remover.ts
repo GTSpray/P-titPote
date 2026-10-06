@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { MessageAliased } from '../../db/entities/MessageAliased.entity.js';
-import type { Remover } from '../../db/repository.js';
+import type { Remover } from '../repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 
 export function createMessageAliasedRemover(

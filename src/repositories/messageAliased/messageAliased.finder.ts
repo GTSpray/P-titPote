@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { MessageAliased } from '../../db/entities/MessageAliased.entity.js';
-import type { Finder } from '../../db/repository.js';
+import type { Finder } from '../repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { MessageAliasNotFoundError } from '../../errors/messageAlias.errors.js';
 import { messageAliasedRecordToEntity } from './messageAliased.mapper.js';

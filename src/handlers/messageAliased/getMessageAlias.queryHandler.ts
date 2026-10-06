@@ -1,4 +1,4 @@
-import type { Finder } from '../../db/repository.js';
+import type { Finder } from '../../repositories/repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { GetMessageAliasQuery } from '../../queries/getMessageAlias.query.js';
 import type { MessageAliasedCriteria } from '../../repositories/messageAliased/messageAliased.finder.js';

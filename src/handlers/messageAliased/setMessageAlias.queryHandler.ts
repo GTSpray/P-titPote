@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import { findOrCreateGuild } from '../../db/services/discordGuild.service.js';
-import type { Lister, Persister } from '../../db/repository.js';
+import type { Lister, Persister } from '../../repositories/repository.js';
 import { MessageAliasEntity } from '../../entities/messageAlias.entity.js';
 import { SetMessageAliasQuery } from '../../queries/setMessageAlias.query.js';
 import { MessageAliasComputer } from './messageAlias.computer.js';
