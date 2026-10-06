@@ -129,12 +129,13 @@ app.post(
           ) {
             logger.debug(`interaction handler`, { reqId, additionalData });
             const dbServices = await orm;
-            return await cta[additionalData.d.a].handler({
+            const response = await cta[additionalData.d.a].handler({
               req,
               res,
               dbServices,
               additionalData,
             });
+            return response;
           }
         } catch (error) {
           if (error instanceof InvalidCommand) {
