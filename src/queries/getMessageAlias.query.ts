@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { parseCommand } from '../errors/invalidCommand.js';
 
 const GetMessageAliasSchema = z.object({
   alias: z
@@ -13,7 +14,7 @@ export class GetMessageAliasQuery {
   alias: string;
 
   constructor(payload: { guildId: string; alias?: string }) {
-    const parsed = GetMessageAliasSchema.parse(payload);
+    const parsed = parseCommand(GetMessageAliasSchema, payload);
     this.guildId = payload.guildId;
     this.alias = parsed.alias;
   }

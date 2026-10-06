@@ -15,6 +15,7 @@ import { cta } from './commands/cta/index.js';
 import { t } from './i18n/index.js';
 import { notifyBotOwner } from './utils/notifyBotOwner.js';
 import { registerSlashCommands } from './utils/registerSlashCommands.js';
+import { InvalidCommand } from './errors/invalidCommand.js';
 
 import config from './mikro-orm.config.js';
 import { initORM } from './db/db.js';
@@ -95,8 +96,19 @@ app.post(
       const { name } = data;
       if (slashcommands.hasOwnProperty(name) && slashcommands[name]) {
         logger.debug(`interaction handler`, { reqId, name });
-        const dbServices = await orm;
-        return slashcommands[name].handler({ req, res, dbServices });
+        try {
+          const dbServices = await orm;
+          return await slashcommands[name].handler({ req, res, dbServices });
+        } catch (error) {
+          if (error instanceof InvalidCommand) {
+            logger.debug('invalid command', { reqId, issues: error.issues });
+            return res.status(400).json({
+              error: t('errors.invalidCommandPayload'),
+              issues: error.issues,
+            });
+          }
+          throw error;
+        }
       }
       logger.error(`unknown command`, { reqId, name });
       return res.status(400).json({ error: t('errors.unknownCommand') });
@@ -117,7 +129,7 @@ app.post(
           ) {
             logger.debug(`interaction handler`, { reqId, additionalData });
             const dbServices = await orm;
-            return cta[additionalData.d.a].handler({
+            return await cta[additionalData.d.a].handler({
               req,
               res,
               dbServices,
@@ -125,6 +137,13 @@ app.post(
             });
           }
         } catch (error) {
+          if (error instanceof InvalidCommand) {
+            logger.debug('invalid command', { reqId, issues: error.issues });
+            return res.status(400).json({
+              error: t('errors.invalidCommandPayload'),
+              issues: error.issues,
+            });
+          }
           logger.error(`unknown error`, { reqId, custom_id });
           return res.status(500).json({ error: t('errors.unknownError') });
         }

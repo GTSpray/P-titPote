@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
   ComponentSimple,
@@ -69,13 +68,6 @@ export const aliasSet: ModalHandlerDelcaration<CTAData> = {
           },
         });
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          const issues = error.issues;
-          logger.debug('zod errors', { issues });
-          return res
-            .status(400)
-            .json({ error: t('errors.invalidSubcommandPayload'), issues });
-        }
         if (error instanceof MessageAliasLimitReachedError) {
           return res.json(errorPayload(t('errors.tooMany')));
         }

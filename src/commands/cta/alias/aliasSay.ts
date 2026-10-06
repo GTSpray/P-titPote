@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import {
   ComponentType,
   InteractionResponseType,
@@ -60,13 +59,6 @@ export const aliasSay: ModalHandlerDelcaration<CTAData> = {
           },
         });
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          const issues = error.issues;
-          logger.debug('zod errors', { issues });
-          return res
-            .status(400)
-            .json({ error: t('errors.invalidSubcommandPayload'), issues });
-        }
         if (error instanceof MessageAliasNotFoundError) {
           return res.json(
             errorPayload(t('alias.say.notFound', { alias: error.alias })),
