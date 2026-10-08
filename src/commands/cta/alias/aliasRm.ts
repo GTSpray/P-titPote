@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
   ComponentSelect,
@@ -6,7 +5,6 @@ import {
   getInputComponnentById,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import {
@@ -15,14 +13,11 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-
-const ValidAliasMessage = z.object({
-  alias: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
-});
+import { RemoveMessageAliasQuery } from '../../../queries/removeMessageAlias.query.js';
+import { RemoveMessageAliasQueryHandler } from '../../../handlers/messageAliased/removeMessageAlias.queryHandler.js';
+import { MessageAliasNotFoundError } from '../../../errors/messageAlias.errors.js';
+import { createMessageAliasedFinder } from '../../../repositories/messageAliased/messageAliased.finder.js';
+import { createMessageAliasedRemover } from '../../../repositories/messageAliased/messageAliased.remover.js';
 
 export const aliasRm: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
@@ -38,29 +33,21 @@ export const aliasRm: ModalHandlerDelcaration<CTAData> = {
 
     const aliasInput = getInputComponnentById<ComponentSelect>(data, 'alias');
 
-    const AliasMessageInput = ValidAliasMessage.safeParse({
-      alias: aliasInput?.component.values[0],
-    });
-
-    if (!AliasMessageInput.success) {
-      const issues = AliasMessageInput.error.issues;
-      logger.debug('zod errors', { issues });
-      return res
-        .status(400)
-        .json({ error: t('errors.invalidSubcommandPayload'), issues });
-    }
-
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
-
-      const messageAliased = await em.findOne(MessageAliased, {
-        server: { guildId },
-        alias: AliasMessageInput.data.alias,
+      const handler = new RemoveMessageAliasQueryHandler(em, {
+        ...createMessageAliasedFinder(em),
+        ...createMessageAliasedRemover(em),
       });
 
-      if (messageAliased) {
-        messageAliased.deletedAt = new Date();
-        await em.persist(messageAliased).flush();
+      try {
+        const query = new RemoveMessageAliasQuery({
+          guildId,
+          alias: aliasInput?.component.values[0],
+        });
+
+        await handler.handle(query);
+
         return res.json({
           type: InteractionResponseType.ChannelMessageWithSource,
           data: {
@@ -68,15 +55,14 @@ export const aliasRm: ModalHandlerDelcaration<CTAData> = {
             components: [...okComponnents()],
           },
         });
+      } catch (error) {
+        if (error instanceof MessageAliasNotFoundError) {
+          return res.json(
+            errorPayload(t('alias.rm.notFound', { alias: error.alias })),
+          );
+        }
+        throw error;
       }
-
-      return res.json(
-        errorPayload(
-          t('alias.rm.notFound', {
-            alias: AliasMessageInput.data.alias,
-          }),
-        ),
-      );
     }
 
     return res.status(500).json({
