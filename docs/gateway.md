@@ -78,8 +78,9 @@ Required environment:
    - shard tuple `[shardId, shardCount]`;
    - `compress: false`;
    - `large_threshold: 250`;
-   - intents for guilds, guild message reactions, guild messages, and direct
-     messages.
+   - intents for guilds, guild members (privileged — enable **Server Members
+     Intent** in the Discord Developer Portal), guild message reactions, guild
+     messages, and direct messages.
 6. On `Ready`, the shard stores `session_id` and `resume_gateway_url`, and the
    top-level gateway sends an online presence using the translated
    `gateway.activity.*` strings.
@@ -116,6 +117,9 @@ Current top-level behavior in `src/gateway.ts`:
   `gateway guild_create persist failed` without disconnecting the shard if the
   database write fails. `GuildDelete` is still log-only; leaving a guild does
   not soft-delete `DiscordGuild` or command state.
+- `GuildMemberAdd`: runs enabled `/trigger` automations via
+  `src/gateway/runGuildTriggers.ts` (welcome roles and welcome messages).
+  Failures are logged per trigger and do not disconnect the shard.
 - `MessageCreate`: when Discord reports an application-command message whose
   interaction metadata name is `poll c`, the bot adds a `✉️` reaction to that
   message with `PUT /channels/{channel.id}/messages/{message.id}/reactions`.

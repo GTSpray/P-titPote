@@ -17,6 +17,7 @@ import { t } from './i18n/index.js';
 import config from './mikro-orm.config.js';
 import { initORM } from './db/db.js';
 import { findOrCreateGuild } from './db/services/discordGuild.service.js';
+import { runGuildTriggers } from './gateway/runGuildTriggers.js';
 
 const dbServices = initORM(config, false);
 
@@ -49,6 +50,30 @@ gateway.on(GatewayDispatchEvents.GuildCreate, ({ shard, event }) => {
 
 gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
   logger.info('gateway guild_delete', { shard, event });
+});
+
+gateway.on(GatewayDispatchEvents.GuildMemberAdd, ({ shard, event }) => {
+  void (async () => {
+    const guildId = event.guild_id;
+    const userId = event.user.id;
+    try {
+      const { orm } = await dbServices;
+      const em = orm.em.fork();
+      await runGuildTriggers(em, event);
+      logger.info('gateway guild_member_add triggers done', {
+        shard,
+        guildId,
+        userId,
+      });
+    } catch (err) {
+      logger.error('gateway guild_member_add triggers failed', {
+        shard,
+        guildId,
+        userId,
+        err,
+      });
+    }
+  })();
 });
 
 gateway.on(GatewayDispatchEvents.MessageCreate, async ({ event }) => {

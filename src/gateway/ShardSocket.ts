@@ -385,6 +385,7 @@ export class ShardSocket {
                   },
                   intents:
                     GatewayIntentBits.Guilds |
+                    GatewayIntentBits.GuildMembers |
                     GatewayIntentBits.GuildMessageReactions |
                     GatewayIntentBits.GuildMessages |
                     GatewayIntentBits.DirectMessages,

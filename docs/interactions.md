@@ -105,6 +105,10 @@ export const cta = {
   pollResp,
   pollSummary,
   pollVote,
+  triggerSetType,
+  triggerSetWelcomeMessage,
+  triggerSetWelcomeRole,
+  triggerRm,
 };
 ```
 

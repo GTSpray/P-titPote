@@ -1,0 +1,208 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "trigger-rm",
+  "title": "Trigger — désactiver une automation",
+  "doc": "docs/usage/trigger/trigger.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Modo",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "type",
+      "text": "/trigger rm",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/trigger rm",
+            "description": "activer, désactiver ou supprimer une automation"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Gérer une automation",
+          "components": [
+            {
+              "type": 18,
+              "label": "Automation",
+              "component": {
+                "type": 3,
+                "custom_id": "trigger",
+                "placeholder": "Choisis une automation...",
+                "options": [
+                  {
+                    "label": "member",
+                    "value": "member",
+                    "description": "Rôle de bienvenue — actif",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  },
+                  {
+                    "label": "welcome",
+                    "value": "welcome",
+                    "description": "Message de bienvenue — actif",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": 18,
+              "label": "Action",
+              "component": {
+                "type": 3,
+                "custom_id": "action",
+                "placeholder": "Choisis une action...",
+                "options": [
+                  {
+                    "label": "Réactiver",
+                    "value": "enable",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  },
+                  {
+                    "label": "Désactiver",
+                    "value": "disable",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  },
+                  {
+                    "label": "Supprimer",
+                    "value": "delete",
+                    "emoji": {
+                      "name": "▪️"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "selectModalOption",
+      "field": "trigger",
+      "option": "welcome",
+      "options": [
+        {
+          "label": "member"
+        },
+        {
+          "label": "welcome"
+        }
+      ]
+    },
+    {
+      "type": "selectModalOption",
+      "field": "action",
+      "option": "disable",
+      "options": [
+        {
+          "label": "Réactiver"
+        },
+        {
+          "label": "Désactiver"
+        },
+        {
+          "label": "Supprimer"
+        }
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "submitModal"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:12",
+            "slashInvocation": {
+              "user": {
+                "name": "Modo",
+                "color": "#5865f2"
+              },
+              "command": "trigger rm"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 10,
+                    "content": "Automation \"welcome\" désactivée."
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/trigger",
+    "prefix": "trigger-rm",
+    "video": true
+  }
+}

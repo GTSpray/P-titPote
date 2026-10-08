@@ -81,6 +81,44 @@ export const fr = {
   'startup.dm.gateway': "P'titPote Gateway v{version} démarrée",
   'register.success': 'success',
   'register.endProcess': 'end process',
+  'trigger.description': 'Configurer des automations serveur',
+  'trigger.sub.set.description': 'créer ou mettre à jour une automation',
+  'trigger.sub.rm.description':
+    'activer, désactiver ou supprimer une automation',
+  'trigger.set.chooseKind': "Choisis le type d'automation à configurer :",
+  'trigger.modal.set.title': 'Configurer une automation',
+  'trigger.modal.config.welcome_message.title': 'Message de bienvenue',
+  'trigger.modal.config.welcome_role.title': 'Rôle de bienvenue',
+  'trigger.modal.rm.title': 'Gérer une automation',
+  'trigger.modal.label.name': "Nom de l'automation",
+  'trigger.modal.label.kind': "Type d'automation",
+  'trigger.modal.label.channel': 'Salon du message',
+  'trigger.modal.label.message': 'Message de bienvenue',
+  'trigger.modal.label.role': 'Rôle à attribuer',
+  'trigger.modal.label.trigger': 'Automation',
+  'trigger.modal.label.action': 'Action',
+  'trigger.modal.description.name':
+    'Caractères alphanumérique minuscule uniquement, 1 à 50 caractères',
+  'trigger.modal.description.message':
+    'Texte libre, 1 à 2000 caractères. Placeholders: {user}, {username}, {server}',
+  'trigger.modal.select.kind.placeholder': 'Choisis un type...',
+  'trigger.modal.select.trigger.placeholder': 'Choisis une automation...',
+  'trigger.modal.select.action.placeholder': 'Choisis une action...',
+  'trigger.kind.welcome_message': 'Message de bienvenue',
+  'trigger.kind.welcome_role': 'Rôle de bienvenue',
+  'trigger.status.enabled': 'actif',
+  'trigger.status.disabled': 'désactivé',
+  'trigger.action.enable': 'Réactiver',
+  'trigger.action.disable': 'Désactiver',
+  'trigger.action.delete': 'Supprimer',
+  'trigger.rm.enabled': 'Automation "{name}" réactivée.',
+  'trigger.rm.disabled': 'Automation "{name}" désactivée.',
+  'trigger.rm.deleted': 'Automation "{name}" supprimée.',
+  'trigger.rm.notFound': 'Ahem... il n\'y a pas d\'automation "{name}" 🤷',
+  'trigger.rm.alreadyEnabled':
+    'Ahem... l\'automation "{name}" est déjà active 🤷',
+  'trigger.rm.alreadyDisabled':
+    'Ahem... l\'automation "{name}" est déjà désactivée 🤷',
 } as const;
 
 export type TranslationKey = keyof typeof fr;
