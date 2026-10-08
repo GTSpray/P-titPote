@@ -52,6 +52,7 @@ help: os
 
 ## Run containers
 start: os
+	docker run --rm -v "$(CURDIR)/logs:/logs" alpine:3.21 chown -R 1000:1000 /logs
 	$(DC_CMD) up -d --build --force-recreate --no-deps --remove-orphans
 
 ## Halt containers

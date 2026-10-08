@@ -83,6 +83,64 @@ export const fr = {
     "P'titPote Gateway arrêtée : fermeture fatale {code} ({reason})",
   'register.success': 'success',
   'register.endProcess': 'end process',
+  'trigger.description': 'Configurer des automatismes serveur',
+  'trigger.menu.chooseAction': 'Que veux-tu faire ?',
+  'trigger.menu.placeholder': 'Choisis une action...',
+  'trigger.menu.selectedChoice': '**{choice}**\n{next}',
+  'trigger.create.chooseKind': "Choisis le type d'automatisme à créer :",
+  'trigger.create.nameTaken': 'Ahem... l\'automatisme "{name}" existe déjà 🤷',
+  'trigger.update.chooseTrigger': 'Quel automatisme veux-tu modifier ?',
+  'trigger.lifecycle.chooseTrigger': 'Quel automatisme ?',
+  'trigger.modal.config.welcome_message.title': 'Message de bienvenue',
+  'trigger.modal.config.welcome_role.title': 'Rôle de bienvenue',
+  'trigger.modal.label.name': "Nom de l'automatisme",
+  'trigger.modal.label.channel': 'Salon du message',
+  'trigger.modal.label.message': 'Message de bienvenue',
+  'trigger.modal.label.role': 'Rôle à attribuer',
+  'trigger.modal.description.name':
+    'Minuscules, chiffres, espaces, _ - . — 1 à 50 caractères',
+  'trigger.modal.description.message':
+    'Texte libre, 1 à 2000 caractères. Placeholders: {user}, {username}, {server}',
+  'trigger.modal.select.kind.placeholder': 'Choisis un type...',
+  'trigger.modal.select.trigger.placeholder': 'Choisis un automatisme...',
+  'trigger.kind.welcome_message': 'Message de bienvenue',
+  'trigger.kind.welcome_role': 'Rôle de bienvenue',
+  'trigger.status.enabled': 'actif',
+  'trigger.status.disabled': 'désactivé',
+  'trigger.action.create': 'Créer',
+  'trigger.action.update': 'Modifier',
+  'trigger.action.enable': 'Activer',
+  'trigger.action.disable': 'Désactiver',
+  'trigger.action.delete': 'Supprimer',
+  'trigger.lifecycle.created': 'Automatisme "{name}" ({kind}) créé.',
+  'trigger.lifecycle.updated': 'Automatisme "{name}" modifié.',
+  'trigger.lifecycle.previewButton': 'Prévisualiser',
+  'trigger.lifecycle.enabled': 'Automatisme "{name}" activé.',
+  'trigger.lifecycle.disabled': 'Automatisme "{name}" désactivé.',
+  'trigger.lifecycle.deleted': 'Automatisme "{name}" supprimé.',
+  'trigger.lifecycle.notFound':
+    'Ahem... il n\'y a pas d\'automatisme "{name}" 🤷',
+  'trigger.lifecycle.alreadyEnabled':
+    'Ahem... l\'automatisme "{name}" est déjà actif 🤷',
+  'trigger.lifecycle.alreadyDisabled':
+    'Ahem... l\'automatisme "{name}" est déjà désactivé 🤷',
+  'trigger.role.managed':
+    'Ahem... je ne peux pas attribuer un rôle géré (bot/intégration) 🤷',
+  'trigger.role.everyone':
+    'Ahem... je ne peux pas attribuer le rôle @everyone 🤷',
+  'trigger.role.missingManageRoles':
+    'Ahem... il me faut la permission Gérer les rôles 🤷',
+  'trigger.role.hierarchy': 'Ahem... mon rôle est trop faible pour ca 🤷',
+  'trigger.role.unavailable': 'Ahem... je ne peux pas attribuer ce rôle 🤷',
+  'trigger.channel.missingViewChannel':
+    "Ahem... je n'ai pas accès à ce salon 🤷",
+  'trigger.channel.missingSendMessages':
+    'Ahem... je ne peux pas envoyer de messages dans ce salon 🤷',
+  'trigger.channel.unsupported':
+    'Ahem... ce type de salon ne convient pas pour un message de bienvenue 🤷',
+  'trigger.channel.notFound': 'Ahem... je ne trouve pas ce salon 🤷',
+  'trigger.channel.unavailable':
+    'Ahem... je ne peux pas publier dans ce salon 🤷',
 } as const;
 
 export type TranslationKey = keyof typeof fr;
