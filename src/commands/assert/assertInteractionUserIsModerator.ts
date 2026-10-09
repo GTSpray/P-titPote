@@ -1,5 +1,6 @@
 import type { APIBaseInteraction } from 'discord-api-types/v10';
 import type { InteractionType } from 'discord-api-types/v10';
+import { ForbiddenError } from '../../cqrs/errors.js';
 import { t } from '../../i18n/index.js';
 
 type InteractionTypeOpts =
@@ -19,7 +20,7 @@ const PERMISSIONS = {
 
 export function assertInteractionUserIsModerator(body: iModeratorBodyOpts) {
   if (!body.member || !body.member.permissions) {
-    throw Error(t('errors.notServerScope'));
+    throw new ForbiddenError(t('errors.notServerScope'));
   }
   const perms = BigInt(body.member.permissions);
 
@@ -32,6 +33,6 @@ export function assertInteractionUserIsModerator(body: iModeratorBodyOpts) {
     perms & PERMISSIONS.BAN_MEMBERS;
 
   if (!isModerator) {
-    throw Error(t('errors.notModerator'));
+    throw new ForbiddenError(t('errors.notModerator'));
   }
 }

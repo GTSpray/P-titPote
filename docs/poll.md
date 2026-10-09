@@ -43,9 +43,10 @@ endpoint parses the action name at `d.a` and dispatches through
 - `PollResp` stores one member's answer for one step. Choice questions set
   `pollChoice`; free-text questions set `content`.
 
-Handlers use `em.fork()` for request-scoped database work and always scope poll
-lookups by `guild_id` so a component from one guild cannot operate on another
-guild's poll.
+Discord adapters build a command or query and call a handler in
+`src/domain/poll/`. Handlers scope every lookup by `guildId` and do not import
+MikroORM. Vote recording and report publication take a row lock through
+`PollLockingFinder` inside `withTransaction`. See [`cqrs.md`](cqrs.md).
 
 ## Draft lifecycle
 
