@@ -126,10 +126,9 @@ describe('cta/triggerSetWelcomeMessage', () => {
     );
   });
 
-  it('should upsert and re-enable existing trigger', async () => {
+  it('should refuse create when name already exists', async () => {
     const guild = new DiscordGuild(guild_id);
     const existing = new GuildTrigger('welcome', 'welcome_role');
-    existing.enabled = false;
     const roleConfig = new TriggerRole(randomDiscordId19());
     roleConfig.trigger = existing;
     existing.roleConfig = roleConfig;
@@ -137,6 +136,43 @@ describe('cta/triggerSetWelcomeMessage', () => {
     await em.persist(guild).flush();
 
     const response = await triggerSetWelcomeMessage.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('trigger.create.nameTaken', { name: 'welcome' }),
+      },
+    });
+  });
+
+  it('should update existing welcome message without changing enabled', async () => {
+    const guild = new DiscordGuild(guild_id);
+    const existing = new GuildTrigger('welcome', 'welcome_message');
+    existing.enabled = false;
+    const messageConfig = new TriggerMessage(randomDiscordId19(), 'old');
+    messageConfig.trigger = existing;
+    existing.messageConfig = messageConfig;
+    guild.triggers.add(existing);
+    await em.persist(guild).flush();
+
+    const updateData: CTAData = {
+      components: getModalLabelComponnents([channelCmp, messageCmp]),
+      custom_id: `{"t":"cta","d":{"a":"tUpdMsg","n":"welcome"}}`,
+    };
+    const { req, res } = getInteractionModalHttpMock({
+      data: updateData,
+      permissions: admin_permissions,
+    });
+    req.body.guild_id = guild_id;
+
+    const response = await triggerSetWelcomeMessage.handler({
+      req,
+      res,
+      dbServices: handlerOpts.dbServices,
+      additionalData: JSON.parse(updateData.custom_id),
+    });
+
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
@@ -154,21 +190,11 @@ describe('cta/triggerSetWelcomeMessage', () => {
     const saved = await em.findOne(
       GuildTrigger,
       { id: existing.id },
-      { populate: ['messageConfig', 'roleConfig'] },
+      { populate: ['messageConfig'] },
     );
-    expect(saved).toEqual(
-      expectedGuildTrigger({
-        id: existing.id,
-        name: 'welcome',
-        kind: 'welcome_message',
-        enabled: true,
-        messageConfig: expectedTriggerMessage({
-          channelId: channel_id,
-          message: 'Bienvenue {user} sur {server}',
-        }),
-        roleConfig: null,
-      }),
-    );
+    expect(saved?.enabled).toBe(false);
+    expect(saved?.messageConfig?.channelId).toBe(channel_id);
+    expect(saved?.messageConfig?.message).toBe('Bienvenue {user} sur {server}');
   });
 
   it('should refuse when creating beyond limit', async () => {

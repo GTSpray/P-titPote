@@ -105,10 +105,13 @@ export const cta = {
   pollResp,
   pollSummary,
   pollVote,
+  triggerMenu,
+  triggerPick,
   triggerSetType,
   triggerSetWelcomeMessage,
   triggerSetWelcomeRole,
-  triggerRm,
+  tUpdMsg: triggerSetWelcomeMessage,
+  tUpdRole: triggerSetWelcomeRole,
 };
 ```
 

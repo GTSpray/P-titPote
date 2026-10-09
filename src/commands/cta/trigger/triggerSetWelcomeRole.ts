@@ -21,18 +21,49 @@ import {
   okComponnents,
 } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import {
+  assertBotCanAssignRole,
+  BotCannotAssignRoleError,
+} from '../../../utils/assertBotCanAssignRole.js';
+import { triggerNameSchema } from '../../../utils/triggerName.js';
 
-const ValidWelcomeRole = z.object({
-  name: z
-    .string()
-    .regex(/^[a-z0-9]+$/)
-    .min(1)
-    .max(50),
+const ensureAssignableRole = async (guildId: string, roleId: string) => {
+  try {
+    await assertBotCanAssignRole(guildId, roleId);
+    return null;
+  } catch (error) {
+    if (error instanceof BotCannotAssignRoleError) {
+      return errorPayload(error.toUserMessage());
+    }
+    logger.error('trigger role assignability check failed', {
+      guildId,
+      roleId,
+      error,
+    });
+    return errorPayload(t('trigger.role.unavailable'));
+  }
+};
+
+const ValidCreate = z.object({
+  name: triggerNameSchema,
   roleId: z.string().min(1).max(50),
 });
 
+const ValidUpdate = z.object({
+  name: triggerNameSchema,
+  roleId: z.string().min(1).max(50),
+});
+
+const okResponse = {
+  type: InteractionResponseType.ChannelMessageWithSource,
+  data: {
+    flags: MessageFlags.IsComponentsV2,
+    components: [...okComponnents()],
+  },
+};
+
 export const triggerSetWelcomeRole: ModalHandlerDelcaration<CTAData> = {
-  async handler({ req, res, dbServices }) {
+  async handler({ req, res, dbServices, additionalData }) {
     try {
       assertInteractionUserIsModerator(req.body);
     } catch (error) {
@@ -42,11 +73,69 @@ export const triggerSetWelcomeRole: ModalHandlerDelcaration<CTAData> = {
 
     const guildId = req.body.guild_id;
     const { data } = req.body;
+    const ctaAction = (<any>additionalData).d?.a;
+    const isUpdate = ctaAction === 'tUpdRole';
 
-    const nameInput = getInputComponnentById<ComponentSimple>(data, 'name');
     const roleInput = getInputComponnentById<ComponentSelect>(data, 'role');
 
-    const parsed = ValidWelcomeRole.safeParse({
+    if (isUpdate) {
+      const parsed = ValidUpdate.safeParse({
+        name: (<any>additionalData).d?.n,
+        roleId: roleInput?.component.values[0],
+      });
+
+      if (!parsed.success) {
+        const issues = parsed.error.issues;
+        logger.debug('zod errors', { issues });
+        return res
+          .status(400)
+          .json({ error: t('errors.invalidSubcommandPayload'), issues });
+      }
+
+      if (!dbServices || !guildId) {
+        return res.status(500).json({
+          error: t('errors.unmetResult'),
+        });
+      }
+
+      const em = dbServices.orm.em.fork();
+      const trigger = await em.findOne(
+        GuildTrigger,
+        {
+          server: { guildId },
+          name: parsed.data.name,
+          kind: 'welcome_role',
+        },
+        { populate: ['messageConfig', 'roleConfig'] },
+      );
+
+      if (!trigger) {
+        return res.json(
+          errorPayload(
+            t('trigger.lifecycle.notFound', { name: parsed.data.name }),
+          ),
+        );
+      }
+
+      const roleError = await ensureAssignableRole(guildId, parsed.data.roleId);
+      if (roleError) {
+        return res.json(roleError);
+      }
+
+      if (trigger.roleConfig) {
+        trigger.roleConfig.roleId = parsed.data.roleId;
+      } else {
+        const roleConfig = new TriggerRole(parsed.data.roleId);
+        roleConfig.trigger = trigger;
+        trigger.roleConfig = roleConfig;
+      }
+
+      await em.persist(trigger).flush();
+      return res.json(okResponse);
+    }
+
+    const nameInput = getInputComponnentById<ComponentSimple>(data, 'name');
+    const parsed = ValidCreate.safeParse({
       name: nameInput?.component.value,
       roleId: roleInput?.component.values[0],
     });
@@ -68,38 +157,34 @@ export const triggerSetWelcomeRole: ModalHandlerDelcaration<CTAData> = {
         'triggers.roleConfig',
       ]);
 
-      let trigger = guild.triggers.find(
+      const existing = guild.triggers.find(
         (aTrigger) => aTrigger.name === parsed.data.name,
       );
-
-      if (!trigger) {
-        if (guild.triggers.length >= TRIGGER_LIMIT) {
-          return res.json(errorPayload(t('errors.tooMany')));
-        }
-        trigger = new GuildTrigger(parsed.data.name, 'welcome_role');
-        guild.triggers.add(trigger);
+      if (existing) {
+        return res.json(
+          errorPayload(
+            t('trigger.create.nameTaken', { name: parsed.data.name }),
+          ),
+        );
       }
 
-      trigger.kind = 'welcome_role';
-      trigger.enabled = true;
-      trigger.messageConfig = null;
-
-      if (trigger.roleConfig) {
-        trigger.roleConfig.roleId = parsed.data.roleId;
-      } else {
-        const roleConfig = new TriggerRole(parsed.data.roleId);
-        roleConfig.trigger = trigger;
-        trigger.roleConfig = roleConfig;
+      if (guild.triggers.length >= TRIGGER_LIMIT) {
+        return res.json(errorPayload(t('errors.tooMany')));
       }
+
+      const roleError = await ensureAssignableRole(guildId, parsed.data.roleId);
+      if (roleError) {
+        return res.json(roleError);
+      }
+
+      const trigger = new GuildTrigger(parsed.data.name, 'welcome_role');
+      const roleConfig = new TriggerRole(parsed.data.roleId);
+      roleConfig.trigger = trigger;
+      trigger.roleConfig = roleConfig;
+      guild.triggers.add(trigger);
 
       await em.persist(guild).flush();
-      return res.json({
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.IsComponentsV2,
-          components: [...okComponnents()],
-        },
-      });
+      return res.json(okResponse);
     }
 
     return res.status(500).json({

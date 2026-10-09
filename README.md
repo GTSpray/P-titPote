@@ -102,9 +102,13 @@ Required scopes:
 Required permissions:
 
 - Manage Messages
-- Manage Roles (for `/trigger` welcome roles)
+- Manage Roles (for `/trigger` welcome roles — required, or Discord returns
+  `Missing Access` when assigning roles)
 - Send Messages
 - Use external Emojis
+
+The bot’s role must also sit **above** any welcome role in
+Server Settings → Roles.
 
 Also enable the privileged **Server Members Intent** in the Discord Developer
 Portal so join triggers receive `GuildMemberAdd` events.

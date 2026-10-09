@@ -8,34 +8,34 @@ role.
 
 Triggers avoid manual onboarding steps. Each automation has a short name, a
 type, and type-specific settings. Disabled triggers stay configured but do not
-run until you update them again with `/trigger set`.
+run until you activate them again.
 
 ### Moderator flow
 
-All `/trigger` subcommands require guild scope and moderator permissions. The
-moderator check accepts members with at least one of these Discord permissions:
-Administrator, Manage Server, Manage Channels, Manage Messages, Kick Members,
-or Ban Members.
+`/trigger` requires guild scope and moderator permissions. The moderator check
+accepts members with at least one of these Discord permissions: Administrator,
+Manage Server, Manage Channels, Manage Messages, Kick Members, or Ban Members.
 
-1. **Create or update an automation** with `/trigger set`:
-   - Replies ephemerally with a select to choose the type (**Message de
-     bienvenue** or **Rôle de bienvenue**).
-   - After you pick a type, a modal asks for:
-     - `name`: lowercase letters and digits only (`a-z`, `0-9`), 1–50
+The command replies ephemerally with a select to choose an action:
+
+1. **Créer** — create a new automation:
+   - Pick the type (**Message de bienvenue** or **Rôle de bienvenue**).
+   - A modal asks for:
+     - `name`: lowercase letters, digits, spaces, `_`, `-`, `.` — 1–50
        characters;
      - welcome message: target channel + message text (1–2000 characters);
      - welcome role: role to assign.
-   - Reusing an existing name updates that automation and re-enables it if it
-     was disabled.
-   - Success replies publicly with **Ok! C'est noté ;)**.
+   - If the name already exists, the bot replies ephemerally that it is already
+     taken (no overwrite).
 
 ![Create trigger](./trigger-set.gif)
 
-2. **Enable, disable, or delete an automation** with `/trigger rm`:
-   - Opens a modal with two selects:
-     - the automation (name, with type and actif/désactivé in the description);
-     - the action: **Réactiver**, **Désactiver**, or **Supprimer**.
-   - **Réactiver** turns a disabled automation back on without reconfiguring it.
+2. **Modifier** — change settings of an existing automation (name and enabled
+   state stay the same).
+
+3. **Activer** / **Désactiver** / **Supprimer** — pick an automation, then the
+   action applies immediately.
+   - **Activer** turns a disabled automation back on.
    - **Désactiver** keeps the automation but stops it from running on join.
    - **Supprimer** removes it; the same name can be created again later.
    - If none exist, replies ephemerally with **Ahem... j'ai rien trouvé... 🤷**.
@@ -54,23 +54,27 @@ In the welcome message text you can use:
 
 - Guild-only: triggers are managed per Discord server.
 - Names are unique per server among non-deleted triggers.
-- Names must use lowercase letters and digits only.
+- Names may use lowercase letters, digits, spaces, `_`, `-`, and `.`.
 - A server can store at most **10** non-deleted triggers (disabled ones count).
   Creating another one replies ephemerally with **Ahem... ca fait beaucoup là.
-  Non?**; updating an existing name still works.
+  Non?**
 - Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
-  faire 🤷** response before any subcommand runs.
+  faire 🤷** response before the menu runs.
 - The bot needs the privileged **Server Members Intent** enabled in the Discord
   Developer Portal for join events to fire.
+- Welcome roles need **Manage Roles**, and the bot’s role must sit **above** the
+  role it assigns (Server Settings → Roles). Otherwise Discord returns Missing
+  Access and the join role is skipped.
 
 ### Examples
 
 ```text
-/trigger set  → select: Message de bienvenue
-              → modal: name=welcome, channel=#général, message=Bienvenue {user} !
-/trigger set  → select: Rôle de bienvenue
-              → modal: name=member, role=@Membre
-/trigger rm   → modal: trigger=welcome, action=Désactiver
-/trigger rm   → modal: trigger=welcome, action=Réactiver
-/trigger rm   → modal: trigger=member, action=Supprimer
+/trigger → Créer → Message de bienvenue
+         → modal: name=welcome, channel=#général, message=Bienvenue {user} !
+/trigger → Créer → Rôle de bienvenue
+         → modal: name=member, role=@Membre
+/trigger → Modifier → welcome → modal: new channel / message
+/trigger → Désactiver → welcome
+/trigger → Activer → welcome
+/trigger → Supprimer → member
 ```

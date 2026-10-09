@@ -82,43 +82,51 @@ export const fr = {
   'register.success': 'success',
   'register.endProcess': 'end process',
   'trigger.description': 'Configurer des automations serveur',
-  'trigger.sub.set.description': 'créer ou mettre à jour une automation',
-  'trigger.sub.rm.description':
-    'activer, désactiver ou supprimer une automation',
-  'trigger.set.chooseKind': "Choisis le type d'automation à configurer :",
-  'trigger.modal.set.title': 'Configurer une automation',
+  'trigger.menu.chooseAction': 'Que veux-tu faire ?',
+  'trigger.menu.placeholder': 'Choisis une action...',
+  'trigger.create.chooseKind': "Choisis le type d'automation à créer :",
+  'trigger.create.nameTaken': 'Ahem... l\'automation "{name}" existe déjà 🤷',
+  'trigger.update.chooseTrigger': 'Quelle automation veux-tu modifier ?',
+  'trigger.lifecycle.chooseTrigger': 'Quelle automation ?',
   'trigger.modal.config.welcome_message.title': 'Message de bienvenue',
   'trigger.modal.config.welcome_role.title': 'Rôle de bienvenue',
-  'trigger.modal.rm.title': 'Gérer une automation',
   'trigger.modal.label.name': "Nom de l'automation",
-  'trigger.modal.label.kind': "Type d'automation",
   'trigger.modal.label.channel': 'Salon du message',
   'trigger.modal.label.message': 'Message de bienvenue',
   'trigger.modal.label.role': 'Rôle à attribuer',
-  'trigger.modal.label.trigger': 'Automation',
-  'trigger.modal.label.action': 'Action',
   'trigger.modal.description.name':
-    'Caractères alphanumérique minuscule uniquement, 1 à 50 caractères',
+    'Minuscules, chiffres, espaces, _ - . — 1 à 50 caractères',
   'trigger.modal.description.message':
     'Texte libre, 1 à 2000 caractères. Placeholders: {user}, {username}, {server}',
   'trigger.modal.select.kind.placeholder': 'Choisis un type...',
   'trigger.modal.select.trigger.placeholder': 'Choisis une automation...',
-  'trigger.modal.select.action.placeholder': 'Choisis une action...',
   'trigger.kind.welcome_message': 'Message de bienvenue',
   'trigger.kind.welcome_role': 'Rôle de bienvenue',
   'trigger.status.enabled': 'actif',
   'trigger.status.disabled': 'désactivé',
-  'trigger.action.enable': 'Réactiver',
+  'trigger.action.create': 'Créer',
+  'trigger.action.update': 'Modifier',
+  'trigger.action.enable': 'Activer',
   'trigger.action.disable': 'Désactiver',
   'trigger.action.delete': 'Supprimer',
-  'trigger.rm.enabled': 'Automation "{name}" réactivée.',
-  'trigger.rm.disabled': 'Automation "{name}" désactivée.',
-  'trigger.rm.deleted': 'Automation "{name}" supprimée.',
-  'trigger.rm.notFound': 'Ahem... il n\'y a pas d\'automation "{name}" 🤷',
-  'trigger.rm.alreadyEnabled':
+  'trigger.lifecycle.enabled': 'Automation "{name}" activée.',
+  'trigger.lifecycle.disabled': 'Automation "{name}" désactivée.',
+  'trigger.lifecycle.deleted': 'Automation "{name}" supprimée.',
+  'trigger.lifecycle.notFound':
+    'Ahem... il n\'y a pas d\'automation "{name}" 🤷',
+  'trigger.lifecycle.alreadyEnabled':
     'Ahem... l\'automation "{name}" est déjà active 🤷',
-  'trigger.rm.alreadyDisabled':
+  'trigger.lifecycle.alreadyDisabled':
     'Ahem... l\'automation "{name}" est déjà désactivée 🤷',
+  'trigger.role.managed':
+    'Ahem... je ne peux pas attribuer un rôle géré (bot/intégration) 🤷',
+  'trigger.role.everyone':
+    'Ahem... je ne peux pas attribuer le rôle @everyone 🤷',
+  'trigger.role.missingManageRoles':
+    'Ahem... il me faut la permission Gérer les rôles 🤷',
+  'trigger.role.hierarchy':
+    'Ahem... mon rôle doit être placé au-dessus du rôle à attribuer (Paramètres du serveur → Rôles) 🤷',
+  'trigger.role.unavailable': 'Ahem... je ne peux pas attribuer ce rôle 🤷',
 } as const;
 
 export type TranslationKey = keyof typeof fr;

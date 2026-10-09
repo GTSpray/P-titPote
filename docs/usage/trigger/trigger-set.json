@@ -1,7 +1,7 @@
 {
   "$schema": "../schema/scenario.schema.json",
   "id": "trigger-set",
-  "title": "Trigger — configurer un message de bienvenue",
+  "title": "Trigger — créer un message de bienvenue",
   "doc": "docs/usage/trigger/trigger.md",
   "chrome": {
     "guild": {
@@ -34,14 +34,14 @@
     },
     {
       "type": "type",
-      "text": "/trigger set",
+      "text": "/trigger",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/trigger set",
-            "description": "créer ou mettre à jour une automation"
+            "name": "/trigger",
+            "description": "Configurer des automations serveur"
           }
         ]
       }
@@ -69,13 +69,118 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "trigger set"
+              "command": "trigger"
             },
             "interaction": {
               "type": 4,
               "data": {
                 "flags": 64,
-                "content": "Choisis le type d'automation à configurer :",
+                "content": "Que veux-tu faire ?",
+                "components": [
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 3,
+                        "custom_id": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerMenu\"}}",
+                        "placeholder": "Choisis une action...",
+                        "options": [
+                          {
+                            "label": "Créer",
+                            "value": "create",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Modifier",
+                            "value": "update",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Activer",
+                            "value": "enable",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Désactiver",
+                            "value": "disable",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Supprimer",
+                            "value": "delete",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 1800
+    },
+    {
+      "type": "selectModalOption",
+      "field": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerMenu\"}}",
+      "option": "create",
+      "options": [
+        {
+          "label": "Créer"
+        },
+        {
+          "label": "Modifier"
+        },
+        {
+          "label": "Activer"
+        },
+        {
+          "label": "Désactiver"
+        },
+        {
+          "label": "Supprimer"
+        }
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:10",
+            "slashInvocation": {
+              "user": {
+                "name": "Modo",
+                "color": "#5865f2"
+              },
+              "command": "trigger"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Choisis le type d'automation à créer :",
                 "components": [
                   {
                     "type": 1,
@@ -143,7 +248,7 @@
             {
               "type": 18,
               "label": "Nom de l'automation",
-              "description": "Caractères alphanumérique minuscule uniquement, 1 à 50 caractères",
+              "description": "Minuscules, chiffres, espaces, _ - . — 1 à 50 caractères",
               "component": {
                 "type": 4,
                 "custom_id": "name",
@@ -206,7 +311,7 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "trigger set"
+              "command": "trigger"
             },
             "interaction": {
               "type": 4,

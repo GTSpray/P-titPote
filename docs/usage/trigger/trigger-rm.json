@@ -34,14 +34,14 @@
     },
     {
       "type": "type",
-      "text": "/trigger rm",
+      "text": "/trigger",
       "revealSuggestions": {
         "mode": "commandMatch",
         "activeIndex": 0,
         "suggestions": [
           {
-            "name": "/trigger rm",
-            "description": "activer, désactiver ou supprimer une automation"
+            "name": "/trigger",
+            "description": "Configurer des automations serveur"
           }
         ]
       }
@@ -52,117 +52,6 @@
     },
     {
       "type": "pressEnter"
-    },
-    {
-      "type": "openModal",
-      "modal": {
-        "type": 9,
-        "author": {
-          "name": "P'tit Pote",
-          "bot": true,
-          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
-        },
-        "data": {
-          "title": "Gérer une automation",
-          "components": [
-            {
-              "type": 18,
-              "label": "Automation",
-              "component": {
-                "type": 3,
-                "custom_id": "trigger",
-                "placeholder": "Choisis une automation...",
-                "options": [
-                  {
-                    "label": "member",
-                    "value": "member",
-                    "description": "Rôle de bienvenue — actif",
-                    "emoji": {
-                      "name": "▪️"
-                    }
-                  },
-                  {
-                    "label": "welcome",
-                    "value": "welcome",
-                    "description": "Message de bienvenue — actif",
-                    "emoji": {
-                      "name": "▪️"
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "type": 18,
-              "label": "Action",
-              "component": {
-                "type": 3,
-                "custom_id": "action",
-                "placeholder": "Choisis une action...",
-                "options": [
-                  {
-                    "label": "Réactiver",
-                    "value": "enable",
-                    "emoji": {
-                      "name": "▪️"
-                    }
-                  },
-                  {
-                    "label": "Désactiver",
-                    "value": "disable",
-                    "emoji": {
-                      "name": "▪️"
-                    }
-                  },
-                  {
-                    "label": "Supprimer",
-                    "value": "delete",
-                    "emoji": {
-                      "name": "▪️"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "type": "selectModalOption",
-      "field": "trigger",
-      "option": "welcome",
-      "options": [
-        {
-          "label": "member"
-        },
-        {
-          "label": "welcome"
-        }
-      ]
-    },
-    {
-      "type": "selectModalOption",
-      "field": "action",
-      "option": "disable",
-      "options": [
-        {
-          "label": "Réactiver"
-        },
-        {
-          "label": "Désactiver"
-        },
-        {
-          "label": "Supprimer"
-        }
-      ]
-    },
-    {
-      "type": "wait",
-      "ms": 700
-    },
-    {
-      "type": "submitModal"
     },
     {
       "type": "applyState",
@@ -180,7 +69,189 @@
                 "name": "Modo",
                 "color": "#5865f2"
               },
-              "command": "trigger rm"
+              "command": "trigger"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Que veux-tu faire ?",
+                "components": [
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 3,
+                        "custom_id": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerMenu\"}}",
+                        "placeholder": "Choisis une action...",
+                        "options": [
+                          {
+                            "label": "Créer",
+                            "value": "create",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Modifier",
+                            "value": "update",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Activer",
+                            "value": "enable",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Désactiver",
+                            "value": "disable",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Supprimer",
+                            "value": "delete",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 1800
+    },
+    {
+      "type": "selectModalOption",
+      "field": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerMenu\"}}",
+      "option": "disable",
+      "options": [
+        {
+          "label": "Créer"
+        },
+        {
+          "label": "Modifier"
+        },
+        {
+          "label": "Activer"
+        },
+        {
+          "label": "Désactiver"
+        },
+        {
+          "label": "Supprimer"
+        }
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:12",
+            "slashInvocation": {
+              "user": {
+                "name": "Modo",
+                "color": "#5865f2"
+              },
+              "command": "trigger"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Quelle automation ?",
+                "components": [
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 3,
+                        "custom_id": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerPick\",\"act\":\"disable\"}}",
+                        "placeholder": "Choisis une automation...",
+                        "options": [
+                          {
+                            "label": "member",
+                            "value": "member",
+                            "description": "Rôle de bienvenue — actif",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "welcome",
+                            "value": "welcome",
+                            "description": "Message de bienvenue — actif",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 1800
+    },
+    {
+      "type": "selectModalOption",
+      "field": "{\"t\":\"cta\",\"d\":{\"a\":\"triggerPick\",\"act\":\"disable\"}}",
+      "option": "welcome",
+      "options": [
+        {
+          "label": "member"
+        },
+        {
+          "label": "welcome"
+        }
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:12",
+            "slashInvocation": {
+              "user": {
+                "name": "Modo",
+                "color": "#5865f2"
+              },
+              "command": "trigger"
             },
             "interaction": {
               "type": 4,
