@@ -16,9 +16,9 @@
 
 ## About
 
-**P'tit Pote** is a Discord bot for polls, reusable message aliases, and a few
-utility commands. It is built with TypeScript, Express, Discord.js, MariaDB, and
-MikroORM.
+**P'tit Pote** is a Discord bot for polls, reusable message aliases, join
+triggers, and a few utility commands. It is built with TypeScript, Express,
+Discord.js, MariaDB, and MikroORM.
 
 The documentation is split for two audiences:
 
@@ -49,6 +49,7 @@ The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
 - [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store, post, and remove reusable message aliases
+- [`docs/usage/trigger/trigger.md`](docs/usage/trigger/trigger.md) — welcome message and welcome role on join
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
 
 ---
@@ -101,8 +102,16 @@ Required scopes:
 Required permissions:
 
 - Manage Messages
+- Manage Roles (for `/trigger` welcome roles — required, or Discord returns
+  `Missing Access` when assigning roles)
 - Send Messages
 - Use external Emojis
+
+The bot’s role must also sit **above** any welcome role in
+Server Settings → Roles.
+
+Also enable the privileged **Server Members Intent** in the Discord Developer
+Portal so join triggers receive `GuildMemberAdd` events.
 
 For more details, see [Discord's getting started guide](https://docs.discord.com/developers/quick-start/getting-started).
 
@@ -181,6 +190,7 @@ These guides describe architecture, services, and implementation details:
 
 - [`docs/interactions.md`](docs/interactions.md) — Discord HTTP interaction dispatch, handlers, and troubleshooting
 - [`docs/alias.md`](docs/alias.md) — alias command validation, persistence, permissions, and troubleshooting
+- [`docs/trigger.md`](docs/trigger.md) — join trigger automations, persistence, and gateway execution
 - [`docs/gimme.md`](docs/gimme.md) — gimme utility command dispatch, emoji extraction, and troubleshooting
 - [`docs/poll.md`](docs/poll.md) — poll modal/button lifecycle, persistence, reports, and troubleshooting
 - [`docs/gateway.md`](docs/gateway.md) — Discord Gateway service lifecycle, events, and troubleshooting
@@ -224,6 +234,7 @@ P-titPote/
 │   ├── usage/                   # End-user command guides
 │   ├── interactions.md          # HTTP interactions dispatch guide
 │   ├── alias.md                 # Alias command technical guide
+│   ├── trigger.md               # Join trigger technical guide
 │   ├── gimme.md                 # Gimme command technical guide
 │   ├── poll.md                  # Poll workflow technical guide
 │   ├── gateway.md               # Gateway service technical guide

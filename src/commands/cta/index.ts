@@ -9,6 +9,11 @@ import { pollPub } from './poll/pollPub.js';
 import { pollResp } from './poll/pollResp.js';
 import { pollSummary } from './poll/pollSummary.js';
 import { pollVote } from './poll/pollVote.js';
+import { triggerMenu } from './trigger/triggerMenu.js';
+import { triggerPick } from './trigger/triggerPick.js';
+import { triggerSetType } from './trigger/triggerSetType.js';
+import { triggerSetWelcomeMessage } from './trigger/triggerSetWelcomeMessage.js';
+import { triggerSetWelcomeRole } from './trigger/triggerSetWelcomeRole.js';
 
 export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   aliasRm,
@@ -21,4 +26,11 @@ export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   pollResp,
   pollSummary,
   pollVote,
+  triggerMenu,
+  triggerPick,
+  triggerSetType,
+  triggerSetWelcomeMessage,
+  triggerSetWelcomeRole,
+  tUpdMsg: triggerSetWelcomeMessage,
+  tUpdRole: triggerSetWelcomeRole,
 };

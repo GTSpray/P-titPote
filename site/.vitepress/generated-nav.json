@@ -11,6 +11,10 @@
     {
       "text": "/poll",
       "link": "/poll/"
+    },
+    {
+      "text": "/trigger",
+      "link": "/trigger/"
     }
   ]
 }
