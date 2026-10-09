@@ -1,3 +1,13 @@
+## [1.12.26](https://github.com/GTSpray/P-titPote/compare/v1.12.25...v1.12.26) (2026-10-09)
+
+### :memo: Documentation
+
+* **testing:** document Vitest workflow ([#304](https://github.com/GTSpray/P-titPote/issues/304)) ([dba1fe4](https://github.com/GTSpray/P-titPote/commit/dba1fe41ae53bcb859169079d63b1ddc578aaabc))
+
+### :repeat: Chore
+
+* **db:** align poll_resp FK name with poll_choice_id ([#311](https://github.com/GTSpray/P-titPote/issues/311)) ([c92a109](https://github.com/GTSpray/P-titPote/commit/c92a109a86bd6564b0e7da13c69be0f8d1bc70b2))
+
 ## [1.12.25](https://github.com/GTSpray/P-titPote/compare/v1.12.24...v1.12.25) (2026-10-05)
 
 ### :repeat: Chore
