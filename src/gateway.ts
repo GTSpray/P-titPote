@@ -51,31 +51,48 @@ gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
   logger.info('gateway guild_delete', { shard, event });
 });
 
-gateway.on(GatewayDispatchEvents.MessageCreate, async ({ event }) => {
-  const metadata = event.interaction_metadata;
-  if (metadata?.type === InteractionType.ApplicationCommand) {
-    const name = (metadata as any).name;
-    if (name === 'poll c') {
-      await discordapi.put(
-        Routes.channelMessageOwnReaction(event.channel_id, event.id, '✉️'),
-      );
+gateway.on(GatewayDispatchEvents.MessageCreate, ({ event }) => {
+  void (async () => {
+    try {
+      const metadata = event.interaction_metadata;
+      if (metadata?.type === InteractionType.ApplicationCommand) {
+        const name = (metadata as any).name;
+        if (name === 'gimme version') {
+          await discordapi.put(
+            Routes.channelMessageOwnReaction(event.channel_id, event.id, '👀'),
+          );
+        }
+      }
+    } catch (err) {
+      logger.error('gateway message_create handler failed', { err });
     }
-  }
+  })();
 });
 
-gateway.on(GatewayDispatchEvents.MessageReactionAdd, async ({ event }) => {
-  if (event.member?.user.id !== process.env.APP_ID) {
-    if (event.emoji.name === '✉️') {
-      await discordapi.delete(
-        Routes.channelMessageUserReaction(
-          event.channel_id,
-          event.message_id,
-          event.emoji.name,
-          event.user_id,
-        ),
-      );
+gateway.on(GatewayDispatchEvents.MessageReactionAdd, ({ event }) => {
+  void (async () => {
+    try {
+      // Only bounce 👀 on bot-authored messages (version replies get the bot's 👀).
+      if (event.message_author_id !== process.env.APP_ID) {
+        return;
+      }
+      if (event.user_id === process.env.APP_ID) {
+        return;
+      }
+      if (event.emoji.name === '👀') {
+        await discordapi.delete(
+          Routes.channelMessageUserReaction(
+            event.channel_id,
+            event.message_id,
+            event.emoji.name,
+            event.user_id,
+          ),
+        );
+      }
+    } catch (err) {
+      logger.error('gateway message_reaction_add handler failed', { err });
     }
-  }
+  })();
 });
 
 gateway.on(GatewayDispatchEvents.Ready, () => {

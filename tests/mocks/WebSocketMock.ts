@@ -35,8 +35,10 @@ export class WebSocketServerMock {
       this.emit('open');
     });
 
-    this.on('wsclose', () => {
-      this.emit('close', 1000, 'client close close');
+    this.on('wsclose', (...args: any[]) => {
+      const code = typeof args[0] === 'number' ? args[0] : 1000;
+      const reason = args[1] ?? 'client close';
+      this.emit('close', code, reason);
     });
   }
 
@@ -56,6 +58,10 @@ export class WebSocketServerMock {
     this.emitter.once(eventName, handler);
   }
 
+  off(eventName: any, handler: (...eventArg: any[]) => void) {
+    this.emitter.off(eventName, handler);
+  }
+
   emit(eventName: string, ...eventArg: any[]) {
     this.emitter.emit(eventName, ...eventArg);
   }
@@ -68,6 +74,7 @@ export class WebSocketServerMock {
 export class WebSocketMock {
   public mockedServer: WebSocketServerMock;
   public readyState = 0; // WebSocket.CONNECTING;
+  private listeners = new Map<string, Set<(...args: any[]) => void>>();
 
   constructor(private url: string) {
     const [domain] = url.split('?');
@@ -82,12 +89,27 @@ export class WebSocketMock {
     });
   }
 
-  on(eventName: any, handler: () => void) {
+  private track(eventName: string, handler: (...args: any[]) => void) {
+    let set = this.listeners.get(eventName);
+    if (!set) {
+      set = new Set();
+      this.listeners.set(eventName, set);
+    }
+    set.add(handler);
+  }
+
+  on(eventName: any, handler: (...args: any[]) => void) {
+    this.track(eventName, handler);
     this.mockedServer.on(eventName, handler);
   }
 
-  once(eventName: any, handler: () => void) {
-    this.mockedServer.once(eventName, handler);
+  once(eventName: any, handler: (...args: any[]) => void) {
+    const wrap = (...args: any[]) => {
+      this.listeners.get(eventName)?.delete(wrap);
+      handler(...args);
+    };
+    this.track(eventName, wrap);
+    this.mockedServer.once(eventName, wrap);
   }
 
   send(d: string) {
@@ -99,5 +121,19 @@ export class WebSocketMock {
     this.readyState = 2; // WebSocket.CLOSING
   }
 
-  removeAllListeners() {}
+  removeAllListeners(eventName?: string) {
+    if (eventName) {
+      for (const handler of this.listeners.get(eventName) ?? []) {
+        this.mockedServer.off(eventName, handler);
+      }
+      this.listeners.delete(eventName);
+      return;
+    }
+    for (const [name, handlers] of this.listeners) {
+      for (const handler of handlers) {
+        this.mockedServer.off(name, handler);
+      }
+    }
+    this.listeners.clear();
+  }
 }

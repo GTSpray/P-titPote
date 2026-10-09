@@ -96,13 +96,24 @@ The shard heartbeat loop is source-tested in
   payloads.
 - Open, close, and resume operations are bounded by `ShardSocket.maxTimeout`
   (`7000` ms) through `getPromiseWithTimeout`.
-- The shard attempts `Resume` when:
-  - Discord sends a `Reconnect` opcode;
-  - Discord sends `InvalidSession` with a resumable session;
-  - the WebSocket closes with abnormal closure (`1006`);
+- Heartbeat timers are cleared on every server close before recovery runs.
+- Recovery goes through a single `recover()` path with exponential backoff and
+  jitter (first attempt immediate; later attempts up to ~30s) after failures.
+- The shard attempts `Resume` when it still has `session_id` +
+  `resume_gateway_url` and Discord signals a recoverable disconnect:
+  - `Reconnect` opcode;
+  - `InvalidSession` with a resumable session (waits 1–5s first, per Discord);
+  - WebSocket close codes such as `1000`, `1001`, `1006`, and most `4000`–`4008`
+    app codes;
   - a heartbeat ACK is not received before timeout.
-- If Discord sends `InvalidSession` as not resumable, the shard closes and opens
-  a fresh connection against the original gateway URL.
+- The shard re-identifies (`open()` against the original gateway URL) when:
+  - Discord sends `InvalidSession` as not resumable;
+  - the close code is `4009` (session timed out);
+  - resume is impossible (`session_id` / resume URL missing) or resume fails.
+- Fatal close codes (`4004`, `4010`–`4014`) mark the shard destroyed and do
+  **not** reconnect (token, sharding, or intents misconfiguration).
+- Async WebSocket callbacks and gateway REST handlers catch errors so an
+  unhandled rejection cannot kill the Node 22 process.
 
 ### Gateway event handlers
 
@@ -117,10 +128,16 @@ Current top-level behavior in `src/gateway.ts`:
   database write fails. `GuildDelete` is still log-only; leaving a guild does
   not soft-delete `DiscordGuild` or command state.
 - `MessageCreate`: when Discord reports an application-command message whose
-  interaction metadata name is `poll c`, the bot adds a `✉️` reaction to that
-  message with `PUT /channels/{channel.id}/messages/{message.id}/reactions`.
-- `MessageReactionAdd`: If a non-bot user adds `✉️`, the bot removes that
-  user's reaction through Discord REST.
+  interaction metadata name is `gimme version`, the bot adds a `👀` reaction to
+  that message with
+  `PUT /channels/{channel.id}/messages/{message.id}/reactions`.
+- `MessageReactionAdd`: if a non-bot user adds `👀` on a bot-authored message
+  (the version reply), the bot removes that user's reaction through Discord
+  REST.
+- Together, these handlers act as a live probe that the gateway WebSocket is
+  receiving events: `/gimme version` is answered by the API, while the `👀`
+  reaction (and bounce) only happens if the gateway is up. See
+  [`docs/usage/gimme/gimme.md`](usage/gimme/gimme.md).
 
 ### Constraints and troubleshooting
 
@@ -130,7 +147,9 @@ Current top-level behavior in `src/gateway.ts`:
   channels where the reaction behavior is expected.
 - If gateway behavior is missing but slash commands still work, check that the
   `gateway` container is running; interaction handling only proves the `api`
-  service is healthy.
+  service is healthy. A practical probe is `/gimme version`: the text reply
+  comes from the API; the `👀` reaction (and bounce) only comes from the
+  gateway.
 - A `gateway`-only process initializes MikroORM with `migrate: false`, so make
   sure migrations were already applied by an `api`/`both` start or `make db-up`
   before relying on `GuildCreate` persistence.
@@ -139,11 +158,13 @@ Current top-level behavior in `src/gateway.ts`:
   same guild row later through `findOrCreateGuild`, but the gateway log points
   at a broader persistence problem.
 - Use `make logs` and search for gateway messages such as `gateway error`,
+  `gateway shard recovering`, `gateway shard server closed connection`,
+  `gateway shard resume failed`, `gateway shard fatal close`,
   `GatewaySocket.connect`, `starting connection`, `opened connection`,
   `send identify packet`, `heartbit acknowledged`, or
   `try to resume connection`.
-- Detailed lifecycle messages are logged at debug level, so set
-  `LOG_LEVEL=debug` when investigating connection or resume issues.
+- Recovery lifecycle warnings/errors are visible at the default log level.
+  Set `LOG_LEVEL=debug` for the verbose per-opcode heartbeat/payload trace.
 
 ### Implementation map
 

@@ -247,6 +247,109 @@ describe('ShardSocket', () => {
         expect(server.getSpy()).toBeCalledWith(s(identityPayload));
       });
     });
+
+    describe.each([
+      ['normal closure', WsClosedCode.NormalClosure],
+      ['going away', WsClosedCode.GoingAway],
+    ])('when websocket closes with %s', (_label, code) => {
+      it('should resume on the resume gateway', async () => {
+        const wsCoSpy = vi.fn();
+        resumeServer.on('wsconnection', wsCoSpy);
+
+        await fakeLatency(20, 50);
+        server.emit('close', code, Buffer.from(''));
+
+        await vi.advanceTimersByTimeAsync(1000000);
+
+        expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+          shardSocket.ws,
+          `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+        );
+      });
+    });
+
+    it('should re-identify when websocket closes with session timed out', async () => {
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.SessionTimedOut, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+        shardSocket.ws,
+        `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+      );
+      expect(server.getSpy()).toHaveBeenCalledWith(
+        s({
+          op: GatewayOpcodes.Identify,
+          d: {
+            token: gateway.token,
+            shard: [0, gateway.shards],
+            compress: false,
+            large_threshold: 250,
+            presence: {},
+            properties: {
+              os: 'linux',
+              browser: 'PtitPote',
+              device: 'PtitPote',
+            },
+            intents,
+          },
+        }),
+      );
+    });
+
+    it('should not reconnect on fatal authentication failure close', async () => {
+      const resumeSpy = vi.fn();
+      const openSpy = vi.fn();
+      resumeServer.on('wsconnection', resumeSpy);
+      server.on('wsconnection', openSpy);
+
+      await fakeLatency(20, 50);
+      server.emit(
+        'close',
+        WsClosedCode.AuthenticationFailed,
+        Buffer.from('invalid token'),
+      );
+
+      await vi.advanceTimersByTimeAsync(1000000);
+
+      expect(resumeSpy).not.toHaveBeenCalled();
+      expect(openSpy).not.toHaveBeenCalled();
+      expect(shardSocket.destroyed).toBe(true);
+    });
+
+    it('should clear heartbeat timers on server close', async () => {
+      shardSocket.heartbitInterval = 1000;
+      // Force a pending heartbeat interval timer
+      (shardSocket as any).continueHeartbeat();
+      expect(shardSocket.heartbitTimer).not.toBeNull();
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.NormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(shardSocket.heartbitTimer).toBeNull();
+      expect(shardSocket.heartbitTimeOut).toBeNull();
+    });
+
+    it('should fall back to identify when resume gateway URL is missing', async () => {
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+      shardSocket.resumeGatewayUrl = null;
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+        shardSocket.ws,
+        `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+      );
+    });
   });
 
   describe('heartbit mechanism', () => {

@@ -81,6 +81,7 @@ export enum GWSEvent {
 }
 
 // https://www.rfc-editor.org/rfc/rfc6455
+// Discord app codes: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
 export enum WsClosedCode {
   NormalClosure = 1000, // indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
   GoingAway = 1001, // indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
@@ -88,7 +89,36 @@ export enum WsClosedCode {
   UnsupportedData = 1003, // indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).
   NoStatusReceived = 1005, // It is designated for use in applications expecting a status code to indicate that no status code was actually present.
   AbnormalClosure = 1006, // It is designated for use in applications expecting a status code to indicate that the connection was closed abnormally, e.g., without sending or receiving a Close control frame.
+  UnknownError = 4000,
+  UnknownOpcode = 4001,
+  DecodeError = 4002,
+  NotAuthenticated = 4003,
+  AuthenticationFailed = 4004,
+  AlreadyAuthenticated = 4005,
+  InvalidSeq = 4007,
+  RateLimited = 4008,
+  SessionTimedOut = 4009,
+  InvalidShard = 4010,
+  ShardingRequired = 4011,
+  InvalidApiVersion = 4012,
+  InvalidIntents = 4013,
+  DisallowedIntents = 4014,
 }
+
+/** Close codes that must not trigger reconnect (token / sharding / intents misconfig). */
+export const FATAL_GATEWAY_CLOSE_CODES: ReadonlySet<number> = new Set([
+  WsClosedCode.AuthenticationFailed,
+  WsClosedCode.InvalidShard,
+  WsClosedCode.ShardingRequired,
+  WsClosedCode.InvalidApiVersion,
+  WsClosedCode.InvalidIntents,
+  WsClosedCode.DisallowedIntents,
+]);
+
+/** Close codes that require a fresh Identify (session no longer resumable). */
+export const IDENTIFY_REQUIRED_CLOSE_CODES: ReadonlySet<number> = new Set([
+  WsClosedCode.SessionTimedOut,
+]);
 
 export type GatewayEvent = {
   [GWSEvent.Debug]: [shard: number, debugmsg: string, meta?: any];
