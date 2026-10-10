@@ -1,6 +1,9 @@
 import { ShardSocket } from './ShardSocket.js';
 import { discordapi } from '../utils/discordapi.js';
-import type { APIGatewayBotInfo } from 'discord-api-types/v10';
+import type {
+  APIGatewayBotInfo,
+  GatewayPresenceUpdateData,
+} from 'discord-api-types/v10';
 import { Routes } from 'discord-api-types/v10';
 import { logger } from '../logger.js';
 import { type GatewayEvent } from './gatewaytypes.js';
@@ -14,6 +17,7 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public shards: number | null;
   private sockets: Map<number, ShardSocket>;
   public url: string;
+  public presence?: GatewayPresenceUpdateData;
   public readonly identifyLimiter = new IdentifyLimiter();
 
   constructor(token: string, shards?: number) {

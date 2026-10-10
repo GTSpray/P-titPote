@@ -72,6 +72,10 @@ export class WebSocketServerMock {
 }
 
 export class WebSocketMock {
+  static readonly CONNECTING = 0;
+  static readonly OPEN = 1;
+  static readonly CLOSING = 2;
+  static readonly CLOSED = 3;
   public mockedServer: WebSocketServerMock;
   public readyState = 0; // WebSocket.CONNECTING;
   private listeners = new Map<string, Set<(...args: any[]) => void>>();

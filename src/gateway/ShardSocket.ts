@@ -4,7 +4,6 @@ import {
   GatewayDispatchEvents,
   GatewayHeartbeatAck,
   GatewayHello,
-  GatewayIntentBits,
   GatewayInvalidSession,
   GatewayOpcodes,
 } from 'discord-api-types/v10';
@@ -20,6 +19,12 @@ import {
 import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
 import { logger } from '../logger.js';
 import { computeBackoff } from './backoff.js';
+import {
+  GatewayClosedError,
+  GatewayInvalidSessionError,
+  isSessionLost,
+} from './errors.js';
+import { buildIdentifyPayload } from './identify.js';
 
 const encoding = 'json';
 const apiVersion = '10';
@@ -50,6 +55,7 @@ export class ShardSocket {
   private recovering = false;
   private reconnectAttempts = 0;
   private resumeFailures = 0;
+  private rejectPending: null | ((reason: unknown) => void) = null;
   private stableTimer: null | ReturnType<typeof setTimeout> = null;
   private sleepers = new Set<() => void>();
   private readyListener: ((payload: { event: any }) => void) | null = null;
@@ -244,8 +250,20 @@ export class ShardSocket {
       if (identifyPath) {
         await this.reidentify();
       } else {
-        await this.resume();
-        this.resumeFailures = 0;
+        try {
+          await this.resume();
+          this.resumeFailures = 0;
+        } catch (error) {
+          if (!isSessionLost(error)) {
+            throw error;
+          }
+          logger.warn('gateway shard session lost, falling back to identify', {
+            shard: this.shard,
+            error,
+          });
+          identifyPath = true;
+          await this.reidentify();
+        }
       }
       if (!this.destroyed) {
         this.startStableTimer();
@@ -336,7 +354,7 @@ export class ShardSocket {
   }
 
   private startHeartbeat() {
-    if (!this.heartbitTimer) {
+    if (!this.heartbitTimer && this.heartbitInterval > 0) {
       const firstBitTimeOut = Math.floor(this.heartbitInterval * this.jitter);
       this.heartbitTimer = setTimeout(() => {
         this.main.emit(GWSEvent.Debug, this.shard, 'emit first heartbit');
@@ -357,12 +375,20 @@ export class ShardSocket {
     this.main.emit(GWSEvent.Debug, this.shard, 'receive invalid session', {
       e,
     });
+    if (this.rejectPending) {
+      this.rejectPending(new GatewayInvalidSessionError(e.d));
+      return;
+    }
     if (e.d) {
       // Discord recommends waiting 1–5s before Resume after Invalid Session.
+      const ws = this.ws;
       const delay =
         invalidSessionResumeDelayMs +
         Math.floor(Math.random() * 4 * invalidSessionResumeDelayMs);
       await this.wait(delay);
+      if (this.destroyed || this.ws !== ws) {
+        return;
+      }
       await this.recover('invalid-session-resumable');
     } else {
       this.main.emit(GWSEvent.Debug, this.shard, 'try to reconnect gateway');
@@ -373,7 +399,16 @@ export class ShardSocket {
   }
 
   send(d: object) {
-    this.ws?.send(s(d));
+    const ws = this.ws;
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      this.main.emit(
+        GWSEvent.Debug,
+        this.shard,
+        'send skipped, socket not open',
+      );
+      return;
+    }
+    ws.send(s(d));
   }
 
   private beat() {
@@ -428,8 +463,14 @@ export class ShardSocket {
       });
       return;
     }
+    if (!e || typeof e !== 'object') {
+      logger.warn('gateway shard received unexpected frame', {
+        shard: this.shard,
+      });
+      return;
+    }
     this.main.emit(GWSEvent.Debug, this.shard, 'ShardSocket.dispatch', { e });
-    if (e && !!e.s) {
+    if (!!e.s) {
       this.s = e.s;
     }
     switch (e.op) {
@@ -484,6 +525,7 @@ export class ShardSocket {
     }
 
     const action = classifyCloseCode(code);
+    this.rejectPending?.(new GatewayClosedError(code, reason));
     if (action === 'fatal') {
       logger.error('gateway shard fatal close, not reconnecting', {
         shard: this.shard,
@@ -492,6 +534,11 @@ export class ShardSocket {
         reason,
       });
       this.destroyed = true;
+      return;
+    }
+
+    if (this.rejectPending) {
+      // an open/resume attempt is in flight: its owner handles the retry
       return;
     }
 
@@ -517,12 +564,6 @@ export class ShardSocket {
         logger.error('gateway shard onMessage failed', {
           shard: this.shard,
           error,
-        });
-        void this.recover('onmessage-error').catch((recoverError) => {
-          logger.error('gateway shard onMessage recover failed', {
-            shard: this.shard,
-            error: recoverError,
-          });
         });
       });
     });
@@ -560,6 +601,7 @@ export class ShardSocket {
           const ws = new WebSocket(
             `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
           );
+          this.rejectPending = reject;
 
           this.removeResumedListener();
           this.resumedListener = () => {
@@ -576,6 +618,9 @@ export class ShardSocket {
           ws.once('open', () => {
             this.main.emit(GWSEvent.Debug, this.shard, 'resumed connection');
             setTimeout(() => {
+              if (this.ws !== ws) {
+                return;
+              }
               this.main.emit(GWSEvent.Debug, this.shard, 'send resume packet');
               this.send({
                 op: GatewayOpcodes.Resume,
@@ -607,6 +652,7 @@ export class ShardSocket {
       await this.resumePromise;
     } finally {
       this.resumePromise = null;
+      this.rejectPending = null;
     }
   }
 
@@ -628,36 +674,28 @@ export class ShardSocket {
           const ws = new WebSocket(
             `${this.main.url}?v=${apiVersion}&encoding=${encoding}`,
           );
+          this.rejectPending = reject;
 
           ws.once('open', () => {
             this.main.emit(GWSEvent.Debug, this.shard, 'opened connection');
             setTimeout(() => {
+              if (this.ws !== ws) {
+                return;
+              }
               this.main.emit(
                 GWSEvent.Debug,
                 this.shard,
                 'send identify packet',
               );
               this.main.identifyLimiter.record();
-              this.send({
-                op: GatewayOpcodes.Identify,
-                d: {
+              this.send(
+                buildIdentifyPayload({
                   token: this.main.token,
-                  shard: [this.shard, this.main.shards],
-                  compress: false,
-                  large_threshold: 250,
-                  presence: {},
-                  properties: {
-                    os: 'linux',
-                    browser: 'PtitPote',
-                    device: 'PtitPote',
-                  },
-                  intents:
-                    GatewayIntentBits.Guilds |
-                    GatewayIntentBits.GuildMessageReactions |
-                    GatewayIntentBits.GuildMessages |
-                    GatewayIntentBits.DirectMessages,
-                },
-              });
+                  shard: this.shard,
+                  shards: this.main.shards,
+                  presence: this.main.presence,
+                }),
+              );
             }, onConnectionDelay);
           });
 
@@ -691,6 +729,7 @@ export class ShardSocket {
       await this.openPromise;
     } finally {
       this.openPromise = null;
+      this.rejectPending = null;
     }
   }
 
