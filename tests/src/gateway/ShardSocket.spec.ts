@@ -15,6 +15,7 @@ import {
   GatewayReadyDispatch,
 } from 'discord-api-types/v10';
 import { WebSocketServerMock } from '../../mocks/WebSocketMock.js';
+import { logger } from '../../../src/logger.js';
 import { WsClosedCode, GWSEvent } from '../../../src/gateway/gatewaytypes.js';
 import {
   CLIENT_RECONNECT_CLOSE_CODE,
@@ -397,6 +398,94 @@ describe('ShardSocket', () => {
         CLIENT_SHUTDOWN_CLOSE_CODE,
         expect.any(String),
       );
+    });
+
+    it('should back off when the connection drops again before being stable', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      resumeServer.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(2500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should reconnect immediately again once the connection was stable', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(61_000);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      resumeServer.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should record every identify in the identify limiter', async () => {
+      expect(gateway.identifyLimiter.count()).toBe(1);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(gateway.identifyLimiter.count()).toBe(2);
+    });
+
+    it('should delay identify when the identify budget is exhausted', async () => {
+      vi.spyOn(gateway.identifyLimiter, 'msUntilAvailable').mockReturnValue(
+        10_000,
+      );
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(wsCoSpy).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        'gateway identify budget exhausted, delaying identify',
+        expect.objectContaining({ delayMs: 10_000 }),
+      );
+
+      await vi.advanceTimersByTimeAsync(6000);
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should reset the sequence number when a new session is identified', async () => {
+      expect(shardSocket.s).toBe(1);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(shardSocket.s).toBeNull();
+    });
+
+    it('should keep trying to resume before falling back to identify when resume times out', async () => {
+      const deadServer = WebSocketServerMock.createInstance();
+      shardSocket.resumeGatewayUrl = deadServer.getUrl();
+      const deadSpy = vi.fn();
+      const identifySpy = vi.fn();
+      deadServer.on('wsconnection', deadSpy);
+      server.on('wsconnection', identifySpy);
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout + 500);
+      expect(deadSpy).toHaveBeenCalledTimes(1);
+      expect(identifySpy).not.toHaveBeenCalled();
+      expect(shardSocket.session_id).not.toBeNull();
+
+      await vi.advanceTimersByTimeAsync(45_000);
+      expect(deadSpy).toHaveBeenCalledTimes(3);
+      expect(identifySpy).toHaveBeenCalled();
     });
 
     it('should clear heartbeat timers on server close', async () => {

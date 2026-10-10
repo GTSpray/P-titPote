@@ -5,12 +5,16 @@ import { Routes } from 'discord-api-types/v10';
 import { logger } from '../logger.js';
 import { type GatewayEvent } from './gatewaytypes.js';
 import { TypedEventEmitter } from './TypedEventEmitter.js';
+import { IdentifyLimiter } from './IdentifyLimiter.js';
+
+const lowSessionStartRemaining = 100;
 
 export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
   public shards: number | null;
   private sockets: Map<number, ShardSocket>;
   public url: string;
+  public readonly identifyLimiter = new IdentifyLimiter();
 
   constructor(token: string, shards?: number) {
     super();
@@ -38,13 +42,21 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
       Routes.gatewayBot(),
     )) as APIGatewayBotInfo;
 
-    const { url, shards } = apigatewayInfosBot;
+    const { url, shards, session_start_limit } = apigatewayInfosBot;
 
     logger.debug('GatewaySocket.connect', { apigatewayInfosBot });
 
     this.url = url;
     if (this.shards === null) {
       this.shards = shards;
+    }
+
+    if (session_start_limit) {
+      const level =
+        session_start_limit.remaining < lowSessionStartRemaining
+          ? 'error'
+          : 'info';
+      logger[level]('gateway session start limit', { session_start_limit });
     }
 
     end = end || this.shards;

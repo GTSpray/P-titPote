@@ -19,6 +19,7 @@ import {
 } from './closeCodes.js';
 import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
 import { logger } from '../logger.js';
+import { computeBackoff } from './backoff.js';
 
 const encoding = 'json';
 const apiVersion = '10';
@@ -27,15 +28,10 @@ const apiVersion = '10';
 const s = JSON.stringify;
 const onConnectionDelay = 20;
 const invalidSessionResumeDelayMs = 1000;
-const minReconnectDelayMs = 1000;
-const maxReconnectDelayMs = 30_000;
+const stableConnectionMs = 60_000;
+const maxResumeFailures = 3;
 
 const noop = () => {};
-
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
 
 export class ShardSocket {
   ws: null | WebSocket;
@@ -53,6 +49,9 @@ export class ShardSocket {
   private intentionalClose = false;
   private recovering = false;
   private reconnectAttempts = 0;
+  private resumeFailures = 0;
+  private stableTimer: null | ReturnType<typeof setTimeout> = null;
+  private sleepers = new Set<() => void>();
   private readyListener: ((payload: { event: any }) => void) | null = null;
   private resumedListener: (() => void) | null = null;
 
@@ -146,16 +145,62 @@ export class ShardSocket {
     }
   }
 
-  private nextBackoffMs(): number {
-    if (this.reconnectAttempts === 0) {
-      return 0;
+  private wait(ms: number): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        this.sleepers.delete(done);
+        resolve();
+      };
+      const timer = setTimeout(done, ms);
+      this.sleepers.add(done);
+    });
+  }
+
+  private cancelWaits() {
+    for (const done of [...this.sleepers]) {
+      done();
     }
-    const exp = Math.min(
-      maxReconnectDelayMs,
-      minReconnectDelayMs * 2 ** (this.reconnectAttempts - 1),
-    );
-    const jitter = Math.floor(Math.random() * minReconnectDelayMs);
-    return Math.min(maxReconnectDelayMs, exp + jitter);
+  }
+
+  private clearStableTimer() {
+    if (this.stableTimer) {
+      clearTimeout(this.stableTimer);
+      this.stableTimer = null;
+    }
+  }
+
+  /** Backoff only resets once a recovered connection stayed up long enough. */
+  private startStableTimer() {
+    this.clearStableTimer();
+    this.stableTimer = setTimeout(() => {
+      this.stableTimer = null;
+      this.reconnectAttempts = 0;
+    }, stableConnectionMs);
+  }
+
+  private async waitForIdentifySlot() {
+    const delay = this.main.identifyLimiter.msUntilAvailable();
+    if (delay > 0) {
+      logger.error('gateway identify budget exhausted, delaying identify', {
+        shard: this.shard,
+        delayMs: delay,
+        identifies: this.main.identifyLimiter.count(),
+      });
+      await this.wait(delay);
+    }
+  }
+
+  private async reidentify() {
+    this.session_id = null;
+    this.resumeGatewayUrl = null;
+    this.resumeFailures = 0;
+    await this.waitForIdentifySlot();
+    if (this.destroyed) {
+      return;
+    }
+    await this.close();
+    await this.open();
   }
 
   private async recover(
@@ -166,77 +211,67 @@ export class ShardSocket {
       return;
     }
     this.recovering = true;
-    const forceIdentify = options.forceIdentify === true;
-    let shouldRetry = false;
+    let retry: { forceIdentify: boolean } | null = null;
+    let identifyPath = false;
     try {
-      const delay = Math.max(this.nextBackoffMs(), options.minDelayMs ?? 0);
+      const attempt = this.reconnectAttempts;
+      this.reconnectAttempts += 1;
+      this.clearStableTimer();
+      const delay = Math.max(computeBackoff(attempt), options.minDelayMs ?? 0);
+      identifyPath =
+        options.forceIdentify === true ||
+        !this.canResume() ||
+        this.resumeFailures >= maxResumeFailures;
       logger.warn('gateway shard recovering', {
         shard: this.shard,
         reason,
-        forceIdentify,
+        identify: identifyPath,
         delayMs: delay,
-        attempt: this.reconnectAttempts,
+        attempt,
       });
       this.main.emit(GWSEvent.Debug, this.shard, 'recovering connection', {
         reason,
-        forceIdentify,
+        identify: identifyPath,
         delayMs: delay,
       });
       if (delay > 0) {
-        await sleep(delay);
+        await this.wait(delay);
       }
       if (this.destroyed) {
         return;
       }
 
-      if (forceIdentify) {
-        this.session_id = null;
-        this.resumeGatewayUrl = null;
-      }
-
-      if (forceIdentify || !this.canResume()) {
-        await this.close();
-        await this.open();
+      if (identifyPath) {
+        await this.reidentify();
       } else {
-        try {
-          await this.resume();
-        } catch (error) {
-          logger.warn('gateway shard resume failed, falling back to identify', {
-            shard: this.shard,
-            error,
-          });
-          this.main.emit(GWSEvent.Debug, this.shard, 'fail to resume', {
-            error,
-          });
-          this.session_id = null;
-          this.resumeGatewayUrl = null;
-          await this.close();
-          await this.open();
-        }
+        await this.resume();
+        this.resumeFailures = 0;
       }
-      this.reconnectAttempts = 0;
+      if (!this.destroyed) {
+        this.startStableTimer();
+      }
     } catch (error) {
-      this.reconnectAttempts += 1;
-      shouldRetry = true;
+      if (!identifyPath) {
+        this.resumeFailures += 1;
+      }
+      retry = { forceIdentify: identifyPath };
       logger.error('gateway shard recover failed', {
         shard: this.shard,
         reason,
         error,
+        identify: identifyPath,
         attempt: this.reconnectAttempts,
       });
-      this.main.emit(GWSEvent.Debug, this.shard, 'recover failed', { error });
     } finally {
       this.recovering = false;
     }
-    if (shouldRetry && !this.destroyed) {
-      void this.recover('recover-retry', { forceIdentify: true }).catch(
-        (error) => {
-          logger.error('gateway shard recover retry failed', {
-            shard: this.shard,
-            error,
-          });
-        },
-      );
+    if (retry && !this.destroyed) {
+      void this.recover('recover-retry', retry).catch((error) => {
+        logger.error('gateway shard recover retry failed', {
+          shard: this.shard,
+          error,
+        });
+      });
     }
   }
 
@@ -327,7 +362,7 @@ export class ShardSocket {
       const delay =
         invalidSessionResumeDelayMs +
         Math.floor(Math.random() * 4 * invalidSessionResumeDelayMs);
-      await sleep(delay);
+      await this.wait(delay);
       await this.recover('invalid-session-resumable');
     } else {
       this.main.emit(GWSEvent.Debug, this.shard, 'try to reconnect gateway');
@@ -588,6 +623,7 @@ export class ShardSocket {
         'ShardSocket.open timed out after %t ms',
         (resolve, reject) => {
           this.main.emit(GWSEvent.Debug, this.shard, 'starting connection');
+          this.s = null;
 
           const ws = new WebSocket(
             `${this.main.url}?v=${apiVersion}&encoding=${encoding}`,
@@ -601,6 +637,7 @@ export class ShardSocket {
                 this.shard,
                 'send identify packet',
               );
+              this.main.identifyLimiter.record();
               this.send({
                 op: GatewayOpcodes.Identify,
                 d: {
@@ -660,6 +697,8 @@ export class ShardSocket {
   destroy(): Promise<void> {
     this.main.emit(GWSEvent.Debug, this.shard, 'destroy');
     this.destroyed = true;
+    this.cancelWaits();
+    this.clearStableTimer();
     this.removeReadyListener();
     this.removeResumedListener();
     return this.close({
