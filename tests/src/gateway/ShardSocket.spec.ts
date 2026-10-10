@@ -491,6 +491,7 @@ describe('ShardSocket', () => {
       expect(deadSpy).toHaveBeenCalledTimes(1);
       expect(identifySpy).not.toHaveBeenCalled();
       expect(shardSocket.session_id).not.toBeNull();
+      expect(gateway.listenerCount(GatewayDispatchEvents.Resumed)).toBe(0);
 
       await vi.advanceTimersByTimeAsync(45_000);
       expect(deadSpy).toHaveBeenCalledTimes(3);
@@ -602,6 +603,53 @@ describe('ShardSocket', () => {
         expect(identifySpy).not.toHaveBeenCalled();
         expect(shardSocket.session_id).not.toBeNull();
       });
+    });
+
+    it('should track its lifecycle state', async () => {
+      expect(shardSocket.state).toBe('ready');
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(shardSocket.state).toBe('resuming');
+
+      await vi.advanceTimersByTimeAsync(500);
+      expect(shardSocket.state).toBe('ready');
+
+      await shardSocket.destroy();
+      expect(shardSocket.state).toBe('destroyed');
+    });
+
+    it('should run a single recovery at a time', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      (shardSocket as any).scheduleRecover('first');
+      (shardSocket as any).scheduleRecover('second');
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should stop an in-flight recovery when destroyed', async () => {
+      const deadServer = WebSocketServerMock.createInstance();
+      shardSocket.resumeGatewayUrl = deadServer.getUrl();
+      const deadSpy = vi.fn();
+      const identifySpy = vi.fn();
+      deadServer.on('wsconnection', deadSpy);
+      server.on('wsconnection', identifySpy);
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(100);
+      expect(shardSocket.state).toBe('resuming');
+
+      await shardSocket.destroy();
+      await vi.advanceTimersByTimeAsync(120_000);
+
+      expect(deadSpy).toHaveBeenCalledOnce();
+      expect(identifySpy).not.toHaveBeenCalled();
+      expect(shardSocket.state).toBe('destroyed');
+      expect(gateway.listenerCount(GatewayDispatchEvents.Resumed)).toBe(0);
+      expect(gateway.listenerCount(GatewayDispatchEvents.Ready)).toBe(0);
     });
 
     it('should not recover after an invalid session wait when destroyed meanwhile', async () => {

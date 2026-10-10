@@ -38,6 +38,11 @@ const maxResumeFailures = 3;
 
 const noop = () => {};
 
+export type ShardState =
+  'idle' | 'connecting' | 'resuming' | 'ready' | 'recovering' | 'destroyed';
+
+type RecoverOptions = { forceIdentify?: boolean; minDelayMs?: number };
+
 export class ShardSocket {
   ws: null | WebSocket;
   heartbitInterval: number;
@@ -50,9 +55,8 @@ export class ShardSocket {
   jitter: number;
   maxTimeout: number;
   resumeGatewayUrl: string | null;
-  destroyed: boolean = false;
-  private intentionalClose = false;
-  private recovering = false;
+  state: ShardState = 'idle';
+  private recoveryTask: null | Promise<void> = null;
   private reconnectAttempts = 0;
   private resumeFailures = 0;
   private rejectPending: null | ((reason: unknown) => void) = null;
@@ -83,6 +87,16 @@ export class ShardSocket {
     this.openPromise = null;
     this.resumePromise = null;
     this.closePromise = null;
+  }
+
+  get destroyed(): boolean {
+    return this.state === 'destroyed';
+  }
+
+  private setState(next: ShardState) {
+    if (this.state !== 'destroyed') {
+      this.state = next;
+    }
   }
 
   private clearHeartbeats() {
@@ -125,7 +139,6 @@ export class ShardSocket {
     if (!ws) {
       return;
     }
-    this.intentionalClose = true;
     this.detachSocketListeners(ws);
     this.clearHeartbeats();
     if (ws.readyState === WebSocket.OPEN) {
@@ -134,7 +147,6 @@ export class ShardSocket {
       ws.terminate();
     }
     this.ws = null;
-    this.intentionalClose = false;
   }
 
   private removeReadyListener() {
@@ -209,17 +221,46 @@ export class ShardSocket {
     await this.open();
   }
 
+  /** Runs (at most) one recovery loop at a time; never rejects. */
   private async recover(
     reason: string,
-    options: { forceIdentify?: boolean; minDelayMs?: number } = {},
+    options: RecoverOptions = {},
   ): Promise<void> {
-    if (this.destroyed || this.recovering) {
+    if (this.destroyed || this.recoveryTask) {
       return;
     }
-    this.recovering = true;
-    let retry: { forceIdentify: boolean } | null = null;
+    const task = this.recoveryLoop(reason, options);
+    this.recoveryTask = task;
+    try {
+      await task;
+    } finally {
+      if (this.recoveryTask === task) {
+        this.recoveryTask = null;
+      }
+    }
+  }
+
+  private scheduleRecover(reason: string, options: RecoverOptions = {}) {
+    void this.recover(reason, options);
+  }
+
+  private async recoveryLoop(reason: string, options: RecoverOptions) {
+    let next: RecoverOptions | null = options;
+    let currentReason = reason;
+    while (next && !this.destroyed) {
+      next = await this.recoveryAttempt(currentReason, next);
+      currentReason = 'recover-retry';
+    }
+  }
+
+  /** @returns the options of the next attempt when this one failed. */
+  private async recoveryAttempt(
+    reason: string,
+    options: RecoverOptions,
+  ): Promise<RecoverOptions | null> {
     let identifyPath = false;
     try {
+      this.setState('recovering');
       const attempt = this.reconnectAttempts;
       this.reconnectAttempts += 1;
       this.clearStableTimer();
@@ -235,16 +276,11 @@ export class ShardSocket {
         delayMs: delay,
         attempt,
       });
-      this.main.emit(GWSEvent.Debug, this.shard, 'recovering connection', {
-        reason,
-        identify: identifyPath,
-        delayMs: delay,
-      });
       if (delay > 0) {
         await this.wait(delay);
       }
       if (this.destroyed) {
-        return;
+        return null;
       }
 
       if (identifyPath) {
@@ -268,11 +304,11 @@ export class ShardSocket {
       if (!this.destroyed) {
         this.startStableTimer();
       }
+      return null;
     } catch (error) {
       if (!identifyPath) {
         this.resumeFailures += 1;
       }
-      retry = { forceIdentify: identifyPath };
       logger.error('gateway shard recover failed', {
         shard: this.shard,
         reason,
@@ -280,16 +316,7 @@ export class ShardSocket {
         identify: identifyPath,
         attempt: this.reconnectAttempts,
       });
-    } finally {
-      this.recovering = false;
-    }
-    if (retry && !this.destroyed) {
-      void this.recover('recover-retry', retry).catch((error) => {
-        logger.error('gateway shard recover retry failed', {
-          shard: this.shard,
-          error,
-        });
-      });
+      return { forceIdentify: identifyPath };
     }
   }
 
@@ -310,7 +337,6 @@ export class ShardSocket {
           );
 
           this.clearHeartbeats();
-          this.intentionalClose = true;
 
           if (this.isSocketActive(ws)) {
             this.detachSocketListeners(ws);
@@ -340,7 +366,6 @@ export class ShardSocket {
       await this.closePromise;
     } finally {
       this.ws = null;
-      this.intentionalClose = false;
       this.closePromise = null;
     }
   }
@@ -420,12 +445,7 @@ export class ShardSocket {
           this.shard,
           'no heartbit ack event timeout',
         );
-        void this.recover('heartbeat-ack-timeout').catch((error) => {
-          logger.error('gateway shard heartbeat recover failed', {
-            shard: this.shard,
-            error,
-          });
-        });
+        this.scheduleRecover('heartbeat-ack-timeout');
       }, ShardSocket.maxTimeout);
     }
     const e = {
@@ -513,14 +533,8 @@ export class ShardSocket {
       codeString,
       reason,
     });
-    this.main.emit(GWSEvent.Debug, this.shard, 'server closed connection', {
-      code,
-      codeString,
-      reason,
-    });
 
-    if (this.intentionalClose || this.destroyed) {
-      this.intentionalClose = false;
+    if (this.destroyed) {
       return;
     }
 
@@ -533,7 +547,7 @@ export class ShardSocket {
         codeString,
         reason,
       });
-      this.destroyed = true;
+      this.setState('destroyed');
       this.cancelWaits();
       this.main.emit(GWSEvent.Fatal, this.shard, { code, reason });
       return;
@@ -548,15 +562,9 @@ export class ShardSocket {
     const minDelayMs = SLOW_RECONNECT_CLOSE_CODES.has(code)
       ? RATE_LIMITED_MIN_DELAY_MS
       : 0;
-    void this.recover(`server-close-${code}`, {
+    this.scheduleRecover(`server-close-${code}`, {
       forceIdentify,
       minDelayMs,
-    }).catch((error) => {
-      logger.error('gateway shard close recover failed', {
-        shard: this.shard,
-        code,
-        error,
-      });
     });
   }
 
@@ -600,6 +608,7 @@ export class ShardSocket {
             this.shard,
             'try to resume connection',
           );
+          this.setState('resuming');
           const ws = new WebSocket(
             `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
           );
@@ -613,6 +622,7 @@ export class ShardSocket {
               'recieved resumed packet',
             );
             this.removeResumedListener();
+            this.setState('ready');
             resolve(undefined);
           };
           this.main.once(GatewayDispatchEvents.Resumed, this.resumedListener);
@@ -671,6 +681,7 @@ export class ShardSocket {
         'ShardSocket.open timed out after %t ms',
         (resolve, reject) => {
           this.main.emit(GWSEvent.Debug, this.shard, 'starting connection');
+          this.setState('connecting');
           this.s = null;
 
           const ws = new WebSocket(
@@ -715,6 +726,7 @@ export class ShardSocket {
             this.main.emit(GWSEvent.Debug, this.shard, 'recieved ready info');
             this.session_id = event.session_id;
             this.resumeGatewayUrl = event.resume_gateway_url;
+            this.setState('ready');
             this.removeReadyListener();
             resolve(undefined);
           };
@@ -735,14 +747,16 @@ export class ShardSocket {
     }
   }
 
-  destroy(): Promise<void> {
+  async destroy(): Promise<void> {
     this.main.emit(GWSEvent.Debug, this.shard, 'destroy');
-    this.destroyed = true;
+    this.setState('destroyed');
     this.cancelWaits();
     this.clearStableTimer();
     this.removeReadyListener();
     this.removeResumedListener();
-    return this.close({
+    this.rejectPending?.(new Error('ShardSocket destroyed'));
+    await this.recoveryTask;
+    await this.close({
       code: CLIENT_SHUTDOWN_CLOSE_CODE,
       reason: 'shutdown',
     });
