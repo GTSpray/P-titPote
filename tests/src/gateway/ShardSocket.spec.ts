@@ -585,8 +585,10 @@ describe('ShardSocket', () => {
           }
         });
 
+        const random = vi.spyOn(Math, 'random').mockReturnValue(0.99);
         server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
         await vi.advanceTimersByTimeAsync(3500);
+        random.mockRestore();
 
         expect(brokenSpy).toHaveBeenCalledTimes(2);
         expect(identifySpy).not.toHaveBeenCalled();
@@ -674,6 +676,7 @@ describe('ShardSocket', () => {
         resume_gateway_url: resumeServer.getUrl(),
       });
 
+      shardSocket.jitter = 0.5; // the first beat is scheduled on hello, keep it deterministic
       shardSocket.open();
 
       await fakeLatency(20, 50);
@@ -710,7 +713,6 @@ describe('ShardSocket', () => {
     });
 
     it('should keep heartbit interval using hello reponse interval', async () => {
-      shardSocket.jitter = 1 / 10000; // force jitter cause random is painfull to test
       server.on('wsmessage', async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {
