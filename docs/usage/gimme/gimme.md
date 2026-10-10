@@ -39,10 +39,9 @@ Posts a public text message with a random emoji and the running bot version.
 The bot also adds a `👀` reaction on that reply. If a member adds `👀` on the
 same message, the bot removes their reaction.
 
-This reaction loop is a quick health check: if the bot reacts (and bounces
-member `👀`), the gateway process is connected and listening to Discord events.
-If only the version text appears with no `👀`, slash commands still work via the
-API, but the gateway is likely down or reconnecting.
+The `👀` reaction shows that the bot is receiving Discord events live. If the
+version text appears without `👀`, the bot may be reconnecting: try again in a
+minute.
 
 ![Show version](./gimme-version.gif)
 
