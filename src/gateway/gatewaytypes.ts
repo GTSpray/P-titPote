@@ -80,6 +80,7 @@ import {
 export enum GWSEvent {
   Debug = 'DEBUG',
   Payload = 'PAYLOAD',
+  Fatal = 'FATAL',
 }
 
 // https://www.rfc-editor.org/rfc/rfc6455
@@ -108,6 +109,7 @@ export enum WsClosedCode {
 }
 
 export type GatewayEvent = {
+  [GWSEvent.Fatal]: [shard: number, info: { code: number; reason: string }];
   [GWSEvent.Debug]: [shard: number, debugmsg: string, meta?: any];
   [GWSEvent.Payload]: [
     shard: number,

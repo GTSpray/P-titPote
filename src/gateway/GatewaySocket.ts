@@ -11,6 +11,12 @@ import { TypedEventEmitter } from './TypedEventEmitter.js';
 import { IdentifyLimiter } from './IdentifyLimiter.js';
 
 const lowSessionStartRemaining = 100;
+const identifyBucketDelayMs = 5000;
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
   public token: string;
@@ -32,7 +38,7 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
     const oldSocket = this.sockets.get(socketId);
     if (oldSocket) {
       logger.debug('GatewaySocket.setSocket close', { sockId: socketId });
-      await oldSocket.close();
+      await oldSocket.destroy();
     }
 
     const newSocket = new ShardSocket(this, socketId);
@@ -65,11 +71,25 @@ export class GatewaySocket extends TypedEventEmitter<GatewayEvent> {
 
     end = end || this.shards;
 
-    const promises = [];
-    for (let i = start; i < end; i++) {
-      promises.push(this.setSocket(i));
+    // Discord allows `max_concurrency` identifies per 5s window, shards are
+    // started by bucket (shard_id % max_concurrency) in order.
+    const concurrency = Math.max(1, session_start_limit?.max_concurrency ?? 1);
+    for (let i = start; i < end; i += concurrency) {
+      const bucket = [];
+      for (let shard = i; shard < Math.min(i + concurrency, end); shard++) {
+        bucket.push(this.setSocket(shard));
+      }
+      await Promise.all(bucket);
+      if (i + concurrency < end) {
+        await sleep(identifyBucketDelayMs);
+      }
     }
-    await Promise.all(promises);
+  }
+
+  async destroy() {
+    const sockets = [...this.sockets.values()];
+    this.sockets.clear();
+    await Promise.allSettled(sockets.map((socket) => socket.destroy()));
   }
 
   send(data: object, shard = 0) {

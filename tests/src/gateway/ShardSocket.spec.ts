@@ -64,6 +64,7 @@ describe('ShardSocket', () => {
   let gateway: GatewaySocket;
   let server: WebSocketServerMock;
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.useFakeTimers();
     server = WebSocketServerMock.createInstance();
     gateway = new GatewaySocket('fakeToken');
@@ -320,11 +321,18 @@ describe('ShardSocket', () => {
         resumeServer.on('wsconnection', resumeSpy);
         server.on('wsconnection', openSpy);
 
+        const fatalSpy = vi.fn();
+        gateway.on(GWSEvent.Fatal, fatalSpy);
+
         await fakeLatency(20, 50);
         server.emit('close', code, Buffer.from('fatal'));
 
         await vi.advanceTimersByTimeAsync(1000000);
 
+        expect(fatalSpy).toHaveBeenCalledExactlyOnceWith(0, {
+          code,
+          reason: 'fatal',
+        });
         expect(resumeSpy).not.toHaveBeenCalled();
         expect(openSpy).not.toHaveBeenCalled();
         expect(shardSocket.destroyed).toBe(true);

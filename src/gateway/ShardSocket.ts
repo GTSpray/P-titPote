@@ -534,6 +534,8 @@ export class ShardSocket {
         reason,
       });
       this.destroyed = true;
+      this.cancelWaits();
+      this.main.emit(GWSEvent.Fatal, this.shard, { code, reason });
       return;
     }
 
