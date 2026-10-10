@@ -8,12 +8,15 @@ import {
   GatewayInvalidSession,
   GatewayOpcodes,
 } from 'discord-api-types/v10';
+import { WsClosedCode, GWSEvent } from './gatewaytypes.js';
 import {
-  FATAL_GATEWAY_CLOSE_CODES,
-  IDENTIFY_REQUIRED_CLOSE_CODES,
-  WsClosedCode,
-  GWSEvent,
-} from './gatewaytypes.js';
+  CLIENT_RECONNECT_CLOSE_CODE,
+  CLIENT_SHUTDOWN_CLOSE_CODE,
+  RATE_LIMITED_MIN_DELAY_MS,
+  SLOW_RECONNECT_CLOSE_CODES,
+  classifyCloseCode,
+  getStatusCodeString,
+} from './closeCodes.js';
 import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
 import { logger } from '../logger.js';
 
@@ -27,55 +30,7 @@ const invalidSessionResumeDelayMs = 1000;
 const minReconnectDelayMs = 1000;
 const maxReconnectDelayMs = 30_000;
 
-const specificStatusCodeMappings = new Map([
-  [1000, 'Normal Closure'],
-  [1001, 'Going Away'],
-  [1002, 'Protocol Error'],
-  [1003, 'Unsupported Data'],
-  [1004, '(For future)'],
-  [1005, 'No Status Received'],
-  [1006, 'Abnormal Closure'],
-  [1007, 'Invalid frame payload data'],
-  [1008, 'Policy Violation'],
-  [1009, 'Message too big'],
-  [1010, 'Missing Extension'],
-  [1011, 'Internal Error'],
-  [1012, 'Service Restart'],
-  [1013, 'Try Again Later'],
-  [1014, 'Bad Gateway'],
-  [1015, 'TLS Handshake'],
-  [4000, 'Unknown Error'],
-  [4001, 'Unknown Opcode'],
-  [4002, 'Decode Error'],
-  [4003, 'Not Authenticated'],
-  [4004, 'Authentication Failed'],
-  [4005, 'Already Authenticated'],
-  [4007, 'Invalid Seq'],
-  [4008, 'Rate Limited'],
-  [4009, 'Session Timed Out'],
-  [4010, 'Invalid Shard'],
-  [4011, 'Sharding Required'],
-  [4012, 'Invalid API Version'],
-  [4013, 'Invalid Intent(s)'],
-  [4014, 'Disallowed Intent(s)'],
-]);
-
-function getStatusCodeString(code: number): string {
-  if (code >= 0 && code <= 999) {
-    return '(Unused)';
-  } else if (code >= 1016) {
-    if (code <= 1999) {
-      return '(For WebSocket standard)';
-    } else if (code <= 2999) {
-      return '(For WebSocket extensions)';
-    } else if (code <= 3999) {
-      return '(For libraries and frameworks)';
-    } else if (code <= 4999) {
-      return specificStatusCodeMappings.get(code) || '(For applications)';
-    }
-  }
-  return specificStatusCodeMappings.get(code) || '(Unknown)';
-}
+const noop = () => {};
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -148,6 +103,8 @@ export class ShardSocket {
     ws.removeAllListeners('close');
     ws.removeAllListeners('error');
     ws.removeAllListeners('open');
+    // closing a CONNECTING socket emits 'error'; without a listener it would crash the process
+    ws.on('error', noop);
   }
 
   private isSocketActive(ws: WebSocket | null): ws is WebSocket {
@@ -166,8 +123,10 @@ export class ShardSocket {
     this.intentionalClose = true;
     this.detachSocketListeners(ws);
     this.clearHeartbeats();
-    if (this.isSocketActive(ws)) {
-      ws.close(1001, 'discard');
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.close(CLIENT_RECONNECT_CLOSE_CODE, 'discard');
+    } else if (this.isSocketActive(ws)) {
+      ws.terminate();
     }
     this.ws = null;
     this.intentionalClose = false;
@@ -201,7 +160,7 @@ export class ShardSocket {
 
   private async recover(
     reason: string,
-    options: { forceIdentify?: boolean } = {},
+    options: { forceIdentify?: boolean; minDelayMs?: number } = {},
   ): Promise<void> {
     if (this.destroyed || this.recovering) {
       return;
@@ -210,7 +169,7 @@ export class ShardSocket {
     const forceIdentify = options.forceIdentify === true;
     let shouldRetry = false;
     try {
-      const delay = this.nextBackoffMs();
+      const delay = Math.max(this.nextBackoffMs(), options.minDelayMs ?? 0);
       logger.warn('gateway shard recovering', {
         shard: this.shard,
         reason,
@@ -281,9 +240,12 @@ export class ShardSocket {
     }
   }
 
-  async close(): Promise<void> {
+  async close(options: { code?: number; reason?: string } = {}): Promise<void> {
+    const { code = CLIENT_RECONNECT_CLOSE_CODE, reason = 'reconnecting' } =
+      options;
     if (!this.closePromise) {
-      this.closePromise = getPromiseWithTimeout(
+      const ws = this.ws;
+      this.closePromise = getPromiseWithTimeout<void>(
         ShardSocket.maxTimeout,
         'ShardSocket.close timed out after %t ms',
         (resolve) => {
@@ -291,13 +253,13 @@ export class ShardSocket {
             GWSEvent.Debug,
             this.shard,
             'client attempting to close connection',
+            { code, reason },
           );
 
           this.clearHeartbeats();
           this.intentionalClose = true;
 
-          if (this.isSocketActive(this.ws)) {
-            const ws = this.ws;
+          if (this.isSocketActive(ws)) {
             this.detachSocketListeners(ws);
             ws.once('close', () => {
               this.main.emit(
@@ -305,23 +267,26 @@ export class ShardSocket {
                 this.shard,
                 'client closed connection',
               );
-              this.ws = null;
-              this.intentionalClose = false;
               resolve();
             });
-            ws.close(1001, 'cya later alligator');
+            ws.close(code, reason);
           } else {
-            this.ws = null;
-            this.intentionalClose = false;
             resolve();
           }
         },
-      );
+      ).catch((error) => {
+        logger.warn('gateway shard close timed out, terminating socket', {
+          shard: this.shard,
+          error,
+        });
+        ws?.terminate();
+      });
     }
 
     try {
       await this.closePromise;
     } finally {
+      this.ws = null;
       this.intentionalClose = false;
       this.closePromise = null;
     }
@@ -483,7 +448,8 @@ export class ShardSocket {
       return;
     }
 
-    if (FATAL_GATEWAY_CLOSE_CODES.has(code)) {
+    const action = classifyCloseCode(code);
+    if (action === 'fatal') {
       logger.error('gateway shard fatal close, not reconnecting', {
         shard: this.shard,
         code,
@@ -494,16 +460,20 @@ export class ShardSocket {
       return;
     }
 
-    const forceIdentify = IDENTIFY_REQUIRED_CLOSE_CODES.has(code);
-    void this.recover(`server-close-${code}`, { forceIdentify }).catch(
-      (error) => {
-        logger.error('gateway shard close recover failed', {
-          shard: this.shard,
-          code,
-          error,
-        });
-      },
-    );
+    const forceIdentify = action === 'identify';
+    const minDelayMs = SLOW_RECONNECT_CLOSE_CODES.has(code)
+      ? RATE_LIMITED_MIN_DELAY_MS
+      : 0;
+    void this.recover(`server-close-${code}`, {
+      forceIdentify,
+      minDelayMs,
+    }).catch((error) => {
+      logger.error('gateway shard close recover failed', {
+        shard: this.shard,
+        code,
+        error,
+      });
+    });
   }
 
   private configureSocket(ws: WebSocket) {
@@ -692,6 +662,9 @@ export class ShardSocket {
     this.destroyed = true;
     this.removeReadyListener();
     this.removeResumedListener();
-    return this.close();
+    return this.close({
+      code: CLIENT_SHUTDOWN_CLOSE_CODE,
+      reason: 'shutdown',
+    });
   }
 }

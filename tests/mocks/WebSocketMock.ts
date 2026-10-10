@@ -121,6 +121,11 @@ export class WebSocketMock {
     this.readyState = 2; // WebSocket.CLOSING
   }
 
+  terminate() {
+    this.readyState = 3; // WebSocket.CLOSED
+    this.mockedServer.emit('wsterminate');
+  }
+
   removeAllListeners(eventName?: string) {
     if (eventName) {
       for (const handler of this.listeners.get(eventName) ?? []) {

@@ -16,6 +16,12 @@ import {
 } from 'discord-api-types/v10';
 import { WebSocketServerMock } from '../../mocks/WebSocketMock.js';
 import { WsClosedCode, GWSEvent } from '../../../src/gateway/gatewaytypes.js';
+import {
+  CLIENT_RECONNECT_CLOSE_CODE,
+  CLIENT_SHUTDOWN_CLOSE_CODE,
+  FATAL_GATEWAY_CLOSE_CODES,
+  RATE_LIMITED_MIN_DELAY_MS,
+} from '../../../src/gateway/closeCodes.js';
 
 const s = JSON.stringify;
 const p = JSON.parse;
@@ -268,12 +274,15 @@ describe('ShardSocket', () => {
       });
     });
 
-    it('should re-identify when websocket closes with session timed out', async () => {
+    it.each([
+      ['session timed out', WsClosedCode.SessionTimedOut],
+      ['invalid seq', WsClosedCode.InvalidSeq],
+    ])('should re-identify when websocket closes with %s', async (_l, code) => {
       const wsCoSpy = vi.fn();
       server.on('wsconnection', wsCoSpy);
 
       await fakeLatency(20, 50);
-      server.emit('close', WsClosedCode.SessionTimedOut, Buffer.from(''));
+      server.emit('close', code, Buffer.from(''));
 
       await vi.advanceTimersByTimeAsync(500);
 
@@ -301,24 +310,93 @@ describe('ShardSocket', () => {
       );
     });
 
-    it('should not reconnect on fatal authentication failure close', async () => {
-      const resumeSpy = vi.fn();
-      const openSpy = vi.fn();
-      resumeServer.on('wsconnection', resumeSpy);
-      server.on('wsconnection', openSpy);
+    it.each([...FATAL_GATEWAY_CLOSE_CODES])(
+      'should not reconnect on fatal close code %i',
+      async (code) => {
+        const resumeSpy = vi.fn();
+        const openSpy = vi.fn();
+        resumeServer.on('wsconnection', resumeSpy);
+        server.on('wsconnection', openSpy);
+
+        await fakeLatency(20, 50);
+        server.emit('close', code, Buffer.from('fatal'));
+
+        await vi.advanceTimersByTimeAsync(1000000);
+
+        expect(resumeSpy).not.toHaveBeenCalled();
+        expect(openSpy).not.toHaveBeenCalled();
+        expect(shardSocket.destroyed).toBe(true);
+      },
+    );
+
+    it('should wait before reconnecting when rate limited by discord', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
 
       await fakeLatency(20, 50);
-      server.emit(
-        'close',
-        WsClosedCode.AuthenticationFailed,
-        Buffer.from('invalid token'),
+      server.emit('close', WsClosedCode.RateLimited, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(RATE_LIMITED_MIN_DELAY_MS - 100);
+      expect(wsCoSpy).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    describe.each([
+      [
+        'discord send reconnect event',
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(reconnectMsg()));
+        },
+      ],
+      [
+        'discord send invalid session event with resumable connection',
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(invalidSessionMsg(true)));
+        },
+      ],
+      [
+        'heartbeat ack is missing',
+        async () => {
+          shardSocket.heartbitInterval = 1000;
+          shardSocket.jitter = 0;
+          server.on('wsmessage', () => {});
+          await vi.advanceTimersByTimeAsync(100);
+          server.send(s(helloMsg({ heartbeat_interval: 1000 })));
+        },
+      ],
+    ])('when %s', (_label, trigger) => {
+      it('should close the old connection with an application code to keep the session resumable', async () => {
+        const closeSpy = vi.fn();
+        server.on('wsclose', closeSpy);
+
+        await trigger();
+        await vi.advanceTimersByTimeAsync(60000);
+
+        expect(closeSpy).toHaveBeenCalled();
+        for (const [code] of closeSpy.mock.calls) {
+          expect([
+            WsClosedCode.NormalClosure,
+            WsClosedCode.GoingAway,
+          ]).not.toContain(code);
+        }
+        expect(closeSpy.mock.calls[0][0]).toBe(CLIENT_RECONNECT_CLOSE_CODE);
+      });
+    });
+
+    it('should close with a normal closure when destroyed', async () => {
+      const closeSpy = vi.fn();
+      server.on('wsclose', closeSpy);
+
+      await shardSocket.destroy();
+
+      expect(closeSpy).toHaveBeenCalledWith(
+        CLIENT_SHUTDOWN_CLOSE_CODE,
+        expect.any(String),
       );
-
-      await vi.advanceTimersByTimeAsync(1000000);
-
-      expect(resumeSpy).not.toHaveBeenCalled();
-      expect(openSpy).not.toHaveBeenCalled();
-      expect(shardSocket.destroyed).toBe(true);
     });
 
     it('should clear heartbeat timers on server close', async () => {

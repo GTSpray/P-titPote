@@ -46,6 +46,7 @@ import {
   type GatewayMessageCreateDispatchData,
   type GatewayMessageDeleteBulkDispatchData,
   type GatewayMessageDeleteDispatchData,
+  type GatewayMessagePollVoteDispatchData,
   type GatewayMessageReactionAddDispatchData,
   type GatewayMessageReactionRemoveAllDispatchData,
   type GatewayMessageReactionRemoveDispatchData,
@@ -54,6 +55,7 @@ import {
   type GatewayPresenceUpdateDispatchData,
   type GatewayRateLimitedDispatchData,
   type GatewayReadyDispatchData,
+  type GatewayResumedDispatch,
   type GatewaySoundboardSoundsDispatchData,
   type GatewayStageInstanceCreateDispatchData,
   type GatewayStageInstanceDeleteDispatchData,
@@ -104,21 +106,6 @@ export enum WsClosedCode {
   InvalidIntents = 4013,
   DisallowedIntents = 4014,
 }
-
-/** Close codes that must not trigger reconnect (token / sharding / intents misconfig). */
-export const FATAL_GATEWAY_CLOSE_CODES: ReadonlySet<number> = new Set([
-  WsClosedCode.AuthenticationFailed,
-  WsClosedCode.InvalidShard,
-  WsClosedCode.ShardingRequired,
-  WsClosedCode.InvalidApiVersion,
-  WsClosedCode.InvalidIntents,
-  WsClosedCode.DisallowedIntents,
-]);
-
-/** Close codes that require a fresh Identify (session no longer resumable). */
-export const IDENTIFY_REQUIRED_CLOSE_CODES: ReadonlySet<number> = new Set([
-  WsClosedCode.SessionTimedOut,
-]);
 
 export type GatewayEvent = {
   [GWSEvent.Debug]: [shard: number, debugmsg: string, meta?: any];
@@ -301,10 +288,10 @@ export type GatewayEvent = {
     { shard: number; event: GatewayMessageDeleteBulkDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteAdd]: [
-    { shard: number; event: GatewayMessageDeleteDispatchData },
+    { shard: number; event: GatewayMessagePollVoteDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteRemove]: [
-    { shard: number; event: GatewayMessageDeleteDispatchData },
+    { shard: number; event: GatewayMessagePollVoteDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionAdd]: [
     { shard: number; event: GatewayMessageReactionAddDispatchData },
@@ -334,7 +321,7 @@ export type GatewayEvent = {
     { shard: number; event: GatewayReadyDispatchData },
   ];
   [GatewayDispatchEvents.Resumed]: [
-    { shard: number; event: GatewayReadyDispatchData },
+    { shard: number; event: GatewayResumedDispatch['d'] },
   ];
   [GatewayDispatchEvents.StageInstanceCreate]: [
     { shard: number; event: GatewayStageInstanceCreateDispatchData },
