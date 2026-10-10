@@ -1,13 +1,24 @@
 import EventEmitter from 'events';
+import { logger } from '../logger.js';
 
 export class TypedEventEmitter<TEvents extends Record<string, any>> {
   private emitter = new EventEmitter();
 
+  /**
+   * Listeners are isolated from each other: one throwing listener neither
+   * prevents the others from running nor bubbles up to the emitting socket.
+   */
   emit<TEventName extends keyof TEvents & string>(
     eventName: TEventName,
     ...eventArg: TEvents[TEventName]
   ) {
-    this.emitter.emit(eventName, ...(eventArg as []));
+    for (const listener of this.emitter.rawListeners(eventName)) {
+      try {
+        listener.apply(this.emitter, eventArg);
+      } catch (error) {
+        logger.error('gateway event listener failed', { eventName, error });
+      }
+    }
   }
 
   on<TEventName extends keyof TEvents & string>(
@@ -29,5 +40,11 @@ export class TypedEventEmitter<TEvents extends Record<string, any>> {
     handler: (...eventArg: TEvents[TEventName]) => void,
   ) {
     this.emitter.off(eventName, handler as any);
+  }
+
+  listenerCount<TEventName extends keyof TEvents & string>(
+    eventName: TEventName,
+  ) {
+    return this.emitter.listenerCount(eventName);
   }
 }

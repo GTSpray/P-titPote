@@ -4,12 +4,27 @@ import {
   GatewayDispatchEvents,
   GatewayHeartbeatAck,
   GatewayHello,
-  GatewayIntentBits,
   GatewayInvalidSession,
   GatewayOpcodes,
 } from 'discord-api-types/v10';
 import { WsClosedCode, GWSEvent } from './gatewaytypes.js';
+import {
+  CLIENT_RECONNECT_CLOSE_CODE,
+  CLIENT_SHUTDOWN_CLOSE_CODE,
+  RATE_LIMITED_MIN_DELAY_MS,
+  SLOW_RECONNECT_CLOSE_CODES,
+  classifyCloseCode,
+  getStatusCodeString,
+} from './closeCodes.js';
 import { getPromiseWithTimeout } from '../utils/getPromiseWithTimeout.js';
+import { logger } from '../logger.js';
+import { computeBackoff } from './backoff.js';
+import {
+  GatewayClosedError,
+  GatewayInvalidSessionError,
+  isSessionLost,
+} from './errors.js';
+import { buildIdentifyPayload } from './identify.js';
 
 const encoding = 'json';
 const apiVersion = '10';
@@ -17,42 +32,16 @@ const apiVersion = '10';
 // todo: implement erlpack https://github.com/discord/erlpack
 const s = JSON.stringify;
 const onConnectionDelay = 20;
+const invalidSessionResumeDelayMs = 1000;
+const stableConnectionMs = 60_000;
+const maxResumeFailures = 3;
 
-const specificStatusCodeMappings = new Map([
-  [1000, 'Normal Closure'],
-  [1001, 'Going Away'],
-  [1002, 'Protocol Error'],
-  [1003, 'Unsupported Data'],
-  [1004, '(For future)'],
-  [1005, 'No Status Received'],
-  [1006, 'Abnormal Closure'],
-  [1007, 'Invalid frame payload data'],
-  [1008, 'Policy Violation'],
-  [1009, 'Message too big'],
-  [1010, 'Missing Extension'],
-  [1011, 'Internal Error'],
-  [1012, 'Service Restart'],
-  [1013, 'Try Again Later'],
-  [1014, 'Bad Gateway'],
-  [1015, 'TLS Handshake'],
-]);
+const noop = () => {};
 
-function getStatusCodeString(code: number): string {
-  if (code >= 0 && code <= 999) {
-    return '(Unused)';
-  } else if (code >= 1016) {
-    if (code <= 1999) {
-      return '(For WebSocket standard)';
-    } else if (code <= 2999) {
-      return '(For WebSocket extensions)';
-    } else if (code <= 3999) {
-      return '(For libraries and frameworks)';
-    } else if (code <= 4999) {
-      return '(For applications)';
-    }
-  }
-  return specificStatusCodeMappings.get(code) || '(Unknown)';
-}
+export type ShardState =
+  'idle' | 'connecting' | 'resuming' | 'ready' | 'recovering' | 'destroyed';
+
+type RecoverOptions = { forceIdentify?: boolean; minDelayMs?: number };
 
 export class ShardSocket {
   ws: null | WebSocket;
@@ -66,7 +55,15 @@ export class ShardSocket {
   jitter: number;
   maxTimeout: number;
   resumeGatewayUrl: string | null;
-  destroyed: boolean = false;
+  state: ShardState = 'idle';
+  private recoveryTask: null | Promise<void> = null;
+  private reconnectAttempts = 0;
+  private resumeFailures = 0;
+  private rejectPending: null | ((reason: unknown) => void) = null;
+  private stableTimer: null | ReturnType<typeof setTimeout> = null;
+  private sleepers = new Set<() => void>();
+  private readyListener: ((payload: { event: any }) => void) | null = null;
+  private resumedListener: (() => void) | null = null;
 
   openPromise: null | Promise<void>;
   closePromise: null | Promise<void>;
@@ -92,9 +89,243 @@ export class ShardSocket {
     this.closePromise = null;
   }
 
-  async close(): Promise<void> {
+  get destroyed(): boolean {
+    return this.state === 'destroyed';
+  }
+
+  private setState(next: ShardState) {
+    if (this.state !== 'destroyed') {
+      this.state = next;
+    }
+  }
+
+  private clearHeartbeats() {
+    if (this.heartbitTimer) {
+      clearTimeout(this.heartbitTimer);
+      this.heartbitTimer = null;
+    }
+    if (this.heartbitTimeOut) {
+      clearTimeout(this.heartbitTimeOut);
+      this.heartbitTimeOut = null;
+    }
+  }
+
+  private canResume(): boolean {
+    return Boolean(this.session_id && this.resumeGatewayUrl);
+  }
+
+  private detachSocketListeners(ws: WebSocket | null) {
+    if (!ws) {
+      return;
+    }
+    ws.removeAllListeners('message');
+    ws.removeAllListeners('close');
+    ws.removeAllListeners('error');
+    ws.removeAllListeners('open');
+    // closing a CONNECTING socket emits 'error'; without a listener it would crash the process
+    ws.on('error', noop);
+  }
+
+  private isSocketActive(ws: WebSocket | null): ws is WebSocket {
+    return (
+      ws != null &&
+      ![WebSocket.CLOSED, WebSocket.CLOSING].includes(<any>ws.readyState)
+    );
+  }
+
+  /** Drop the current socket without waiting for a clean close handshake. */
+  private discardSocket() {
+    const ws = this.ws;
+    if (!ws) {
+      return;
+    }
+    this.detachSocketListeners(ws);
+    this.clearHeartbeats();
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.close(CLIENT_RECONNECT_CLOSE_CODE, 'discard');
+    } else if (this.isSocketActive(ws)) {
+      ws.terminate();
+    }
+    this.ws = null;
+  }
+
+  private removeReadyListener() {
+    if (this.readyListener) {
+      this.main.off(GatewayDispatchEvents.Ready, this.readyListener);
+      this.readyListener = null;
+    }
+  }
+
+  private removeResumedListener() {
+    if (this.resumedListener) {
+      this.main.off(GatewayDispatchEvents.Resumed, this.resumedListener);
+      this.resumedListener = null;
+    }
+  }
+
+  private wait(ms: number): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        this.sleepers.delete(done);
+        resolve();
+      };
+      const timer = setTimeout(done, ms);
+      this.sleepers.add(done);
+    });
+  }
+
+  private cancelWaits() {
+    for (const done of [...this.sleepers]) {
+      done();
+    }
+  }
+
+  private clearStableTimer() {
+    if (this.stableTimer) {
+      clearTimeout(this.stableTimer);
+      this.stableTimer = null;
+    }
+  }
+
+  /** Backoff only resets once a recovered connection stayed up long enough. */
+  private startStableTimer() {
+    this.clearStableTimer();
+    this.stableTimer = setTimeout(() => {
+      this.stableTimer = null;
+      this.reconnectAttempts = 0;
+    }, stableConnectionMs);
+  }
+
+  private async waitForIdentifySlot() {
+    const delay = this.main.identifyLimiter.msUntilAvailable();
+    if (delay > 0) {
+      logger.error('gateway identify budget exhausted, delaying identify', {
+        shard: this.shard,
+        delayMs: delay,
+        identifies: this.main.identifyLimiter.count(),
+      });
+      await this.wait(delay);
+    }
+  }
+
+  private async reidentify() {
+    this.session_id = null;
+    this.resumeGatewayUrl = null;
+    this.resumeFailures = 0;
+    await this.waitForIdentifySlot();
+    if (this.destroyed) {
+      return;
+    }
+    await this.close();
+    await this.open();
+  }
+
+  /** Runs (at most) one recovery loop at a time; never rejects. */
+  private async recover(
+    reason: string,
+    options: RecoverOptions = {},
+  ): Promise<void> {
+    if (this.destroyed || this.recoveryTask) {
+      return;
+    }
+    const task = this.recoveryLoop(reason, options);
+    this.recoveryTask = task;
+    try {
+      await task;
+    } finally {
+      if (this.recoveryTask === task) {
+        this.recoveryTask = null;
+      }
+    }
+  }
+
+  private scheduleRecover(reason: string, options: RecoverOptions = {}) {
+    void this.recover(reason, options);
+  }
+
+  private async recoveryLoop(reason: string, options: RecoverOptions) {
+    let next: RecoverOptions | null = options;
+    let currentReason = reason;
+    while (next && !this.destroyed) {
+      next = await this.recoveryAttempt(currentReason, next);
+      currentReason = 'recover-retry';
+    }
+  }
+
+  /** @returns the options of the next attempt when this one failed. */
+  private async recoveryAttempt(
+    reason: string,
+    options: RecoverOptions,
+  ): Promise<RecoverOptions | null> {
+    let identifyPath = false;
+    try {
+      this.setState('recovering');
+      const attempt = this.reconnectAttempts;
+      this.reconnectAttempts += 1;
+      this.clearStableTimer();
+      const delay = Math.max(computeBackoff(attempt), options.minDelayMs ?? 0);
+      identifyPath =
+        options.forceIdentify === true ||
+        !this.canResume() ||
+        this.resumeFailures >= maxResumeFailures;
+      logger.warn('gateway shard recovering', {
+        shard: this.shard,
+        reason,
+        identify: identifyPath,
+        delayMs: delay,
+        attempt,
+      });
+      if (delay > 0) {
+        await this.wait(delay);
+      }
+      if (this.destroyed) {
+        return null;
+      }
+
+      if (identifyPath) {
+        await this.reidentify();
+      } else {
+        try {
+          await this.resume();
+          this.resumeFailures = 0;
+        } catch (error) {
+          if (!isSessionLost(error)) {
+            throw error;
+          }
+          logger.warn('gateway shard session lost, falling back to identify', {
+            shard: this.shard,
+            error,
+          });
+          identifyPath = true;
+          await this.reidentify();
+        }
+      }
+      if (!this.destroyed) {
+        this.startStableTimer();
+      }
+      return null;
+    } catch (error) {
+      if (!identifyPath) {
+        this.resumeFailures += 1;
+      }
+      logger.error('gateway shard recover failed', {
+        shard: this.shard,
+        reason,
+        error,
+        identify: identifyPath,
+        attempt: this.reconnectAttempts,
+      });
+      return { forceIdentify: identifyPath };
+    }
+  }
+
+  async close(options: { code?: number; reason?: string } = {}): Promise<void> {
+    const { code = CLIENT_RECONNECT_CLOSE_CODE, reason = 'reconnecting' } =
+      options;
     if (!this.closePromise) {
-      this.closePromise = getPromiseWithTimeout(
+      const ws = this.ws;
+      this.closePromise = getPromiseWithTimeout<void>(
         ShardSocket.maxTimeout,
         'ShardSocket.close timed out after %t ms',
         (resolve) => {
@@ -102,46 +333,39 @@ export class ShardSocket {
             GWSEvent.Debug,
             this.shard,
             'client attempting to close connection',
+            { code, reason },
           );
 
-          if (this.heartbitTimer) {
-            clearTimeout(this.heartbitTimer);
-            this.heartbitTimer = null;
-          }
-          if (this.heartbitTimeOut) {
-            clearTimeout(this.heartbitTimeOut);
-            this.heartbitTimeOut = null;
-          }
+          this.clearHeartbeats();
 
-          if (
-            ![WebSocket.CLOSED, WebSocket.CLOSING].includes(
-              <any>this.ws?.readyState,
-            )
-          ) {
-            this.ws?.once('close', async () => {
+          if (this.isSocketActive(ws)) {
+            this.detachSocketListeners(ws);
+            ws.once('close', () => {
               this.main.emit(
                 GWSEvent.Debug,
                 this.shard,
                 'client closed connection',
               );
-              this.ws?.removeAllListeners('close');
-              this.ws = null;
               resolve();
             });
-            this.ws?.close(1001, 'cya later alligator');
+            ws.close(code, reason);
           } else {
-            this.ws = null;
             resolve();
           }
         },
-      );
+      ).catch((error) => {
+        logger.warn('gateway shard close timed out, terminating socket', {
+          shard: this.shard,
+          error,
+        });
+        ws?.terminate();
+      });
     }
 
     try {
       await this.closePromise;
-    } catch (e) {
-      throw e;
     } finally {
+      this.ws = null;
       this.closePromise = null;
     }
   }
@@ -155,7 +379,7 @@ export class ShardSocket {
   }
 
   private startHeartbeat() {
-    if (!this.heartbitTimer) {
+    if (!this.heartbitTimer && this.heartbitInterval > 0) {
       const firstBitTimeOut = Math.floor(this.heartbitInterval * this.jitter);
       this.heartbitTimer = setTimeout(() => {
         this.main.emit(GWSEvent.Debug, this.shard, 'emit first heartbit');
@@ -176,29 +400,52 @@ export class ShardSocket {
     this.main.emit(GWSEvent.Debug, this.shard, 'receive invalid session', {
       e,
     });
+    if (this.rejectPending) {
+      this.rejectPending(new GatewayInvalidSessionError(e.d));
+      return;
+    }
     if (e.d) {
-      await this.resume();
+      // Discord recommends waiting 1–5s before Resume after Invalid Session.
+      const ws = this.ws;
+      const delay =
+        invalidSessionResumeDelayMs +
+        Math.floor(Math.random() * 4 * invalidSessionResumeDelayMs);
+      await this.wait(delay);
+      if (this.destroyed || this.ws !== ws) {
+        return;
+      }
+      await this.recover('invalid-session-resumable');
     } else {
       this.main.emit(GWSEvent.Debug, this.shard, 'try to reconnect gateway');
-      await this.close();
-      await this.open();
+      await this.recover('invalid-session-unresumable', {
+        forceIdentify: true,
+      });
     }
   }
 
   send(d: object) {
-    this.ws?.send(s(d));
+    const ws = this.ws;
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      this.main.emit(
+        GWSEvent.Debug,
+        this.shard,
+        'send skipped, socket not open',
+      );
+      return;
+    }
+    ws.send(s(d));
   }
 
   private beat() {
     if (!this.heartbitTimeOut) {
-      this.heartbitTimeOut = setTimeout(async () => {
+      this.heartbitTimeOut = setTimeout(() => {
         this.heartbitTimeOut = null;
         this.main.emit(
           GWSEvent.Debug,
           this.shard,
           'no heartbit ack event timeout',
         );
-        await this.resume();
+        this.scheduleRecover('heartbeat-ack-timeout');
       }, ShardSocket.maxTimeout);
     }
     const e = {
@@ -209,7 +456,7 @@ export class ShardSocket {
     this.send(e);
   }
 
-  private beatAck(e: GatewayHeartbeatAck) {
+  private beatAck(_e: GatewayHeartbeatAck) {
     this.main.emit(GWSEvent.Debug, this.shard, 'heartbit acknowledged');
     if (this.heartbitTimeOut) {
       clearTimeout(this.heartbitTimeOut);
@@ -226,9 +473,24 @@ export class ShardSocket {
   }
 
   private async onMessage(d: WebSocket.RawData) {
-    const e = JSON.parse(d.toString());
+    let e: any;
+    try {
+      e = JSON.parse(d.toString());
+    } catch (error) {
+      logger.warn('gateway shard received invalid JSON frame', {
+        shard: this.shard,
+        error,
+      });
+      return;
+    }
+    if (!e || typeof e !== 'object') {
+      logger.warn('gateway shard received unexpected frame', {
+        shard: this.shard,
+      });
+      return;
+    }
     this.main.emit(GWSEvent.Debug, this.shard, 'ShardSocket.dispatch', { e });
-    if (e && !!e.s) {
+    if (!!e.s) {
       this.s = e.s;
     }
     switch (e.op) {
@@ -247,7 +509,7 @@ export class ShardSocket {
         break;
       case GatewayOpcodes.Reconnect:
         this.main.emit(GWSEvent.Debug, this.shard, 'recieved reconnect');
-        await this.resume();
+        await this.recover('opcode-reconnect');
         break;
       case GatewayOpcodes.InvalidSession:
         await this.invalidSession(<any>e);
@@ -259,40 +521,84 @@ export class ShardSocket {
     this.startHeartbeat();
   }
 
-  private configureSocket(ws: WebSocket) {
-    ws.on('message', async (data: WebSocket.RawData) => {
-      await this.onMessage(data);
-    });
-    ws.once('close', async (code: WsClosedCode, reason: string) => {
-      this.main.emit(GWSEvent.Debug, this.shard, 'server closed connection', {
-        code,
-        codeString: getStatusCodeString(code),
-        reason: reason.toString(),
-      });
+  private handleServerClose(code: number, reason: string) {
+    this.clearHeartbeats();
+    this.detachSocketListeners(this.ws);
+    this.ws = null;
 
-      if ([WsClosedCode.AbnormalClosure].includes(code)) {
-        try {
-          await this.resume();
-        } catch (error) {
-          this.main.emit(GWSEvent.Debug, this.shard, 'fail to resume', {
-            error,
-          });
-          await this.close();
-          await this.open();
-        }
-      }
+    const codeString = getStatusCodeString(code);
+    logger.warn('gateway shard server closed connection', {
+      shard: this.shard,
+      code,
+      codeString,
+      reason,
     });
-    ws.once('error', (e) => {
+
+    if (this.destroyed) {
+      return;
+    }
+
+    const action = classifyCloseCode(code);
+    this.rejectPending?.(new GatewayClosedError(code, reason));
+    if (action === 'fatal') {
+      logger.error('gateway shard fatal close, not reconnecting', {
+        shard: this.shard,
+        code,
+        codeString,
+        reason,
+      });
+      this.setState('destroyed');
+      this.cancelWaits();
+      this.main.emit(GWSEvent.Fatal, this.shard, { code, reason });
+      return;
+    }
+
+    if (this.rejectPending) {
+      // an open/resume attempt is in flight: its owner handles the retry
+      return;
+    }
+
+    const forceIdentify = action === 'identify';
+    const minDelayMs = SLOW_RECONNECT_CLOSE_CODES.has(code)
+      ? RATE_LIMITED_MIN_DELAY_MS
+      : 0;
+    this.scheduleRecover(`server-close-${code}`, {
+      forceIdentify,
+      minDelayMs,
+    });
+  }
+
+  private configureSocket(ws: WebSocket) {
+    ws.on('message', (data: WebSocket.RawData) => {
+      void this.onMessage(data).catch((error) => {
+        logger.error('gateway shard onMessage failed', {
+          shard: this.shard,
+          error,
+        });
+      });
+    });
+    ws.once('close', (code: WsClosedCode, reason: Buffer) => {
+      this.handleServerClose(code, reason.toString());
+    });
+    ws.on('error', (e) => {
+      logger.warn('gateway shard websocket error', {
+        shard: this.shard,
+        error: e,
+      });
       this.main.emit(GWSEvent.Debug, this.shard, 'recieved error', e);
     });
   }
 
   private async resume() {
+    if (!this.canResume()) {
+      throw new Error('ShardSocket.resume requires session_id and resume URL');
+    }
+
     if (!this.resumePromise) {
-      this.resumePromise = getPromiseWithTimeout(
+      this.resumePromise = getPromiseWithTimeout<void>(
         this.maxTimeout,
         'ShardSocket.resume timed out after %t ms',
-        async (resolve) => {
+        async (resolve, reject) => {
           if (this.ws) {
             this.main.emit(GWSEvent.Debug, this.shard, 'close connection');
             await this.close();
@@ -302,21 +608,31 @@ export class ShardSocket {
             this.shard,
             'try to resume connection',
           );
+          this.setState('resuming');
           const ws = new WebSocket(
             `${this.resumeGatewayUrl}?v=${apiVersion}&encoding=${encoding}`,
           );
+          this.rejectPending = reject;
 
-          this.main.once(GatewayDispatchEvents.Resumed, () => {
+          this.removeResumedListener();
+          this.resumedListener = () => {
             this.main.emit(
               GWSEvent.Debug,
               this.shard,
               'recieved resumed packet',
             );
+            this.removeResumedListener();
+            this.setState('ready');
             resolve(undefined);
-          });
+          };
+          this.main.once(GatewayDispatchEvents.Resumed, this.resumedListener);
+
           ws.once('open', () => {
             this.main.emit(GWSEvent.Debug, this.shard, 'resumed connection');
             setTimeout(() => {
+              if (this.ws !== ws) {
+                return;
+              }
               this.main.emit(GWSEvent.Debug, this.shard, 'send resume packet');
               this.send({
                 op: GatewayOpcodes.Resume,
@@ -329,18 +645,26 @@ export class ShardSocket {
             }, onConnectionDelay);
           });
 
+          ws.once('error', (error) => {
+            this.removeResumedListener();
+            reject(error);
+          });
+
           this.configureSocket(ws);
           this.ws = ws;
         },
-      );
+      ).catch((error) => {
+        this.removeResumedListener();
+        this.discardSocket();
+        throw error;
+      });
     }
 
     try {
       await this.resumePromise;
-    } catch (e) {
-      throw e;
     } finally {
       this.resumePromise = null;
+      this.rejectPending = null;
     }
   }
 
@@ -352,73 +676,89 @@ export class ShardSocket {
     }
 
     if (!this.openPromise) {
-      this.openPromise = getPromiseWithTimeout(
+      this.openPromise = getPromiseWithTimeout<void>(
         this.maxTimeout,
         'ShardSocket.open timed out after %t ms',
-        (resolve) => {
+        (resolve, reject) => {
           this.main.emit(GWSEvent.Debug, this.shard, 'starting connection');
+          this.setState('connecting');
+          this.s = null;
 
           const ws = new WebSocket(
             `${this.main.url}?v=${apiVersion}&encoding=${encoding}`,
           );
+          this.rejectPending = reject;
 
           ws.once('open', () => {
             this.main.emit(GWSEvent.Debug, this.shard, 'opened connection');
             setTimeout(() => {
+              if (this.ws !== ws) {
+                return;
+              }
               this.main.emit(
                 GWSEvent.Debug,
                 this.shard,
                 'send identify packet',
               );
-              this.send({
-                op: GatewayOpcodes.Identify,
-                d: {
+              this.main.identifyLimiter.record();
+              this.send(
+                buildIdentifyPayload({
                   token: this.main.token,
-                  shard: [this.shard, this.main.shards],
-                  compress: false,
-                  large_threshold: 250,
-                  presence: {},
-                  properties: {
-                    os: 'linux',
-                    browser: 'PtitPote',
-                    device: 'PtitPote',
-                  },
-                  intents:
-                    GatewayIntentBits.Guilds |
-                    GatewayIntentBits.GuildMessageReactions |
-                    GatewayIntentBits.GuildMessages |
-                    GatewayIntentBits.DirectMessages,
-                },
-              });
+                  shard: this.shard,
+                  shards: this.main.shards,
+                  presence: this.main.presence,
+                }),
+              );
             }, onConnectionDelay);
+          });
+
+          ws.once('error', (error) => {
+            this.removeReadyListener();
+            reject(error);
           });
 
           this.configureSocket(ws);
 
           this.ws = ws;
 
-          this.main.once(GatewayDispatchEvents.Ready, ({ event }) => {
+          this.removeReadyListener();
+          this.readyListener = ({ event }) => {
             this.main.emit(GWSEvent.Debug, this.shard, 'recieved ready info');
             this.session_id = event.session_id;
             this.resumeGatewayUrl = event.resume_gateway_url;
-            resolve();
-          });
+            this.setState('ready');
+            this.removeReadyListener();
+            resolve(undefined);
+          };
+          this.main.once(GatewayDispatchEvents.Ready, this.readyListener);
         },
-      );
+      ).catch((error) => {
+        this.removeReadyListener();
+        this.discardSocket();
+        throw error;
+      });
     }
 
     try {
       await this.openPromise;
-    } catch (e) {
-      throw e;
     } finally {
       this.openPromise = null;
+      this.rejectPending = null;
     }
   }
 
-  destroy(): Promise<void> {
+  async destroy(): Promise<void> {
     this.main.emit(GWSEvent.Debug, this.shard, 'destroy');
-    this.destroyed = true;
-    return this.close();
+    this.setState('destroyed');
+    this.cancelWaits();
+    this.clearStableTimer();
+    this.removeReadyListener();
+    this.removeResumedListener();
+    this.rejectPending?.(new Error('ShardSocket destroyed'));
+    await this.recoveryTask;
+    await this.close({
+      code: CLIENT_SHUTDOWN_CLOSE_CODE,
+      reason: 'shutdown',
+    });
   }
 }

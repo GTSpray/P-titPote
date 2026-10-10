@@ -15,7 +15,15 @@ import {
   GatewayReadyDispatch,
 } from 'discord-api-types/v10';
 import { WebSocketServerMock } from '../../mocks/WebSocketMock.js';
+import { logger } from '../../../src/logger.js';
+import { GatewayClosedError } from '../../../src/gateway/errors.js';
 import { WsClosedCode, GWSEvent } from '../../../src/gateway/gatewaytypes.js';
+import {
+  CLIENT_RECONNECT_CLOSE_CODE,
+  CLIENT_SHUTDOWN_CLOSE_CODE,
+  FATAL_GATEWAY_CLOSE_CODES,
+  RATE_LIMITED_MIN_DELAY_MS,
+} from '../../../src/gateway/closeCodes.js';
 
 const s = JSON.stringify;
 const p = JSON.parse;
@@ -34,11 +42,29 @@ const intents =
   GatewayIntentBits.GuildMessages |
   GatewayIntentBits.DirectMessages;
 
+const identify = (shards: number | null = null, presence: object = {}) => ({
+  op: GatewayOpcodes.Identify,
+  d: {
+    token: 'fakeToken',
+    shard: [0, shards],
+    compress: false,
+    large_threshold: 250,
+    presence,
+    properties: {
+      os: 'linux',
+      browser: 'PtitPote',
+      device: 'PtitPote',
+    },
+    intents,
+  },
+});
+
 describe('ShardSocket', () => {
   let shardSocket: ShardSocket;
   let gateway: GatewaySocket;
   let server: WebSocketServerMock;
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.useFakeTimers();
     server = WebSocketServerMock.createInstance();
     gateway = new GatewaySocket('fakeToken');
@@ -76,28 +102,43 @@ describe('ShardSocket', () => {
     );
   });
 
+  it('should not leak the ready listener when open times out', async () => {
+    const openPromise = shardSocket.open();
+    const assertion = expect(openPromise).rejects.toThrow();
+    await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout + 100);
+    await assertion;
+
+    expect(gateway.listenerCount(GatewayDispatchEvents.Ready)).toBe(0);
+  });
+
+  it('should reject open right away when the server closes the connection', async () => {
+    const openPromise = shardSocket.open();
+    const assertion =
+      expect(openPromise).rejects.toBeInstanceOf(GatewayClosedError);
+    await vi.advanceTimersByTimeAsync(100);
+    server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+    await vi.advanceTimersByTimeAsync(10);
+
+    await assertion;
+    expect(gateway.listenerCount(GatewayDispatchEvents.Ready)).toBe(0);
+  });
+
+  it('should send the configured presence with identify', async () => {
+    const presence = { status: 'online', afk: false, since: null };
+    gateway.presence = presence as any;
+    shardSocket.open().catch(() => {});
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(server.getSpy()).toBeCalledWith(s(identify(null, presence)));
+  });
+
   it('should send identify with intents', async () => {
     shardSocket.open().catch(() => {});
     await vi.advanceTimersByTimeAsync(100);
     server.send(s(helloMsg({})));
     await vi.advanceTimersByTimeAsync(100);
 
-    const identityPayload = {
-      op: GatewayOpcodes.Identify,
-      d: {
-        token: gateway.token,
-        shard: [0, gateway.shards],
-        compress: false,
-        large_threshold: 250,
-        presence: {},
-        properties: {
-          os: 'linux',
-          browser: 'PtitPote',
-          device: 'PtitPote',
-        },
-        intents,
-      },
-    };
+    const identityPayload = identify();
     expect(server.getSpy()).toBeCalledWith(s(identityPayload));
   });
 
@@ -228,24 +269,456 @@ describe('ShardSocket', () => {
 
       it('should send identify with intents', async () => {
         await vi.advanceTimersByTimeAsync(100);
-        const identityPayload = {
-          op: GatewayOpcodes.Identify,
-          d: {
-            token: gateway.token,
-            shard: [0, gateway.shards],
-            compress: false,
-            large_threshold: 250,
-            presence: {},
-            properties: {
-              os: 'linux',
-              browser: 'PtitPote',
-              device: 'PtitPote',
-            },
-            intents,
-          },
-        };
+        const identityPayload = identify();
         expect(server.getSpy()).toBeCalledWith(s(identityPayload));
       });
+    });
+
+    describe.each([
+      ['normal closure', WsClosedCode.NormalClosure],
+      ['going away', WsClosedCode.GoingAway],
+    ])('when websocket closes with %s', (_label, code) => {
+      it('should resume on the resume gateway', async () => {
+        const wsCoSpy = vi.fn();
+        resumeServer.on('wsconnection', wsCoSpy);
+
+        await fakeLatency(20, 50);
+        server.emit('close', code, Buffer.from(''));
+
+        await vi.advanceTimersByTimeAsync(1000000);
+
+        expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+          shardSocket.ws,
+          `${resumeServer.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+        );
+      });
+    });
+
+    it.each([
+      ['session timed out', WsClosedCode.SessionTimedOut],
+      ['invalid seq', WsClosedCode.InvalidSeq],
+    ])('should re-identify when websocket closes with %s', async (_l, code) => {
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', code, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+        shardSocket.ws,
+        `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+      );
+      expect(server.getSpy()).toHaveBeenCalledWith(s(identify()));
+    });
+
+    it.each([...FATAL_GATEWAY_CLOSE_CODES])(
+      'should not reconnect on fatal close code %i',
+      async (code) => {
+        const resumeSpy = vi.fn();
+        const openSpy = vi.fn();
+        resumeServer.on('wsconnection', resumeSpy);
+        server.on('wsconnection', openSpy);
+
+        const fatalSpy = vi.fn();
+        gateway.on(GWSEvent.Fatal, fatalSpy);
+
+        await fakeLatency(20, 50);
+        server.emit('close', code, Buffer.from('fatal'));
+
+        await vi.advanceTimersByTimeAsync(1000000);
+
+        expect(fatalSpy).toHaveBeenCalledExactlyOnceWith(0, {
+          code,
+          reason: 'fatal',
+        });
+        expect(resumeSpy).not.toHaveBeenCalled();
+        expect(openSpy).not.toHaveBeenCalled();
+        expect(shardSocket.destroyed).toBe(true);
+      },
+    );
+
+    it('should wait before reconnecting when rate limited by discord', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.RateLimited, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(RATE_LIMITED_MIN_DELAY_MS - 100);
+      expect(wsCoSpy).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    describe.each([
+      [
+        'discord send reconnect event',
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(reconnectMsg()));
+        },
+      ],
+      [
+        'discord send invalid session event with resumable connection',
+        async () => {
+          await fakeLatency(20, 50);
+          server.send(s(invalidSessionMsg(true)));
+        },
+      ],
+      [
+        'heartbeat ack is missing',
+        async () => {
+          shardSocket.heartbitInterval = 1000;
+          shardSocket.jitter = 0;
+          server.on('wsmessage', () => {});
+          await vi.advanceTimersByTimeAsync(100);
+          server.send(s(helloMsg({ heartbeat_interval: 1000 })));
+        },
+      ],
+    ])('when %s', (_label, trigger) => {
+      it('should close the old connection with an application code to keep the session resumable', async () => {
+        const closeSpy = vi.fn();
+        server.on('wsclose', closeSpy);
+
+        await trigger();
+        await vi.advanceTimersByTimeAsync(60000);
+
+        expect(closeSpy).toHaveBeenCalled();
+        for (const [code] of closeSpy.mock.calls) {
+          expect([
+            WsClosedCode.NormalClosure,
+            WsClosedCode.GoingAway,
+          ]).not.toContain(code);
+        }
+        expect(closeSpy.mock.calls[0][0]).toBe(CLIENT_RECONNECT_CLOSE_CODE);
+      });
+    });
+
+    it('should close with a normal closure when destroyed', async () => {
+      const closeSpy = vi.fn();
+      server.on('wsclose', closeSpy);
+
+      await shardSocket.destroy();
+
+      expect(closeSpy).toHaveBeenCalledWith(
+        CLIENT_SHUTDOWN_CLOSE_CODE,
+        expect.any(String),
+      );
+    });
+
+    it('should back off when the connection drops again before being stable', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      resumeServer.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(2500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should reconnect immediately again once the connection was stable', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(61_000);
+      expect(wsCoSpy).toHaveBeenCalledTimes(1);
+
+      resumeServer.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(500);
+      expect(wsCoSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should record every identify in the identify limiter', async () => {
+      expect(gateway.identifyLimiter.count()).toBe(1);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(gateway.identifyLimiter.count()).toBe(2);
+    });
+
+    it('should delay identify when the identify budget is exhausted', async () => {
+      vi.spyOn(gateway.identifyLimiter, 'msUntilAvailable').mockReturnValue(
+        10_000,
+      );
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(wsCoSpy).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        'gateway identify budget exhausted, delaying identify',
+        expect.objectContaining({ delayMs: 10_000 }),
+      );
+
+      await vi.advanceTimersByTimeAsync(6000);
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should reset the sequence number when a new session is identified', async () => {
+      expect(shardSocket.s).toBe(1);
+
+      server.send(s(invalidSessionMsg(false)));
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(shardSocket.s).toBeNull();
+    });
+
+    it('should keep trying to resume before falling back to identify when resume times out', async () => {
+      const deadServer = WebSocketServerMock.createInstance();
+      shardSocket.resumeGatewayUrl = deadServer.getUrl();
+      const deadSpy = vi.fn();
+      const identifySpy = vi.fn();
+      deadServer.on('wsconnection', deadSpy);
+      server.on('wsconnection', identifySpy);
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(ShardSocket.maxTimeout + 500);
+      expect(deadSpy).toHaveBeenCalledTimes(1);
+      expect(identifySpy).not.toHaveBeenCalled();
+      expect(shardSocket.session_id).not.toBeNull();
+      expect(gateway.listenerCount(GatewayDispatchEvents.Resumed)).toBe(0);
+
+      await vi.advanceTimersByTimeAsync(45_000);
+      expect(deadSpy).toHaveBeenCalledTimes(3);
+      expect(identifySpy).toHaveBeenCalled();
+    });
+
+    it('should clear heartbeat timers on server close', async () => {
+      shardSocket.heartbitInterval = 1000;
+      // Force a pending heartbeat interval timer
+      (shardSocket as any).continueHeartbeat();
+      expect(shardSocket.heartbitTimer).not.toBeNull();
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.NormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(shardSocket.heartbitTimer).toBeNull();
+      expect(shardSocket.heartbitTimeOut).toBeNull();
+    });
+
+    it('should fall back to identify when resume gateway URL is missing', async () => {
+      const wsCoSpy = vi.fn();
+      server.on('wsconnection', wsCoSpy);
+      shardSocket.resumeGatewayUrl = null;
+
+      await fakeLatency(20, 50);
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledExactlyOnceWith(
+        shardSocket.ws,
+        `${server.getUrl()}?v=${apiVersion}&encoding=${encoding}`,
+      );
+    });
+
+    describe('when the resume attempt fails', () => {
+      let brokenServer: WebSocketServerMock;
+      let brokenSpy: ReturnType<typeof vi.fn>;
+      let identifySpy: ReturnType<typeof vi.fn>;
+
+      beforeEach(() => {
+        brokenServer = WebSocketServerMock.createInstance();
+        brokenSpy = vi.fn();
+        identifySpy = vi.fn();
+        brokenServer.on('wsconnection', brokenSpy);
+        server.on('wsconnection', identifySpy);
+        shardSocket.resumeGatewayUrl = brokenServer.getUrl();
+      });
+
+      it.each([
+        [
+          'an unresumable invalid session',
+          () => brokenServer.send(s(invalidSessionMsg(false))),
+        ],
+        [
+          'a session timed out close',
+          () =>
+            brokenServer.emit(
+              'close',
+              WsClosedCode.SessionTimedOut,
+              Buffer.from(''),
+            ),
+        ],
+        [
+          'an invalid seq close',
+          () =>
+            brokenServer.emit(
+              'close',
+              WsClosedCode.InvalidSeq,
+              Buffer.from(''),
+            ),
+        ],
+      ])(
+        'should identify right away on %s without waiting for the timeout',
+        async (_label, answer) => {
+          brokenServer.on('wsmessage', (d) => {
+            if (p(d).op === GatewayOpcodes.Resume) {
+              answer();
+            }
+          });
+
+          server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+          await vi.advanceTimersByTimeAsync(1000);
+
+          expect(brokenSpy).toHaveBeenCalledOnce();
+          expect(identifySpy).toHaveBeenCalledOnce();
+          expect(ShardSocket.maxTimeout).toBeGreaterThan(1000);
+        },
+      );
+
+      it('should retry resume without waiting for the timeout when the connection drops', async () => {
+        brokenServer.on('wsmessage', (d) => {
+          if (p(d).op === GatewayOpcodes.Resume) {
+            brokenServer.emit(
+              'close',
+              WsClosedCode.AbnormalClosure,
+              Buffer.from(''),
+            );
+          }
+        });
+
+        const random = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+        server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+        await vi.advanceTimersByTimeAsync(3500);
+        random.mockRestore();
+
+        expect(brokenSpy).toHaveBeenCalledTimes(2);
+        expect(identifySpy).not.toHaveBeenCalled();
+        expect(shardSocket.session_id).not.toBeNull();
+      });
+    });
+
+    it('should track its lifecycle state', async () => {
+      expect(shardSocket.state).toBe('ready');
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(shardSocket.state).toBe('resuming');
+
+      await vi.advanceTimersByTimeAsync(500);
+      expect(shardSocket.state).toBe('ready');
+
+      await shardSocket.destroy();
+      expect(shardSocket.state).toBe('destroyed');
+    });
+
+    it('should run a single recovery at a time', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      (shardSocket as any).scheduleRecover('first');
+      (shardSocket as any).scheduleRecover('second');
+      await vi.advanceTimersByTimeAsync(500);
+
+      expect(wsCoSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should stop an in-flight recovery when destroyed', async () => {
+      const deadServer = WebSocketServerMock.createInstance();
+      shardSocket.resumeGatewayUrl = deadServer.getUrl();
+      const deadSpy = vi.fn();
+      const identifySpy = vi.fn();
+      deadServer.on('wsconnection', deadSpy);
+      server.on('wsconnection', identifySpy);
+
+      server.emit('close', WsClosedCode.AbnormalClosure, Buffer.from(''));
+      await vi.advanceTimersByTimeAsync(100);
+      expect(shardSocket.state).toBe('resuming');
+
+      await shardSocket.destroy();
+      await vi.advanceTimersByTimeAsync(120_000);
+
+      expect(deadSpy).toHaveBeenCalledOnce();
+      expect(identifySpy).not.toHaveBeenCalled();
+      expect(shardSocket.state).toBe('destroyed');
+      expect(gateway.listenerCount(GatewayDispatchEvents.Resumed)).toBe(0);
+      expect(gateway.listenerCount(GatewayDispatchEvents.Ready)).toBe(0);
+    });
+
+    it('should not recover after an invalid session wait when destroyed meanwhile', async () => {
+      const wsCoSpy = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+
+      server.send(s(invalidSessionMsg(true)));
+      await vi.advanceTimersByTimeAsync(100);
+      await shardSocket.destroy();
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      expect(wsCoSpy).not.toHaveBeenCalled();
+    });
+
+    it('should keep the connection when an event listener throws', async () => {
+      const wsCoSpy = vi.fn();
+      const otherListener = vi.fn();
+      resumeServer.on('wsconnection', wsCoSpy);
+      server.on('wsconnection', wsCoSpy);
+      gateway.on(GatewayDispatchEvents.MessageCreate, () => {
+        throw new Error('listener failure');
+      });
+      gateway.on(GatewayDispatchEvents.MessageCreate, otherListener);
+
+      server.send(
+        s({
+          t: GatewayDispatchEvents.MessageCreate,
+          s: 2,
+          op: GatewayOpcodes.Dispatch,
+          d: { content: 'hello' },
+        }),
+      );
+      await vi.advanceTimersByTimeAsync(5000);
+
+      expect(otherListener).toHaveBeenCalledOnce();
+      expect(wsCoSpy).not.toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        'gateway event listener failed',
+        expect.objectContaining({
+          eventName: GatewayDispatchEvents.MessageCreate,
+        }),
+      );
+    });
+
+    it.each([
+      ['invalid json', 'not json', 'gateway shard received invalid JSON frame'],
+      ['a null frame', 'null', 'gateway shard received unexpected frame'],
+    ])(
+      'should ignore %s frames without reconnecting',
+      async (_l, frame, log) => {
+        const wsCoSpy = vi.fn();
+        resumeServer.on('wsconnection', wsCoSpy);
+        server.on('wsconnection', wsCoSpy);
+
+        server.send(frame);
+        await vi.advanceTimersByTimeAsync(5000);
+
+        expect(logger.warn).toHaveBeenCalledWith(log, expect.anything());
+        expect(wsCoSpy).not.toHaveBeenCalled();
+      },
+    );
+
+    it('should not send on a socket that is not open', async () => {
+      server.getSpy().mockClear();
+      shardSocket.ws!.readyState = 3;
+
+      shardSocket.send({ op: GatewayOpcodes.Heartbeat, d: null });
+
+      expect(server.getSpy()).not.toHaveBeenCalled();
     });
   });
 
@@ -259,6 +732,7 @@ describe('ShardSocket', () => {
         resume_gateway_url: resumeServer.getUrl(),
       });
 
+      shardSocket.jitter = 0.5; // the first beat is scheduled on hello, keep it deterministic
       shardSocket.open();
 
       await fakeLatency(20, 50);
@@ -295,7 +769,6 @@ describe('ShardSocket', () => {
     });
 
     it('should keep heartbit interval using hello reponse interval', async () => {
-      shardSocket.jitter = 1 / 10000; // force jitter cause random is painfull to test
       server.on('wsmessage', async (d) => {
         const m = p(d);
         if (m.op === GatewayOpcodes.Heartbeat) {

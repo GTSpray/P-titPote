@@ -5,6 +5,7 @@ import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { ShardSocket } from '../../../src/gateway/ShardSocket.js';
 import * as ShardSocketModule from '../../../src/gateway/ShardSocket.js';
 import { MockInstance } from 'vitest';
+import { logger } from '../../../src/logger.js';
 
 class FakeShardSocket extends ShardSocket {}
 vi.mock('../../../src/gateway/ShardSocket.js');
@@ -25,15 +26,15 @@ describe('GatewaySocket', () => {
     const fakeshards = 1;
 
     let shardSocketOpenSpy: MockInstance<() => Promise<void>>;
-    let shardSocketCloseSpy: MockInstance<() => Promise<void>>;
+    let shardSocketDestroySpy: MockInstance<() => Promise<void>>;
 
     beforeEach(() => {
       shardSocketOpenSpy = vi
         .spyOn(ShardSocket.prototype, 'open')
         .mockResolvedValue();
 
-      shardSocketCloseSpy = vi
-        .spyOn(ShardSocket.prototype, 'close')
+      shardSocketDestroySpy = vi
+        .spyOn(ShardSocket.prototype, 'destroy')
         .mockResolvedValue();
 
       DiscrodRESTMock.register(
@@ -76,10 +77,117 @@ describe('GatewaySocket', () => {
       expect(shardSocketOpenSpy).toHaveBeenCalledWith();
     });
 
-    it('should close previous created ShardSocket', async () => {
+    it('should destroy previous created ShardSocket', async () => {
       await gateway.connect();
       await gateway.connect();
-      expect(shardSocketCloseSpy).toHaveBeenCalledWith();
+      expect(shardSocketDestroySpy).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('connect with session start limit', () => {
+    const register = (session_start_limit: object, shards: number) =>
+      DiscrodRESTMock.register(
+        {
+          verb: DiscrodRESTMockVerb.get,
+          fullRoute: Routes.gatewayBot(),
+        },
+        { url: 'wss://gateway.discord.gg', session_start_limit, shards },
+      );
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      vi.spyOn(ShardSocket.prototype, 'open').mockResolvedValue();
+      vi.spyOn(ShardSocket.prototype, 'destroy').mockResolvedValue();
+    });
+
+    it('logs the remaining session starts', async () => {
+      register({ max_concurrency: 1, remaining: 973, total: 1000 }, 1);
+
+      await gateway.connect();
+
+      expect(logger.info).toHaveBeenCalledWith(
+        'gateway session start limit',
+        expect.anything(),
+      );
+    });
+
+    it('logs an error when few session starts remain', async () => {
+      register({ max_concurrency: 1, remaining: 12, total: 1000 }, 1);
+
+      await gateway.connect();
+
+      expect(logger.error).toHaveBeenCalledWith(
+        'gateway session start limit',
+        expect.anything(),
+      );
+    });
+
+    it('starts shards by bucket of max_concurrency, 5s apart', async () => {
+      vi.useFakeTimers();
+      const openSpy = vi.spyOn(ShardSocket.prototype, 'open');
+      register({ max_concurrency: 2, remaining: 900, total: 1000 }, 5);
+
+      const connected = gateway.connect();
+      await vi.advanceTimersByTimeAsync(100);
+      expect(openSpy).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(openSpy).toHaveBeenCalledTimes(4);
+
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(openSpy).toHaveBeenCalledTimes(5);
+      await connected;
+      vi.useRealTimers();
+    });
+
+    it('rejects when a shard fails to open', async () => {
+      register({ max_concurrency: 1, remaining: 900, total: 1000 }, 1);
+      vi.spyOn(ShardSocket.prototype, 'open').mockRejectedValue(
+        new Error('open failed'),
+      );
+
+      await expect(gateway.connect()).rejects.toThrow('open failed');
+    });
+  });
+
+  describe('destroy', () => {
+    it('destroys every shard socket once', async () => {
+      vi.spyOn(ShardSocket.prototype, 'open').mockResolvedValue();
+      const destroySpy = vi
+        .spyOn(ShardSocket.prototype, 'destroy')
+        .mockResolvedValue();
+      DiscrodRESTMock.register(
+        { verb: DiscrodRESTMockVerb.get, fullRoute: Routes.gatewayBot() },
+        {
+          url: 'wss://gateway.discord.gg',
+          session_start_limit: { max_concurrency: 5, remaining: 900 },
+          shards: 2,
+        },
+      );
+      await gateway.connect();
+
+      await gateway.destroy();
+      await gateway.destroy();
+
+      expect(destroySpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not fail when a shard cannot be destroyed', async () => {
+      vi.spyOn(ShardSocket.prototype, 'open').mockResolvedValue();
+      vi.spyOn(ShardSocket.prototype, 'destroy').mockRejectedValue(
+        new Error('boom'),
+      );
+      DiscrodRESTMock.register(
+        { verb: DiscrodRESTMockVerb.get, fullRoute: Routes.gatewayBot() },
+        {
+          url: 'wss://gateway.discord.gg',
+          session_start_limit: { max_concurrency: 1, remaining: 900 },
+          shards: 1,
+        },
+      );
+      await gateway.connect();
+
+      await expect(gateway.destroy()).resolves.toBeUndefined();
     });
   });
 

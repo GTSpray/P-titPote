@@ -4,7 +4,7 @@ export const getPromiseWithTimeout = <T extends unknown>(
   executor: (
     resolve: (value: T) => void,
     reject: (reason?: any) => void,
-  ) => void,
+  ) => void | Promise<void>,
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     let expired = false;
@@ -25,6 +25,6 @@ export const getPromiseWithTimeout = <T extends unknown>(
         resolve(value);
       }
     };
-    executor(res, rej);
+    Promise.resolve(executor(res, rej)).catch(rej);
   });
 };

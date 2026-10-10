@@ -46,6 +46,7 @@ import {
   type GatewayMessageCreateDispatchData,
   type GatewayMessageDeleteBulkDispatchData,
   type GatewayMessageDeleteDispatchData,
+  type GatewayMessagePollVoteDispatchData,
   type GatewayMessageReactionAddDispatchData,
   type GatewayMessageReactionRemoveAllDispatchData,
   type GatewayMessageReactionRemoveDispatchData,
@@ -54,6 +55,7 @@ import {
   type GatewayPresenceUpdateDispatchData,
   type GatewayRateLimitedDispatchData,
   type GatewayReadyDispatchData,
+  type GatewayResumedDispatch,
   type GatewaySoundboardSoundsDispatchData,
   type GatewayStageInstanceCreateDispatchData,
   type GatewayStageInstanceDeleteDispatchData,
@@ -78,9 +80,11 @@ import {
 export enum GWSEvent {
   Debug = 'DEBUG',
   Payload = 'PAYLOAD',
+  Fatal = 'FATAL',
 }
 
 // https://www.rfc-editor.org/rfc/rfc6455
+// Discord app codes: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
 export enum WsClosedCode {
   NormalClosure = 1000, // indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
   GoingAway = 1001, // indicates that an endpoint is "going away", such as a server going down or a browser having navigated away from a page.
@@ -88,9 +92,24 @@ export enum WsClosedCode {
   UnsupportedData = 1003, // indicates that an endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).
   NoStatusReceived = 1005, // It is designated for use in applications expecting a status code to indicate that no status code was actually present.
   AbnormalClosure = 1006, // It is designated for use in applications expecting a status code to indicate that the connection was closed abnormally, e.g., without sending or receiving a Close control frame.
+  UnknownError = 4000,
+  UnknownOpcode = 4001,
+  DecodeError = 4002,
+  NotAuthenticated = 4003,
+  AuthenticationFailed = 4004,
+  AlreadyAuthenticated = 4005,
+  InvalidSeq = 4007,
+  RateLimited = 4008,
+  SessionTimedOut = 4009,
+  InvalidShard = 4010,
+  ShardingRequired = 4011,
+  InvalidApiVersion = 4012,
+  InvalidIntents = 4013,
+  DisallowedIntents = 4014,
 }
 
 export type GatewayEvent = {
+  [GWSEvent.Fatal]: [shard: number, info: { code: number; reason: string }];
   [GWSEvent.Debug]: [shard: number, debugmsg: string, meta?: any];
   [GWSEvent.Payload]: [
     shard: number,
@@ -271,10 +290,10 @@ export type GatewayEvent = {
     { shard: number; event: GatewayMessageDeleteBulkDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteAdd]: [
-    { shard: number; event: GatewayMessageDeleteDispatchData },
+    { shard: number; event: GatewayMessagePollVoteDispatchData },
   ];
   [GatewayDispatchEvents.MessagePollVoteRemove]: [
-    { shard: number; event: GatewayMessageDeleteDispatchData },
+    { shard: number; event: GatewayMessagePollVoteDispatchData },
   ];
   [GatewayDispatchEvents.MessageReactionAdd]: [
     { shard: number; event: GatewayMessageReactionAddDispatchData },
@@ -304,7 +323,7 @@ export type GatewayEvent = {
     { shard: number; event: GatewayReadyDispatchData },
   ];
   [GatewayDispatchEvents.Resumed]: [
-    { shard: number; event: GatewayReadyDispatchData },
+    { shard: number; event: GatewayResumedDispatch['d'] },
   ];
   [GatewayDispatchEvents.StageInstanceCreate]: [
     { shard: number; event: GatewayStageInstanceCreateDispatchData },
