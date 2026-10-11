@@ -1,3 +1,9 @@
+## [1.12.27](https://github.com/GTSpray/P-titPote/compare/v1.12.26...v1.12.27) (2026-10-11)
+
+### :bug: Fixes
+
+* **gateway:** reconnect on recoverable closes and avoid unhandled rejection exits ([#312](https://github.com/GTSpray/P-titPote/issues/312)) ([18d97de](https://github.com/GTSpray/P-titPote/commit/18d97de4e24c7d472ec5c002d83cfb57c2aacdb8))
+
 ## [1.12.26](https://github.com/GTSpray/P-titPote/compare/v1.12.25...v1.12.26) (2026-10-09)
 
 ### :memo: Documentation
