@@ -97,6 +97,27 @@ Operational notes:
 - Schema generator dumps are useful for review, but committed schema changes
   should be represented as migrations under `src/migrations/`.
 
+### Reviewing generated migrations
+
+MikroORM migrations are plain TypeScript files and should be reviewed as the
+source of truth for schema changes. Before committing a database change:
+
+1. build the project so the CLI reads the latest compiled config;
+2. inspect the generated SQL in the migration file;
+3. run `make db-check` against a disposable database when Docker is available.
+
+Generated migrations can be narrower than an entity change. For example,
+`Migration20261009074546` only renames the `poll_resp.poll_choice_id` foreign-key
+constraint from `poll_resp_choice_id_foreign` to
+`poll_resp_poll_choice_id_foreign`; it keeps the same column and `on delete set
+null` behavior. Constraint-only migrations like this should still keep matching
+`up` and `down` steps because production startup applies pending migrations
+automatically from the API process.
+
+At the time of writing, no MikroORM `.snapshot-*.json` file is tracked under
+`src/migrations/`. If the CLI generates a snapshot during local work, treat it as
+a review artifact unless the migration workflow is intentionally changing.
+
 ## Database dumps
 
 `make db-dump` executes `/database/bin/db-dump` inside the `database` container.
