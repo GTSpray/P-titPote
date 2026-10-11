@@ -79,6 +79,8 @@ export const fr = {
   'startup.noTokenEnv': 'no APP_ID provided in env',
   'startup.dm.api': "P'titPote API v{version} démarrée",
   'startup.dm.gateway': "P'titPote Gateway v{version} démarrée",
+  'startup.dm.gatewayFatal':
+    "P'titPote Gateway arrêtée : fermeture fatale {code} ({reason})",
   'register.success': 'success',
   'register.endProcess': 'end process',
 } as const;

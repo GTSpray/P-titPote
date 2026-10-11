@@ -75,7 +75,7 @@ make test
 # Run tests in watch mode
 make testw
 
-# Check formatting
+# Check formatting and TypeScript (tests)
 make lint
 
 # Format the repository with Prettier
@@ -305,7 +305,7 @@ Before proposing a change, verify:
 - User-facing command changes include updated usage docs and scenarios when needed.
 - `make build` passes, or an equivalent local build was attempted.
 - `make test` passes, or failures are explained.
-- `make lint` passes, or formatting changes are provided.
+- `make lint` passes (Prettier + tests TypeScript check), or fixes are provided.
 - No secrets or local-only files are included.
 - No external Discord state was changed unless explicitly requested.
 - Any database migration impact is documented.

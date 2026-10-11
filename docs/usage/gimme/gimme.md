@@ -36,6 +36,12 @@ includes **Voilà.. ce que j'ai trouvé** followed by the gallery.
 #### `/gimme version`
 
 Posts a public text message with a random emoji and the running bot version.
+The bot also adds a `👀` reaction on that reply. If a member adds `👀` on the
+same message, the bot removes their reaction.
+
+The `👀` reaction shows that the bot is receiving Discord events live. If the
+version text appears without `👀`, the bot may be reconnecting: try again in a
+minute.
 
 ![Show version](./gimme-version.gif)
 

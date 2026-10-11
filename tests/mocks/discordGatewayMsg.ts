@@ -84,20 +84,20 @@ export const readyMsg = (d: any): GatewayReadyDispatch => ({
 });
 
 export const heartbeatAckMsg = (): GatewayHeartbeatAck =>
-  <GatewayHeartbeatAck>{
+  ({
     t: null,
     s: null,
     op: GatewayOpcodes.HeartbeatAck,
     d: null, // never but in fact null
-  };
+  }) as unknown as GatewayHeartbeatAck;
 
 export const reconnectMsg = (): GatewayReconnect =>
-  <GatewayReconnect>{
+  ({
     t: null,
     s: null,
     op: GatewayOpcodes.Reconnect,
     d: null, // never but in fact null
-  };
+  }) as unknown as GatewayReconnect;
 
 export const invalidSessionMsg = (d: boolean = false): GatewayInvalidSession =>
   <GatewayInvalidSession>{
@@ -108,12 +108,13 @@ export const invalidSessionMsg = (d: boolean = false): GatewayInvalidSession =>
   };
 
 export const resumedMsg = (): GatewayResumedDispatch =>
-  <GatewayResumedDispatch>{
+  ({
     t: GatewayDispatchEvents.Resumed,
+    s: 1,
     op: GatewayOpcodes.Dispatch,
     d: {
       _trace: [
         '["gateway-prd-arm-us-east1-b-6k49",{"micros":907,"calls":["id_created",{"micros":0,"calls":[]},"session_lookup_time",{"micros":626,"calls":[]},"session_lookup_finished",{"micros":10,"calls":[]},"discord-sessions-prd-2-97",{"micros":12}]}]',
       ],
     },
-  };
+  }) as unknown as GatewayResumedDispatch;
