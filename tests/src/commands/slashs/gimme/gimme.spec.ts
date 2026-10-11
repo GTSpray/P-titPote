@@ -175,7 +175,7 @@ describe('/gimme', () => {
       name: 'version',
       type: 1,
     };
-    const data: emojiModule.gimmeEmojiCommandData = {
+    const data: versionModule.gimmeVersionCommandData = {
       id: randomDiscordId19(),
       name: 'gimme',
       options: [subcommand],

@@ -18,7 +18,11 @@ describe('superviseGateway', () => {
     exit = vi.fn();
     notify = vi.fn().mockResolvedValue(undefined);
     signals = new EventEmitter();
-    superviseGateway(gateway, { exit, notify, signals: signals as any });
+    superviseGateway(gateway, {
+      exit: exit as (code: number) => void,
+      notify: notify as (content: string) => Promise<void>,
+      signals: signals as any,
+    });
   });
 
   afterEach(() => {

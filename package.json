@@ -17,7 +17,7 @@
     "dev:gateway": "nodemon -q dist/src/gateway.js",
     "test": "vitest --config ./vitest.config.ts run",
     "build": "tsc --pretty",
-    "lint": "prettier . --check",
+    "lint": "prettier . --check && tsc -p tests/tsconfig.json --pretty",
     "bundle": "tsc --pretty && tar -czf ptitpote.tar.gz -C $PWD dist/src"
   },
   "mikro-orm": {

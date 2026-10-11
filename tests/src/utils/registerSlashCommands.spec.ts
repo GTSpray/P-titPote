@@ -16,11 +16,11 @@ describe('registerSlashCommands', () => {
   });
 
   afterEach(() => {
-    delete process.env.APP_ID;
+    Reflect.deleteProperty(process.env, 'APP_ID');
   });
 
   it('throws when APP_ID is unset', async () => {
-    delete process.env.APP_ID;
+    Reflect.deleteProperty(process.env, 'APP_ID');
 
     await expect(registerSlashCommands()).rejects.toThrow(
       'no APP_ID provided in env',

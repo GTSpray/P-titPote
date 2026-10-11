@@ -537,8 +537,8 @@ describe('ShardSocket', () => {
         brokenServer = WebSocketServerMock.createInstance();
         brokenSpy = vi.fn();
         identifySpy = vi.fn();
-        brokenServer.on('wsconnection', brokenSpy);
-        server.on('wsconnection', identifySpy);
+        brokenServer.on('wsconnection', brokenSpy as (...args: any[]) => void);
+        server.on('wsconnection', identifySpy as (...args: any[]) => void);
         shardSocket.resumeGatewayUrl = brokenServer.getUrl();
       });
 
@@ -714,7 +714,10 @@ describe('ShardSocket', () => {
 
     it('should not send on a socket that is not open', async () => {
       server.getSpy().mockClear();
-      shardSocket.ws!.readyState = 3;
+      Object.defineProperty(shardSocket.ws!, 'readyState', {
+        configurable: true,
+        value: 3,
+      });
 
       shardSocket.send({ op: GatewayOpcodes.Heartbeat, d: null });
 
@@ -795,10 +798,9 @@ describe('ShardSocket', () => {
       await vi.advanceTimersByTimeAsync(100);
 
       const spy = vi.fn();
-      const event = <GatewayDispatchEvents>(
-        GatewayDispatchEvents[<keyof typeof GatewayDispatchEvents>e]
-      );
-      gateway.on(event, spy);
+      const event =
+        GatewayDispatchEvents[e as keyof typeof GatewayDispatchEvents];
+      gateway.on(event as any, spy);
 
       const expectedEvent = { aPayload: 'expected' };
 

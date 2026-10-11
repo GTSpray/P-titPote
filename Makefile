@@ -147,9 +147,9 @@ ci: os
 	$(DC_CMD_CI) run --entrypoint "" api npm run build
 	$(DC_CMD_CI) up -d --remove-orphans
 
-## Lint all files with Prettier
+## Lint formatting (Prettier) and TypeScript (tests)
 lint: os
-	$(DC_CMD_CI) run --entrypoint "" api npx prettier . --check
+	$(DC_CMD_CI) run --entrypoint "" api npm run lint
 
 ## Run tests (need containers as developpement mode)
 test: os
