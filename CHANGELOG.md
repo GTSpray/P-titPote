@@ -1,3 +1,9 @@
+## [1.12.31](https://github.com/GTSpray/P-titPote/compare/v1.12.30...v1.12.31) (2026-10-12)
+
+### :repeat: Chore
+
+* **deps:** bump conventional-changelog-conventionalcommits from 10.4.0 to 10.4.1 ([#317](https://github.com/GTSpray/P-titPote/issues/317)) ([107a005](https://github.com/GTSpray/P-titPote/commit/107a0059effc2e848c5477d31adaa17386b02b7d))
+
 ## [1.12.30](https://github.com/GTSpray/P-titPote/compare/v1.12.29...v1.12.30) (2026-10-12)
 
 ### :repeat: Chore
