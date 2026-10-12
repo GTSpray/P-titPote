@@ -1,3 +1,13 @@
+## [1.12.28](https://github.com/GTSpray/P-titPote/compare/v1.12.27...v1.12.28) (2026-10-12)
+
+### :memo: Documentation
+
+* **database:** document migration review workflow ([#313](https://github.com/GTSpray/P-titPote/issues/313)) ([216ce32](https://github.com/GTSpray/P-titPote/commit/216ce32759368b98fbb561f33bc8f1446ede4dac))
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group with 5 updates ([#314](https://github.com/GTSpray/P-titPote/issues/314)) ([ea33def](https://github.com/GTSpray/P-titPote/commit/ea33defe781e758af3eea125ecf73c0e31016459))
+
 ## [1.12.27](https://github.com/GTSpray/P-titPote/compare/v1.12.26...v1.12.27) (2026-10-11)
 
 ### :bug: Fixes
