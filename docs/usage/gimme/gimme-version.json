@@ -81,6 +81,45 @@
           }
         ]
       },
+      "holdMs": 800
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "14:10",
+            "slashInvocation": {
+              "user": {
+                "name": "You"
+              },
+              "command": "gimme version"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 32768,
+                "components": [
+                  {
+                    "type": 10,
+                    "content": "Hello here ✨! \nJe suis P'titPote v1.5.24."
+                  }
+                ]
+              }
+            },
+            "reactions": [{ "emoji": "👀", "count": 1 }]
+          }
+        ]
+      },
       "holdMs": 2500
     }
   ],
