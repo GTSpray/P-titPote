@@ -15,6 +15,9 @@ import { Poll } from './db/entities/Poll.entity.js';
 import { PollChoice } from './db/entities/PollChoice.entity.js';
 import { PollStep } from './db/entities/PollStep.entity.js';
 import { PollResp } from './db/entities/PollResp.entity.js';
+import { GuildTrigger } from './db/entities/GuildTrigger.entity.js';
+import { TriggerMessage } from './db/entities/TriggerMessage.entity.js';
+import { TriggerRole } from './db/entities/TriggerRole.entity.js';
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
@@ -54,6 +57,9 @@ const config: Options = defineConfig({
     PollChoice,
     PollStep,
     PollResp,
+    GuildTrigger,
+    TriggerMessage,
+    TriggerRole,
   ],
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),

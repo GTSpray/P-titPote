@@ -13,6 +13,18 @@ export const errorPayload = (content: string) => ({
   },
 });
 
+/** Replace a message-component interaction’s message (clears selects by default). */
+export const updateMessagePayload = (
+  content: string,
+  components: object[] = [],
+) => ({
+  type: InteractionResponseType.UpdateMessage,
+  data: {
+    content,
+    components,
+  },
+});
+
 export const notFoundPayload = () => errorPayload(t('common.notFound'));
 
 export const notAllowed = () => errorPayload(t('common.notAllowed'));

@@ -1,0 +1,86 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "trigger-welcome-message-join",
+  "title": "Trigger — message de bienvenue à l'arrivée d'un membre",
+  "doc": "docs/usage/trigger/trigger.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "général",
+      "type": "text"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Modo",
+      "status": "Online"
+    }
+  },
+  "users": [
+    {
+      "id": "1",
+      "name": "Alex"
+    }
+  ],
+  "actions": [
+    {
+      "type": "wait",
+      "ms": 1200
+    },
+    {
+      "type": "applyState",
+      "holdMs": 1400,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex"
+            },
+            "timestamp": "14:12",
+            "system": {
+              "type": "join",
+              "waveSticker": "wumpus_hello"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 900
+    },
+    {
+      "type": "applyState",
+      "holdMs": 2800,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex"
+            },
+            "timestamp": "14:12",
+            "system": {
+              "type": "join",
+              "waveSticker": "wumpus_hello"
+            }
+          },
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "content": "Bienvenue <@1> !",
+            "timestamp": "14:12"
+          }
+        ]
+      }
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/trigger",
+    "prefix": "trigger-welcome-message-join",
+    "video": true
+  }
+}

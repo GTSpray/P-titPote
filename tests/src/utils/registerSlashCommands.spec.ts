@@ -1,30 +1,23 @@
 import { REST } from 'discord.js';
 import { Routes } from 'discord-api-types/v10';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { slashcommandsRegister } from '../../../src/commands/slash/index.js';
 import { logger } from '../../../src/logger.js';
 import { registerSlashCommands } from '../../../src/utils/registerSlashCommands.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
-import { randomDiscordId19 } from '../../mocks/discord-api/utils.js';
 
 describe('registerSlashCommands', () => {
-  const appId = randomDiscordId19();
-
-  beforeEach(() => {
-    process.env.APP_ID = appId;
-  });
-
-  afterEach(() => {
-    Reflect.deleteProperty(process.env, 'APP_ID');
-  });
+  const appId = process.env.APP_ID!;
 
   it('throws when APP_ID is unset', async () => {
-    Reflect.deleteProperty(process.env, 'APP_ID');
+    vi.stubEnv('APP_ID', '');
 
     await expect(registerSlashCommands()).rejects.toThrow(
       'no APP_ID provided in env',
     );
+
+    vi.unstubAllEnvs();
   });
 
   it('puts application commands then logs success', async () => {

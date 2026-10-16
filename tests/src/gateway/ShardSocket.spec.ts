@@ -38,6 +38,7 @@ const fakeLatency = async (min: number, max: number) => {
 
 const intents =
   GatewayIntentBits.Guilds |
+  GatewayIntentBits.GuildMembers |
   GatewayIntentBits.GuildMessageReactions |
   GatewayIntentBits.GuildMessages |
   GatewayIntentBits.DirectMessages;

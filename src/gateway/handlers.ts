@@ -2,6 +2,7 @@ import {
   GatewayDispatchEvents,
   InteractionType,
   Routes,
+  type GatewayGuildMemberAddDispatchData,
   type GatewayMessageCreateDispatchData,
   type GatewayMessageReactionAddDispatchData,
 } from 'discord-api-types/v10';
@@ -13,6 +14,7 @@ import type { DBServices } from '../db/db.js';
 import { findOrCreateGuild } from '../db/services/discordGuild.service.js';
 import type { GatewaySocket } from './GatewaySocket.js';
 import { GWSEvent } from './gatewaytypes.js';
+import { runGuildTriggers } from './runGuildTriggers.js';
 
 export const PROBE_COMMAND_NAME = 'gimme version';
 export const PROBE_EMOJI = '👀';
@@ -103,6 +105,32 @@ export async function handleGuildCreate(
   }
 }
 
+export async function handleGuildMemberAdd(
+  dbServices: Promise<DBServices>,
+  shard: number,
+  event: GatewayGuildMemberAddDispatchData,
+): Promise<void> {
+  const guildId = event.guild_id;
+  const userId = event.user.id;
+  try {
+    const { orm } = await dbServices;
+    const em = orm.em.fork();
+    await runGuildTriggers(em, event);
+    logger.info('gateway guild_member_add triggers done', {
+      shard,
+      guildId,
+      userId,
+    });
+  } catch (err) {
+    logger.error('gateway guild_member_add triggers failed', {
+      shard,
+      guildId,
+      userId,
+      err,
+    });
+  }
+}
+
 export function registerGatewayHandlers(
   gateway: GatewaySocket,
   dbServices: Promise<DBServices>,
@@ -121,6 +149,10 @@ export function registerGatewayHandlers(
 
   gateway.on(GatewayDispatchEvents.GuildDelete, ({ shard, event }) => {
     logger.info('gateway guild_delete', { shard, event });
+  });
+
+  gateway.on(GatewayDispatchEvents.GuildMemberAdd, ({ shard, event }) => {
+    void handleGuildMemberAdd(dbServices, shard, event);
   });
 
   gateway.on(GatewayDispatchEvents.MessageCreate, ({ event }) => {
