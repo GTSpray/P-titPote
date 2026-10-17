@@ -1,9 +1,50 @@
 # Poll technical workflow
 
-The poll subsystem is a multi-step Discord interaction workflow backed by
-MikroORM entities. It starts from `/poll create`, continues through modal and
-button component handlers, and ends when a moderator publishes a public voting
-message or posts a report.
+The poll subsystem is a multi-step Discord interaction workflow. CTAs stay thin
+Discord adapters; domain work goes through Query / QueryHandler / Computer /
+Repository (same pattern as message aliases).
+
+## Architecture
+
+```mermaid
+flowchart LR
+  CTA["CTA / slash"] --> Q["Query + Zod"]
+  Q --> H["QueryHandler"]
+  H --> C["Computer"]
+  H --> R["Repository ports"]
+  R --> ORM["MikroORM Poll*"]
+  H --> E["PollEntity"]
+```
+
+| Layer | Location |
+| ----- | -------- |
+| Domain entities | `src/entities/poll.entity.ts` |
+| Queries | `src/queries/poll/*.query.ts` (Zod via `parseCommand` → `InvalidCommand`) |
+| Handlers / computers | `src/handlers/poll/` |
+| Repositories | `src/repositories/poll/` (mapper is the only ORM-aware mapper for reads/writes outside locked tx) |
+| Domain errors | `src/errors/poll.errors.ts` |
+
+### Queries
+
+| Query | CTA | Intent |
+| ----- | --- | ------ |
+| `CreatePollQuery` | `pollCreate` (no `pId`) | Create draft + first question |
+| `AppendPollQuestionQuery` | `pollCreate` + question | Append a question |
+| `AppendPollChoicesQuery` | `pollCreate` + choices | Append choices on last step |
+| `GetPollQuery` / `GetPollStepQuery` | `pollAddQ`, `pollAddC`, `pollResp` | Read for modals |
+| `PublishPollQuery` | `pollPub` | Set `publicationDate` |
+| `SubmitPollVoteQuery` | `pollVote` | Upsert member answers (locked) |
+| `ClosePollReportQuery` | `pollSummary` | Close, build report, publish chunks (locked) |
+
+`InvalidCommand` from Query Zod validation is handled in `src/api.ts` (HTTP 400 +
+issues). Domain errors (`PollAlreadyPublishedError`, `PollClosedError`, …) are
+caught in CTAs and mapped to existing Discord payloads.
+
+`SubmitPollVoteQueryHandler` and `ClosePollReportQueryHandler` open
+`em.transactional`, load the guild-scoped poll with
+`LockMode.PESSIMISTIC_WRITE` via `findOneOrFail`, and keep Discord report posting
+inside that transaction. Report markdown is built by `PollReportComputer`;
+channel posts go through an injected `PollReportPublisher`.
 
 ## Intent
 
@@ -88,12 +129,13 @@ paragraph text inputs.
 
 Vote submission and report generation both serialize on the `Poll` row:
 
-- `pollVote` runs in `em.transactional`, loads the guild-scoped poll with
-  `LockMode.PESSIMISTIC_WRITE`, checks the current `endDate` and voter role,
-  then creates or updates the member's `PollResp` rows in the same transaction.
-- `pollSummary` also runs in `em.transactional`, locks the same poll row, closes
-  the poll when it is still open, flushes that close, then reads responses and
-  posts the report.
+- `SubmitPollVoteQueryHandler` runs in `em.transactional`, loads the
+  guild-scoped poll with `LockMode.PESSIMISTIC_WRITE`, checks the current
+  `endDate` and voter role, then creates or updates the member's `PollResp`
+  rows in the same transaction.
+- `ClosePollReportQueryHandler` also runs in `em.transactional`, locks the same
+  poll row, closes the poll when it is still open, flushes that close, then
+  reads responses and posts the report via `PollReportPublisher`.
 
 This shared lock is the boundary between voting and reporting. If a vote is
 already being recorded, the report waits and includes the committed response. If
@@ -103,12 +145,12 @@ transaction and then sees the closed `endDate` instead of writing a response.
 Keep the close, response read, and Discord report posting in the same locked
 transaction unless another consistency boundary replaces it. The lock is held
 while report chunks are posted so stored responses cannot change after the
-report content is built. If Discord rejects a report message, `pollSummary`
+report content is built. If Discord rejects a report message, the handler
 restores the previous `endDate` before returning the failure response.
 
 ## Reports and closing behavior
 
-The **Compte rendu** button is moderator-only. `pollSummary`:
+The **Compte rendu** button is moderator-only. `ClosePollReportQueryHandler`:
 
 1. loads the poll, steps, choices, and all responses;
 2. stores the previous `endDate`;
