@@ -83,6 +83,22 @@ export const fr = {
     "P'titPote Gateway arrêtée : fermeture fatale {code} ({reason})",
   'register.success': 'success',
   'register.endProcess': 'end process',
+  'remind.description': 'Rappel pour remonter un fil oublié',
+  'remind.sub.on.description': 'Active un rappel de remontée sur ce fil',
+  'remind.sub.status.description': 'Affiche le rappel actif sur ce fil',
+  'remind.sub.off.description': 'Désactive le rappel sur ce fil',
+  'remind.option.days': "Jours d'inactivité avant remontée (1-30)",
+  'remind.on.success':
+    "Ok! Je remonterai ce fil s'il reste silencieux {days} jour(s) ;)",
+  'remind.on.alreadyExists': 'Ahem... il y a déjà un rappel sur ce fil 🤷',
+  'remind.on.notThread': 'Ahem... cette commande ne marche que dans un fil 🤷',
+  'remind.on.archived':
+    'Ahem... ce fil est archivé, je ne peux pas y mettre de rappel 🤷',
+  'remind.status.active':
+    "Rappel actif : remontée après {days} jour(s) d'inactivité (par <@{ownerId}>)",
+  'remind.status.inactive': 'Ahem... pas de rappel sur ce fil 🤷',
+  'remind.off.success': 'Ok! Plus de rappel sur ce fil ;)',
+  'remind.bump.message': '⬆️',
 } as const;
 
 export type TranslationKey = keyof typeof fr;

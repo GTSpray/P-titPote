@@ -15,6 +15,7 @@ import { Poll } from './db/entities/Poll.entity.js';
 import { PollChoice } from './db/entities/PollChoice.entity.js';
 import { PollStep } from './db/entities/PollStep.entity.js';
 import { PollResp } from './db/entities/PollResp.entity.js';
+import { ThreadRemind } from './db/entities/ThreadRemind.entity.js';
 
 class CustomLogger extends DefaultLogger {
   logQuery(context: { query: string } & LogContext): void {
@@ -54,6 +55,7 @@ const config: Options = defineConfig({
     PollChoice,
     PollStep,
     PollResp,
+    ThreadRemind,
   ],
   debug: true,
   loggerFactory: (options) => new CustomLogger(options),
