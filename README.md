@@ -187,7 +187,7 @@ These guides describe architecture, services, and implementation details:
 - [`docs/database.md`](docs/database.md) — MikroORM/MariaDB entities, migrations, tests, and runbook
 - [`docs/testing.md`](docs/testing.md) — Vitest setup, database isolation, mocks, and troubleshooting
 - [`docs/logging.md`](docs/logging.md) — Winston log format, transports, correlation, and troubleshooting
-- [`docs/release.md`](docs/release.md) — semantic-release, GHCR image publishing, and container runbook
+- [`docs/release.md`](docs/release.md) — semantic-release, dependency updates, GHCR image publishing, and container runbook
 
 Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
 
@@ -230,7 +230,7 @@ P-titPote/
 │   ├── database.md              # Database and migration runbook
 │   ├── testing.md               # Vitest and test infrastructure guide
 │   ├── logging.md               # Logging and observability guide
-│   └── release.md               # Release and container image runbook
+│   └── release.md               # Release, dependency update, and container image runbook
 ├── site/                        # VitePress user docs (GitHub Pages)
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts
