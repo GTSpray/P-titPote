@@ -1,3 +1,14 @@
+## [1.12.33](https://github.com/GTSpray/P-titPote/compare/v1.12.32...v1.12.33) (2026-10-19)
+
+### :memo: Documentation
+
+* **gimme:** show 👀 probe reaction in version scenario ([#319](https://github.com/GTSpray/P-titPote/issues/319)) ([5bde3ec](https://github.com/GTSpray/P-titPote/commit/5bde3ecc17a85aa9faad4cc125b553ca75ef23a2))
+* **release:** document dependency update workflow ([#320](https://github.com/GTSpray/P-titPote/issues/320)) ([774f860](https://github.com/GTSpray/P-titPote/commit/774f86084d36bd1790688ddf28acbbe3445aa85f))
+
+### :repeat: Chore
+
+* **deps:** bump prettier from 3.9.9 to 3.9.10 ([#324](https://github.com/GTSpray/P-titPote/issues/324)) ([2e5d8fb](https://github.com/GTSpray/P-titPote/commit/2e5d8fb3946d01e8a39fcba2bc03235ab4284b32))
+
 ## [1.12.32](https://github.com/GTSpray/P-titPote/compare/v1.12.31...v1.12.32) (2026-10-12)
 
 ### :repeat: Chore
