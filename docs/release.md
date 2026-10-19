@@ -42,6 +42,45 @@ The explicit commit analyzer rules are:
 Release notes group additional commit types such as `docs`, `ci`, and `style`,
 but a Docker image is pushed only when semantic-release produces a new version.
 
+## Dependency updates
+
+Dependabot is configured in `.github/dependabot.yml` to check three ecosystems
+weekly:
+
+| Ecosystem      | Scope                                    | Notes                                           |
+| -------------- | ---------------------------------------- | ----------------------------------------------- |
+| npm            | `/package.json` and `/package-lock.json` | `@mikro-orm/*` packages are grouped together.   |
+| Docker         | Dockerfiles under `/docker/**/*`         | Used by local, CI, and production image builds. |
+| GitHub Actions | workflows under `.github/workflows/`     | Uses the `chore(deps): ` commit-message prefix. |
+
+Most npm and GitHub Actions dependency PRs use `chore(deps): ...`. Because
+`chore` is mapped to a patch release, merging one to `main` normally creates a
+new GitHub release and GHCR image. Docker dependency PRs affect future local,
+CI, and release image builds even when application code is unchanged; a
+Docker-only PR with a non-releasing commit type will not publish a new GHCR image
+until another releasing commit lands.
+
+Review dependency updates as operational changes:
+
+- Keep npm updates paired with the generated `package-lock.json`; do not edit
+  the lockfile by hand.
+- Run the normal quality gate (`make build`, `make test`, `make lint`) before
+  merge. For docs-only or Docker-unavailable environments, use the closest local
+  npm checks and let CI verify the Compose path.
+- For MikroORM bumps, also run `make db-check` after a build and review
+  [`docs/database.md`](database.md) for migration/snapshot expectations.
+- For Docker base image or MariaDB image bumps, confirm `make ci` can build and
+  start the Compose stack, then check both `api` and `gateway` logs.
+- For GitHub Actions bumps, inspect permission changes and action release notes;
+  do not broaden workflow permissions just to satisfy an update.
+
+Node version drift is the most common local pitfall. The app declares
+`"node": ">=22.x"`, CI workflows request Node.js 22, and the runtime image uses
+`node:26-slim`. `actions/setup-node` resolves the latest matching 22.x release,
+but a developer's older local 22.x can still trigger npm engine warnings from
+newer dev tools. Prefer upgrading local Node or using the Docker Makefile
+targets instead of bypassing engine checks.
+
 ## Container image
 
 `docker/ptitpote/Dockerfile` builds the application from source for production.
