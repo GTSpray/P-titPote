@@ -4,7 +4,7 @@
 
 # P'tit Pote
 
-**P'tit Pote** is a Discord bot for polls, reusable message aliases, join
+**P'tit Pote** is a Discord bot for polls, reusable message aliases, event based
 triggers, and a few utility commands.
 
 These guides are for server members and moderators. They describe command
