@@ -17,6 +17,12 @@
       "status": "Online"
     }
   },
+  "users": [
+    {
+      "id": "1",
+      "name": "Modo"
+    }
+  ],
   "defaults": {
     "botPendingText": "Envoi de la commande..."
   },
@@ -476,7 +482,7 @@
               "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
             },
             "timestamp": "14:11",
-            "content": "Bienvenue <@Modo> !"
+            "content": "Bienvenue <@1> !"
           }
         ]
       },
