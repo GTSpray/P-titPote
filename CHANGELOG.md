@@ -1,3 +1,9 @@
+## [1.12.34](https://github.com/GTSpray/P-titPote/compare/v1.12.33...v1.12.34) (2026-10-19)
+
+### :repeat: Chore
+
+* **deps:** bump the mikro-orm group across 1 directory with 5 updates ([#321](https://github.com/GTSpray/P-titPote/issues/321)) ([630b420](https://github.com/GTSpray/P-titPote/commit/630b420cdc726fff5d2d983c19c0491f5f99a0b7))
+
 ## [1.12.33](https://github.com/GTSpray/P-titPote/compare/v1.12.32...v1.12.33) (2026-10-19)
 
 ### :memo: Documentation
