@@ -56,11 +56,71 @@ export const trigMenu: ModalHandlerDelcaration<CTASelectData> = {
       });
     }
 
-    if (parsed.data.action === 'create') {
-      return res.json(
-        updateMessagePayload(
-          selectedContent('create', t('trigger.create.chooseKind')),
-          [
+    const { action } = parsed.data;
+
+    switch (action) {
+      case 'create':
+        return res.json(
+          updateMessagePayload(
+            selectedContent('create', t('trigger.create.chooseKind')),
+            [
+              {
+                type: ComponentType.ActionRow,
+                components: [
+                  {
+                    type: ComponentType.StringSelect,
+                    custom_id: JSON.stringify({
+                      t: 'cta',
+                      d: { a: 'trigSetType' },
+                    }),
+                    placeholder: t('trigger.modal.select.kind.placeholder'),
+                    options: [
+                      {
+                        label: t('trigger.kind.welcome_message'),
+                        value: 'welcome_message',
+                      },
+                      {
+                        label: t('trigger.kind.welcome_role'),
+                        value: 'welcome_role',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ),
+        );
+
+      case 'update':
+      case 'enable':
+      case 'disable':
+      case 'delete': {
+        if (!dbServices) {
+          return res.status(500).json({
+            error: t('errors.unmetResult'),
+          });
+        }
+
+        const em = dbServices.orm.em.fork();
+        const triggers = await em.find(
+          GuildTrigger,
+          { server: { guildId } },
+          { orderBy: { name: 'ASC' } },
+        );
+
+        if (triggers.length === 0) {
+          return res.json(
+            updateMessagePayload(selectedContent(action, t('common.notFound'))),
+          );
+        }
+
+        const nextKey: TranslationKey =
+          action === 'update'
+            ? 'trigger.update.chooseTrigger'
+            : 'trigger.lifecycle.chooseTrigger';
+
+        return res.json(
+          updateMessagePayload(selectedContent(action, t(nextKey)), [
             {
               type: ComponentType.ActionRow,
               components: [
@@ -68,70 +128,16 @@ export const trigMenu: ModalHandlerDelcaration<CTASelectData> = {
                   type: ComponentType.StringSelect,
                   custom_id: JSON.stringify({
                     t: 'cta',
-                    d: { a: 'trigSetType' },
+                    d: { a: 'trigPick', act: action },
                   }),
-                  placeholder: t('trigger.modal.select.kind.placeholder'),
-                  options: [
-                    {
-                      label: t('trigger.kind.welcome_message'),
-                      value: 'welcome_message',
-                    },
-                    {
-                      label: t('trigger.kind.welcome_role'),
-                      value: 'welcome_role',
-                    },
-                  ],
+                  placeholder: t('trigger.modal.select.trigger.placeholder'),
+                  options: triggerSelectOptions(triggers),
                 },
               ],
             },
-          ],
-        ),
-      );
+          ]),
+        );
+      }
     }
-
-    if (!dbServices) {
-      return res.status(500).json({
-        error: t('errors.unmetResult'),
-      });
-    }
-
-    const em = dbServices.orm.em.fork();
-    const triggers = await em.find(
-      GuildTrigger,
-      { server: { guildId } },
-      { orderBy: { name: 'ASC' } },
-    );
-
-    if (triggers.length === 0) {
-      return res.json(
-        updateMessagePayload(
-          selectedContent(parsed.data.action, t('common.notFound')),
-        ),
-      );
-    }
-
-    const contentKey =
-      parsed.data.action === 'update'
-        ? 'trigger.update.chooseTrigger'
-        : 'trigger.lifecycle.chooseTrigger';
-
-    return res.json(
-      updateMessagePayload(selectedContent(parsed.data.action, t(contentKey)), [
-        {
-          type: ComponentType.ActionRow,
-          components: [
-            {
-              type: ComponentType.StringSelect,
-              custom_id: JSON.stringify({
-                t: 'cta',
-                d: { a: 'trigPick', act: parsed.data.action },
-              }),
-              placeholder: t('trigger.modal.select.trigger.placeholder'),
-              options: triggerSelectOptions(triggers),
-            },
-          ],
-        },
-      ]),
-    );
   },
 };
