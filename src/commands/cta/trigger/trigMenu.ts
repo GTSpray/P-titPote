@@ -1,6 +1,8 @@
 import * as z from 'zod';
 import { ComponentType } from 'discord-api-types/v10';
+import type { Response } from 'express';
 import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
+import type { DBServices } from '../../../db/db.js';
 import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
@@ -15,6 +17,7 @@ const ValidTriggerMenu = z.object({
 });
 
 type TriggerMenuAction = z.infer<typeof ValidTriggerMenu>['action'];
+type TriggerPickAction = Exclude<TriggerMenuAction, 'create'>;
 
 const actionLabelKey: Record<TriggerMenuAction, TranslationKey> = {
   create: 'trigger.action.create',
@@ -29,6 +32,88 @@ const selectedContent = (action: TriggerMenuAction, next: string) =>
     choice: t(actionLabelKey[action]),
     next,
   });
+
+const unmetResult = (res: Response) =>
+  res.status(500).json({
+    error: t('errors.unmetResult'),
+  });
+
+const handleCreate = (res: Response) =>
+  res.json(
+    updateMessagePayload(
+      selectedContent('create', t('trigger.create.chooseKind')),
+      [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.StringSelect,
+              custom_id: JSON.stringify({
+                t: 'cta',
+                d: { a: 'trigSetType' },
+              }),
+              placeholder: t('trigger.modal.select.kind.placeholder'),
+              options: [
+                {
+                  label: triggerKindLabel(GuildTriggerKind.WelcomeMessage),
+                  value: GuildTriggerKind.WelcomeMessage,
+                },
+                {
+                  label: triggerKindLabel(GuildTriggerKind.WelcomeRole),
+                  value: GuildTriggerKind.WelcomeRole,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    ),
+  );
+
+const handlePickTrigger = async (
+  res: Response,
+  dbServices: DBServices | undefined,
+  guildId: string,
+  action: TriggerPickAction,
+) => {
+  if (!dbServices) {
+    return unmetResult(res);
+  }
+
+  const triggers = await dbServices.orm.em
+    .fork()
+    .find(GuildTrigger, { server: { guildId } }, { orderBy: { name: 'ASC' } });
+
+  if (triggers.length === 0) {
+    return res.json(
+      updateMessagePayload(selectedContent(action, t('common.notFound'))),
+    );
+  }
+
+  const nextKey: TranslationKey =
+    action === 'update'
+      ? 'trigger.update.chooseTrigger'
+      : 'trigger.lifecycle.chooseTrigger';
+
+  return res.json(
+    updateMessagePayload(selectedContent(action, t(nextKey)), [
+      {
+        type: ComponentType.ActionRow,
+        components: [
+          {
+            type: ComponentType.StringSelect,
+            custom_id: JSON.stringify({
+              t: 'cta',
+              d: { a: 'trigPick', act: action },
+            }),
+            placeholder: t('trigger.modal.select.trigger.placeholder'),
+            options: triggerSelectOptions(triggers),
+          },
+        ],
+      },
+    ]),
+  );
+};
 
 export const trigMenu: ModalHandlerDelcaration<CTASelectData> = {
   async handler({ req, res, dbServices }) {
@@ -53,95 +138,26 @@ export const trigMenu: ModalHandlerDelcaration<CTASelectData> = {
     }
 
     if (!guildId) {
-      return res.status(500).json({
-        error: t('errors.unmetResult'),
-      });
+      return unmetResult(res);
     }
 
     const { action } = parsed.data;
 
+    let resp: Response;
     switch (action) {
       case 'create':
-        return res.json(
-          updateMessagePayload(
-            selectedContent('create', t('trigger.create.chooseKind')),
-            [
-              {
-                type: ComponentType.ActionRow,
-                components: [
-                  {
-                    type: ComponentType.StringSelect,
-                    custom_id: JSON.stringify({
-                      t: 'cta',
-                      d: { a: 'trigSetType' },
-                    }),
-                    placeholder: t('trigger.modal.select.kind.placeholder'),
-                    options: [
-                      {
-                        label: triggerKindLabel(
-                          GuildTriggerKind.WelcomeMessage,
-                        ),
-                        value: GuildTriggerKind.WelcomeMessage,
-                      },
-                      {
-                        label: triggerKindLabel(GuildTriggerKind.WelcomeRole),
-                        value: GuildTriggerKind.WelcomeRole,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          ),
-        );
-
+        resp = handleCreate(res);
+        break;
       case 'update':
       case 'enable':
       case 'disable':
-      case 'delete': {
-        if (!dbServices) {
-          return res.status(500).json({
-            error: t('errors.unmetResult'),
-          });
-        }
-
-        const em = dbServices.orm.em.fork();
-        const triggers = await em.find(
-          GuildTrigger,
-          { server: { guildId } },
-          { orderBy: { name: 'ASC' } },
-        );
-
-        if (triggers.length === 0) {
-          return res.json(
-            updateMessagePayload(selectedContent(action, t('common.notFound'))),
-          );
-        }
-
-        const nextKey: TranslationKey =
-          action === 'update'
-            ? 'trigger.update.chooseTrigger'
-            : 'trigger.lifecycle.chooseTrigger';
-
-        return res.json(
-          updateMessagePayload(selectedContent(action, t(nextKey)), [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.StringSelect,
-                  custom_id: JSON.stringify({
-                    t: 'cta',
-                    d: { a: 'trigPick', act: action },
-                  }),
-                  placeholder: t('trigger.modal.select.trigger.placeholder'),
-                  options: triggerSelectOptions(triggers),
-                },
-              ],
-            },
-          ]),
-        );
-      }
+      case 'delete':
+        resp = await handlePickTrigger(res, dbServices, guildId, action);
+        break;
+      default:
+        resp = unmetResult(res);
     }
+
+    return resp;
   },
 };
