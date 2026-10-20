@@ -217,15 +217,27 @@ export const trigPick: ModalHandlerDelcaration<CTASelectData> = {
       );
     }
 
+    let rep: Response;
     switch (act) {
       case 'update':
-        return handleUpdate(res, trigger);
+        rep = handleUpdate(res, trigger);
+        break;
       case 'enable':
-        return handleEnable(req, res, em, trigger, name);
+        rep = await handleEnable(req, res, em, trigger, name);
+        break;
       case 'disable':
-        return handleDisable(req, res, em, trigger, name);
+        rep = await handleDisable(req, res, em, trigger, name);
+        break;
       case 'delete':
-        return handleDelete(req, res, em, trigger, name);
+        rep = await handleDelete(req, res, em, trigger, name);
+        break;
+      default:
+        rep = res.status(500).json({
+          error: t('errors.unmetResult'),
+        });
+        break;
     }
+
+    return rep;
   },
 };
