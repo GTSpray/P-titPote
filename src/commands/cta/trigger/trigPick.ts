@@ -3,10 +3,10 @@ import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
-  Routes,
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10';
+import type { EntityManager } from '@mikro-orm/core';
 import type { Request, Response } from 'express';
 import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
 import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
@@ -15,46 +15,159 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { triggerNameSchema } from '../../../utils/triggerName.js';
-import { discordapi } from '../../../utils/discordapi.js';
+import { dismissEphemeralSelect } from '../../../utils/dismissEphemeralSelect.js';
 
 const ValidTriggerPick = z.object({
   act: z.enum(['update', 'enable', 'disable', 'delete']),
   name: triggerNameSchema,
 });
 
-/** Public channel confirmation (not ephemeral). */
-const okPublic = (content: string) => ({
-  type: InteractionResponseType.ChannelMessageWithSource,
+const respondPublicOk = (req: Request, res: Response, content: string) => {
+  const response = res.json({
+    type: InteractionResponseType.ChannelMessageWithSource,
+    data: {
+      flags: MessageFlags.IsComponentsV2,
+      components: [
+        {
+          type: ComponentType.TextDisplay,
+          content,
+        },
+      ],
+    },
+  });
+  dismissEphemeralSelect(req);
+  return response;
+};
+
+const welcomeMessageUpdateModal = (trigger: GuildTrigger) => ({
+  type: InteractionResponseType.Modal,
   data: {
-    flags: MessageFlags.IsComponentsV2,
+    custom_id: JSON.stringify({
+      t: 'cta',
+      d: { a: 'trigSetWelMsg', n: trigger.name },
+    }),
+    title: t('trigger.modal.config.welcome_message.title'),
     components: [
       {
-        type: ComponentType.TextDisplay,
-        content,
+        type: ComponentType.Label,
+        label: t('trigger.modal.label.channel'),
+        component: {
+          type: ComponentType.ChannelSelect,
+          custom_id: 'channel',
+          required: true,
+          ...(trigger.messageConfig?.channelId
+            ? {
+                default_values: [
+                  {
+                    id: trigger.messageConfig.channelId,
+                    type: SelectMenuDefaultValueType.Channel,
+                  },
+                ],
+              }
+            : {}),
+        },
+      },
+      {
+        type: ComponentType.Label,
+        label: t('trigger.modal.label.message'),
+        description: t('trigger.modal.description.message'),
+        component: {
+          type: ComponentType.TextInput,
+          custom_id: 'message',
+          style: TextInputStyle.Paragraph,
+          min_length: 1,
+          max_length: 2000,
+          required: true,
+          value: trigger.messageConfig?.message?.slice(0, 2000),
+        },
       },
     ],
   },
 });
 
-/** Drop the ephemeral select menu after a public confirmation response. */
-const dismissEphemeralSelect = (req: Request) => {
-  const applicationId = req.body.application_id as string | undefined;
-  const token = req.body.token as string | undefined;
-  const messageId = req.body.message?.id as string | undefined;
-  if (!applicationId || !token || !messageId) {
-    return;
+const welcomeRoleUpdateModal = (trigger: GuildTrigger) => ({
+  type: InteractionResponseType.Modal,
+  data: {
+    custom_id: JSON.stringify({
+      t: 'cta',
+      d: { a: 'trigSetWelRole', n: trigger.name },
+    }),
+    title: t('trigger.modal.config.welcome_role.title'),
+    components: [
+      {
+        type: ComponentType.Label,
+        label: t('trigger.modal.label.role'),
+        component: {
+          type: ComponentType.RoleSelect,
+          custom_id: 'role',
+          required: true,
+          ...(trigger.roleConfig?.roleId
+            ? {
+                default_values: [
+                  {
+                    id: trigger.roleConfig.roleId,
+                    type: SelectMenuDefaultValueType.Role,
+                  },
+                ],
+              }
+            : {}),
+        },
+      },
+    ],
+  },
+});
+
+const handleUpdate = (res: Response, trigger: GuildTrigger) => {
+  if (trigger.kind === 'welcome_message') {
+    return res.json(welcomeMessageUpdateModal(trigger));
   }
-  void discordapi
-    .delete(Routes.webhookMessage(applicationId, token, messageId))
-    .catch((error) => {
-      logger.error(error);
-    });
+  return res.json(welcomeRoleUpdateModal(trigger));
 };
 
-const respondPublicOk = (req: Request, res: Response, content: string) => {
-  const response = res.json(okPublic(content));
-  dismissEphemeralSelect(req);
-  return response;
+const handleEnable = async (
+  req: Request,
+  res: Response,
+  em: EntityManager,
+  trigger: GuildTrigger,
+  name: string,
+) => {
+  if (trigger.enabled) {
+    return res.json(
+      updateMessagePayload(t('trigger.lifecycle.alreadyEnabled', { name })),
+    );
+  }
+  trigger.enabled = true;
+  await em.persist(trigger).flush();
+  return respondPublicOk(req, res, t('trigger.lifecycle.enabled', { name }));
+};
+
+const handleDisable = async (
+  req: Request,
+  res: Response,
+  em: EntityManager,
+  trigger: GuildTrigger,
+  name: string,
+) => {
+  if (!trigger.enabled) {
+    return res.json(
+      updateMessagePayload(t('trigger.lifecycle.alreadyDisabled', { name })),
+    );
+  }
+  trigger.enabled = false;
+  await em.persist(trigger).flush();
+  return respondPublicOk(req, res, t('trigger.lifecycle.disabled', { name }));
+};
+
+const handleDelete = async (
+  req: Request,
+  res: Response,
+  em: EntityManager,
+  trigger: GuildTrigger,
+  name: string,
+) => {
+  trigger.deletedAt = new Date();
+  await em.persist(trigger).flush();
+  return respondPublicOk(req, res, t('trigger.lifecycle.deleted', { name }));
 };
 
 export const trigPick: ModalHandlerDelcaration<CTASelectData> = {
@@ -86,150 +199,33 @@ export const trigPick: ModalHandlerDelcaration<CTASelectData> = {
       });
     }
 
+    const { act, name } = parsed.data;
+
     const em = dbServices.orm.em.fork();
     const trigger = await em.findOne(
       GuildTrigger,
       {
         server: { guildId },
-        name: parsed.data.name,
+        name,
       },
       { populate: ['messageConfig', 'roleConfig'] },
     );
 
     if (!trigger) {
       return res.json(
-        updateMessagePayload(
-          t('trigger.lifecycle.notFound', { name: parsed.data.name }),
-        ),
+        updateMessagePayload(t('trigger.lifecycle.notFound', { name })),
       );
     }
 
-    if (parsed.data.act === 'update') {
-      if (trigger.kind === 'welcome_message') {
-        return res.json({
-          type: InteractionResponseType.Modal,
-          data: {
-            custom_id: JSON.stringify({
-              t: 'cta',
-              d: { a: 'trigSetWelMsg', n: trigger.name },
-            }),
-            title: t('trigger.modal.config.welcome_message.title'),
-            components: [
-              {
-                type: ComponentType.Label,
-                label: t('trigger.modal.label.channel'),
-                component: {
-                  type: ComponentType.ChannelSelect,
-                  custom_id: 'channel',
-                  required: true,
-                  ...(trigger.messageConfig?.channelId
-                    ? {
-                        default_values: [
-                          {
-                            id: trigger.messageConfig.channelId,
-                            type: SelectMenuDefaultValueType.Channel,
-                          },
-                        ],
-                      }
-                    : {}),
-                },
-              },
-              {
-                type: ComponentType.Label,
-                label: t('trigger.modal.label.message'),
-                description: t('trigger.modal.description.message'),
-                component: {
-                  type: ComponentType.TextInput,
-                  custom_id: 'message',
-                  style: TextInputStyle.Paragraph,
-                  min_length: 1,
-                  max_length: 2000,
-                  required: true,
-                  value: trigger.messageConfig?.message?.slice(0, 2000),
-                },
-              },
-            ],
-          },
-        });
-      }
-
-      return res.json({
-        type: InteractionResponseType.Modal,
-        data: {
-          custom_id: JSON.stringify({
-            t: 'cta',
-            d: { a: 'trigSetWelRole', n: trigger.name },
-          }),
-          title: t('trigger.modal.config.welcome_role.title'),
-          components: [
-            {
-              type: ComponentType.Label,
-              label: t('trigger.modal.label.role'),
-              component: {
-                type: ComponentType.RoleSelect,
-                custom_id: 'role',
-                required: true,
-                ...(trigger.roleConfig?.roleId
-                  ? {
-                      default_values: [
-                        {
-                          id: trigger.roleConfig.roleId,
-                          type: SelectMenuDefaultValueType.Role,
-                        },
-                      ],
-                    }
-                  : {}),
-              },
-            },
-          ],
-        },
-      });
+    switch (act) {
+      case 'update':
+        return handleUpdate(res, trigger);
+      case 'enable':
+        return handleEnable(req, res, em, trigger, name);
+      case 'disable':
+        return handleDisable(req, res, em, trigger, name);
+      case 'delete':
+        return handleDelete(req, res, em, trigger, name);
     }
-
-    if (parsed.data.act === 'enable') {
-      if (trigger.enabled) {
-        return res.json(
-          updateMessagePayload(
-            t('trigger.lifecycle.alreadyEnabled', {
-              name: parsed.data.name,
-            }),
-          ),
-        );
-      }
-      trigger.enabled = true;
-      await em.persist(trigger).flush();
-      return respondPublicOk(
-        req,
-        res,
-        t('trigger.lifecycle.enabled', { name: parsed.data.name }),
-      );
-    }
-
-    if (parsed.data.act === 'disable') {
-      if (!trigger.enabled) {
-        return res.json(
-          updateMessagePayload(
-            t('trigger.lifecycle.alreadyDisabled', {
-              name: parsed.data.name,
-            }),
-          ),
-        );
-      }
-      trigger.enabled = false;
-      await em.persist(trigger).flush();
-      return respondPublicOk(
-        req,
-        res,
-        t('trigger.lifecycle.disabled', { name: parsed.data.name }),
-      );
-    }
-
-    trigger.deletedAt = new Date();
-    await em.persist(trigger).flush();
-    return respondPublicOk(
-      req,
-      res,
-      t('trigger.lifecycle.deleted', { name: parsed.data.name }),
-    );
   },
 };
