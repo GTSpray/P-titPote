@@ -26,7 +26,7 @@ import {
   assertBotCanAssignRole,
   BotCannotAssignRoleError,
 } from '../../../utils/assertBotCanAssignRole.js';
-import { triggerNameSchema } from '../../../utils/triggerName.js';
+import { triggerNameSchema } from '../../../trigger/triggerName.js';
 
 const ensureAssignableRole = async (guildId: string, roleId: string) => {
   try {

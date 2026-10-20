@@ -27,7 +27,7 @@ import {
   assertBotCanPostInChannel,
   BotCannotPostInChannelError,
 } from '../../../utils/assertBotCanPostInChannel.js';
-import { triggerNameSchema } from '../../../utils/triggerName.js';
+import { triggerNameSchema } from '../../../trigger/triggerName.js';
 
 const ensurePostableChannel = async (guildId: string, channelId: string) => {
   try {

@@ -1,4 +1,4 @@
-import { interpolateTriggerMessage } from '../../../src/utils/interpolateTriggerMessage.js';
+import { interpolateTriggerMessage } from '../../../src/trigger/interpolateTriggerMessage.js';
 
 describe('interpolateTriggerMessage', () => {
   it('should replace placeholders', () => {

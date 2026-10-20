@@ -6,7 +6,7 @@ import {
 import type { EntityManager } from '@mikro-orm/core';
 import { GuildTrigger } from '../db/entities/GuildTrigger.entity.js';
 import { discordapi } from '../utils/discordapi.js';
-import { interpolateTriggerMessage } from '../utils/interpolateTriggerMessage.js';
+import { interpolateTriggerMessage } from '../trigger/interpolateTriggerMessage.js';
 import { logger } from '../logger.js';
 
 export const runGuildTriggers = async (

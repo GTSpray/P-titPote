@@ -15,8 +15,8 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { discordapi } from '../../../utils/discordapi.js';
-import { interpolateTriggerMessage } from '../../../utils/interpolateTriggerMessage.js';
-import { triggerNameSchema } from '../../../utils/triggerName.js';
+import { interpolateTriggerMessage } from '../../../trigger/interpolateTriggerMessage.js';
+import { triggerNameSchema } from '../../../trigger/triggerName.js';
 
 const ValidPreview = z.object({
   name: triggerNameSchema,
