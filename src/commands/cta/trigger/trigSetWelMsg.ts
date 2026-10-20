@@ -28,6 +28,8 @@ import {
   BotCannotPostInChannelError,
 } from '../../../utils/assertBotCanPostInChannel.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
+import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 
 const ensurePostableChannel = async (guildId: string, channelId: string) => {
   try {
@@ -134,7 +136,7 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
         {
           server: { guildId },
           name: parsed.data.name,
-          kind: 'welcome_message',
+          kind: GuildTriggerKind.WelcomeMessage,
         },
         { populate: ['messageConfig', 'roleConfig'] },
       );
@@ -223,7 +225,10 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
         return res.json(channelError);
       }
 
-      const trigger = new GuildTrigger(parsed.data.name, 'welcome_message');
+      const trigger = new GuildTrigger(
+        parsed.data.name,
+        GuildTriggerKind.WelcomeMessage,
+      );
       const messageConfig = new TriggerMessage(
         parsed.data.channelId,
         parsed.data.message,
@@ -237,7 +242,7 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
         okConfirm(
           t('trigger.lifecycle.created', {
             name: parsed.data.name,
-            kind: t('trigger.kind.welcome_message'),
+            kind: triggerKindLabel(GuildTriggerKind.WelcomeMessage),
           }),
           parsed.data.name,
         ),

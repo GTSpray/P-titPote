@@ -6,6 +6,8 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t, type TranslationKey } from '../../../i18n/index.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
+import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 import { triggerSelectOptions } from './triggerSelectOptions.js';
 
 const ValidTriggerMenu = z.object({
@@ -76,12 +78,14 @@ export const trigMenu: ModalHandlerDelcaration<CTASelectData> = {
                     placeholder: t('trigger.modal.select.kind.placeholder'),
                     options: [
                       {
-                        label: t('trigger.kind.welcome_message'),
-                        value: 'welcome_message',
+                        label: triggerKindLabel(
+                          GuildTriggerKind.WelcomeMessage,
+                        ),
+                        value: GuildTriggerKind.WelcomeMessage,
                       },
                       {
-                        label: t('trigger.kind.welcome_role'),
-                        value: 'welcome_role',
+                        label: triggerKindLabel(GuildTriggerKind.WelcomeRole),
+                        value: GuildTriggerKind.WelcomeRole,
                       },
                     ],
                   },

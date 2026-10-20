@@ -17,6 +17,7 @@ import { t } from '../../../i18n/index.js';
 import { discordapi } from '../../../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../../../trigger/interpolateTriggerMessage.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 
 const ValidPreview = z.object({
   name: triggerNameSchema,
@@ -53,7 +54,7 @@ export const trigPreviewWelMsg: ModalHandlerDelcaration<CTASelectData> = {
       {
         server: { guildId },
         name: parsed.data.name,
-        kind: 'welcome_message',
+        kind: GuildTriggerKind.WelcomeMessage,
       },
       { populate: ['messageConfig'] },
     );

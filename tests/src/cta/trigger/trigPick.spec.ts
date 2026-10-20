@@ -21,6 +21,7 @@ import {
 } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
 import {
@@ -70,7 +71,7 @@ describe('cta/trigPick', () => {
     em = orm.em.fork();
 
     const guild = new DiscordGuild(guild_id);
-    trigger = new GuildTrigger('welcome', 'welcome_message');
+    trigger = new GuildTrigger('welcome', GuildTriggerKind.WelcomeMessage);
     const messageConfig = new TriggerMessage(channelId, 'Bienvenue {user}');
     messageConfig.trigger = trigger;
     trigger.messageConfig = messageConfig;
@@ -127,7 +128,10 @@ describe('cta/trigPick', () => {
 
   it('should open update role modal with role preselected', async () => {
     const roleId = randomDiscordId19();
-    const roleTrigger = new GuildTrigger('member', 'welcome_role');
+    const roleTrigger = new GuildTrigger(
+      'member',
+      GuildTriggerKind.WelcomeRole,
+    );
     const roleConfig = new TriggerRole(roleId);
     roleConfig.trigger = roleTrigger;
     roleTrigger.roleConfig = roleConfig;

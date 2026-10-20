@@ -15,6 +15,7 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 import { dismissEphemeralSelect } from '../../../utils/dismissEphemeralSelect.js';
 
 const ValidTriggerPick = z.object({
@@ -118,7 +119,7 @@ const welcomeRoleUpdateModal = (trigger: GuildTrigger) => ({
 });
 
 const handleUpdate = (res: Response, trigger: GuildTrigger) => {
-  if (trigger.kind === 'welcome_message') {
+  if (trigger.kind === GuildTriggerKind.WelcomeMessage) {
     return res.json(welcomeMessageUpdateModal(trigger));
   }
   return res.json(welcomeRoleUpdateModal(trigger));

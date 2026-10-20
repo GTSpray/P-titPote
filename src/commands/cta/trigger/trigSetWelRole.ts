@@ -27,6 +27,8 @@ import {
   BotCannotAssignRoleError,
 } from '../../../utils/assertBotCanAssignRole.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
+import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 
 const ensureAssignableRole = async (guildId: string, roleId: string) => {
   try {
@@ -109,7 +111,7 @@ export const trigSetWelRole: ModalHandlerDelcaration<CTAData> = {
         {
           server: { guildId },
           name: parsed.data.name,
-          kind: 'welcome_role',
+          kind: GuildTriggerKind.WelcomeRole,
         },
         { populate: ['messageConfig', 'roleConfig'] },
       );
@@ -184,7 +186,10 @@ export const trigSetWelRole: ModalHandlerDelcaration<CTAData> = {
         return res.json(roleError);
       }
 
-      const trigger = new GuildTrigger(parsed.data.name, 'welcome_role');
+      const trigger = new GuildTrigger(
+        parsed.data.name,
+        GuildTriggerKind.WelcomeRole,
+      );
       const roleConfig = new TriggerRole(parsed.data.roleId);
       roleConfig.trigger = trigger;
       trigger.roleConfig = roleConfig;
@@ -195,7 +200,7 @@ export const trigSetWelRole: ModalHandlerDelcaration<CTAData> = {
         okText(
           t('trigger.lifecycle.created', {
             name: parsed.data.name,
-            kind: t('trigger.kind.welcome_role'),
+            kind: triggerKindLabel(GuildTriggerKind.WelcomeRole),
           }),
         ),
       );

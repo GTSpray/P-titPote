@@ -7,7 +7,48 @@ import type { EntityManager } from '@mikro-orm/core';
 import { GuildTrigger } from '../db/entities/GuildTrigger.entity.js';
 import { discordapi } from '../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../trigger/interpolateTriggerMessage.js';
+import {
+  GuildTriggerKind,
+  GUILD_TRIGGER_KINDS,
+} from '../trigger/GuildTriggerKind.js';
 import { logger } from '../logger.js';
+
+type TriggerRunContext = {
+  guildId: string;
+  userId: string;
+  username: string;
+  serverName: string;
+};
+
+const runWelcomeRole = async (
+  trigger: GuildTrigger,
+  { guildId, userId }: TriggerRunContext,
+): Promise<void> => {
+  const roleId = trigger.roleConfig?.roleId;
+  if (!roleId) {
+    return;
+  }
+  await discordapi.put(Routes.guildMemberRole(guildId, userId, roleId));
+};
+
+const runWelcomeMessage = async (
+  trigger: GuildTrigger,
+  { userId, username, serverName }: TriggerRunContext,
+): Promise<void> => {
+  const channelId = trigger.messageConfig?.channelId;
+  const message = trigger.messageConfig?.message;
+  if (!channelId || !message) {
+    return;
+  }
+  const content = interpolateTriggerMessage(message, {
+    userId,
+    username,
+    serverName,
+  });
+  await discordapi.post(Routes.channelMessages(channelId), {
+    body: { content },
+  });
+};
 
 export const runGuildTriggers = async (
   em: EntityManager,
@@ -21,6 +62,7 @@ export const runGuildTriggers = async (
     GuildTrigger,
     {
       server: { guildId },
+      kind: { $in: [...GUILD_TRIGGER_KINDS] },
       enabled: true,
     },
     { populate: ['messageConfig', 'roleConfig'] },
@@ -40,34 +82,22 @@ export const runGuildTriggers = async (
     logger.error('trigger guild fetch failed', { guildId, err });
   }
 
+  const context: TriggerRunContext = {
+    guildId,
+    userId,
+    username,
+    serverName,
+  };
+
   for (const trigger of triggers) {
     try {
-      if (trigger.kind === 'welcome_role' && trigger.roleConfig?.roleId) {
-        await discordapi.put(
-          Routes.guildMemberRole(guildId, userId, trigger.roleConfig.roleId),
-        );
-        continue;
-      }
-
-      if (
-        trigger.kind === 'welcome_message' &&
-        trigger.messageConfig?.channelId &&
-        trigger.messageConfig.message
-      ) {
-        const content = interpolateTriggerMessage(
-          trigger.messageConfig.message,
-          {
-            userId,
-            username,
-            serverName,
-          },
-        );
-        await discordapi.post(
-          Routes.channelMessages(trigger.messageConfig.channelId),
-          {
-            body: { content },
-          },
-        );
+      switch (trigger.kind) {
+        case GuildTriggerKind.WelcomeRole:
+          await runWelcomeRole(trigger, context);
+          break;
+        case GuildTriggerKind.WelcomeMessage:
+          await runWelcomeMessage(trigger, context);
+          break;
       }
     } catch (err) {
       logger.error('trigger execution failed', {

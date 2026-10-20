@@ -10,9 +10,13 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import {
+  GuildTriggerKind,
+  guildTriggerKindSchema,
+} from '../../../trigger/GuildTriggerKind.js';
 
 const ValidTriggerKind = z.object({
-  kind: z.enum(['welcome_message', 'welcome_role']),
+  kind: guildTriggerKindSchema,
 });
 
 const nameLabel = () => ({
@@ -118,10 +122,10 @@ export const trigSetType: ModalHandlerDelcaration<CTASelectData> = {
 
     let resp: Response;
     switch (parsed.data.kind) {
-      case 'welcome_message':
+      case GuildTriggerKind.WelcomeMessage:
         resp = res.json(welcomeMessageCreateModal());
         break;
-      case 'welcome_role':
+      case GuildTriggerKind.WelcomeRole:
         resp = res.json(welcomeRoleCreateModal());
         break;
       default:

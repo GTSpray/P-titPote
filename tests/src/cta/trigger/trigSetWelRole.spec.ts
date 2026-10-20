@@ -20,6 +20,7 @@ import {
   Routes,
 } from 'discord-api-types/v10';
 import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
 import { expectedTriggerRole } from '../../../epectedEntities/expectedTriggerRole.js';
 import {
@@ -159,7 +160,7 @@ describe('cta/trigSetWelRole', () => {
     expect(saved).toEqual(
       expectedGuildTrigger({
         name: 'member',
-        kind: 'welcome_role',
+        kind: GuildTriggerKind.WelcomeRole,
         enabled: true,
         messageConfig: null,
         roleConfig: expectedTriggerRole({

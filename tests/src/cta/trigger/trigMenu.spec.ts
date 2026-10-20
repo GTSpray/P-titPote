@@ -15,6 +15,7 @@ import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import {
   admin_permissions,
@@ -88,11 +89,11 @@ describe('cta/trigMenu', () => {
                 options: [
                   {
                     label: t('trigger.kind.welcome_message'),
-                    value: 'welcome_message',
+                    value: GuildTriggerKind.WelcomeMessage,
                   },
                   {
                     label: t('trigger.kind.welcome_role'),
-                    value: 'welcome_role',
+                    value: GuildTriggerKind.WelcomeRole,
                   },
                 ],
               },
@@ -105,7 +106,10 @@ describe('cta/trigMenu', () => {
 
   it('should show trigger pick on disable', async () => {
     const guild = new DiscordGuild(guild_id);
-    const trigger = new GuildTrigger('welcome', 'welcome_message');
+    const trigger = new GuildTrigger(
+      'welcome',
+      GuildTriggerKind.WelcomeMessage,
+    );
     const messageConfig = new TriggerMessage(randomDiscordId19(), 'hi');
     messageConfig.trigger = trigger;
     trigger.messageConfig = messageConfig;

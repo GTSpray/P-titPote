@@ -10,6 +10,7 @@ import { getInteractionMessageComponentHttpMock } from '../../../mocks/getIntera
 import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import {
   admin_permissions,
@@ -45,7 +46,10 @@ describe('cta/trigPreviewWelMsg', () => {
     userId = req.body.member!.user!.id;
 
     const guild = new DiscordGuild(guildId);
-    const trigger = new GuildTrigger('welcome', 'welcome_message');
+    const trigger = new GuildTrigger(
+      'welcome',
+      GuildTriggerKind.WelcomeMessage,
+    );
     const messageConfig = new TriggerMessage(randomDiscordId19(), message);
     messageConfig.trigger = trigger;
     trigger.messageConfig = messageConfig;

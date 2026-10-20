@@ -23,6 +23,7 @@ import {
   GuildTrigger,
   TRIGGER_LIMIT,
 } from '../../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
 import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
@@ -142,7 +143,7 @@ describe('cta/trigSetWelMsg', () => {
     expect(saved).toEqual(
       expectedGuildTrigger({
         name: 'welcome',
-        kind: 'welcome_message',
+        kind: GuildTriggerKind.WelcomeMessage,
         enabled: true,
         messageConfig: expectedTriggerMessage({
           channelId: channel_id,
@@ -155,7 +156,7 @@ describe('cta/trigSetWelMsg', () => {
 
   it('should refuse create when name already exists', async () => {
     const guild = new DiscordGuild(guild_id);
-    const existing = new GuildTrigger('welcome', 'welcome_role');
+    const existing = new GuildTrigger('welcome', GuildTriggerKind.WelcomeRole);
     const roleConfig = new TriggerRole(randomDiscordId19());
     roleConfig.trigger = existing;
     existing.roleConfig = roleConfig;
@@ -192,7 +193,10 @@ describe('cta/trigSetWelMsg', () => {
 
   it('should update existing welcome message without changing enabled', async () => {
     const guild = new DiscordGuild(guild_id);
-    const existing = new GuildTrigger('welcome', 'welcome_message');
+    const existing = new GuildTrigger(
+      'welcome',
+      GuildTriggerKind.WelcomeMessage,
+    );
     existing.enabled = false;
     const messageConfig = new TriggerMessage(randomDiscordId19(), 'old');
     messageConfig.trigger = existing;
@@ -245,7 +249,7 @@ describe('cta/trigSetWelMsg', () => {
   it('should refuse when creating beyond limit', async () => {
     const guild = new DiscordGuild(guild_id);
     for (let i = 0; i < TRIGGER_LIMIT; i++) {
-      const trigger = new GuildTrigger(`t${i}`, 'welcome_role');
+      const trigger = new GuildTrigger(`t${i}`, GuildTriggerKind.WelcomeRole);
       const roleConfig = new TriggerRole(randomDiscordId19());
       roleConfig.trigger = trigger;
       trigger.roleConfig = roleConfig;

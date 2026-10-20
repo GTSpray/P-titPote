@@ -15,6 +15,7 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
+import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 
 describe('cta/trigSetType', () => {
   let handlerOpts: ModalHandlerOptions<CTASelectData>;
@@ -24,7 +25,7 @@ describe('cta/trigSetType', () => {
     data = {
       custom_id: `{"t":"cta","d":{"a":"trigSetType"}}`,
       component_type: ComponentType.StringSelect,
-      values: ['welcome_message'],
+      values: [GuildTriggerKind.WelcomeMessage],
     };
     const { req, res } = getInteractionMessageComponentHttpMock({
       data,
@@ -92,7 +93,7 @@ describe('cta/trigSetType', () => {
   });
 
   it('should open welcome role config modal', async () => {
-    data.values = ['welcome_role'];
+    data.values = [GuildTriggerKind.WelcomeRole];
     handlerOpts.req.body.data = data;
 
     const response = await trigSetType.handler(handlerOpts);

@@ -9,6 +9,7 @@ import { Routes } from 'discord-api-types/v10';
 import { initORM } from '../../initORM.js';
 import { DiscordGuild } from '../../../src/db/entities/DiscordGuild.entity.js';
 import { GuildTrigger } from '../../../src/db/entities/GuildTrigger.entity.js';
+import { GuildTriggerKind } from '../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../src/db/entities/TriggerRole.entity.js';
 import { runGuildTriggers } from '../../../src/gateway/runGuildTriggers.js';
@@ -36,18 +37,18 @@ describe('runGuildTriggers', () => {
 
   it('should assign role and post welcome message for enabled triggers', async () => {
     const guild = new DiscordGuild(guild_id);
-    const msg = new GuildTrigger('welcome', 'welcome_message');
+    const msg = new GuildTrigger('welcome', GuildTriggerKind.WelcomeMessage);
     const messageConfig = new TriggerMessage(
       channel_id,
       'Bienvenue {user} sur {server}',
     );
     messageConfig.trigger = msg;
     msg.messageConfig = messageConfig;
-    const role = new GuildTrigger('member', 'welcome_role');
+    const role = new GuildTrigger('member', GuildTriggerKind.WelcomeRole);
     const roleConfig = new TriggerRole(role_id);
     roleConfig.trigger = role;
     role.roleConfig = roleConfig;
-    const disabled = new GuildTrigger('off', 'welcome_role');
+    const disabled = new GuildTrigger('off', GuildTriggerKind.WelcomeRole);
     const disabledRole = new TriggerRole(randomDiscordId19());
     disabledRole.trigger = disabled;
     disabled.roleConfig = disabledRole;
