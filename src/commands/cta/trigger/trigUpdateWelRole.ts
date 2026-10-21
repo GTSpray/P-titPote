@@ -53,17 +53,6 @@ export const trigUpdateWelRole: ModalHandlerDelcaration<CTAData> = {
         .json({ error: t('errors.invalidSubcommandPayload'), issues });
     }
 
-    const em = dbServices.orm.em.fork();
-    const trigger = await em.findOneOrFail(
-      GuildTrigger,
-      {
-        server: { guildId },
-        name: parsed.data.name,
-        kind: GuildTriggerKind.WelcomeRole,
-      },
-      { populate: ['messageConfig', 'roleConfig'] },
-    );
-
     try {
       await assertBotCanAssignRole(guildId, parsed.data.roleId);
     } catch (error) {
@@ -77,6 +66,17 @@ export const trigUpdateWelRole: ModalHandlerDelcaration<CTAData> = {
       });
       return res.json(errorPayload(t('trigger.role.unavailable')));
     }
+
+    const em = dbServices.orm.em.fork();
+    const trigger = await em.findOneOrFail(
+      GuildTrigger,
+      {
+        server: { guildId },
+        name: parsed.data.name,
+        kind: GuildTriggerKind.WelcomeRole,
+      },
+      { populate: ['messageConfig', 'roleConfig'] },
+    );
 
     applyRoleConfig(trigger, parsed.data);
     await em.persist(trigger).flush();

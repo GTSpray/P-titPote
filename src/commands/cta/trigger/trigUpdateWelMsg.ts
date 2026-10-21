@@ -56,17 +56,6 @@ export const trigUpdateWelMsg: ModalHandlerDelcaration<CTAData> = {
         .json({ error: t('errors.invalidSubcommandPayload'), issues });
     }
 
-    const em = dbServices.orm.em.fork();
-    const trigger = await em.findOneOrFail(
-      GuildTrigger,
-      {
-        server: { guildId },
-        name: parsed.data.name,
-        kind: GuildTriggerKind.WelcomeMessage,
-      },
-      { populate: ['messageConfig', 'roleConfig'] },
-    );
-
     try {
       await assertBotCanPostInChannel(guildId, parsed.data.channelId);
     } catch (error) {
@@ -80,6 +69,17 @@ export const trigUpdateWelMsg: ModalHandlerDelcaration<CTAData> = {
       });
       return res.json(errorPayload(t('trigger.channel.unavailable')));
     }
+
+    const em = dbServices.orm.em.fork();
+    const trigger = await em.findOneOrFail(
+      GuildTrigger,
+      {
+        server: { guildId },
+        name: parsed.data.name,
+        kind: GuildTriggerKind.WelcomeMessage,
+      },
+      { populate: ['messageConfig', 'roleConfig'] },
+    );
 
     applyMessageConfig(trigger, parsed.data);
     await em.persist(trigger).flush();
