@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '../i18n/index.js';
-import { GuildTriggerKind } from './GuildTriggerKind.js';
+import { GuildTriggerKind } from '../db/entities/GuildTrigger.entity.js';
 
 const kindLabelKey: Record<GuildTriggerKind, TranslationKey> = {
   [GuildTriggerKind.WelcomeMessage]: 'trigger.kind.welcome_message',

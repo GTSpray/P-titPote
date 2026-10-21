@@ -10,7 +10,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
+import { GuildTriggerKind } from '../../../db/entities/GuildTrigger.entity.js';
 
 const ValidTriggerKind = z.object({
   kind: z.enum([GuildTriggerKind.WelcomeMessage, GuildTriggerKind.WelcomeRole]),

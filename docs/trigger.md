@@ -59,7 +59,7 @@ never upserts; update only changes the matching kind’s config.
 
 ## Runtime execution
 
-`src/gateway/runGuildTriggers.ts` loads enabled triggers for the guild on
+`src/gateway/runMemberJoinTrigger.ts` loads enabled triggers for the guild on
 `GuildMemberAdd`, assigns roles via `PUT guildMemberRole`, and posts messages
 via `POST channelMessages` after interpolating `{user}`, `{username}`, and
 `{server}`.

@@ -20,8 +20,10 @@ import {
   TextInputStyle,
 } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
-import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
-import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../../src/db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
 import {
@@ -189,8 +191,8 @@ describe('cta/trigPick', () => {
     });
 
     em.clear();
-    const saved = await em.findOne(GuildTrigger, { id: trigger.id });
-    expect(saved?.enabled).toBe(false);
+    const saved = await em.findOneOrFail(GuildTrigger, { id: trigger.id });
+    expect(saved.enabled).toBe(false);
   });
 
   it('should enable trigger', async () => {
@@ -214,12 +216,13 @@ describe('cta/trigPick', () => {
     });
 
     em.clear();
-    const saved = await em.findOne(GuildTrigger, { id: trigger.id });
-    expect(saved?.enabled).toBe(true);
+    const saved = await em.findOneOrFail(GuildTrigger, { id: trigger.id });
+    expect(saved.enabled).toBe(true);
   });
 
   it('should soft-delete trigger', async () => {
     const handlerOpts = await makeOpts('delete');
+    const now = new Date();
     const response = await trigPick.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
@@ -236,12 +239,12 @@ describe('cta/trigPick', () => {
     });
 
     em.clear();
-    const saved = await em.findOne(
+    const saved = await em.findOneOrFail(
       GuildTrigger,
       { id: trigger.id },
       { filters: false },
     );
-    expect(saved?.deletedAt).toBeInstanceOf(Date);
+    expect(saved.deletedAt).toBeDateCloseTo(now, 2000);
   });
 
   it('should refuse already disabled', async () => {

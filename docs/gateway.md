@@ -173,7 +173,7 @@ Handlers are registered by `registerGatewayHandlers()` in
   database write fails. `GuildDelete` is still log-only; leaving a guild does
   not soft-delete `DiscordGuild` or command state.
 - `GuildMemberAdd`: runs enabled `/trigger` automations via
-  `src/gateway/runGuildTriggers.ts` (welcome roles and welcome messages).
+  `src/gateway/runMemberJoinTrigger.ts` (welcome roles and welcome messages).
   Failures are logged per trigger and do not disconnect the shard.
 - `MessageCreate`: when Discord reports an application-command message whose
   command name is `gimme version`, the bot adds a `👀` reaction to that message

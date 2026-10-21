@@ -20,7 +20,7 @@ import { DiscordGuild } from '../../../src/db/entities/DiscordGuild.entity.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { randomDiscordId19 } from '../../mocks/discord-api/utils.js';
 import { initORM } from '../../initORM.js';
-import * as runGuildTriggersModule from '../../../src/gateway/runGuildTriggers.js';
+import * as runMemberJoinTriggerModule from '../../../src/gateway/runMemberJoinTrigger.js';
 
 const appId = process.env.APP_ID!;
 const channelId = randomDiscordId19();
@@ -235,7 +235,7 @@ describe('gateway handlers', () => {
     it('runs guild triggers', async () => {
       const event = memberAddEvent();
       const runSpy = vi
-        .spyOn(runGuildTriggersModule, 'runGuildTriggers')
+        .spyOn(runMemberJoinTriggerModule, 'runMemberJoinTrigger')
         .mockResolvedValue(undefined);
 
       await handleGuildMemberAdd(initORM(), 0, event);
@@ -252,9 +252,10 @@ describe('gateway handlers', () => {
 
     it('logs and swallows trigger failures', async () => {
       const event = memberAddEvent();
-      vi.spyOn(runGuildTriggersModule, 'runGuildTriggers').mockRejectedValue(
-        new Error('trigger down'),
-      );
+      vi.spyOn(
+        runMemberJoinTriggerModule,
+        'runMemberJoinTrigger',
+      ).mockRejectedValue(new Error('trigger down'));
 
       await expect(
         handleGuildMemberAdd(initORM(), 0, event),

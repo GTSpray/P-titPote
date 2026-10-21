@@ -3,12 +3,14 @@ import { ComponentType } from 'discord-api-types/v10';
 import type { Response } from 'express';
 import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
 import type { DBServices } from '../../../db/db.js';
-import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../db/entities/GuildTrigger.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t, type TranslationKey } from '../../../i18n/index.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 import { triggerSelectOptions } from './triggerSelectOptions.js';
 

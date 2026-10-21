@@ -21,9 +21,9 @@ import {
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import {
   GuildTrigger,
+  GuildTriggerKind,
   TRIGGER_LIMIT,
 } from '../../../../src/db/entities/GuildTrigger.entity.js';
-import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
 import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
@@ -40,6 +40,7 @@ import {
 import { t } from '../../../../src/i18n/index.js';
 import * as assertBotCanPostInChannelModule from '../../../../src/utils/assertBotCanPostInChannel.js';
 import { BotCannotPostInChannelError } from '../../../../src/utils/assertBotCanPostInChannel.js';
+import type { MockInstance } from 'vitest';
 
 const previewButton = (name: string) => ({
   type: ComponentType.ActionRow,
@@ -67,12 +68,14 @@ describe('cta/trigSetWelMsg', () => {
   let nameCmp: PartialComponentSingle;
   let channelCmp: PartialComponentList;
   let messageCmp: PartialComponentSingle;
+  let assertBotCanPostInChannelSpy: MockInstance<
+    typeof assertBotCanPostInChannelModule.assertBotCanPostInChannel
+  >;
 
   beforeEach(async () => {
-    vi.spyOn(
-      assertBotCanPostInChannelModule,
-      'assertBotCanPostInChannel',
-    ).mockResolvedValue(undefined);
+    assertBotCanPostInChannelSpy = vi
+      .spyOn(assertBotCanPostInChannelModule, 'assertBotCanPostInChannel')
+      .mockResolvedValue(undefined);
 
     channel_id = randomDiscordId19();
     nameCmp = {
@@ -132,7 +135,7 @@ describe('cta/trigSetWelMsg', () => {
     });
 
     em.clear();
-    const saved = await em.findOne(
+    const saved = await em.findOneOrFail(
       GuildTrigger,
       {
         server: { guildId: guild_id },
@@ -175,10 +178,9 @@ describe('cta/trigSetWelMsg', () => {
   });
 
   it('should refuse when bot cannot post in the channel', async () => {
-    vi.spyOn(
-      assertBotCanPostInChannelModule,
-      'assertBotCanPostInChannel',
-    ).mockRejectedValue(new BotCannotPostInChannelError('missingViewChannel'));
+    assertBotCanPostInChannelSpy.mockRejectedValue(
+      new BotCannotPostInChannelError('missingViewChannel'),
+    );
 
     const response = await trigSetWelMsg.handler(handlerOpts);
 
@@ -236,14 +238,23 @@ describe('cta/trigSetWelMsg', () => {
     });
 
     em.clear();
-    const saved = await em.findOne(
+    const saved = await em.findOneOrFail(
       GuildTrigger,
       { id: existing.id },
-      { populate: ['messageConfig'] },
+      { populate: ['messageConfig', 'roleConfig'] },
     );
-    expect(saved?.enabled).toBe(false);
-    expect(saved?.messageConfig?.channelId).toBe(channel_id);
-    expect(saved?.messageConfig?.message).toBe('Bienvenue {user} sur {server}');
+    expect(saved).toEqual(
+      expectedGuildTrigger({
+        name: 'welcome',
+        kind: GuildTriggerKind.WelcomeMessage,
+        enabled: false,
+        messageConfig: expectedTriggerMessage({
+          channelId: channel_id,
+          message: 'Bienvenue {user} sur {server}',
+        }),
+        roleConfig: null,
+      }),
+    );
   });
 
   it('should refuse when creating beyond limit', async () => {

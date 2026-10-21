@@ -9,7 +9,10 @@ import {
   type CTAEnvelope,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../db/entities/GuildTrigger.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
@@ -17,7 +20,6 @@ import { t } from '../../../i18n/index.js';
 import { discordapi } from '../../../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../../../trigger/interpolateTriggerMessage.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 
 const ValidPreview = z.object({
   name: triggerNameSchema,

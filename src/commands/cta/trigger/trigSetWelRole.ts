@@ -14,6 +14,7 @@ import {
 } from '../../modals.js';
 import {
   GuildTrigger,
+  GuildTriggerKind,
   TRIGGER_LIMIT,
 } from '../../../db/entities/GuildTrigger.entity.js';
 import { TriggerRole } from '../../../db/entities/TriggerRole.entity.js';
@@ -27,7 +28,6 @@ import {
   BotCannotAssignRoleError,
 } from '../../../utils/assertBotCanAssignRole.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 
 const ensureAssignableRole = async (guildId: string, roleId: string) => {

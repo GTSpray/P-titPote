@@ -15,7 +15,7 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
-import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
+import { GuildTriggerKind } from '../../../../src/db/entities/GuildTrigger.entity.js';
 
 describe('cta/trigSetType', () => {
   let handlerOpts: ModalHandlerOptions<CTASelectData>;

@@ -9,13 +9,15 @@ import {
 import type { EntityManager } from '@mikro-orm/core';
 import type { Request, Response } from 'express';
 import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
-import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../db/entities/GuildTrigger.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 import { dismissEphemeralSelect } from '../../../utils/dismissEphemeralSelect.js';
 
 const ValidTriggerPick = z.object({

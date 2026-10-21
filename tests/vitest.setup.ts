@@ -4,6 +4,9 @@ import './customMatchers/customMatchers.js';
 import { initORM } from './initORM.js';
 import { WebSocketMock } from './mocks/WebSocketMock.js';
 
+// Keep APP_ID fake even if the container/.env provides a real bot application id.
+process.env.APP_ID = '1234567890123456789';
+
 vi.mock('../src/logger.js');
 
 vi.mock('ws', () => ({

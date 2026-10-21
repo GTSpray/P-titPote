@@ -8,15 +8,17 @@ import { REST } from 'discord.js';
 import { Routes } from 'discord-api-types/v10';
 import { initORM } from '../../initORM.js';
 import { DiscordGuild } from '../../../src/db/entities/DiscordGuild.entity.js';
-import { GuildTrigger } from '../../../src/db/entities/GuildTrigger.entity.js';
-import { GuildTriggerKind } from '../../../src/trigger/GuildTriggerKind.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../src/db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from '../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../src/db/entities/TriggerRole.entity.js';
-import { runGuildTriggers } from '../../../src/gateway/runGuildTriggers.js';
+import { runMemberJoinTrigger } from '../../../src/gateway/runMemberJoinTrigger.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { randomDiscordId19 } from '../../mocks/discord-api/utils.js';
 
-describe('runGuildTriggers', () => {
+describe('runMemberJoinTrigger', () => {
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
@@ -84,7 +86,7 @@ describe('runGuildTriggers', () => {
     const putSpy = vi.spyOn(REST.prototype, 'put');
     const postSpy = vi.spyOn(REST.prototype, 'post');
 
-    await runGuildTriggers(em, {
+    await runMemberJoinTrigger(em, {
       guild_id,
       user: {
         id: user_id,
@@ -103,7 +105,7 @@ describe('runGuildTriggers', () => {
 
   it('should do nothing when no enabled triggers', async () => {
     const getSpy = vi.spyOn(REST.prototype, 'get');
-    await runGuildTriggers(em, {
+    await runMemberJoinTrigger(em, {
       guild_id,
       user: {
         id: user_id,

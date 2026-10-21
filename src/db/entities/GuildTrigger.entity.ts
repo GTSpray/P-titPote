@@ -11,7 +11,11 @@ import { DiscordGuild } from './DiscordGuild.entity.js';
 import { type Rel } from '@mikro-orm/core';
 import { TriggerMessage } from './TriggerMessage.entity.js';
 import { TriggerRole } from './TriggerRole.entity.js';
-import { GuildTriggerKind } from '../../trigger/GuildTriggerKind.js';
+
+export enum GuildTriggerKind {
+  WelcomeMessage = 'welcome_message',
+  WelcomeRole = 'welcome_role',
+}
 
 /** Max non-deleted triggers per guild (disabled included). */
 export const TRIGGER_LIMIT = 10;

@@ -4,10 +4,12 @@ import {
   type RESTGetAPIGuildResult,
 } from 'discord-api-types/v10';
 import type { EntityManager } from '@mikro-orm/core';
-import { GuildTrigger } from '../db/entities/GuildTrigger.entity.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../db/entities/GuildTrigger.entity.js';
 import { discordapi } from '../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../trigger/interpolateTriggerMessage.js';
-import { GuildTriggerKind } from '../trigger/GuildTriggerKind.js';
 import { logger } from '../logger.js';
 
 type TriggerRunContext = {
@@ -47,7 +49,7 @@ const runWelcomeMessage = async (
   });
 };
 
-export const runGuildTriggers = async (
+export const runMemberJoinTrigger = async (
   em: EntityManager,
   event: GatewayGuildMemberAddDispatchData,
 ): Promise<void> => {

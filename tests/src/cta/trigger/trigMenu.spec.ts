@@ -14,8 +14,10 @@ import { getInteractionMessageComponentHttpMock } from '../../../mocks/getIntera
 import { randomDiscordId19 } from '../../../mocks/discord-api/utils.js';
 import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
-import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
-import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../../src/db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import {
   admin_permissions,

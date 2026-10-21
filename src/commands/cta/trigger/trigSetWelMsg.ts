@@ -15,6 +15,7 @@ import {
 } from '../../modals.js';
 import {
   GuildTrigger,
+  GuildTriggerKind,
   TRIGGER_LIMIT,
 } from '../../../db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from '../../../db/entities/TriggerMessage.entity.js';
@@ -28,7 +29,6 @@ import {
   BotCannotPostInChannelError,
 } from '../../../utils/assertBotCanPostInChannel.js';
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
-import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 
 const ensurePostableChannel = async (guildId: string, channelId: string) => {

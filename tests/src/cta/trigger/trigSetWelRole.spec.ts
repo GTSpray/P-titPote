@@ -19,8 +19,10 @@ import {
   PermissionFlagsBits,
   Routes,
 } from 'discord-api-types/v10';
-import { GuildTrigger } from '../../../../src/db/entities/GuildTrigger.entity.js';
-import { GuildTriggerKind } from '../../../../src/trigger/GuildTriggerKind.js';
+import {
+  GuildTrigger,
+  GuildTriggerKind,
+} from '../../../../src/db/entities/GuildTrigger.entity.js';
 import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
 import { expectedTriggerRole } from '../../../epectedEntities/expectedTriggerRole.js';
 import {

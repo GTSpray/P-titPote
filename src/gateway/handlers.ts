@@ -14,7 +14,7 @@ import type { DBServices } from '../db/db.js';
 import { findOrCreateGuild } from '../db/services/discordGuild.service.js';
 import type { GatewaySocket } from './GatewaySocket.js';
 import { GWSEvent } from './gatewaytypes.js';
-import { runGuildTriggers } from './runGuildTriggers.js';
+import { runMemberJoinTrigger } from './runMemberJoinTrigger.js';
 
 export const PROBE_COMMAND_NAME = 'gimme version';
 export const PROBE_EMOJI = '👀';
@@ -115,7 +115,7 @@ export async function handleGuildMemberAdd(
   try {
     const { orm } = await dbServices;
     const em = orm.em.fork();
-    await runGuildTriggers(em, event);
+    await runMemberJoinTrigger(em, event);
     logger.info('gateway guild_member_add triggers done', {
       shard,
       guildId,
