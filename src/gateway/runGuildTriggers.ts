@@ -7,10 +7,7 @@ import type { EntityManager } from '@mikro-orm/core';
 import { GuildTrigger } from '../db/entities/GuildTrigger.entity.js';
 import { discordapi } from '../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../trigger/interpolateTriggerMessage.js';
-import {
-  GuildTriggerKind,
-  GUILD_TRIGGER_KINDS,
-} from '../trigger/GuildTriggerKind.js';
+import { GuildTriggerKind } from '../trigger/GuildTriggerKind.js';
 import { logger } from '../logger.js';
 
 type TriggerRunContext = {
@@ -62,7 +59,9 @@ export const runGuildTriggers = async (
     GuildTrigger,
     {
       server: { guildId },
-      kind: { $in: [...GUILD_TRIGGER_KINDS] },
+      kind: {
+        $in: [GuildTriggerKind.WelcomeMessage, GuildTriggerKind.WelcomeRole],
+      },
       enabled: true,
     },
     { populate: ['messageConfig', 'roleConfig'] },

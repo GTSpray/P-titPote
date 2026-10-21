@@ -10,13 +10,10 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import {
-  GuildTriggerKind,
-  guildTriggerKindSchema,
-} from '../../../trigger/GuildTriggerKind.js';
+import { GuildTriggerKind } from '../../../trigger/GuildTriggerKind.js';
 
 const ValidTriggerKind = z.object({
-  kind: guildTriggerKindSchema,
+  kind: z.enum([GuildTriggerKind.WelcomeMessage, GuildTriggerKind.WelcomeRole]),
 });
 
 const nameLabel = () => ({
