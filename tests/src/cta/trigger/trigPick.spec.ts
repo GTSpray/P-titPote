@@ -81,7 +81,7 @@ describe('cta/trigPick', () => {
     await em.persist(guild).flush();
   });
 
-  it('should open update modal without name field', async () => {
+  it('should open the welcome-message update modal without a name field', async () => {
     const handlerOpts = await makeOpts('update');
     const response = await trigPick.handler(handlerOpts);
 
@@ -128,7 +128,7 @@ describe('cta/trigPick', () => {
     });
   });
 
-  it('should open update role modal with role preselected', async () => {
+  it('should open the welcome-role update modal when a role is already configured', async () => {
     const roleId = randomDiscordId19();
     const roleTrigger = new GuildTrigger(
       'member',
@@ -173,7 +173,7 @@ describe('cta/trigPick', () => {
     });
   });
 
-  it('should disable trigger', async () => {
+  it('should disable the selected trigger', async () => {
     const handlerOpts = await makeOpts('disable');
     const response = await trigPick.handler(handlerOpts);
 
@@ -195,7 +195,7 @@ describe('cta/trigPick', () => {
     expect(saved.enabled).toBe(false);
   });
 
-  it('should enable trigger', async () => {
+  it('should enable the selected trigger', async () => {
     trigger.enabled = false;
     await em.persist(trigger).flush();
 
@@ -220,7 +220,7 @@ describe('cta/trigPick', () => {
     expect(saved.enabled).toBe(true);
   });
 
-  it('should soft-delete trigger', async () => {
+  it('should soft-delete the selected trigger', async () => {
     const handlerOpts = await makeOpts('delete');
     const now = new Date();
     const response = await trigPick.handler(handlerOpts);
@@ -247,7 +247,7 @@ describe('cta/trigPick', () => {
     expect(saved.deletedAt).toBeDateCloseTo(now, 2000);
   });
 
-  it('should refuse already disabled', async () => {
+  it('should refuse to disable when the trigger is already disabled', async () => {
     trigger.enabled = false;
     await em.persist(trigger).flush();
 
@@ -263,7 +263,7 @@ describe('cta/trigPick', () => {
     });
   });
 
-  it('should refuse non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const data: CTASelectData = {
       custom_id: JSON.stringify({
         t: 'cta',

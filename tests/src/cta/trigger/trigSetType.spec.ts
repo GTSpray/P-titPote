@@ -40,7 +40,7 @@ describe('cta/trigSetType', () => {
     };
   });
 
-  it('should open welcome message config modal', async () => {
+  it('should open the welcome message config modal', async () => {
     const response = await trigSetType.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
@@ -92,7 +92,7 @@ describe('cta/trigSetType', () => {
     });
   });
 
-  it('should open welcome role config modal', async () => {
+  it('should open the welcome role config modal', async () => {
     data.values = [GuildTriggerKind.WelcomeRole];
     handlerOpts.req.body.data = data;
 
@@ -134,7 +134,7 @@ describe('cta/trigSetType', () => {
     });
   });
 
-  it('should refuse non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const { req, res } = getInteractionMessageComponentHttpMock({
       data,
       permissions: default_member_permissions,

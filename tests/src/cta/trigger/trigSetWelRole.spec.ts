@@ -130,7 +130,7 @@ describe('cta/trigSetWelRole', () => {
     em = orm.em.fork();
   });
 
-  it('should create welcome role trigger', async () => {
+  it('should create a welcome role trigger', async () => {
     mockAssignableRole();
     const response = await trigSetWelRole.handler(handlerOpts);
 
@@ -172,7 +172,7 @@ describe('cta/trigSetWelRole', () => {
     );
   });
 
-  it('should refuse when bot role is below target role', async () => {
+  it('should refuse when the bot role is below the target role', async () => {
     const botUserId = process.env.APP_ID!;
     DiscrodRESTMock.register(
       {
@@ -225,7 +225,7 @@ describe('cta/trigSetWelRole', () => {
     });
   });
 
-  it('should refuse non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
       permissions: default_member_permissions,

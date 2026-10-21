@@ -71,7 +71,7 @@ describe('cta/trigPreviewWelMsg', () => {
     };
   };
 
-  it('posts an interpolated preview for moderators', async () => {
+  it('should post an interpolated preview when the user is a moderator', async () => {
     const opts = await setupTrigger('Bienvenue {user} sur {server}');
 
     const response = await trigPreviewWelMsg.handler(opts);
@@ -84,7 +84,7 @@ describe('cta/trigPreviewWelMsg', () => {
     });
   });
 
-  it('refuses non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const { req, res } = getInteractionMessageComponentHttpMock({
       data: {
         custom_id: '{"t":"cta","d":{"a":"trigPreviewWelMsg","n":"welcome"}}',
@@ -110,7 +110,7 @@ describe('cta/trigPreviewWelMsg', () => {
     });
   });
 
-  it('returns not found when the trigger is missing', async () => {
+  it('should return not found when the trigger is missing', async () => {
     const dbServices = await initORM();
     const { req, res } = getInteractionMessageComponentHttpMock({
       data: {
@@ -137,7 +137,7 @@ describe('cta/trigPreviewWelMsg', () => {
     });
   });
 
-  it('returns not found when the trigger was soft-deleted', async () => {
+  it('should return not found when the trigger was soft-deleted', async () => {
     const opts = await setupTrigger('Bienvenue {user}');
     const em = opts.dbServices.orm.em.fork();
     const trigger = await em.findOneOrFail(GuildTrigger, {

@@ -67,7 +67,7 @@ describe('cta/trigMenu', () => {
     em = orm.em.fork();
   });
 
-  it('should show kind select on create', async () => {
+  it('should show the kind select when creating a trigger', async () => {
     const response = await trigMenu.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
@@ -106,7 +106,7 @@ describe('cta/trigMenu', () => {
     });
   });
 
-  it('should show trigger pick on disable', async () => {
+  it('should show the trigger pick when disabling a trigger', async () => {
     const guild = new DiscordGuild(guild_id);
     const trigger = new GuildTrigger(
       'welcome',
@@ -160,7 +160,7 @@ describe('cta/trigMenu', () => {
     });
   });
 
-  it('should notFound when no triggers for update', async () => {
+  it('should show not found when updating with no triggers', async () => {
     const opts = await makeOpts('update');
     opts.req.body.guild_id = guild_id;
     const response = await trigMenu.handler({
@@ -182,7 +182,7 @@ describe('cta/trigMenu', () => {
     });
   });
 
-  it('should refuse non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const data: CTASelectData = {
       custom_id: `{"t":"cta","d":{"a":"trigMenu"}}`,
       component_type: ComponentType.StringSelect,

@@ -114,7 +114,7 @@ describe('cta/trigSetWelMsg', () => {
     em = orm.em.fork();
   });
 
-  it('should create welcome message trigger', async () => {
+  it('should create a welcome message trigger', async () => {
     const response = await trigSetWelMsg.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
@@ -157,7 +157,7 @@ describe('cta/trigSetWelMsg', () => {
     );
   });
 
-  it('should refuse create when name already exists', async () => {
+  it('should refuse to create when the name already exists', async () => {
     const guild = new DiscordGuild(guild_id);
     const existing = new GuildTrigger('welcome', GuildTriggerKind.WelcomeRole);
     const roleConfig = new TriggerRole(randomDiscordId19());
@@ -177,7 +177,7 @@ describe('cta/trigSetWelMsg', () => {
     });
   });
 
-  it('should refuse when bot cannot post in the channel', async () => {
+  it('should refuse when the bot cannot post in the channel', async () => {
     assertBotCanPostInChannelSpy.mockRejectedValue(
       new BotCannotPostInChannelError('missingViewChannel'),
     );
@@ -193,7 +193,7 @@ describe('cta/trigSetWelMsg', () => {
     });
   });
 
-  it('should update existing welcome message without changing enabled', async () => {
+  it('should update the welcome message without changing enabled', async () => {
     const guild = new DiscordGuild(guild_id);
     const existing = new GuildTrigger(
       'welcome',
@@ -257,7 +257,7 @@ describe('cta/trigSetWelMsg', () => {
     );
   });
 
-  it('should refuse when creating beyond limit', async () => {
+  it('should refuse to create when the guild is at the trigger limit', async () => {
     const guild = new DiscordGuild(guild_id);
     for (let i = 0; i < TRIGGER_LIMIT; i++) {
       const trigger = new GuildTrigger(`t${i}`, GuildTriggerKind.WelcomeRole);
@@ -279,7 +279,7 @@ describe('cta/trigSetWelMsg', () => {
     });
   });
 
-  it('should refuse non-moderators', async () => {
+  it('should refuse when the user is not a moderator', async () => {
     const { req, res } = getInteractionModalHttpMock({
       data,
       permissions: default_member_permissions,

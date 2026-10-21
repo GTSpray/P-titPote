@@ -37,7 +37,7 @@ describe('runMemberJoinTrigger', () => {
     DiscrodRESTMock.clear();
   });
 
-  it('should assign role and post welcome message for enabled triggers', async () => {
+  it('should assign the welcome role and post the welcome message when triggers are enabled', async () => {
     const guild = new DiscordGuild(guild_id);
     const msg = new GuildTrigger('welcome', GuildTriggerKind.WelcomeMessage);
     const messageConfig = new TriggerMessage(
@@ -103,7 +103,7 @@ describe('runMemberJoinTrigger', () => {
     });
   });
 
-  it('should do nothing when no enabled triggers', async () => {
+  it('should do nothing when no triggers are enabled', async () => {
     const getSpy = vi.spyOn(REST.prototype, 'get');
     await runMemberJoinTrigger(em, {
       guild_id,

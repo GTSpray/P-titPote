@@ -232,7 +232,7 @@ describe('gateway handlers', () => {
         user: { id: randomDiscordId19() },
       }) as any;
 
-    it('runs guild triggers', async () => {
+    it('should run member-join triggers', async () => {
       const event = memberAddEvent();
       const runSpy = vi
         .spyOn(runMemberJoinTriggerModule, 'runMemberJoinTrigger')
@@ -250,7 +250,7 @@ describe('gateway handlers', () => {
       );
     });
 
-    it('logs and swallows trigger failures', async () => {
+    it('should log and swallow when member-join triggers fail', async () => {
       const event = memberAddEvent();
       vi.spyOn(
         runMemberJoinTriggerModule,
