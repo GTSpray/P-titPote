@@ -4,7 +4,7 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
-import { trigSetWelMsg } from '../../../../src/commands/cta/trigger/trigSetWelMsg.js';
+import { trigCreateWelMsg } from '../../../../src/commands/cta/trigger/trigCreateWelMsg.js';
 import {
   CTAData,
   ModalHandlerOptions,
@@ -24,7 +24,6 @@ import {
   GuildTriggerKind,
   TRIGGER_LIMIT,
 } from '../../../../src/db/entities/GuildTrigger.entity.js';
-import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
 import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
 import { expectedTriggerMessage } from '../../../epectedEntities/expectedTriggerMessage.js';
@@ -57,7 +56,7 @@ const previewButton = (name: string) => ({
   ],
 });
 
-describe('cta/trigSetWelMsg', () => {
+describe('cta/trigCreateWelMsg', () => {
   let guild_id: string;
   let channel_id: string;
   let em: SqlEntityManager<
@@ -96,7 +95,7 @@ describe('cta/trigSetWelMsg', () => {
 
     data = {
       components: getModalLabelComponnents([nameCmp, channelCmp, messageCmp]),
-      custom_id: `{"t":"cta","d":{"a":"trigSetWelMsg"}}`,
+      custom_id: `{"t":"cta","d":{"a":"trigCreateWelMsg"}}`,
     };
     const { req, res } = getInteractionModalHttpMock({
       data,
@@ -115,7 +114,7 @@ describe('cta/trigSetWelMsg', () => {
   });
 
   it('should create a welcome message trigger', async () => {
-    const response = await trigSetWelMsg.handler(handlerOpts);
+    const response = await trigCreateWelMsg.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -166,7 +165,7 @@ describe('cta/trigSetWelMsg', () => {
     guild.triggers.add(existing);
     await em.persist(guild).flush();
 
-    const response = await trigSetWelMsg.handler(handlerOpts);
+    const response = await trigCreateWelMsg.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -182,7 +181,7 @@ describe('cta/trigSetWelMsg', () => {
       new BotCannotPostInChannelError('missingViewChannel'),
     );
 
-    const response = await trigSetWelMsg.handler(handlerOpts);
+    const response = await trigCreateWelMsg.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -191,70 +190,6 @@ describe('cta/trigSetWelMsg', () => {
         content: t('trigger.channel.missingViewChannel'),
       },
     });
-  });
-
-  it('should update the welcome message without changing enabled', async () => {
-    const guild = new DiscordGuild(guild_id);
-    const existing = new GuildTrigger(
-      'welcome',
-      GuildTriggerKind.WelcomeMessage,
-    );
-    existing.enabled = false;
-    const messageConfig = new TriggerMessage(randomDiscordId19(), 'old');
-    messageConfig.trigger = existing;
-    existing.messageConfig = messageConfig;
-    guild.triggers.add(existing);
-    await em.persist(guild).flush();
-
-    const updateData: CTAData = {
-      components: getModalLabelComponnents([channelCmp, messageCmp]),
-      custom_id: `{"t":"cta","d":{"a":"trigSetWelMsg","n":"welcome"}}`,
-    };
-    const { req, res } = getInteractionModalHttpMock({
-      data: updateData,
-      permissions: admin_permissions,
-    });
-    req.body.guild_id = guild_id;
-
-    const response = await trigSetWelMsg.handler({
-      req,
-      res,
-      dbServices: handlerOpts.dbServices,
-      additionalData: JSON.parse(updateData.custom_id),
-    });
-
-    expect(response).toMeetApiResponse(200, {
-      type: InteractionResponseType.ChannelMessageWithSource,
-      data: {
-        flags: MessageFlags.IsComponentsV2,
-        components: [
-          {
-            type: ComponentType.TextDisplay,
-            content: t('trigger.lifecycle.updated', { name: 'welcome' }),
-          },
-          previewButton('welcome'),
-        ],
-      },
-    });
-
-    em.clear();
-    const saved = await em.findOneOrFail(
-      GuildTrigger,
-      { id: existing.id },
-      { populate: ['messageConfig', 'roleConfig'] },
-    );
-    expect(saved).toEqual(
-      expectedGuildTrigger({
-        name: 'welcome',
-        kind: GuildTriggerKind.WelcomeMessage,
-        enabled: false,
-        messageConfig: expectedTriggerMessage({
-          channelId: channel_id,
-          message: 'Bienvenue {user} sur {server}',
-        }),
-        roleConfig: null,
-      }),
-    );
   });
 
   it('should refuse to create when the guild is at the trigger limit', async () => {
@@ -268,7 +203,7 @@ describe('cta/trigSetWelMsg', () => {
     }
     await em.persist(guild).flush();
 
-    const response = await trigSetWelMsg.handler(handlerOpts);
+    const response = await trigCreateWelMsg.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -285,7 +220,7 @@ describe('cta/trigSetWelMsg', () => {
       permissions: default_member_permissions,
     });
 
-    const response = await trigSetWelMsg.handler({
+    const response = await trigCreateWelMsg.handler({
       ...handlerOpts,
       req,
       res,

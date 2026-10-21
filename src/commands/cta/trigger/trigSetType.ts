@@ -35,7 +35,7 @@ const welcomeMessageCreateModal = () => ({
   data: {
     custom_id: JSON.stringify({
       t: 'cta',
-      d: { a: 'trigSetWelMsg' },
+      d: { a: 'trigCreateWelMsg' },
     }),
     title: t('trigger.modal.config.welcome_message.title'),
     components: [
@@ -71,7 +71,7 @@ const welcomeRoleCreateModal = () => ({
   data: {
     custom_id: JSON.stringify({
       t: 'cta',
-      d: { a: 'trigSetWelRole' },
+      d: { a: 'trigCreateWelRole' },
     }),
     title: t('trigger.modal.config.welcome_role.title'),
     components: [

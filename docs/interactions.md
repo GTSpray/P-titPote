@@ -108,8 +108,10 @@ export const cta = {
   trigMenu,
   trigPick,
   trigSetType,
-  trigSetWelMsg,
-  trigSetWelRole,
+  trigCreateWelMsg,
+  trigUpdateWelMsg,
+  trigCreateWelRole,
+  trigUpdateWelRole,
 };
 ```
 

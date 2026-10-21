@@ -47,7 +47,7 @@ const welcomeMessageUpdateModal = (trigger: GuildTrigger) => ({
   data: {
     custom_id: JSON.stringify({
       t: 'cta',
-      d: { a: 'trigSetWelMsg', n: trigger.name },
+      d: { a: 'trigUpdateWelMsg', n: trigger.name },
     }),
     title: t('trigger.modal.config.welcome_message.title'),
     components: [
@@ -93,7 +93,7 @@ const welcomeRoleUpdateModal = (trigger: GuildTrigger) => ({
   data: {
     custom_id: JSON.stringify({
       t: 'cta',
-      d: { a: 'trigSetWelRole', n: trigger.name },
+      d: { a: 'trigUpdateWelRole', n: trigger.name },
     }),
     title: t('trigger.modal.config.welcome_role.title'),
     components: [

@@ -90,7 +90,7 @@ describe('cta/trigPick', () => {
       data: {
         custom_id: JSON.stringify({
           t: 'cta',
-          d: { a: 'trigSetWelMsg', n: 'welcome' },
+          d: { a: 'trigUpdateWelMsg', n: 'welcome' },
         }),
         title: t('trigger.modal.config.welcome_message.title'),
         components: [
@@ -149,7 +149,7 @@ describe('cta/trigPick', () => {
       data: {
         custom_id: JSON.stringify({
           t: 'cta',
-          d: { a: 'trigSetWelRole', n: 'member' },
+          d: { a: 'trigUpdateWelRole', n: 'member' },
         }),
         title: t('trigger.modal.config.welcome_role.title'),
         components: [

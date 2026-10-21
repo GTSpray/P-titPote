@@ -34,17 +34,16 @@ open.
 
 CTA registry:
 
-| CTA action          | Handler                                                                     |
-| ------------------- | --------------------------------------------------------------------------- |
-| `trigMenu`          | Action select → `UpdateMessage` with choice + next select                   |
-| `trigSetType`       | Create: kind select → open create config modal                              |
-| `trigSetWelMsg`     | Create / update welcome message (`n` = name on update; `enabled` unchanged) |
-| `trigPreviewWelMsg` | Preview welcome message (`n` = name in button `custom_id`)                  |
-| `trigSetWelRole`    | Create / update welcome role (`n` = name on update; `enabled` unchanged)    |
-| `trigPick`          | Update modal, or apply enable / disable / delete                            |
-
-Create vs update for welcome handlers is distinguished by the presence of `n`
-in the CTA payload (no separate action aliases).
+| CTA action          | Handler                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `trigMenu`          | Action select → `UpdateMessage` with choice + next select  |
+| `trigSetType`       | Create: kind select → open create config modal             |
+| `trigCreateWelMsg`  | Create welcome message                                     |
+| `trigUpdateWelMsg`  | Update welcome message (`n` = name; `enabled` unchanged)   |
+| `trigPreviewWelMsg` | Preview welcome message (`n` = name in button `custom_id`) |
+| `trigCreateWelRole` | Create welcome role                                        |
+| `trigUpdateWelRole` | Update welcome role (`n` = name; `enabled` unchanged)      |
+| `trigPick`          | Update modal, or apply enable / disable / delete           |
 
 ## Persistence
 
@@ -82,9 +81,9 @@ persisting for the same reason.
 ## Welcome message preview
 
 After a successful create/update of a `welcome_message` trigger,
-`trigSetWelMsg` replies with a public confirmation that includes a
-**Prévisualiser** button. The button `custom_id` carries the trigger name
-(`trigPreviewWelMsg` + `n`).
+`trigCreateWelMsg` / `trigUpdateWelMsg` reply with a public confirmation that
+includes a **Prévisualiser** button. The button `custom_id` carries the
+trigger name (`trigPreviewWelMsg` + `n`).
 
 Clicking it (moderators only) posts an interpolated preview in the **same**
 channel, with the clicker as `{user}` / `{username}` — same substitution as

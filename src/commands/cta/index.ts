@@ -13,8 +13,10 @@ import { trigMenu } from './trigger/trigMenu.js';
 import { trigPick } from './trigger/trigPick.js';
 import { trigSetType } from './trigger/trigSetType.js';
 import { trigPreviewWelMsg } from './trigger/trigPreviewWelMsg.js';
-import { trigSetWelMsg } from './trigger/trigSetWelMsg.js';
-import { trigSetWelRole } from './trigger/trigSetWelRole.js';
+import { trigCreateWelMsg } from './trigger/trigCreateWelMsg.js';
+import { trigUpdateWelMsg } from './trigger/trigUpdateWelMsg.js';
+import { trigCreateWelRole } from './trigger/trigCreateWelRole.js';
+import { trigUpdateWelRole } from './trigger/trigUpdateWelRole.js';
 
 export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   aliasRm,
@@ -31,6 +33,8 @@ export const cta: Record<string, ModalHandlerDelcaration<any>> = {
   trigPick,
   trigPreviewWelMsg,
   trigSetType,
-  trigSetWelMsg,
-  trigSetWelRole,
+  trigCreateWelMsg,
+  trigUpdateWelMsg,
+  trigCreateWelRole,
+  trigUpdateWelRole,
 };

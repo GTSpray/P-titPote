@@ -4,7 +4,7 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
-import { trigSetWelRole } from '../../../../src/commands/cta/trigger/trigSetWelRole.js';
+import { trigCreateWelRole } from '../../../../src/commands/cta/trigger/trigCreateWelRole.js';
 import {
   CTAData,
   ModalHandlerOptions,
@@ -40,7 +40,7 @@ import {
   DiscrodRESTMockVerb,
 } from '../../../mocks/discordjs.js';
 
-describe('cta/trigSetWelRole', () => {
+describe('cta/trigCreateWelRole', () => {
   let guild_id: string;
   let role_id: string;
   let bot_role_id: string;
@@ -112,7 +112,7 @@ describe('cta/trigSetWelRole', () => {
 
     data = {
       components: getModalLabelComponnents([nameCmp, roleCmp]),
-      custom_id: `{"t":"cta","d":{"a":"trigSetWelRole"}}`,
+      custom_id: `{"t":"cta","d":{"a":"trigCreateWelRole"}}`,
     };
     const { req, res } = getInteractionModalHttpMock({
       data,
@@ -132,7 +132,7 @@ describe('cta/trigSetWelRole', () => {
 
   it('should create a welcome role trigger', async () => {
     mockAssignableRole();
-    const response = await trigSetWelRole.handler(handlerOpts);
+    const response = await trigCreateWelRole.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -214,7 +214,7 @@ describe('cta/trigSetWelRole', () => {
       },
     );
 
-    const response = await trigSetWelRole.handler(handlerOpts);
+    const response = await trigCreateWelRole.handler(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
@@ -231,7 +231,7 @@ describe('cta/trigSetWelRole', () => {
       permissions: default_member_permissions,
     });
 
-    const response = await trigSetWelRole.handler({
+    const response = await trigCreateWelRole.handler({
       ...handlerOpts,
       req,
       res,
