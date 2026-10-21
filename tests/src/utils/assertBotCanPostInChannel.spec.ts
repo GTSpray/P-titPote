@@ -311,9 +311,7 @@ describe('assertBotCanPostInChannel', () => {
   });
 
   it('should reject when Discord returns Missing Access (50001)', async () => {
-    registerChannelFetchError(
-      discordApiError(50001, 403, 'Missing Access'),
-    );
+    registerChannelFetchError(discordApiError(50001, 403, 'Missing Access'));
 
     await expect(
       assertBotCanPostInChannel(guildId, channelId),
@@ -321,9 +319,7 @@ describe('assertBotCanPostInChannel', () => {
   });
 
   it('should reject when Discord returns 404 Unknown Channel', async () => {
-    registerChannelFetchError(
-      discordApiError(10003, 404, 'Unknown Channel'),
-    );
+    registerChannelFetchError(discordApiError(10003, 404, 'Unknown Channel'));
 
     await expect(
       assertBotCanPostInChannel(guildId, channelId),
