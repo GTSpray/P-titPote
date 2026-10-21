@@ -5,6 +5,7 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
+import type { EntityManager } from '@mikro-orm/core';
 import {
   ComponentSelect,
   ComponentSimple,
@@ -31,6 +32,14 @@ import {
 import { triggerNameSchema } from '../../../trigger/triggerName.js';
 import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
 
+const ValidWelMsg = z.object({
+  name: triggerNameSchema,
+  channelId: z.string().min(1).max(50),
+  message: z.string().min(1).max(2000),
+});
+
+type WelMsgInput = z.infer<typeof ValidWelMsg>;
+
 const ensurePostableChannel = async (guildId: string, channelId: string) => {
   try {
     await assertBotCanPostInChannel(guildId, channelId);
@@ -47,18 +56,6 @@ const ensurePostableChannel = async (guildId: string, channelId: string) => {
     return errorPayload(t('trigger.channel.unavailable'));
   }
 };
-
-const ValidCreate = z.object({
-  name: triggerNameSchema,
-  channelId: z.string().min(1).max(50),
-  message: z.string().min(1).max(2000),
-});
-
-const ValidUpdate = z.object({
-  name: triggerNameSchema,
-  channelId: z.string().min(1).max(50),
-  message: z.string().min(1).max(2000),
-});
 
 const okConfirm = (content: string, triggerName: string) => ({
   type: InteractionResponseType.ChannelMessageWithSource,
@@ -87,6 +84,89 @@ const okConfirm = (content: string, triggerName: string) => ({
   },
 });
 
+const applyMessageConfig = (
+  trigger: GuildTrigger,
+  { channelId, message }: Pick<WelMsgInput, 'channelId' | 'message'>,
+) => {
+  if (trigger.messageConfig) {
+    trigger.messageConfig.channelId = channelId;
+    trigger.messageConfig.message = message;
+    return;
+  }
+  const messageConfig = new TriggerMessage(channelId, message);
+  messageConfig.trigger = trigger;
+  trigger.messageConfig = messageConfig;
+};
+
+const updateWelcomeMessage = async (
+  em: EntityManager,
+  guildId: string,
+  input: WelMsgInput,
+) => {
+  const trigger = await em.findOne(
+    GuildTrigger,
+    {
+      server: { guildId },
+      name: input.name,
+      kind: GuildTriggerKind.WelcomeMessage,
+    },
+    { populate: ['messageConfig', 'roleConfig'] },
+  );
+  if (!trigger) {
+    return errorPayload(t('trigger.lifecycle.notFound', { name: input.name }));
+  }
+
+  const channelError = await ensurePostableChannel(guildId, input.channelId);
+  if (channelError) {
+    return channelError;
+  }
+
+  applyMessageConfig(trigger, input);
+  await em.persist(trigger).flush();
+  return okConfirm(
+    t('trigger.lifecycle.updated', { name: input.name }),
+    input.name,
+  );
+};
+
+const createWelcomeMessage = async (
+  em: EntityManager,
+  guildId: string,
+  input: WelMsgInput,
+) => {
+  const guild = await findOrCreateGuild(em, guildId);
+  await em.populate(guild, [
+    'triggers',
+    'triggers.messageConfig',
+    'triggers.roleConfig',
+  ]);
+
+  if (guild.triggers.find((trigger) => trigger.name === input.name)) {
+    return errorPayload(t('trigger.create.nameTaken', { name: input.name }));
+  }
+  if (guild.triggers.length >= TRIGGER_LIMIT) {
+    return errorPayload(t('errors.tooMany'));
+  }
+
+  const channelError = await ensurePostableChannel(guildId, input.channelId);
+  if (channelError) {
+    return channelError;
+  }
+
+  const trigger = new GuildTrigger(input.name, GuildTriggerKind.WelcomeMessage);
+  applyMessageConfig(trigger, input);
+  guild.triggers.add(trigger);
+
+  await em.persist(guild).flush();
+  return okConfirm(
+    t('trigger.lifecycle.created', {
+      name: input.name,
+      kind: triggerKindLabel(GuildTriggerKind.WelcomeMessage),
+    }),
+    input.name,
+  );
+};
+
 export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices, additionalData }) {
     try {
@@ -97,92 +177,21 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
     }
 
     const guildId = req.body.guild_id;
-    const { data } = req.body;
-    const { n: name } = (additionalData as CTAEnvelope<{ n?: string }>).d;
-
-    const channelInput = getInputComponnentById<ComponentSelect>(
-      data,
-      'channel',
-    );
-    const messageInput = getInputComponnentById<ComponentSimple>(
-      data,
-      'message',
-    );
-
-    if (name !== undefined) {
-      const parsed = ValidUpdate.safeParse({
-        name,
-        channelId: channelInput?.component.values[0],
-        message: messageInput?.component.value,
-      });
-
-      if (!parsed.success) {
-        const issues = parsed.error.issues;
-        logger.debug('zod errors', { issues });
-        return res
-          .status(400)
-          .json({ error: t('errors.invalidSubcommandPayload'), issues });
-      }
-
-      if (!dbServices || !guildId) {
-        return res.status(500).json({
-          error: t('errors.unmetResult'),
-        });
-      }
-
-      const em = dbServices.orm.em.fork();
-      const trigger = await em.findOne(
-        GuildTrigger,
-        {
-          server: { guildId },
-          name: parsed.data.name,
-          kind: GuildTriggerKind.WelcomeMessage,
-        },
-        { populate: ['messageConfig', 'roleConfig'] },
-      );
-
-      if (!trigger) {
-        return res.json(
-          errorPayload(
-            t('trigger.lifecycle.notFound', { name: parsed.data.name }),
-          ),
-        );
-      }
-
-      const channelError = await ensurePostableChannel(
-        guildId,
-        parsed.data.channelId,
-      );
-      if (channelError) {
-        return res.json(channelError);
-      }
-
-      if (trigger.messageConfig) {
-        trigger.messageConfig.channelId = parsed.data.channelId;
-        trigger.messageConfig.message = parsed.data.message;
-      } else {
-        const messageConfig = new TriggerMessage(
-          parsed.data.channelId,
-          parsed.data.message,
-        );
-        messageConfig.trigger = trigger;
-        trigger.messageConfig = messageConfig;
-      }
-
-      await em.persist(trigger).flush();
-      return res.json(
-        okConfirm(
-          t('trigger.lifecycle.updated', { name: parsed.data.name }),
-          parsed.data.name,
-        ),
-      );
+    if (!dbServices || !guildId) {
+      return res.status(500).json({ error: t('errors.unmetResult') });
     }
 
-    const nameInput = getInputComponnentById<ComponentSimple>(data, 'name');
-    const parsed = ValidCreate.safeParse({
-      name: nameInput?.component.value,
-      channelId: channelInput?.component.values[0],
-      message: messageInput?.component.value,
+    const { data } = req.body;
+    const updateName = (additionalData as CTAEnvelope<{ n?: string }>).d.n;
+    const name =
+      updateName ??
+      getInputComponnentById<ComponentSimple>(data, 'name')?.component.value;
+    const parsed = ValidWelMsg.safeParse({
+      name,
+      channelId: getInputComponnentById<ComponentSelect>(data, 'channel')
+        ?.component.values[0],
+      message: getInputComponnentById<ComponentSimple>(data, 'message')
+        ?.component.value,
     });
 
     if (!parsed.success) {
@@ -193,64 +202,12 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
         .json({ error: t('errors.invalidSubcommandPayload'), issues });
     }
 
-    if (dbServices && guildId) {
-      const em = dbServices.orm.em.fork();
-      const guild = await findOrCreateGuild(em, guildId);
-      await em.populate(guild, [
-        'triggers',
-        'triggers.messageConfig',
-        'triggers.roleConfig',
-      ]);
+    const em = dbServices.orm.em.fork();
+    const payload =
+      updateName !== undefined
+        ? await updateWelcomeMessage(em, guildId, parsed.data)
+        : await createWelcomeMessage(em, guildId, parsed.data);
 
-      const existing = guild.triggers.find(
-        (aTrigger) => aTrigger.name === parsed.data.name,
-      );
-      if (existing) {
-        return res.json(
-          errorPayload(
-            t('trigger.create.nameTaken', { name: parsed.data.name }),
-          ),
-        );
-      }
-
-      if (guild.triggers.length >= TRIGGER_LIMIT) {
-        return res.json(errorPayload(t('errors.tooMany')));
-      }
-
-      const channelError = await ensurePostableChannel(
-        guildId,
-        parsed.data.channelId,
-      );
-      if (channelError) {
-        return res.json(channelError);
-      }
-
-      const trigger = new GuildTrigger(
-        parsed.data.name,
-        GuildTriggerKind.WelcomeMessage,
-      );
-      const messageConfig = new TriggerMessage(
-        parsed.data.channelId,
-        parsed.data.message,
-      );
-      messageConfig.trigger = trigger;
-      trigger.messageConfig = messageConfig;
-      guild.triggers.add(trigger);
-
-      await em.persist(guild).flush();
-      return res.json(
-        okConfirm(
-          t('trigger.lifecycle.created', {
-            name: parsed.data.name,
-            kind: triggerKindLabel(GuildTriggerKind.WelcomeMessage),
-          }),
-          parsed.data.name,
-        ),
-      );
-    }
-
-    return res.status(500).json({
-      error: t('errors.unmetResult'),
-    });
+    return res.json(payload);
   },
 };
