@@ -57,10 +57,6 @@ const botHasManageRoles = (
   );
 };
 
-/**
- * Ensures the bot can assign `roleId` in `guildId` (Manage Roles + hierarchy).
- * Throws {@link BotCannotAssignRoleError} when it cannot.
- */
 export const assertBotCanAssignRole = async (
   guildId: string,
   roleId: string,
