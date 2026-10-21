@@ -26,6 +26,8 @@ import {
 } from '../../../../src/db/entities/GuildTrigger.entity.js';
 import { TriggerMessage } from '../../../../src/db/entities/TriggerMessage.entity.js';
 import { TriggerRole } from '../../../../src/db/entities/TriggerRole.entity.js';
+import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrigger.js';
+import { expectedTriggerMessage } from '../../../epectedEntities/expectedTriggerMessage.js';
 import {
   admin_permissions,
   default_member_permissions,
@@ -191,8 +193,23 @@ describe('cta/trigPick', () => {
     });
 
     em.clear();
-    const saved = await em.findOneOrFail(GuildTrigger, { id: trigger.id });
-    expect(saved.enabled).toBe(false);
+    const saved = await em.findOneOrFail(
+      GuildTrigger,
+      { id: trigger.id },
+      { populate: ['messageConfig', 'roleConfig'] },
+    );
+    expect(saved).toEqual(
+      expectedGuildTrigger({
+        name: 'welcome',
+        kind: GuildTriggerKind.WelcomeMessage,
+        enabled: false,
+        messageConfig: expectedTriggerMessage({
+          channelId,
+          message: 'Bienvenue {user}',
+        }),
+        roleConfig: null,
+      }),
+    );
   });
 
   it('should enable the selected trigger', async () => {
@@ -216,8 +233,23 @@ describe('cta/trigPick', () => {
     });
 
     em.clear();
-    const saved = await em.findOneOrFail(GuildTrigger, { id: trigger.id });
-    expect(saved.enabled).toBe(true);
+    const saved = await em.findOneOrFail(
+      GuildTrigger,
+      { id: trigger.id },
+      { populate: ['messageConfig', 'roleConfig'] },
+    );
+    expect(saved).toEqual(
+      expectedGuildTrigger({
+        name: 'welcome',
+        kind: GuildTriggerKind.WelcomeMessage,
+        enabled: true,
+        messageConfig: expectedTriggerMessage({
+          channelId,
+          message: 'Bienvenue {user}',
+        }),
+        roleConfig: null,
+      }),
+    );
   });
 
   it('should soft-delete the selected trigger', async () => {

@@ -14,9 +14,12 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import {
+  assertBotCanAssignRole,
+  BotCannotAssignRoleError,
+} from '../../../utils/assertBotCanAssignRole.js';
+import {
   ValidWelRole,
   applyRoleConfig,
-  ensureAssignableRole,
   okWelRoleConfirm,
 } from './welRoleShared.js';
 
@@ -51,7 +54,7 @@ export const trigUpdateWelRole: ModalHandlerDelcaration<CTAData> = {
     }
 
     const em = dbServices.orm.em.fork();
-    const trigger = await em.findOne(
+    const trigger = await em.findOneOrFail(
       GuildTrigger,
       {
         server: { guildId },
@@ -60,17 +63,19 @@ export const trigUpdateWelRole: ModalHandlerDelcaration<CTAData> = {
       },
       { populate: ['messageConfig', 'roleConfig'] },
     );
-    if (!trigger) {
-      return res.json(
-        errorPayload(
-          t('trigger.lifecycle.notFound', { name: parsed.data.name }),
-        ),
-      );
-    }
 
-    const roleError = await ensureAssignableRole(guildId, parsed.data.roleId);
-    if (roleError) {
-      return res.json(roleError);
+    try {
+      await assertBotCanAssignRole(guildId, parsed.data.roleId);
+    } catch (error) {
+      if (error instanceof BotCannotAssignRoleError) {
+        return res.json(errorPayload(error.toUserMessage()));
+      }
+      logger.error('trigger role assignability check failed', {
+        guildId,
+        roleId: parsed.data.roleId,
+        error,
+      });
+      return res.json(errorPayload(t('trigger.role.unavailable')));
     }
 
     applyRoleConfig(trigger, parsed.data);

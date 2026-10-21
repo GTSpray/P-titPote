@@ -15,9 +15,12 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import {
+  assertBotCanPostInChannel,
+  BotCannotPostInChannelError,
+} from '../../../utils/assertBotCanPostInChannel.js';
+import {
   ValidWelMsg,
   applyMessageConfig,
-  ensurePostableChannel,
   okWelMsgConfirm,
 } from './welMsgShared.js';
 
@@ -54,7 +57,7 @@ export const trigUpdateWelMsg: ModalHandlerDelcaration<CTAData> = {
     }
 
     const em = dbServices.orm.em.fork();
-    const trigger = await em.findOne(
+    const trigger = await em.findOneOrFail(
       GuildTrigger,
       {
         server: { guildId },
@@ -63,20 +66,19 @@ export const trigUpdateWelMsg: ModalHandlerDelcaration<CTAData> = {
       },
       { populate: ['messageConfig', 'roleConfig'] },
     );
-    if (!trigger) {
-      return res.json(
-        errorPayload(
-          t('trigger.lifecycle.notFound', { name: parsed.data.name }),
-        ),
-      );
-    }
 
-    const channelError = await ensurePostableChannel(
-      guildId,
-      parsed.data.channelId,
-    );
-    if (channelError) {
-      return res.json(channelError);
+    try {
+      await assertBotCanPostInChannel(guildId, parsed.data.channelId);
+    } catch (error) {
+      if (error instanceof BotCannotPostInChannelError) {
+        return res.json(errorPayload(error.toUserMessage()));
+      }
+      logger.error('trigger channel postability check failed', {
+        guildId,
+        channelId: parsed.data.channelId,
+        error,
+      });
+      return res.json(errorPayload(t('trigger.channel.unavailable')));
     }
 
     applyMessageConfig(trigger, parsed.data);
