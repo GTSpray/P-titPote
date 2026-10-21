@@ -182,9 +182,12 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
     }
 
     const { data } = req.body;
-    const updateName = (additionalData as CTAEnvelope<{ n?: string }>).d.n;
+    // Update CTAs put the trigger name in custom_id (`d.n`); create CTAs omit it
+    // and collect the name from the modal field instead.
+    const cta = (additionalData as CTAEnvelope<{ n?: string }>).d;
+    const isUpdate = cta.n !== undefined;
     const name =
-      updateName ??
+      cta.n ??
       getInputComponnentById<ComponentSimple>(data, 'name')?.component.value;
     const parsed = ValidWelMsg.safeParse({
       name,
@@ -203,10 +206,9 @@ export const trigSetWelMsg: ModalHandlerDelcaration<CTAData> = {
     }
 
     const em = dbServices.orm.em.fork();
-    const payload =
-      updateName !== undefined
-        ? await updateWelcomeMessage(em, guildId, parsed.data)
-        : await createWelcomeMessage(em, guildId, parsed.data);
+    const payload = isUpdate
+      ? await updateWelcomeMessage(em, guildId, parsed.data)
+      : await createWelcomeMessage(em, guildId, parsed.data);
 
     return res.json(payload);
   },
