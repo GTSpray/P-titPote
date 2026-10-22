@@ -12,17 +12,24 @@ import {
   getInputComponnentsByPrefix,
   ModalHandlerDelcaration,
 } from '../../modals.js';
-import { Poll } from '../../../db/entities/Poll.entity.js';
-import { PollStep } from '../../../db/entities/PollStep.entity.js';
-import { PollChoice } from '../../../db/entities/PollChoice.entity.js';
-import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { doNotUpdatePublishedPoll, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
+import type { PollEntity } from '../../../entities/poll.entity.js';
+import { CreatePollQuery } from '../../../queries/poll/createPoll.query.js';
+import { AppendPollQuestionQuery } from '../../../queries/poll/appendPollQuestion.query.js';
+import { AppendPollChoicesQuery } from '../../../queries/poll/appendPollChoices.query.js';
+import { CreatePollQueryHandler } from '../../../handlers/poll/createPoll.queryHandler.js';
+import { AppendPollQuestionQueryHandler } from '../../../handlers/poll/appendPollQuestion.queryHandler.js';
+import { AppendPollChoicesQueryHandler } from '../../../handlers/poll/appendPollChoices.queryHandler.js';
+import { PollDraftComputer } from '../../../handlers/poll/pollDraft.computer.js';
+import { createPollFinder } from '../../../repositories/poll/poll.finder.js';
+import { createPollPersister } from '../../../repositories/poll/poll.persister.js';
+import { PollAlreadyPublishedError } from '../../../errors/poll.errors.js';
 
-const getSummary = (aPoll: Poll) => {
+const getSummary = (aPoll: PollEntity) => {
   const summaryLines = [
     `## ${aPoll.title}`,
     ...(aPoll.endDate
@@ -46,6 +53,60 @@ const getSummary = (aPoll: Poll) => {
   return summaryLines.join('\n');
 };
 
+const draftResponse = (aPoll: PollEntity) => {
+  const lastStep = aPoll.steps[aPoll.steps.length - 1];
+  return {
+    type: InteractionResponseType.ChannelMessageWithSource,
+    data: {
+      flags: MessageFlags.Ephemeral,
+      content: getSummary(aPoll),
+      components: [
+        {
+          type: ComponentType.ActionRow,
+          components: [
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: t('poll.button.addChoices'),
+              custom_id: JSON.stringify({
+                t: 'cta',
+                d: {
+                  a: 'pollAddC',
+                  sId: lastStep.id,
+                },
+              }),
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: t('poll.button.newQuestion'),
+              custom_id: JSON.stringify({
+                t: 'cta',
+                d: {
+                  a: 'pollAddQ',
+                  pId: aPoll.id,
+                },
+              }),
+            },
+            {
+              type: ComponentType.Button,
+              style: ButtonStyle.Primary,
+              label: t('poll.button.publish'),
+              custom_id: JSON.stringify({
+                t: 'cta',
+                d: {
+                  a: 'pollPub',
+                  pId: aPoll.id,
+                },
+              }),
+            },
+          ],
+        },
+      ],
+    },
+  };
+};
+
 export const pollCreate: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
     try {
@@ -59,135 +120,98 @@ export const pollCreate: ModalHandlerDelcaration<CTAData> = {
     if (dbServices && guildId) {
       const em = dbServices.orm.em.fork();
       const pollId = (<any>additionalData).d.pId;
-      let aPoll: Poll;
-      if (!pollId) {
-        const title = getInputComponnentById<ComponentSimple>(data, 'title');
-        const role = getInputComponnentById<ComponentSelect>(data, 'role');
-        const question = getInputComponnentById<ComponentSimple>(
-          data,
-          'question',
-        );
-        const aGuild = await findOrCreateGuild(em, guildId);
-        aPoll = new Poll(
-          `${title?.component.value}`,
-          role?.component.values[0],
-        );
-        aGuild.polls.add(aPoll);
-        const firstStep = new PollStep(`${question?.component.value}`, 0);
-        const qDesc = getInputComponnentById<ComponentSimple>(
-          data,
-          'description',
-        );
-        firstStep.description = <string>qDesc?.component.value ?? null;
-        aPoll.steps.add(firstStep);
-        await em.persist(aGuild).flush();
-      } else {
-        aPoll = await em.findOneOrFail(
-          Poll,
-          { id: pollId, server: { guildId } },
-          {
-            populate: ['steps', 'steps.choices'],
-          },
-        );
+      const computer = new PollDraftComputer();
+      const repository = {
+        ...createPollFinder(em),
+        ...createPollPersister(em),
+      };
 
-        if (aPoll.publicationDate !== null) {
-          return res.json(doNotUpdatePublishedPoll());
-        }
-
-        const newQuestion = getInputComponnentById<ComponentSimple>(
-          data,
-          'question',
-        );
-        if (newQuestion) {
-          const newStep = new PollStep(
-            `${newQuestion?.component.value}`,
-            aPoll.steps.count(),
+      try {
+        let aPoll: PollEntity;
+        if (!pollId) {
+          const title = getInputComponnentById<ComponentSimple>(data, 'title');
+          const role = getInputComponnentById<ComponentSelect>(data, 'role');
+          const question = getInputComponnentById<ComponentSimple>(
+            data,
+            'question',
           );
           const qDesc = getInputComponnentById<ComponentSimple>(
             data,
             'description',
           );
-          newStep.description = <string>qDesc?.component.value ?? null;
-          aPoll.steps.add(newStep);
-        }
-
-        const newChoices = getInputComponnentsByPrefix<ComponentSimple>(
-          data,
-          'choice',
-        );
-        if (newChoices.length > 0) {
-          const lastStep = aPoll.steps.reduce(
-            (_obj, current) => current,
-            aPoll.steps[0],
+          const handler = new CreatePollQueryHandler(
+            em,
+            createPollPersister(em),
+            computer,
           );
-          const l = lastStep.choices.count();
-          newChoices
-            .map((e) => `${e.component.value}`.trim())
-            .filter((e) => e !== '')
-            .forEach((e, i) => {
-              const newChoice = new PollChoice(e, l + i);
-              lastStep.choices.add(newChoice);
+          aPoll = await handler.handle(
+            new CreatePollQuery({
+              guildId,
+              title: title?.component.value,
+              question: question?.component.value,
+              description: qDesc?.component.value ?? null,
+              role: role?.component.values[0] ?? null,
+            }),
+          );
+        } else {
+          const newQuestion = getInputComponnentById<ComponentSimple>(
+            data,
+            'question',
+          );
+          const newChoices = getInputComponnentsByPrefix<ComponentSimple>(
+            data,
+            'choice',
+          );
+
+          if (newQuestion) {
+            const qDesc = getInputComponnentById<ComponentSimple>(
+              data,
+              'description',
+            );
+            const handler = new AppendPollQuestionQueryHandler(
+              em,
+              repository,
+              computer,
+            );
+            aPoll = await handler.handle(
+              new AppendPollQuestionQuery({
+                guildId,
+                pollId,
+                question: newQuestion.component.value,
+                description: qDesc?.component.value ?? null,
+              }),
+            );
+          } else if (newChoices.length > 0) {
+            const choices = newChoices
+              .map((e) => `${e.component.value}`.trim())
+              .filter((e) => e !== '');
+            const handler = new AppendPollChoicesQueryHandler(
+              em,
+              repository,
+              computer,
+            );
+            aPoll = await handler.handle(
+              new AppendPollChoicesQuery({
+                guildId,
+                pollId,
+                choices,
+              }),
+            );
+          } else {
+            aPoll = await createPollFinder(em).findOrFail({
+              guildId,
+              pollId,
             });
+          }
         }
 
-        await em.persist(aPoll).flush();
+        return res.json(draftResponse(aPoll));
+      } catch (error) {
+        if (error instanceof PollAlreadyPublishedError) {
+          return res.json(doNotUpdatePublishedPoll());
+        }
+        throw error;
       }
-
-      const lastStep = aPoll.steps.reduce(
-        (_obj, current) => current,
-        aPoll.steps[0],
-      );
-
-      return res.json({
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.Ephemeral,
-          content: getSummary(aPoll),
-          components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Primary,
-                  label: t('poll.button.addChoices'),
-                  custom_id: JSON.stringify({
-                    t: 'cta',
-                    d: {
-                      a: 'pollAddC',
-                      sId: lastStep.id,
-                    },
-                  }),
-                },
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Primary,
-                  label: t('poll.button.newQuestion'),
-                  custom_id: JSON.stringify({
-                    t: 'cta',
-                    d: {
-                      a: 'pollAddQ',
-                      pId: aPoll.id,
-                    },
-                  }),
-                },
-                {
-                  type: ComponentType.Button,
-                  style: ButtonStyle.Primary,
-                  label: t('poll.button.publish'),
-                  custom_id: JSON.stringify({
-                    t: 'cta',
-                    d: {
-                      a: 'pollPub',
-                      pId: aPoll.id,
-                    },
-                  }),
-                },
-              ],
-            },
-          ],
-        },
-      });
     }
 
     return res.status(500).json({ error: t('errors.unknown') });
