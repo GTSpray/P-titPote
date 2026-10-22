@@ -12,11 +12,7 @@ export const expectedRemind = (opts: Partial<ThreadRemind>): ThreadRemind => {
     ownerUserId: expect.any(String),
     idleDays: expect.any(Number),
     nextTickAt: expect.any(Date),
-    lastBumpMessageId: expect.toBeOneOf([
-      expect.any(String),
-      null,
-      undefined,
-    ]),
+    lastBumpMessageId: expect.toBeOneOf([expect.any(String), null, undefined]),
     ...opts,
   };
 };
