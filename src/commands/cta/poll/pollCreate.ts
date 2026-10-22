@@ -20,7 +20,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { doNotUpdatePublishedPoll, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
+import { formatDiscordTimestamp } from '../../../utils/formatDiscordTimestamp.js';
 
 const getSummary = (aPoll: Poll) => {
   const summaryLines = [
