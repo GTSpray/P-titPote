@@ -21,6 +21,9 @@ import {
 import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
 import { ThreadRemind } from '../../../../../src/db/entities/ThreadRemind.entity.js';
 import { t } from '../../../../../src/i18n/index.js';
+import { REMIND_DAYS_MAX } from '../../../../../src/shared/remind/constants.js';
+import { expectedDiscordGuild } from '../../../../epectedEntities/expectedDiscordGuild.js';
+import { expectedRemind } from '../../../../epectedEntities/expectedRemind.js';
 
 const buildSubcommand = (days: number): remindOnSubCommandData => ({
   name: 'on',
@@ -137,9 +140,14 @@ describe('/remind on', () => {
       { threadId: thread_id },
       { populate: ['server'] },
     );
-    expect(remind.idleDays).toBe(3);
-    expect(remind.ownerUserId).toBe(owner_id);
-    expect(remind.server.guildId).toBe(guild_id);
+    expect(remind).toEqual(
+      expectedRemind({
+        threadId: thread_id,
+        ownerUserId: owner_id,
+        idleDays: 3,
+        server: expectedDiscordGuild({ guildId: guild_id }),
+      }),
+    );
   });
 
   it('should refuse when a reminder already exists', async () => {
@@ -190,6 +198,18 @@ describe('/remind on', () => {
 
     const response = await on(handlerOpts, subcommand);
 
-    expect(response?.statusCode).toBe(400);
+    expect(response).toMeetApiResponse(400, {
+      error: t('errors.invalidSubcommandPayload'),
+      issues: expect.arrayContaining([
+        {
+          code: 'too_big',
+          maximum: REMIND_DAYS_MAX,
+          inclusive: true,
+          origin: 'number',
+          path: [],
+          message: `Too big: expected number to be <=${REMIND_DAYS_MAX}`,
+        },
+      ]),
+    });
   });
 });
