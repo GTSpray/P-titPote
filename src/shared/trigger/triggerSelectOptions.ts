@@ -1,6 +1,6 @@
-import type { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
-import { t } from '../../../i18n/index.js';
-import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
+import type { GuildTrigger } from '../../db/entities/GuildTrigger.entity.js';
+import { t } from '../../i18n/index.js';
+import { triggerKindLabel } from './triggerKindLabel.js';
 
 export function triggerSelectOptions(triggers: GuildTrigger[]) {
   return triggers.map((aTrigger) => {

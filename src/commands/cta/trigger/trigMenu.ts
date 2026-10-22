@@ -12,7 +12,7 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t, type TranslationKey } from '../../../i18n/index.js';
 import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
-import { triggerSelectOptions } from './triggerSelectOptions.js';
+import { triggerSelectOptions } from '../../../shared/trigger/triggerSelectOptions.js';
 
 const ValidTriggerMenu = z.object({
   action: z.enum(['create', 'update', 'enable', 'disable', 'delete']),
