@@ -17,7 +17,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
 import { dismissEphemeralSelect } from '../../../utils/dismissEphemeralSelect.js';
 
 const ValidTriggerPick = z.object({

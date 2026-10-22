@@ -15,7 +15,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
+import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
 import {
   ValidWelRole,
   applyRoleConfig,

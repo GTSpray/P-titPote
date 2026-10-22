@@ -11,7 +11,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t, type TranslationKey } from '../../../i18n/index.js';
-import { triggerKindLabel } from '../../../trigger/triggerKindLabel.js';
+import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
 import { triggerSelectOptions } from './triggerSelectOptions.js';
 
 const ValidTriggerMenu = z.object({

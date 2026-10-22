@@ -13,7 +13,7 @@ import {
   assertBotCanAssignRole,
   BotCannotAssignRoleError,
 } from '../../../utils/assertBotCanAssignRole.js';
-import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
 
 export const ValidWelRole = z.object({
   name: triggerNameSchema,

@@ -14,7 +14,7 @@ import {
   assertBotCanPostInChannel,
   BotCannotPostInChannelError,
 } from '../../../utils/assertBotCanPostInChannel.js';
-import { triggerNameSchema } from '../../../trigger/triggerName.js';
+import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
 
 export const ValidWelMsg = z.object({
   name: triggerNameSchema,

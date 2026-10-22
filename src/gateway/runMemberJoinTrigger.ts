@@ -9,7 +9,7 @@ import {
   GuildTriggerKind,
 } from '../db/entities/GuildTrigger.entity.js';
 import { discordapi } from '../utils/discordapi.js';
-import { interpolateTriggerMessage } from '../trigger/interpolateTriggerMessage.js';
+import { interpolateTriggerMessage } from '../shared/trigger/interpolateTriggerMessage.js';
 import { logger } from '../logger.js';
 
 type TriggerRunContext = {

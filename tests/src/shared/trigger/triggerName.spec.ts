@@ -1,4 +1,4 @@
-import { triggerNameSchema } from '../../../src/trigger/triggerName.js';
+import { triggerNameSchema } from '../../../../src/shared/trigger/triggerName.js';
 
 describe('triggerNameSchema', () => {
   it('accepts underscore', () => {
