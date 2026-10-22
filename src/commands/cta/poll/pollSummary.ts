@@ -6,10 +6,8 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import {
-  formatDiscordTimestamp,
-  isPollClosed,
-} from '../../../utils/pollDates.js';
+import { formatDiscordTimestamp } from '../../../utils/formatDiscordTimestamp.js';
+import { isPollClosed } from '../../../shared/poll/isPollClosed.js';
 import { unMention } from '../../../utils/unMention.js';
 import { splitStringIntoChunks } from '../../../utils/splitStringIntoChunks.js';
 import { Routes } from 'discord-api-types/v10';

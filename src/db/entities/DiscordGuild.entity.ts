@@ -8,6 +8,7 @@ import {
 import { Collection } from '@mikro-orm/core';
 import { MessageAliased } from './MessageAliased.entity.js';
 import { Poll } from './Poll.entity.js';
+import { GuildTrigger } from './GuildTrigger.entity.js';
 
 @Entity()
 @Unique({
@@ -29,4 +30,7 @@ export class DiscordGuild extends EntityBase {
 
   @OneToMany(() => Poll, (poll) => poll.server)
   polls: Collection<Poll> = new Collection<Poll>(this);
+
+  @OneToMany(() => GuildTrigger, (trigger) => trigger.server)
+  triggers: Collection<GuildTrigger> = new Collection<GuildTrigger>(this);
 }

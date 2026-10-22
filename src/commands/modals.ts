@@ -8,11 +8,16 @@ type DiscordInteractionBody<Data> = APIBaseInteraction<
   Data
 >;
 
+export type CTAEnvelope<D extends object = Record<string, never>> = {
+  t: 'cta';
+  d: { a: string } & D;
+};
+
 export type ModalHandlerOptions<Data> = {
   req: Request<any, any, DiscordInteractionBody<Data>, any, any>;
   res: Response;
   dbServices?: DBServices;
-  additionalData: object;
+  additionalData: CTAEnvelope | object;
 };
 
 export type ModalHandlerDelcaration<Data extends object> = {
@@ -22,6 +27,12 @@ export type ModalHandlerDelcaration<Data extends object> = {
 export interface CTAData {
   components: Component<CTAComponnent>[];
   custom_id: string;
+}
+
+export interface CTASelectData {
+  custom_id: string;
+  component_type: number;
+  values: string[];
 }
 
 type CTAComponnent = ComponentSimple | ComponentSelect;

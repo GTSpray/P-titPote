@@ -1,6 +1,6 @@
 import { REST } from 'discord.js';
 import { Routes } from 'discord-api-types/v10';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { logger } from '../../../src/logger.js';
 import { notifyBotOwner } from '../../../src/utils/notifyBotOwner.js';
@@ -14,10 +14,6 @@ describe('notifyBotOwner', () => {
 
   beforeEach(() => {
     process.env.BOT_OWNER_ID = ownerId;
-  });
-
-  afterEach(() => {
-    delete process.env.BOT_OWNER_ID;
   });
 
   it('skips when BOT_OWNER_ID is unset', async () => {

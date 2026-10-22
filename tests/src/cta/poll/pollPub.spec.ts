@@ -27,7 +27,7 @@ import {
   default_member_permissions,
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
-import { formatDiscordTimestamp } from '../../../../src/utils/pollDates.js';
+import { formatDiscordTimestamp } from '../../../../src/utils/formatDiscordTimestamp.js';
 
 describe('cta/pollPub', () => {
   let guild_id: string;

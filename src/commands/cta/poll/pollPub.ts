@@ -10,7 +10,7 @@ import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
 import { notAllowed, doNotUpdatePublishedPoll } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
-import { formatDiscordTimestamp } from '../../../utils/pollDates.js';
+import { formatDiscordTimestamp } from '../../../utils/formatDiscordTimestamp.js';
 
 export const pollPub: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {

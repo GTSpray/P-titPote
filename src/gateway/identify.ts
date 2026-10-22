@@ -7,6 +7,7 @@ import {
 
 export const GATEWAY_INTENTS =
   GatewayIntentBits.Guilds |
+  GatewayIntentBits.GuildMembers |
   GatewayIntentBits.GuildMessageReactions |
   GatewayIntentBits.GuildMessages |
   GatewayIntentBits.DirectMessages;

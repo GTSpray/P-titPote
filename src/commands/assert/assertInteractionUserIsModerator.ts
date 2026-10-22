@@ -1,6 +1,7 @@
 import type { APIBaseInteraction } from 'discord-api-types/v10';
 import type { InteractionType } from 'discord-api-types/v10';
 import { t } from '../../i18n/index.js';
+import { isModeratorPermissions } from '../../utils/isModeratorPermissions.js';
 
 type InteractionTypeOpts =
   | InteractionType.ApplicationCommand
@@ -8,30 +9,12 @@ type InteractionTypeOpts =
   | InteractionType.MessageComponent;
 type iModeratorBodyOpts = APIBaseInteraction<InteractionTypeOpts, unknown>;
 
-const PERMISSIONS = {
-  ADMINISTRATOR: 0x8n,
-  MANAGE_GUILD: 0x20n,
-  MANAGE_CHANNELS: 0x10n,
-  MANAGE_MESSAGES: 0x2000n,
-  KICK_MEMBERS: 0x2n,
-  BAN_MEMBERS: 0x4n,
-};
-
 export function assertInteractionUserIsModerator(body: iModeratorBodyOpts) {
   if (!body.member || !body.member.permissions) {
     throw Error(t('errors.notServerScope'));
   }
-  const perms = BigInt(body.member.permissions);
 
-  const isModerator =
-    perms & PERMISSIONS.ADMINISTRATOR ||
-    perms & PERMISSIONS.MANAGE_GUILD ||
-    perms & PERMISSIONS.MANAGE_CHANNELS ||
-    perms & PERMISSIONS.MANAGE_MESSAGES ||
-    perms & PERMISSIONS.KICK_MEMBERS ||
-    perms & PERMISSIONS.BAN_MEMBERS;
-
-  if (!isModerator) {
+  if (!isModeratorPermissions(body.member.permissions)) {
     throw Error(t('errors.notModerator'));
   }
 }

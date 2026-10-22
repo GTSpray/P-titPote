@@ -8,6 +8,7 @@ import { GatewaySocket } from '../../../src/gateway/GatewaySocket.js';
 import {
   getInteractionCommand,
   handleGuildCreate,
+  handleGuildMemberAdd,
   handleMessageCreate,
   handleMessageReactionAdd,
   PROBE_COMMAND_NAME,
@@ -19,8 +20,9 @@ import { DiscordGuild } from '../../../src/db/entities/DiscordGuild.entity.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { randomDiscordId19 } from '../../mocks/discord-api/utils.js';
 import { initORM } from '../../initORM.js';
+import * as runMemberJoinTriggerModule from '../../../src/gateway/runMemberJoinTrigger.js';
 
-const appId = '1234567890';
+const appId = process.env.APP_ID!;
 const channelId = randomDiscordId19();
 const messageId = randomDiscordId19();
 const userId = randomDiscordId19();
@@ -62,13 +64,8 @@ describe('gateway handlers', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv('APP_ID', appId);
     putSpy = vi.spyOn(REST.prototype, 'put');
     deleteSpy = vi.spyOn(REST.prototype, 'delete');
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
   });
 
   describe('getInteractionCommand', () => {
@@ -224,6 +221,52 @@ describe('gateway handlers', () => {
       expect(logger.error).toHaveBeenCalledWith(
         'gateway guild_create persist failed',
         expect.objectContaining({ guildId: 'guild' }),
+      );
+    });
+  });
+
+  describe('handleGuildMemberAdd', () => {
+    const memberAddEvent = () =>
+      ({
+        guild_id: randomDiscordId19(),
+        user: { id: randomDiscordId19() },
+      }) as any;
+
+    it('should run member-join triggers', async () => {
+      const event = memberAddEvent();
+      const runSpy = vi
+        .spyOn(runMemberJoinTriggerModule, 'runMemberJoinTrigger')
+        .mockResolvedValue(undefined);
+
+      await handleGuildMemberAdd(initORM(), 0, event);
+
+      expect(runSpy).toHaveBeenCalledOnce();
+      expect(logger.info).toHaveBeenCalledWith(
+        'gateway guild_member_add triggers done',
+        expect.objectContaining({
+          guildId: event.guild_id,
+          userId: event.user.id,
+        }),
+      );
+    });
+
+    it('should log and swallow when member-join triggers fail', async () => {
+      const event = memberAddEvent();
+      vi.spyOn(
+        runMemberJoinTriggerModule,
+        'runMemberJoinTrigger',
+      ).mockRejectedValue(new Error('trigger down'));
+
+      await expect(
+        handleGuildMemberAdd(initORM(), 0, event),
+      ).resolves.toBeUndefined();
+
+      expect(logger.error).toHaveBeenCalledWith(
+        'gateway guild_member_add triggers failed',
+        expect.objectContaining({
+          guildId: event.guild_id,
+          userId: event.user.id,
+        }),
       );
     });
   });

@@ -13,6 +13,8 @@ export default defineConfig({
     setupFiles: ['tests/vitest.setup.ts'],
     env: {
       DOTENV_CONFIG_QUIET: 'true',
+      // Fake Discord application id — never use a real APP_ID from .env in tests.
+      APP_ID: '1234567890123456789',
     },
     reporters: process.env.GITHUB_ACTIONS
       ? [

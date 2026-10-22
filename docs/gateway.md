@@ -84,8 +84,9 @@ Required environment:
    - `large_threshold: 250`;
    - the bot presence (`GatewaySocket.presence`, set by `src/gateway.ts` from
      the `gateway.activity.*` strings), so it survives every re-identify;
-   - intents for guilds, guild message reactions, guild messages, and direct
-     messages.
+   - intents for guilds, guild members (privileged — enable **Server Members
+     Intent** in the Discord Developer Portal), guild message reactions, guild
+     messages, and direct messages.
 6. On `Ready`, the shard stores `session_id` and `resume_gateway_url`.
 7. At process start, `src/gateway.ts` retries `GatewaySocket.connect()` (up to 5
    attempts with exponential backoff) because the first connection is not
@@ -171,6 +172,9 @@ Handlers are registered by `registerGatewayHandlers()` in
   `gateway guild_create persist failed` without disconnecting the shard if the
   database write fails. `GuildDelete` is still log-only; leaving a guild does
   not soft-delete `DiscordGuild` or command state.
+- `GuildMemberAdd`: runs enabled `/trigger` automations via
+  `src/gateway/runMemberJoinTrigger.ts` (welcome roles and welcome messages).
+  Failures are logged per trigger and do not disconnect the shard.
 - `MessageCreate`: when Discord reports an application-command message whose
   command name is `gimme version`, the bot adds a `👀` reaction to that message
   with `PUT /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me`.

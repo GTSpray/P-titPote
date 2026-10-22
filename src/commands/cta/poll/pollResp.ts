@@ -10,7 +10,7 @@ import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { escapeModalTitle } from '../../../utils/escapeModalTitle.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { t } from '../../../i18n/index.js';
-import { isPollClosed } from '../../../utils/pollDates.js';
+import { isPollClosed } from '../../../shared/poll/isPollClosed.js';
 
 export const pollResp: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, additionalData, dbServices }) {
