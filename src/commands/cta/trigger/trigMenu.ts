@@ -12,7 +12,6 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t, type TranslationKey } from '../../../i18n/index.js';
 import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
-import { triggerSelectOptions } from '../../../shared/trigger/triggerSelectOptions.js';
 
 const ValidTriggerMenu = z.object({
   action: z.enum(['create', 'update', 'enable', 'disable', 'delete']),
@@ -29,8 +28,8 @@ const actionLabelKey: Record<TriggerMenuAction, TranslationKey> = {
   delete: 'trigger.action.delete',
 };
 
-export function triggerSelectOptions(triggers: GuildTrigger[]) {
-  return triggers.map((aTrigger) => {
+const triggerSelectOptions = (triggers: GuildTrigger[]) =>
+  triggers.map((aTrigger) => {
     const kindLabel = triggerKindLabel(aTrigger.kind);
     const statusLabel = aTrigger.enabled
       ? t('trigger.status.enabled')
@@ -41,7 +40,6 @@ export function triggerSelectOptions(triggers: GuildTrigger[]) {
       description: `${kindLabel} — ${statusLabel}`.slice(0, 100),
     };
   });
-}
 
 const selectedContent = (action: TriggerMenuAction, next: string) =>
   t('trigger.menu.selectedChoice', {
