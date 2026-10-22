@@ -22,7 +22,7 @@ import {
   ValidWelMsg,
   applyMessageConfig,
   okWelMsgConfirm,
-} from './welMsgShared.js';
+} from '../../../shared/trigger/welMsgShared.js';
 
 export const trigUpdateWelMsg: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices, additionalData }) {

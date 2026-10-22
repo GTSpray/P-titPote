@@ -21,7 +21,7 @@ import {
   applyMessageConfig,
   ensurePostableChannel,
   okWelMsgConfirm,
-} from './welMsgShared.js';
+} from '../../../shared/trigger/welMsgShared.js';
 
 export const trigCreateWelMsg: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {

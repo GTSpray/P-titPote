@@ -21,7 +21,7 @@ import {
   applyRoleConfig,
   ensureAssignableRole,
   okWelRoleConfirm,
-} from './welRoleShared.js';
+} from '../../../shared/trigger/welRoleShared.js';
 
 export const trigCreateWelRole: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {

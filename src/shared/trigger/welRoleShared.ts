@@ -4,16 +4,16 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
-import { GuildTrigger } from '../../../db/entities/GuildTrigger.entity.js';
-import { TriggerRole } from '../../../db/entities/TriggerRole.entity.js';
-import { logger } from '../../../logger.js';
-import { errorPayload } from '../../commonMessages.js';
-import { t } from '../../../i18n/index.js';
+import { GuildTrigger } from '../../db/entities/GuildTrigger.entity.js';
+import { TriggerRole } from '../../db/entities/TriggerRole.entity.js';
+import { logger } from '../../logger.js';
+import { errorPayload } from '../../commands/commonMessages.js';
+import { t } from '../../i18n/index.js';
 import {
   assertBotCanAssignRole,
   BotCannotAssignRoleError,
-} from '../../../utils/assertBotCanAssignRole.js';
-import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
+} from '../../utils/assertBotCanAssignRole.js';
+import { triggerNameSchema } from './triggerName.js';
 
 export const ValidWelRole = z.object({
   name: triggerNameSchema,
