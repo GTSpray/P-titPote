@@ -13,8 +13,6 @@ import { computeNextTickAt } from '../shared/remind/computeNextTickAt.js';
 import { isOlderThanIdleDays } from '../shared/remind/isOlderThanIdleDays.js';
 import { REMIND_INTERVAL_MS } from '../shared/remind/constants.js';
 
-export { REMIND_INTERVAL_MS };
-
 const DISCORD_NOT_FOUND_CODES = new Set<number>([
   RESTJSONErrorCodes.UnknownChannel,
   RESTJSONErrorCodes.UnknownGuild,
