@@ -16,7 +16,7 @@ import {
 } from '../../../src/utils/remindLoop.js';
 import { t } from '../../../src/i18n/index.js';
 import { REST } from 'discord.js';
-import { computeNextTickAt } from '../../../src/utils/remindConstants.js';
+import { computeNextTickAt } from '../../../src/shared/remind/computeNextTickAt.js';
 
 describe('remindLoop', () => {
   let em: SqlEntityManager<

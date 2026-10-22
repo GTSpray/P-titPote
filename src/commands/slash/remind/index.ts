@@ -17,7 +17,7 @@ import { t } from '../../../i18n/index.js';
 import {
   REMIND_DAYS_MAX,
   REMIND_DAYS_MIN,
-} from '../../../utils/remindConstants.js';
+} from '../../../shared/remind/constants.js';
 
 const builder = new SlashCommandBuilder()
   .setDescription(t('remind.description'))

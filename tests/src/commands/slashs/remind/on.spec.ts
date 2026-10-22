@@ -22,43 +22,39 @@ import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity
 import { ThreadRemind } from '../../../../../src/db/entities/ThreadRemind.entity.js';
 import { t } from '../../../../../src/i18n/index.js';
 
+const buildSubcommand = (days: number): remindOnSubCommandData => ({
+  name: 'on',
+  options: [{ name: 'days', type: 4, value: days }],
+  type: 1,
+});
+
+const buildRemindOnData = (
+  subcommand: remindOnSubCommandData,
+): remindOnCommandData => ({
+  id: randomDiscordId19(),
+  name: 'remind',
+  options: [subcommand],
+  type: 1,
+});
+
 describe('/remind on', () => {
-  let handlerOpts: CommandHandlerOptions<remindOnCommandData>;
   let em: SqlEntityManager<
     AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
   >;
-  let guild_id: string;
-  let thread_id: string;
-  let owner_id: string;
-
-  const buildSubcommand = (days: number): remindOnSubCommandData => ({
-    name: 'on',
-    options: [{ name: 'days', type: 4, value: days }],
-    type: 1,
-  });
-
-  const setup = async (days = 2, channelType = ChannelType.PublicThread) => {
-    const subcommand = buildSubcommand(days);
-    const data: remindOnCommandData = {
-      id: randomDiscordId19(),
-      name: 'remind',
-      options: [subcommand],
-      type: 1,
-    };
-    const { req, res } = getInteractionCommandHttpMock({ data });
-    req.body.channel.type = channelType;
-    const dbServices = await initORM();
-    handlerOpts = { req, res, dbServices };
-    guild_id = <string>req.body.guild_id;
-    thread_id = <string>req.body.channel.id;
-    owner_id = <string>req.body.member?.user.id;
-    const { orm } = await initORM();
-    em = orm.em.fork();
-    return subcommand;
-  };
 
   it('should refuse outside a thread', async () => {
-    const subcommand = await setup(2, ChannelType.GuildText);
+    const subcommand = buildSubcommand(2);
+    const { req, res } = getInteractionCommandHttpMock({
+      data: buildRemindOnData(subcommand),
+    });
+    req.body.channel.type = ChannelType.GuildText;
+    const dbServices = await initORM();
+    const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
+      req,
+      res,
+      dbServices,
+    };
+
     const response = await on(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
@@ -71,12 +67,26 @@ describe('/remind on', () => {
   });
 
   it('should refuse on an archived thread', async () => {
-    const subcommand = await setup(2);
-    handlerOpts.req.body.channel.thread_metadata = {
+    const subcommand = buildSubcommand(2);
+    const { req, res } = getInteractionCommandHttpMock({
+      data: buildRemindOnData(subcommand),
+    });
+    req.body.channel.type = ChannelType.PublicThread;
+    req.body.channel.thread_metadata = {
       archived: true,
       auto_archive_duration: 1440,
       archive_timestamp: '2026-09-01T00:00:00.000Z',
     };
+    const dbServices = await initORM();
+    const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
+      req,
+      res,
+      dbServices,
+    };
+    const thread_id = <string>req.body.channel.id;
+    const { orm } = await initORM();
+    em = orm.em.fork();
+
     const response = await on(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
@@ -94,7 +104,23 @@ describe('/remind on', () => {
   });
 
   it('should create a ThreadRemind', async () => {
-    const subcommand = await setup(3);
+    const subcommand = buildSubcommand(3);
+    const { req, res } = getInteractionCommandHttpMock({
+      data: buildRemindOnData(subcommand),
+    });
+    req.body.channel.type = ChannelType.PublicThread;
+    const dbServices = await initORM();
+    const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
+      req,
+      res,
+      dbServices,
+    };
+    const guild_id = <string>req.body.guild_id;
+    const thread_id = <string>req.body.channel.id;
+    const owner_id = <string>req.body.member?.user.id;
+    const { orm } = await initORM();
+    em = orm.em.fork();
+
     const response = await on(handlerOpts, subcommand);
 
     expect(response).toMeetApiResponse(200, {
@@ -117,7 +143,22 @@ describe('/remind on', () => {
   });
 
   it('should refuse when a reminder already exists', async () => {
-    const subcommand = await setup(2);
+    const subcommand = buildSubcommand(2);
+    const { req, res } = getInteractionCommandHttpMock({
+      data: buildRemindOnData(subcommand),
+    });
+    req.body.channel.type = ChannelType.PublicThread;
+    const dbServices = await initORM();
+    const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
+      req,
+      res,
+      dbServices,
+    };
+    const guild_id = <string>req.body.guild_id;
+    const thread_id = <string>req.body.channel.id;
+    const { orm } = await initORM();
+    em = orm.em.fork();
+
     const guild = new DiscordGuild(guild_id);
     const existing = new ThreadRemind(thread_id, randomDiscordId19(), 5);
     existing.server = guild;
@@ -135,7 +176,18 @@ describe('/remind on', () => {
   });
 
   it('should refuse days outside 1-30', async () => {
-    const subcommand = await setup(99);
+    const subcommand = buildSubcommand(99);
+    const { req, res } = getInteractionCommandHttpMock({
+      data: buildRemindOnData(subcommand),
+    });
+    req.body.channel.type = ChannelType.PublicThread;
+    const dbServices = await initORM();
+    const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
+      req,
+      res,
+      dbServices,
+    };
+
     const response = await on(handlerOpts, subcommand);
 
     expect(response?.statusCode).toBe(400);

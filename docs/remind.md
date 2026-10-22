@@ -71,7 +71,7 @@ Errors are isolated per guild and per thread.
   refuse archived on `/remind on`).
 - `tests/src/utils/remindLoop.spec.ts` — guild leave, nextTick filter, idle
   reschedule, bump, previous bump delete, archived soft-delete, isolation.
-- `tests/src/utils/remindConstants.spec.ts` — age helper.
+- `tests/src/shared/remind/` — `isOlderThanIdleDays`, `computeNextTickAt`.
 
 ## Troubleshooting
 

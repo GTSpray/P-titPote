@@ -11,7 +11,7 @@ import {
 import {
   REMIND_DAYS_MAX,
   REMIND_DAYS_MIN,
-} from '../../../utils/remindConstants.js';
+} from '../../../shared/remind/constants.js';
 import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { ThreadRemind } from '../../../db/entities/ThreadRemind.entity.js';
 import { getOptionValue } from '../../options.js';

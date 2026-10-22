@@ -18,7 +18,7 @@ import { t } from '../../../../../src/i18n/index.js';
 import {
   REMIND_DAYS_MAX,
   REMIND_DAYS_MIN,
-} from '../../../../../src/utils/remindConstants.js';
+} from '../../../../../src/shared/remind/constants.js';
 
 describe('/remind', () => {
   let handlerOpts: CommandHandlerOptions<remindDataOpts>;

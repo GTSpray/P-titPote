@@ -9,11 +9,9 @@ import { ThreadRemind } from '../db/entities/ThreadRemind.entity.js';
 import { discordapi } from './discordapi.js';
 import { logger } from '../logger.js';
 import { t } from '../i18n/index.js';
-import {
-  computeNextTickAt,
-  isOlderThanIdleDays,
-  REMIND_INTERVAL_MS,
-} from './remindConstants.js';
+import { computeNextTickAt } from '../shared/remind/computeNextTickAt.js';
+import { isOlderThanIdleDays } from '../shared/remind/isOlderThanIdleDays.js';
+import { REMIND_INTERVAL_MS } from '../shared/remind/constants.js';
 
 export { REMIND_INTERVAL_MS };
 
