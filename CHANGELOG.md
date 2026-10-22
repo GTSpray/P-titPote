@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/GTSpray/P-titPote/compare/v1.12.37...v1.13.0) (2026-10-22)
+
+### :sparkles: Features
+
+* **trigger:** add /trigger join automations for welcome message and role ([#310](https://github.com/GTSpray/P-titPote/issues/310)) ([386b595](https://github.com/GTSpray/P-titPote/commit/386b595c64351f09e9c9baa1930ba02c5a2141eb))
+
 ## [1.12.37](https://github.com/GTSpray/P-titPote/compare/v1.12.36...v1.12.37) (2026-10-19)
 
 ### :repeat: Chore
