@@ -29,6 +29,20 @@ const actionLabelKey: Record<TriggerMenuAction, TranslationKey> = {
   delete: 'trigger.action.delete',
 };
 
+export function triggerSelectOptions(triggers: GuildTrigger[]) {
+  return triggers.map((aTrigger) => {
+    const kindLabel = triggerKindLabel(aTrigger.kind);
+    const statusLabel = aTrigger.enabled
+      ? t('trigger.status.enabled')
+      : t('trigger.status.disabled');
+    return {
+      label: aTrigger.name,
+      value: aTrigger.name,
+      description: `${kindLabel} — ${statusLabel}`.slice(0, 100),
+    };
+  });
+}
+
 const selectedContent = (action: TriggerMenuAction, next: string) =>
   t('trigger.menu.selectedChoice', {
     choice: t(actionLabelKey[action]),
