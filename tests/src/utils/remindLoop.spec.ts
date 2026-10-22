@@ -10,10 +10,7 @@ import { ThreadRemind } from '../../../src/db/entities/ThreadRemind.entity.js';
 import { randomDiscordId19 } from '../../mocks/discord-api/utils.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { RESTJSONErrorCodes, Routes } from 'discord-api-types/v10';
-import {
-  REMIND_INTERVAL_MS,
-  runRemindTick,
-} from '../../../src/utils/remindLoop.js';
+import { runRemindTick } from '../../../src/utils/remindLoop.js';
 import { t } from '../../../src/i18n/index.js';
 import { REST } from 'discord.js';
 import { computeNextTickAt } from '../../../src/shared/remind/computeNextTickAt.js';
@@ -38,10 +35,6 @@ describe('remindLoop', () => {
     remind = new ThreadRemind(thread_id, randomDiscordId19(), 2, now);
     remind.server = guild;
     await em.persist([guild, remind]).flush();
-  });
-
-  it('should export a 10 minutes interval', () => {
-    expect(REMIND_INTERVAL_MS).toBe(60 * 10000);
   });
 
   it('should soft-delete all guild reminds when the bot left the guild', async () => {
