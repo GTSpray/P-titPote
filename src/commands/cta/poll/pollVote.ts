@@ -9,7 +9,7 @@ import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { t } from '../../../i18n/index.js';
-import { isPollClosed } from '../../../shared/pollDates.js';
+import { isPollClosed } from '../../../shared/poll/isPollClosed.js';
 import { LockMode } from '@mikro-orm/core';
 
 export const pollVote: ModalHandlerDelcaration<CTAData> = {

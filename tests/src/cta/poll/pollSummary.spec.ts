@@ -28,7 +28,7 @@ import {
 } from '../../../mocks/discord-api/rolePermission.js';
 import { t } from '../../../../src/i18n/index.js';
 import { formatDiscordTimestamp } from '../../../../src/utils/formatDiscordTimestamp.js';
-import { isPollClosed } from '../../../../src/shared/pollDates.js';
+import { isPollClosed } from '../../../../src/shared/poll/isPollClosed.js';
 import { REST } from 'discord.js';
 import {
   DiscrodRESTMock,

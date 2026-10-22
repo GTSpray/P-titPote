@@ -7,7 +7,7 @@ import { assertInteractionUserIsModerator } from '../../assert/assertInteraction
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { formatDiscordTimestamp } from '../../../utils/formatDiscordTimestamp.js';
-import { isPollClosed } from '../../../shared/pollDates.js';
+import { isPollClosed } from '../../../shared/poll/isPollClosed.js';
 import { unMention } from '../../../utils/unMention.js';
 import { splitStringIntoChunks } from '../../../utils/splitStringIntoChunks.js';
 import { Routes } from 'discord-api-types/v10';
