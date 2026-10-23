@@ -17,7 +17,7 @@
 ## About
 
 **P'tit Pote** is a Discord bot for polls, reusable message aliases, event based
-triggers,reminders and a few utility commands. It is built with TypeScript, Express,
+triggers, reminders, and a few utility commands. It is built with TypeScript, Express,
 Discord.js, MariaDB, and MikroORM.
 
 The documentation is split for two audiences:
@@ -49,13 +49,8 @@ The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
 - [`docs/usage/README.md`](docs/usage/README.md) — user docs home / command index
 - [`docs/usage/poll/poll.md`](docs/usage/poll/poll.md) — create polls, vote, and view reports
 - [`docs/usage/alias/alias.md`](docs/usage/alias/alias.md) — store, post, and remove reusable message aliases
-  <<<<<<< HEAD
 - [`docs/usage/trigger/trigger.md`](docs/usage/trigger/trigger.md) — event-driven automations (currently join: welcome message or welcome role)
-  \=======
 - [`docs/usage/remind/remind.md`](docs/usage/remind/remind.md) — bump forgotten threads after idle days
-
-> > > > > > > b6dbc94 (feat(remind): bump forgotten threads after idle days)
-
 - [`docs/usage/gimme/gimme.md`](docs/usage/gimme/gimme.md) — otter image, emoji gallery, and version
 
 ---
