@@ -15,6 +15,10 @@
     {
       "text": "/trigger",
       "link": "/trigger/"
+    },
+    {
+      "text": "/remind",
+      "link": "/remind/"
     }
   ]
 }
