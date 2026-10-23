@@ -1,6 +1,5 @@
 import type { EntityManager } from '@mikro-orm/core';
 import {
-  RESTJSONErrorCodes,
   Routes,
   type APIMessage,
   type APIThreadChannel,
@@ -12,37 +11,8 @@ import { t } from '../i18n/index.js';
 import { computeNextTickAt } from '../shared/remind/computeNextTickAt.js';
 import { isOlderThanIdleDays } from '../shared/remind/isOlderThanIdleDays.js';
 import { REMIND_INTERVAL_MS } from '../shared/remind/constants.js';
-
-const DISCORD_NOT_FOUND_CODES = new Set<number>([
-  RESTJSONErrorCodes.UnknownChannel,
-  RESTJSONErrorCodes.UnknownGuild,
-  RESTJSONErrorCodes.UnknownMember,
-  RESTJSONErrorCodes.UnknownMessage,
-]);
-
-function isDiscordNotFound(error: unknown): boolean {
-  if (!error || typeof error !== 'object') {
-    return false;
-  }
-  const err = error as { status?: number; code?: number };
-  if (err.status === 404) {
-    return true;
-  }
-  return DISCORD_NOT_FOUND_CODES.has(err.code ?? -1);
-}
-
-async function isBotInGuild(guildId: string): Promise<boolean> {
-  try {
-    // Bot token: GET /guilds/{id}. userGuildMember is OAuth-only (20001 for bots).
-    await discordapi.get(Routes.guild(guildId));
-    return true;
-  } catch (error) {
-    if (isDiscordNotFound(error)) {
-      return false;
-    }
-    throw error;
-  }
-}
+import { isBotInGuild } from './isBotInGuild.js';
+import { isDiscordNotFound } from './isDiscordNotFound.js';
 
 function softDeleteRemind(remind: ThreadRemind): void {
   remind.deletedAt = new Date();
