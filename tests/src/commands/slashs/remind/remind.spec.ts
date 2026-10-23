@@ -161,7 +161,7 @@ describe('/remind', () => {
       name: 'remind',
       options: [{ name: 'nope', type: 1 }],
       type: 1,
-    };
+    } as unknown as remindDataOpts;
 
     beforeEach(async () => {
       const { req, res } = getInteractionCommandHttpMock({ data });

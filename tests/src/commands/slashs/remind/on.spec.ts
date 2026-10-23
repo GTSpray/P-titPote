@@ -7,8 +7,10 @@ import {
   ChannelType,
   InteractionResponseType,
   MessageFlags,
+  type APIThreadChannel,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { interactionBodyChannel } from '../../../../mocks/interactionBodyChannel.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
 import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
@@ -50,7 +52,7 @@ describe('/remind on', () => {
     const { req, res } = getInteractionCommandHttpMock({
       data: buildRemindOnData(subcommand),
     });
-    req.body.channel.type = ChannelType.GuildText;
+    interactionBodyChannel(req).type = ChannelType.GuildText;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
       req,
@@ -74,9 +76,11 @@ describe('/remind on', () => {
     const { req, res } = getInteractionCommandHttpMock({
       data: buildRemindOnData(subcommand),
     });
-    req.body.channel.type = ChannelType.PublicThread;
-    req.body.channel.thread_metadata = {
+    const channel = interactionBodyChannel(req) as APIThreadChannel;
+    channel.type = ChannelType.PublicThread;
+    channel.thread_metadata = {
       archived: true,
+      locked: false,
       auto_archive_duration: 1440,
       archive_timestamp: '2026-09-01T00:00:00.000Z',
     };
@@ -86,7 +90,7 @@ describe('/remind on', () => {
       res,
       dbServices,
     };
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const { orm } = await initORM();
     em = orm.em.fork();
 
@@ -111,7 +115,8 @@ describe('/remind on', () => {
     const { req, res } = getInteractionCommandHttpMock({
       data: buildRemindOnData(subcommand),
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
       req,
@@ -119,7 +124,7 @@ describe('/remind on', () => {
       dbServices,
     };
     const guild_id = <string>req.body.guild_id;
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const owner_id = <string>req.body.member?.user.id;
     const { orm } = await initORM();
     em = orm.em.fork();
@@ -155,7 +160,8 @@ describe('/remind on', () => {
     const { req, res } = getInteractionCommandHttpMock({
       data: buildRemindOnData(subcommand),
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
       req,
@@ -163,7 +169,7 @@ describe('/remind on', () => {
       dbServices,
     };
     const guild_id = <string>req.body.guild_id;
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const { orm } = await initORM();
     em = orm.em.fork();
 
@@ -188,7 +194,7 @@ describe('/remind on', () => {
     const { req, res } = getInteractionCommandHttpMock({
       data: buildRemindOnData(subcommand),
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    interactionBodyChannel(req).type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOnCommandData> = {
       req,

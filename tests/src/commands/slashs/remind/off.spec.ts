@@ -8,6 +8,7 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { interactionBodyChannel } from '../../../../mocks/interactionBodyChannel.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
 import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
@@ -42,7 +43,8 @@ describe('/remind off', () => {
       data: remindOffData,
       permissions: default_member_permissions,
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOffCommandData> = {
       req,
@@ -50,7 +52,7 @@ describe('/remind off', () => {
       dbServices,
     };
     const guild_id = <string>req.body.guild_id;
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const callerId = <string>req.body.member?.user.id;
     const { orm } = await initORM();
     em = orm.em.fork();
@@ -79,7 +81,8 @@ describe('/remind off', () => {
       data: remindOffData,
       permissions: admin_permissions,
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOffCommandData> = {
       req,
@@ -87,7 +90,7 @@ describe('/remind off', () => {
       dbServices,
     };
     const guild_id = <string>req.body.guild_id;
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const callerId = <string>req.body.member?.user.id;
     const { orm } = await initORM();
     em = orm.em.fork();
@@ -118,7 +121,8 @@ describe('/remind off', () => {
       data: remindOffData,
       permissions: default_member_permissions,
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOffCommandData> = {
       req,
@@ -126,7 +130,7 @@ describe('/remind off', () => {
       dbServices,
     };
     const guild_id = <string>req.body.guild_id;
-    const thread_id = <string>req.body.channel.id;
+    const thread_id = channel.id;
     const { orm } = await initORM();
     em = orm.em.fork();
 
@@ -151,7 +155,8 @@ describe('/remind off', () => {
       data: remindOffData,
       permissions: default_member_permissions,
     });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     const handlerOpts: CommandHandlerOptions<remindOffCommandData> = {
       req,

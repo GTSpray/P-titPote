@@ -8,6 +8,7 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
+import { interactionBodyChannel } from '../../../../mocks/interactionBodyChannel.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
 import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
@@ -37,11 +38,12 @@ describe('/remind status', () => {
       type: 1,
     };
     const { req, res } = getInteractionCommandHttpMock({ data });
-    req.body.channel.type = ChannelType.PublicThread;
+    const channel = interactionBodyChannel(req);
+    channel.type = ChannelType.PublicThread;
     const dbServices = await initORM();
     handlerOpts = { req, res, dbServices };
     guild_id = <string>req.body.guild_id;
-    thread_id = <string>req.body.channel.id;
+    thread_id = channel.id;
     const { orm } = await initORM();
     em = orm.em.fork();
   });
@@ -77,7 +79,7 @@ describe('/remind status', () => {
   });
 
   it('should refuse outside a thread', async () => {
-    handlerOpts.req.body.channel.type = ChannelType.GuildText;
+    interactionBodyChannel(handlerOpts.req).type = ChannelType.GuildText;
     const response = await status(handlerOpts);
 
     expect(response).toMeetApiResponse(200, {
