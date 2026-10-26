@@ -1,3 +1,9 @@
+## [1.13.2](https://github.com/GTSpray/P-titPote/compare/v1.13.1...v1.13.2) (2026-10-26)
+
+### :repeat: Chore
+
+* **deps:** bump express from 5.2.1 to 5.3.0 ([#332](https://github.com/GTSpray/P-titPote/issues/332)) ([c6b9c59](https://github.com/GTSpray/P-titPote/commit/c6b9c5940ac86b3129afb729c3cd2644d95fd0a2))
+
 ## [1.13.1](https://github.com/GTSpray/P-titPote/compare/v1.13.0...v1.13.1) (2026-10-26)
 
 ### :bug: Fixes
