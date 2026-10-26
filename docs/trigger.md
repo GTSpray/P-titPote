@@ -132,6 +132,19 @@ Requires `GatewayIntentBits.GuildMembers` in `GATEWAY_INTENTS`
 (`src/gateway/identify.ts`; privileged intent must also be enabled in the
 Discord Developer Portal).
 
+Welcome-role assignment uses `PUT guildMemberRole`. Discord returns `50001`
+Missing Access when the bot lacks **Manage Roles** or its highest role is not
+above the target role. Create/update CTAs call
+`assertBotCanAssignRole` before persisting so moderators get an ephemeral error
+instead of a silent runtime failure. Human users also need **Manage Roles** (or
+Administrator) to open the welcome-role create/update flow or re-enable a
+welcome-role trigger.
+
+Welcome-message posts use `POST channelMessages`. Discord returns `50001`
+Missing Access when the bot cannot **View Channel** / **Send Messages** in the
+target channel. Create/update CTAs call `assertBotCanPostInChannel` before
+persisting for the same reason.
+
 ## Welcome message preview
 
 After a successful create/update of a `welcome_message` trigger,
@@ -150,7 +163,9 @@ Same moderator gate as alias/poll: `assertInteractionUserIsModerator` on slash
 and CTA handlers. It accepts members with Administrator, Manage Server, Manage
 Channels, Manage Messages, Kick Members, or Ban Members. The slash command's
 builder default permission is only `SendMessages`, so the server-side moderator
-assertion is the real authorization boundary.
+assertion is the real authorization boundary. Welcome-role create/update/enable
+paths add `assertInteractionUserCanManageRoles` because those actions can grant
+roles to future members.
 
 ## Limits and validation
 

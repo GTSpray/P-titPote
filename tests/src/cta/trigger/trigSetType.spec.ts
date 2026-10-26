@@ -8,6 +8,7 @@ import { getInteractionMessageComponentHttpMock } from '../../../mocks/getIntera
 import {
   ComponentType,
   InteractionResponseType,
+  PermissionFlagsBits,
   TextInputStyle,
 } from 'discord-api-types/v10';
 import {
@@ -130,6 +131,28 @@ describe('cta/trigSetType', () => {
             },
           },
         ],
+      },
+    });
+  });
+
+  it('should refuse the welcome role flow when the user cannot manage roles', async () => {
+    data.values = [GuildTriggerKind.WelcomeRole];
+    const { req, res } = getInteractionMessageComponentHttpMock({
+      data,
+      permissions: `${PermissionFlagsBits.ManageMessages}`,
+    });
+
+    const response = await trigSetType.handler({
+      ...handlerOpts,
+      req,
+      res,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.UpdateMessage,
+      data: {
+        content: t('common.notAllowed'),
+        components: [],
       },
     });
   });

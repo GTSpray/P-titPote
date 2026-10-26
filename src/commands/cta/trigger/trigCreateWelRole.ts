@@ -12,7 +12,10 @@ import {
 } from '../../../db/entities/GuildTrigger.entity.js';
 import { findOrCreateGuild } from '../../../db/services/discordGuild.service.js';
 import { logger } from '../../../logger.js';
-import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import {
+  assertInteractionUserCanManageRoles,
+  assertInteractionUserIsModerator,
+} from '../../assert/assertInteractionUserIsModerator.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { triggerKindLabel } from '../../../shared/trigger/triggerKindLabel.js';
@@ -27,6 +30,7 @@ export const trigCreateWelRole: ModalHandlerDelcaration<CTAData> = {
   async handler({ req, res, dbServices }) {
     try {
       assertInteractionUserIsModerator(req.body);
+      assertInteractionUserCanManageRoles(req.body);
     } catch (error) {
       logger.error(error);
       return res.json(notAllowed());

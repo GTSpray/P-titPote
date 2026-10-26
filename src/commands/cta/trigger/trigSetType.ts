@@ -7,7 +7,10 @@ import {
 import type { Response } from 'express';
 import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
 import { logger } from '../../../logger.js';
-import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import {
+  assertInteractionUserCanManageRoles,
+  assertInteractionUserIsModerator,
+} from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { GuildTriggerKind } from '../../../db/entities/GuildTrigger.entity.js';
@@ -123,6 +126,12 @@ export const trigSetType: ModalHandlerDelcaration<CTASelectData> = {
         resp = res.json(welcomeMessageCreateModal());
         break;
       case GuildTriggerKind.WelcomeRole:
+        try {
+          assertInteractionUserCanManageRoles(req.body);
+        } catch (error) {
+          logger.error(error);
+          return res.json(updateMessagePayload(t('common.notAllowed')));
+        }
         resp = res.json(welcomeRoleCreateModal());
         break;
       default:

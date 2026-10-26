@@ -16,6 +16,7 @@ import {
   ComponentType,
   InteractionResponseType,
   MessageFlags,
+  PermissionFlagsBits,
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10';
@@ -45,6 +46,7 @@ describe('cta/trigPick', () => {
   const makeOpts = async (
     act: string,
     name = 'welcome',
+    permissions = admin_permissions,
   ): Promise<ModalHandlerOptions<CTASelectData>> => {
     const data: CTASelectData = {
       custom_id: JSON.stringify({
@@ -56,7 +58,7 @@ describe('cta/trigPick', () => {
     };
     const { req, res } = getInteractionMessageComponentHttpMock({
       data,
-      permissions: admin_permissions,
+      permissions,
     });
     req.body.guild_id = guild_id;
     const dbServices = await initORM();
@@ -175,6 +177,35 @@ describe('cta/trigPick', () => {
     });
   });
 
+  it('should refuse the welcome-role update modal when the user cannot manage roles', async () => {
+    const roleId = randomDiscordId19();
+    const roleTrigger = new GuildTrigger(
+      'member',
+      GuildTriggerKind.WelcomeRole,
+    );
+    const roleConfig = new TriggerRole(roleId);
+    roleConfig.trigger = roleTrigger;
+    roleTrigger.roleConfig = roleConfig;
+    const guild = await em.findOneOrFail(DiscordGuild, { guildId: guild_id });
+    guild.triggers.add(roleTrigger);
+    await em.persist(guild).flush();
+
+    const handlerOpts = await makeOpts(
+      'update',
+      'member',
+      `${PermissionFlagsBits.ManageMessages}`,
+    );
+    const response = await trigPick.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.UpdateMessage,
+      data: {
+        content: t('common.notAllowed'),
+        components: [],
+      },
+    });
+  });
+
   it('should disable the selected trigger', async () => {
     const handlerOpts = await makeOpts('disable');
     const response = await trigPick.handler(handlerOpts);
@@ -250,6 +281,39 @@ describe('cta/trigPick', () => {
         roleConfig: null,
       }),
     );
+  });
+
+  it('should refuse to enable a welcome-role trigger when the user cannot manage roles', async () => {
+    const roleTrigger = new GuildTrigger(
+      'member',
+      GuildTriggerKind.WelcomeRole,
+    );
+    const roleConfig = new TriggerRole(randomDiscordId19());
+    roleConfig.trigger = roleTrigger;
+    roleTrigger.roleConfig = roleConfig;
+    roleTrigger.enabled = false;
+    const guild = await em.findOneOrFail(DiscordGuild, { guildId: guild_id });
+    guild.triggers.add(roleTrigger);
+    await em.persist(guild).flush();
+
+    const handlerOpts = await makeOpts(
+      'enable',
+      'member',
+      `${PermissionFlagsBits.ManageMessages}`,
+    );
+    const response = await trigPick.handler(handlerOpts);
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.UpdateMessage,
+      data: {
+        content: t('common.notAllowed'),
+        components: [],
+      },
+    });
+
+    em.clear();
+    const saved = await em.findOneOrFail(GuildTrigger, { id: roleTrigger.id });
+    expect(saved.enabled).toBe(false);
   });
 
   it('should soft-delete the selected trigger', async () => {
