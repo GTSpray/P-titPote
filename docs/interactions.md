@@ -91,7 +91,7 @@ in `src/commands/modals.ts`).
 ## CTA buttons and modals
 
 Buttons and modals share the CTA registry in `src/commands/cta/index.ts`.
-Registered actions currently serve the poll and alias workflows:
+Registered actions currently serve the alias, poll, and trigger workflows:
 
 ```ts
 export const cta = {
@@ -107,6 +107,7 @@ export const cta = {
   pollVote,
   trigMenu,
   trigPick,
+  trigPreviewWelMsg,
   trigSetType,
   trigCreateWelMsg,
   trigUpdateWelMsg,
