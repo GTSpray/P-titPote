@@ -1,3 +1,13 @@
+## [1.13.1](https://github.com/GTSpray/P-titPote/compare/v1.13.0...v1.13.1) (2026-10-26)
+
+### :bug: Fixes
+
+* **trigger:** require Manage Roles for role automations ([#333](https://github.com/GTSpray/P-titPote/issues/333)) ([33bf87e](https://github.com/GTSpray/P-titPote/commit/33bf87e50637e40feb17ec105f638d6bae301470))
+
+### :repeat: CI
+
+* allow manual runs via workflow_dispatch ([#326](https://github.com/GTSpray/P-titPote/issues/326)) ([17f58d7](https://github.com/GTSpray/P-titPote/commit/17f58d7341eb03bdb895a48964aa62d093f962cf))
+
 ## [1.13.0](https://github.com/GTSpray/P-titPote/compare/v1.12.37...v1.13.0) (2026-10-22)
 
 ### :sparkles: Features
