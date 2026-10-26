@@ -24,6 +24,10 @@ text and the next select (or the result) replaces the previous one.
 check accepts members with at least one of: Administrator, Manage Server,
 Manage Channels, Manage Messages, Kick Members, or Ban Members.
 
+Welcome-role creation, welcome-role updates, and re-enabling a welcome-role
+automation additionally require **Manage Roles** (or Administrator), because
+those actions can cause the bot to assign roles to new members.
+
 Non-moderators receive an ephemeral **Ahem... je ne suis pas habilité à le
 faire 🤷** response.
 
@@ -95,10 +99,10 @@ Assigns a role when someone joins.
 4. Submit. Success replies with the automation name and kind, for example
    **Automatisme "member" (Rôle de bienvenue) créé.**
 
-**Requirements:** the bot needs **Manage Roles**, and its highest role must sit
-**above** the role it assigns (Server Settings → Roles). Otherwise Discord
-returns Missing Access and the join role is skipped; setup also checks this
-and can fail with an ephemeral error.
+**Requirements:** the moderator needs **Manage Roles** (or Administrator). The
+bot also needs **Manage Roles**, and its highest role must sit **above** the
+role it assigns (Server Settings → Roles). Otherwise setup fails with an
+ephemeral error instead of silently failing on join.
 
 ![Create welcome role](./trigger-welcome-role.gif)
 

@@ -14,7 +14,10 @@ import {
   GuildTriggerKind,
 } from '../../../db/entities/GuildTrigger.entity.js';
 import { logger } from '../../../logger.js';
-import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';
+import {
+  assertInteractionUserCanManageRoles,
+  assertInteractionUserIsModerator,
+} from '../../assert/assertInteractionUserIsModerator.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
@@ -218,6 +221,18 @@ export const trigPick: ModalHandlerDelcaration<CTASelectData> = {
       return res.json(
         updateMessagePayload(t('trigger.lifecycle.notFound', { name })),
       );
+    }
+
+    if (
+      trigger.kind === GuildTriggerKind.WelcomeRole &&
+      (act === 'update' || act === 'enable')
+    ) {
+      try {
+        assertInteractionUserCanManageRoles(req.body);
+      } catch (error) {
+        logger.error(error);
+        return res.json(updateMessagePayload(t('common.notAllowed')));
+      }
     }
 
     let rep: Response;

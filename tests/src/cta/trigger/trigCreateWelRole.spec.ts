@@ -245,4 +245,25 @@ describe('cta/trigCreateWelRole', () => {
       },
     });
   });
+
+  it('should refuse when the user cannot manage roles', async () => {
+    const { req, res } = getInteractionModalHttpMock({
+      data,
+      permissions: `${PermissionFlagsBits.ManageMessages}`,
+    });
+
+    const response = await trigCreateWelRole.handler({
+      ...handlerOpts,
+      req,
+      res,
+    });
+
+    expect(response).toMeetApiResponse(200, {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        flags: MessageFlags.Ephemeral,
+        content: t('common.notAllowed'),
+      },
+    });
+  });
 });

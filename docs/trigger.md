@@ -71,7 +71,9 @@ Welcome-role assignment uses `PUT guildMemberRole`. Discord returns `50001`
 Missing Access when the bot lacks **Manage Roles** or its highest role is not
 above the target role. Create/update CTAs call
 `assertBotCanAssignRole` before persisting so moderators get an ephemeral error
-instead of a silent runtime failure.
+instead of a silent runtime failure. Human users also need **Manage Roles** (or
+Administrator) to open the welcome-role create/update flow or re-enable a
+welcome-role trigger.
 
 Welcome-message posts use `POST channelMessages`. Discord returns `50001`
 Missing Access when the bot cannot **View Channel** / **Send Messages** in the
@@ -92,7 +94,9 @@ join-time execution.
 ## Permissions
 
 Same moderator gate as alias/poll: `assertInteractionUserIsModerator` on slash
-and CTA handlers.
+and CTA handlers. Welcome-role create/update/enable paths add
+`assertInteractionUserCanManageRoles` because those actions can grant roles to
+future members.
 
 ## Limits and validation
 
