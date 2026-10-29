@@ -49,20 +49,20 @@ export type gimmeOtterSubCommandData = {
   type: number;
 };
 
-export const otter = async ({
-  res,
-}: CommandHandlerOptions<gimmeOtterCommandData>): Promise<Response | null> => {
+async function getOtterImageUrl() {
   let imageUrl = FALLBACK_OTTER_IMAGE_URL;
-
   try {
-    const response = await fetch(OTTER_IMAGE_API_URL, {
+    const tinyFoxOtterResponse = await fetch(OTTER_IMAGE_API_URL, {
       signal: AbortSignal.timeout(2000),
       headers: { accept: 'application/json' },
     });
-    if (!response.ok) {
-      logger.warn('gimme otter image api failed', { status: response.status });
+    if (!tinyFoxOtterResponse.ok) {
+      logger.warn('gimme otter image api failed', {
+        status: tinyFoxOtterResponse.status,
+      });
     } else {
-      const parsed = TinyFoxOtterPayload.safeParse(await response.json());
+      const payload = await tinyFoxOtterResponse.json();
+      const parsed = TinyFoxOtterPayload.safeParse(payload);
       if (!parsed.success) {
         logger.warn('gimme otter image api payload invalid');
       } else {
@@ -88,6 +88,12 @@ export const otter = async ({
       err: error instanceof Error ? error.message : 'unknown',
     });
   }
+}
+
+export const otter = async ({
+  res,
+}: CommandHandlerOptions<gimmeOtterCommandData>): Promise<Response | null> => {
+  let imageUrl = await getOtterImageUrl();
 
   return res.json({
     type: InteractionResponseType.ChannelMessageWithSource,
