@@ -88,6 +88,8 @@ async function getOtterImageUrl() {
       err: error instanceof Error ? error.message : 'unknown',
     });
   }
+
+  return imageUrl;
 }
 
 export const otter = async ({
