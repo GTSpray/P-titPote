@@ -1,3 +1,13 @@
+## [1.14.0](https://github.com/GTSpray/P-titPote/compare/v1.13.6...v1.14.0) (2026-10-29)
+
+### :sparkles: Features
+
+* **gimme-otter:** fetch a random otter image and fall back to the usual one ([#335](https://github.com/GTSpray/P-titPote/issues/335)) ([97b3905](https://github.com/GTSpray/P-titPote/commit/97b3905f3a3022f66f9a769582211a6e98287798))
+
+### :memo: Documentation
+
+* expand trigger automation runbook ([#327](https://github.com/GTSpray/P-titPote/issues/327)) ([6659c4c](https://github.com/GTSpray/P-titPote/commit/6659c4cff6663f6bb4aaf74d9d9841ecb5004423))
+
 ## [1.13.6](https://github.com/GTSpray/P-titPote/compare/v1.13.5...v1.13.6) (2026-10-26)
 
 ### :repeat: Chore
