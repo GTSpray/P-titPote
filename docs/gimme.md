@@ -1,8 +1,9 @@
 # Gimme command workflow
 
 The `/gimme` command provides lightweight utility responses that do not persist
-state. It shares the slash-command dispatch path with the rest of the bot, and
-its emoji subcommand makes bounded Discord REST and CDN calls.
+state. It shares the slash-command dispatch path with the rest of the bot.
+`otter` calls the TinyFox image API, and `emoji` makes bounded Discord REST
+and CDN calls.
 
 ## Intent
 
@@ -10,7 +11,7 @@ its emoji subcommand makes bounded Discord REST and CDN calls.
 
 | Subcommand | Purpose                                                                   |
 | ---------- | ------------------------------------------------------------------------- |
-| `otter`    | Return the repository otter image as a media gallery.                     |
+| `otter`    | Return a random otter photo, or the repository otter if lookup fails.     |
 | `emoji`    | Find recent custom emojis in the current channel and display up to three. |
 | `version`  | Return the running package version with a random emoji.                   |
 
@@ -29,8 +30,12 @@ the root handler responds with `errors.unmetResult`.
 
 Subcommand handlers return Discord InteractionResponse payloads directly:
 
-- `otter` returns Components V2 with `common.foundIt` and a media gallery item
-  pointing at `assets/otter.png` on GitHub.
+- `otter` returns Components V2 with `common.foundIt` and a media gallery item.
+  It requests `https://api.tinyfox.dev/img.json?animal=ott` (2s timeout) and
+  posts `https://api.tinyfox.dev` plus the JSON `loc` when `loc` is a relative
+  image path on that host (`.jpg`, `.jpeg`, `.png`, `.gif`, or `.webp`). Any
+  failure — timeout, non-OK HTTP, invalid JSON, or a rejected `loc` — is logged
+  with `logger.warn` and the gallery falls back to `assets/otter.png` on GitHub.
 - `version` returns Components V2 text with `gimme.version.message`,
   `process.env.npm_package_version`, and `getRandomEmoji()`.
 - `emoji` may call Discord REST and the Discord CDN before building its response.
@@ -59,6 +64,9 @@ gallery whose item descriptions use the extracted emoji names.
 
 ## Constraints and pitfalls
 
+- `/gimme otter` must answer within Discord's interaction window, so the
+  TinyFox request times out after 2 seconds and never fails the command: the
+  repository otter is the response when the API cannot be used.
 - `/gimme emoji` needs bot access to read message history in the current
   channel. Discord REST failures bubble up to the interaction handler today.
 - Unicode emojis are not collected; only custom Discord emoji markup is parsed.
@@ -75,7 +83,9 @@ The gimme test suite lives under `tests/src/commands/slashs/gimme/`:
 
 - `gimme.spec.ts` covers command declaration, subcommand dispatch, and malformed
   root payloads.
-- `otter.spec.ts` covers the media gallery response.
+- `otter.spec.ts` covers the TinyFox JSON gallery response and the repository
+  otter fallback when the API is unreachable, errors, or returns an unusable
+  `loc`.
 - `version.spec.ts` covers version rendering and the unknown fallback.
 - `emoji.spec.ts` covers REST query limits, not-found responses, custom emoji
   token shapes, deduplication, response limits, long-message filtering, and

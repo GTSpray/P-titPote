@@ -10,8 +10,10 @@ import {
 import { SlashCommandBuilder } from 'discord.js';
 
 import { Response } from 'express';
+import * as z from 'zod';
 import { foundItComponnents } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
+import { logger } from '../../../logger.js';
 
 const builder = new SlashCommandBuilder()
   .setDescription(t('gimme.otter.description'))
@@ -25,6 +27,15 @@ const builder = new SlashCommandBuilder()
     ApplicationIntegrationType.GuildInstall,
     ApplicationIntegrationType.UserInstall,
   );
+
+const OTTER_IMAGE_API_URL = 'https://api.tinyfox.dev/img.json?animal=ott';
+const TINYFOX_ORIGIN = 'https://api.tinyfox.dev';
+const FALLBACK_OTTER_IMAGE_URL =
+  'https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true';
+
+const TinyFoxOtterPayload = z.object({
+  loc: z.string(),
+});
 
 export interface gimmeOtterCommandData {
   id: string;
@@ -41,6 +52,43 @@ export type gimmeOtterSubCommandData = {
 export const otter = async ({
   res,
 }: CommandHandlerOptions<gimmeOtterCommandData>): Promise<Response | null> => {
+  let imageUrl = FALLBACK_OTTER_IMAGE_URL;
+
+  try {
+    const response = await fetch(OTTER_IMAGE_API_URL, {
+      signal: AbortSignal.timeout(2000),
+      headers: { accept: 'application/json' },
+    });
+    if (!response.ok) {
+      logger.warn('gimme otter image api failed', { status: response.status });
+    } else {
+      const parsed = TinyFoxOtterPayload.safeParse(await response.json());
+      if (!parsed.success) {
+        logger.warn('gimme otter image api payload invalid');
+      } else {
+        const { loc } = parsed.data;
+        const media = new URL(loc, TINYFOX_ORIGIN);
+        if (
+          loc.startsWith('/') &&
+          !loc.startsWith('//') &&
+          !loc.includes('..') &&
+          !loc.includes('\\') &&
+          loc.length <= 500 &&
+          media.origin === TINYFOX_ORIGIN &&
+          /\.(jpe?g|png|gif|webp)$/i.test(media.pathname)
+        ) {
+          imageUrl = media.href;
+        } else {
+          logger.warn('gimme otter image api loc rejected');
+        }
+      }
+    }
+  } catch (error) {
+    logger.warn('gimme otter image api unavailable', {
+      err: error instanceof Error ? error.message : 'unknown',
+    });
+  }
+
   return res.json({
     type: InteractionResponseType.ChannelMessageWithSource,
     data: {
@@ -52,9 +100,7 @@ export const otter = async ({
           items: [
             {
               description: 'otter',
-              media: {
-                url: 'https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png?raw=true',
-              },
+              media: { url: imageUrl },
             },
           ],
         },

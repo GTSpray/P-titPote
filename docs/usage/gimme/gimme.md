@@ -6,7 +6,7 @@ slash commands.
 
 ### Intent
 
-`/gimme` provides lightweight utility responses: a fixed otter image, custom
+`/gimme` provides lightweight utility responses: a random otter photo, custom
 emoji previews scraped from recent channel messages, and the running bot
 version.
 
@@ -14,9 +14,14 @@ version.
 
 #### `/gimme otter`
 
-Posts a public media gallery with the repository otter image:
+Posts a public media gallery with a random otter photo. If that photo service
+does not answer, or the reply cannot be used, the bot posts its usual otter
+instead:
 
 `https://github.com/GTSpray/P-titPote/raw/main/assets/otter.png`
+
+The capture below shows that usual otter. A successful lookup shows a different
+photo in the same gallery.
 
 ![Show otter](./gimme-otter.gif)
 
