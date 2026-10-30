@@ -1,3 +1,9 @@
+## [1.15.1](https://github.com/GTSpray/P-titPote/compare/v1.15.0...v1.15.1) (2026-10-30)
+
+### :repeat: Chore
+
+* catch unused symbols and type-only imports in tsc ([#336](https://github.com/GTSpray/P-titPote/issues/336)) ([50c14c8](https://github.com/GTSpray/P-titPote/commit/50c14c80c56aa554656561135c7e1ad4f49ae6df))
+
 ## [1.15.0](https://github.com/GTSpray/P-titPote/compare/v1.14.0...v1.15.0) (2026-10-30)
 
 ### :sparkles: Features
