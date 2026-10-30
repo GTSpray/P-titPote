@@ -1,0 +1,225 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "remind-off",
+  "title": "Remind — désactiver un rappel",
+  "doc": "docs/usage/remind/remind.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "événements",
+      "type": "text"
+    },
+    "thread": {
+      "name": "idée-barbecue",
+      "active": true,
+      "startedBy": "Alex"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Alex",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "applyState",
+      "holdMs": 2200,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "On a fixé la date, le fil n'a plus besoin d'être remonté.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Ok, tu peux couper le rappel alors.",
+            "timestamp": "12:16"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 1000
+    },
+    {
+      "type": "type",
+      "text": "/remind",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/remind",
+            "description": "Rappel pour remonter un fil oublié"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "On a fixé la date, le fil n'a plus besoin d'être remonté.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Ok, tu peux couper le rappel alors.",
+            "timestamp": "12:16"
+          },
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "12:17",
+            "ephemeral": true,
+            "slashInvocation": {
+              "user": {
+                "name": "Alex",
+                "color": "#57F287"
+              },
+              "command": "remind"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Que veux-tu faire ?",
+                "components": [
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 3,
+                        "custom_id": "{\"t\":\"cta\",\"d\":{\"a\":\"remindMenu\"}}",
+                        "placeholder": "Choisis une action...",
+                        "options": [
+                          {
+                            "label": "Activer",
+                            "value": "on",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Statut",
+                            "value": "status",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Désactiver",
+                            "value": "off",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 1800
+    },
+    {
+      "type": "selectMessageOption",
+      "field": "{\"t\":\"cta\",\"d\":{\"a\":\"remindMenu\"}}",
+      "option": "Désactiver"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "On a fixé la date, le fil n'a plus besoin d'être remonté.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Ok, tu peux couper le rappel alors.",
+            "timestamp": "12:16"
+          },
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "12:17",
+            "ephemeral": true,
+            "slashInvocation": {
+              "user": {
+                "name": "Alex",
+                "color": "#57F287"
+              },
+              "command": "remind"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Ok! Plus de rappel sur ce fil ;)"
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/remind",
+    "prefix": "remind-off",
+    "video": true
+  }
+}

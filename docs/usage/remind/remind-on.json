@@ -1,0 +1,367 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "id": "remind-on",
+  "title": "Remind — activer un rappel",
+  "doc": "docs/usage/remind/remind.md",
+  "chrome": {
+    "guild": {
+      "name": "Serveur de démo"
+    },
+    "channel": {
+      "name": "événements",
+      "type": "text"
+    },
+    "thread": {
+      "name": "idée-barbecue",
+      "active": false,
+      "startedBy": "Alex"
+    },
+    "membersOnline": 8,
+    "viewer": {
+      "name": "Alex",
+      "status": "Online"
+    }
+  },
+  "defaults": {
+    "botPendingText": "Envoi de la commande..."
+  },
+  "actions": [
+    {
+      "type": "applyState",
+      "holdMs": 2800,
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "On organise un barbecue le mois prochain ?",
+            "timestamp": "12:10"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Oui ! J'ai ouvert un fil pour les idées de menu.",
+            "timestamp": "12:11"
+          },
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Parfait, j'y active un rappel pour qu'on n'oublie pas le fil.",
+            "timestamp": "12:12"
+          }
+        ]
+      }
+    },
+    {
+      "type": "clickThread",
+      "name": "idée-barbecue"
+    },
+    {
+      "type": "applyState",
+      "holdMs": 2200,
+      "chrome": {
+        "guild": {
+          "name": "Serveur de démo"
+        },
+        "channel": {
+          "name": "événements",
+          "type": "text"
+        },
+        "thread": {
+          "name": "idée-barbecue",
+          "active": true,
+          "startedBy": "Alex"
+        },
+        "membersOnline": 8,
+        "viewer": {
+          "name": "Alex",
+          "status": "Online"
+        }
+      },
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Idées pour le barbecue :",
+            "timestamp": "12:14"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Brochettes, salade, et desserts à prévoir.",
+            "timestamp": "12:15"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 600
+    },
+    {
+      "type": "type",
+      "text": "Je mets un rappel au cas où le fil tombe dans l'oubli."
+    },
+    {
+      "type": "wait",
+      "ms": 400
+    },
+    {
+      "type": "pressEnter",
+      "userMessage": {
+        "author": {
+          "name": "Alex",
+          "color": "#57F287"
+        },
+        "content": "Je mets un rappel au cas où le fil tombe dans l'oubli.",
+        "timestamp": "12:16"
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 1000
+    },
+    {
+      "type": "focusInput"
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "type",
+      "text": "/remind",
+      "revealSuggestions": {
+        "mode": "commandMatch",
+        "activeIndex": 0,
+        "suggestions": [
+          {
+            "name": "/remind",
+            "description": "Rappel pour remonter un fil oublié"
+          }
+        ]
+      }
+    },
+    {
+      "type": "wait",
+      "ms": 800
+    },
+    {
+      "type": "pressEnter"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Idées pour le barbecue :",
+            "timestamp": "12:14"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Brochettes, salade, et desserts à prévoir.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Je mets un rappel au cas où le fil tombe dans l'oubli.",
+            "timestamp": "12:16"
+          },
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "12:17",
+            "ephemeral": true,
+            "slashInvocation": {
+              "user": {
+                "name": "Alex",
+                "color": "#57F287"
+              },
+              "command": "remind"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Que veux-tu faire ?",
+                "components": [
+                  {
+                    "type": 1,
+                    "components": [
+                      {
+                        "type": 3,
+                        "custom_id": "{\"t\":\"cta\",\"d\":{\"a\":\"remindMenu\"}}",
+                        "placeholder": "Choisis une action...",
+                        "options": [
+                          {
+                            "label": "Activer",
+                            "value": "on",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Statut",
+                            "value": "status",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          },
+                          {
+                            "label": "Désactiver",
+                            "value": "off",
+                            "emoji": {
+                              "name": "▪️"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 1800
+    },
+    {
+      "type": "selectMessageOption",
+      "field": "{\"t\":\"cta\",\"d\":{\"a\":\"remindMenu\"}}",
+      "option": "Activer"
+    },
+    {
+      "type": "openModal",
+      "modal": {
+        "type": 9,
+        "author": {
+          "name": "P'tit Pote",
+          "bot": true,
+          "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+        },
+        "data": {
+          "title": "Activer le rappel",
+          "components": [
+            {
+              "type": 18,
+              "label": "Jours d'inactivité",
+              "description": "Nombre entier de 1 à 30",
+              "component": {
+                "type": 4,
+                "custom_id": "days",
+                "style": 1,
+                "required": true
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "fillModal",
+      "values": {
+        "days": "3"
+      },
+      "msPerField": 130
+    },
+    {
+      "type": "wait",
+      "ms": 700
+    },
+    {
+      "type": "submitModal"
+    },
+    {
+      "type": "applyState",
+      "layers": {
+        "messages": [
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Idées pour le barbecue :",
+            "timestamp": "12:14"
+          },
+          {
+            "author": {
+              "name": "Sam",
+              "color": "#5865F2"
+            },
+            "content": "Brochettes, salade, et desserts à prévoir.",
+            "timestamp": "12:15"
+          },
+          {
+            "author": {
+              "name": "Alex",
+              "color": "#57F287"
+            },
+            "content": "Je mets un rappel au cas où le fil tombe dans l'oubli.",
+            "timestamp": "12:16"
+          },
+          {
+            "author": {
+              "name": "P'tit Pote",
+              "bot": true,
+              "avatarUrl": "https://raw.githubusercontent.com/GTSpray/P-titPote/main/assets/ptitpote.png"
+            },
+            "timestamp": "12:17",
+            "ephemeral": true,
+            "slashInvocation": {
+              "user": {
+                "name": "Alex",
+                "color": "#57F287"
+              },
+              "command": "remind"
+            },
+            "interaction": {
+              "type": 4,
+              "data": {
+                "flags": 64,
+                "content": "Ok! Je remonterai ce fil s'il reste silencieux 3 jour(s) ;)"
+              }
+            }
+          }
+        ]
+      },
+      "holdMs": 2500
+    }
+  ],
+  "output": {
+    "directory": "docs/usage/remind",
+    "prefix": "remind-on",
+    "video": true
+  }
+}
