@@ -1,5 +1,5 @@
-import { Request } from 'express';
-import { MockRequest } from 'node-mocks-http';
+import type { Request } from 'express';
+import type { MockRequest } from 'node-mocks-http';
 import {
   ComponentType,
   InteractionResponseType,
@@ -19,11 +19,11 @@ import {
 } from '../../../../mocks/discordjs.js';
 import { getApiMessageData } from '../../../../mocks/discord-api/getApiMessageData.js';
 import * as getEmojiUrlModule from '../../../../../src/utils/getEmojiUrl.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import {
   emoji,
-  gimmeEmojiCommandData,
-  gimmeEmojiSubCommandData,
+  type gimmeEmojiCommandData,
+  type gimmeEmojiSubCommandData,
   stealemoji_emojiLimit,
   stealemoji_msgLimit,
   stealemoji_msgSizeLimit,

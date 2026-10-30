@@ -1,7 +1,7 @@
-import { expect, ExpectationResult } from 'vitest';
+import { expect, type ExpectationResult } from 'vitest';
 
-import { Response } from 'express';
-import { MockResponse } from 'node-mocks-http';
+import type { Response } from 'express';
+import type { MockResponse } from 'node-mocks-http';
 
 function toBeType(received: unknown, expectedType: string): ExpectationResult {
   const pass = typeof received === expectedType && !Number.isNaN(received);

@@ -1,31 +1,14 @@
-import { CommandHandlerOptions } from '../../commands.js';
+import type { CommandHandlerOptions } from '../../commands.js';
 import {
-  ApplicationIntegrationType,
   ComponentType,
-  InteractionContextType,
   InteractionResponseType,
   MessageFlags,
-  PermissionFlagsBits,
 } from 'discord-api-types/v10';
-import { SlashCommandBuilder } from 'discord.js';
 
 import { getRandomEmoji } from '../../../utils/getRandomEmoji.js';
 
-import { Response } from 'express';
+import type { Response } from 'express';
 import { t } from '../../../i18n/index.js';
-
-const builder = new SlashCommandBuilder()
-  .setDescription(t('gimme.otter.description'))
-  .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
-  .setContexts(
-    InteractionContextType.BotDM,
-    InteractionContextType.Guild,
-    InteractionContextType.PrivateChannel,
-  )
-  .setIntegrationTypes(
-    ApplicationIntegrationType.GuildInstall,
-    ApplicationIntegrationType.UserInstall,
-  );
 
 export interface gimmeVersionCommandData {
   id: string;

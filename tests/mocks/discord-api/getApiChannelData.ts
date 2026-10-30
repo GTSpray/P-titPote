@@ -1,6 +1,10 @@
 import type { APIChannel } from 'discord-api-types/v10';
 import { ChannelType } from 'discord-api-types/v10';
-import { BitFieldFlag, getRandomString, randomDiscordId19 } from './utils.js';
+import {
+  type BitFieldFlag,
+  getRandomString,
+  randomDiscordId19,
+} from './utils.js';
 
 export const getApiChannelData = (
   options: Partial<APIChannel> = {},

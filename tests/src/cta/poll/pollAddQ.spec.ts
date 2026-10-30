@@ -9,7 +9,7 @@ import {
   POLL_STEP_LIMIT,
   pollAddQ,
 } from '../../../../src/commands/cta/poll/pollAddQ.js';
-import { ModalHandlerOptions } from '../../../../src/commands/modals.js';
+import type { ModalHandlerOptions } from '../../../../src/commands/modals.js';
 import { initORM } from '../../../initORM.js';
 import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
@@ -118,7 +118,7 @@ describe('cta/pollAddQ', () => {
     const stepSize = POLL_STEP_LIMIT;
     existingPoll.steps.add(
       Array.from({ length: stepSize }).map(
-        (e, i) => new PollStep(`question n°${i}`, i),
+        (_, i) => new PollStep(`question n°${i}`, i),
       ),
     );
 

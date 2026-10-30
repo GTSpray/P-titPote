@@ -1,12 +1,12 @@
 import {
   GatewayDispatchEvents,
-  GatewayHeartbeatAck,
-  GatewayHello,
-  GatewayInvalidSession,
+  type GatewayHeartbeatAck,
+  type GatewayHello,
+  type GatewayInvalidSession,
   GatewayOpcodes,
-  GatewayReadyDispatch,
-  GatewayReconnect,
-  GatewayResumedDispatch,
+  type GatewayReadyDispatch,
+  type GatewayReconnect,
+  type GatewayResumedDispatch,
 } from 'discord-api-types/v10';
 import { getRandomString, randomDiscordId19 } from './discord-api/utils.js';
 

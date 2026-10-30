@@ -5,12 +5,12 @@ import {
   MessageFlags,
 } from 'discord-api-types/v10';
 import {
-  ComponentSelect,
-  ComponentSimple,
-  CTAData,
+  type ComponentSelect,
+  type ComponentSimple,
+  type CTAData,
   getInputComponnentById,
   getInputComponnentsByPrefix,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollStep } from '../../../db/entities/PollStep.entity.js';

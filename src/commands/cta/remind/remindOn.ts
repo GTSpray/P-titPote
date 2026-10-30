@@ -1,10 +1,10 @@
 import * as z from 'zod';
 import type { Response } from 'express';
 import {
-  ComponentSimple,
-  CTAData,
+  type ComponentSimple,
+  type CTAData,
   getInputComponnentById,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import { logger } from '../../../logger.js';
 import { updateMessagePayload } from '../../commonMessages.js';

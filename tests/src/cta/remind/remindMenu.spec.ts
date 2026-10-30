@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { remindMenu } from '../../../../src/commands/cta/remind/remindMenu.js';
-import {
+import type {
   CTASelectData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';

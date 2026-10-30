@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import {
-  Options,
+  type Options,
   MariaDbDriver,
   DefaultLogger,
-  LogContext,
-  LoggerNamespace,
+  type LogContext,
+  type LoggerNamespace,
   defineConfig,
 } from '@mikro-orm/mariadb';
 import { Migrator } from '@mikro-orm/migrations';
@@ -21,12 +21,16 @@ import { TriggerRole } from './db/entities/TriggerRole.entity.js';
 import { ThreadRemind } from './db/entities/ThreadRemind.entity.js';
 
 class CustomLogger extends DefaultLogger {
-  logQuery(context: { query: string } & LogContext): void {
+  override logQuery(context: { query: string } & LogContext): void {
     logger.info('new sql query', {
       context,
     });
   }
-  log(namespace: LoggerNamespace, message: string, context?: LogContext) {
+  override log(
+    namespace: LoggerNamespace,
+    message: string,
+    context?: LogContext,
+  ) {
     switch (context?.level) {
       case 'error':
         logger.error(message, { context });

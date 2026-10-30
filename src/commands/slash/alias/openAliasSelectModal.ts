@@ -3,7 +3,7 @@ import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { notFoundPayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { ComponentType, InteractionResponseType } from 'discord-api-types/v10';
-import { Response } from 'express';
+import type { Response } from 'express';
 
 export async function openAliasSelectModal({
   res,

@@ -1,6 +1,6 @@
 import {
-  aliasRmCommandData,
-  aliasRmSubCommandData,
+  type aliasRmCommandData,
+  type aliasRmSubCommandData,
   rm,
 } from '../../../../../src/commands/slash/alias/rm.js';
 import {
@@ -10,7 +10,7 @@ import {
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
 import { DiscordGuild } from '../../../../../src/db/entities/DiscordGuild.entity.js';
 import { MessageAliased } from '../../../../../src/db/entities/MessageAliased.entity.js';

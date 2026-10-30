@@ -7,8 +7,8 @@ import {
   PermissionFlagsBits,
 } from 'discord-api-types/v10';
 import { SlashCommandBuilder } from 'discord.js';
-import { create, pollCreateCommandData } from './create.js';
-import { Response } from 'express';
+import { create, type pollCreateCommandData } from './create.js';
+import type { Response } from 'express';
 import { logger } from '../../../logger.js';
 import { t } from '../../../i18n/index.js';
 

@@ -12,7 +12,7 @@ import {
   GatewayDispatchEvents,
   GatewayIntentBits,
   GatewayOpcodes,
-  GatewayReadyDispatch,
+  type GatewayReadyDispatch,
 } from 'discord-api-types/v10';
 import { WebSocketServerMock } from '../../mocks/WebSocketMock.js';
 import { logger } from '../../../src/logger.js';

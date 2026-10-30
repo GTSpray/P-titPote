@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { ComponentType } from 'discord-api-types/v10';
 import type { Response } from 'express';
-import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
+import type { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
 import type { DBServices } from '../../../db/db.js';
 import {
   GuildTrigger,

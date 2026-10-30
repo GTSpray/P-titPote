@@ -1,8 +1,8 @@
-import { DefaultLogger, Options } from '@mikro-orm/mariadb';
+import { DefaultLogger, type Options } from '@mikro-orm/mariadb';
 import config from '../src/mikro-orm.config.js';
 
 class ShutUpLogger extends DefaultLogger {
-  log() {}
+  override log() {}
 }
 
 const c: Options = {

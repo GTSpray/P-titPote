@@ -6,7 +6,7 @@ import {
   NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollPub } from '../../../../src/commands/cta/poll/pollPub.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
