@@ -353,15 +353,15 @@ describe('cta/aliasSet', () => {
       permissions: admin_permissions,
     });
 
-    const response = await aliasSet.handler({
-      ...handlerOpts,
-      req,
-      res,
-      additionalData: JSON.parse(badData.custom_id),
-    });
-
-    expect(response).toMeetApiResponse(400, {
-      error: t('errors.invalidSubcommandPayload'),
+    await expect(
+      aliasSet.handler({
+        ...handlerOpts,
+        req,
+        res,
+        additionalData: JSON.parse(badData.custom_id),
+      }),
+    ).rejects.toMatchObject({
+      name: 'InvalidCommand',
       issues: expect.arrayContaining([
         {
           code,
@@ -413,15 +413,15 @@ describe('cta/aliasSet', () => {
         permissions: admin_permissions,
       });
 
-      const response = await aliasSet.handler({
-        ...handlerOpts,
-        req,
-        res,
-        additionalData: JSON.parse(badData.custom_id),
-      });
-
-      expect(response).toMeetApiResponse(400, {
-        error: t('errors.invalidSubcommandPayload'),
+      await expect(
+        aliasSet.handler({
+          ...handlerOpts,
+          req,
+          res,
+          additionalData: JSON.parse(badData.custom_id),
+        }),
+      ).rejects.toMatchObject({
+        name: 'InvalidCommand',
         issues: expect.arrayContaining([
           {
             code,
