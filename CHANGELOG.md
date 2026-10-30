@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/GTSpray/P-titPote/compare/v1.14.0...v1.15.0) (2026-10-30)
+
+### :sparkles: Features
+
+* **remind:** bump forgotten threads after idle days ([#285](https://github.com/GTSpray/P-titPote/issues/285)) ([da2f34c](https://github.com/GTSpray/P-titPote/commit/da2f34ceaf8029015430b17e1c54e3223a3eda75))
+
 ## [1.14.0](https://github.com/GTSpray/P-titPote/compare/v1.13.6...v1.14.0) (2026-10-29)
 
 ### :sparkles: Features
