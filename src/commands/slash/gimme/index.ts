@@ -8,13 +8,13 @@ import {
 } from 'discord-api-types/v10';
 import { SlashCommandBuilder } from 'discord.js';
 
-import { Response } from 'express';
+import type { Response } from 'express';
 import { logger } from '../../../logger.js';
-import { gimmeOtterCommandData, otter } from './otter.js';
-import { gimmeVersionCommandData, version } from './version.js';
+import { type gimmeOtterCommandData, otter } from './otter.js';
+import { type gimmeVersionCommandData, version } from './version.js';
 import {
   emoji,
-  gimmeEmojiCommandData,
+  type gimmeEmojiCommandData,
   stealemoji_emojiLimit,
   stealemoji_msgLimit,
 } from './emoji.js';

@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { trigMenu } from '../../../../src/commands/cta/trigger/trigMenu.js';
-import {
+import type {
   CTASelectData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';

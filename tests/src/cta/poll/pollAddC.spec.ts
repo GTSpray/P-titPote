@@ -9,7 +9,7 @@ import {
   pollAddC,
   STEP_CHOICE_LIMIT,
 } from '../../../../src/commands/cta/poll/pollAddC.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -233,7 +233,7 @@ describe('cta/pollAddC', () => {
   });
 
   it.each(
-    Array.from({ length: 4 }).map((e, i) => [
+    Array.from({ length: 4 }).map((_, i) => [
       i + 1,
       STEP_CHOICE_LIMIT - (i + 1),
     ]),
@@ -242,7 +242,7 @@ describe('cta/pollAddC', () => {
     async (length: number, stepSize: number) => {
       firstStep.choices.add(
         Array.from({ length: stepSize }).map(
-          (e, i) => new PollChoice(`choice n°${i}`, i),
+          (_, i) => new PollChoice(`choice n°${i}`, i),
         ),
       );
       await em.persist(firstStep).flush();
@@ -256,7 +256,7 @@ describe('cta/pollAddC', () => {
               type: ComponentType.TextDisplay,
               content: expect.any(String),
             },
-            ...Array.from({ length }).map((e, i) => {
+            ...Array.from({ length }).map((_, i) => {
               const choiceOrder = stepSize + i + 1;
               return expect.objectContaining({
                 label: t('poll.modal.label.choice', { order: choiceOrder }),
@@ -275,7 +275,7 @@ describe('cta/pollAddC', () => {
     const stepSize = STEP_CHOICE_LIMIT - 4;
     firstStep.choices.add(
       Array.from({ length: stepSize }).map(
-        (e, i) => new PollChoice(`choice n°${i}`, i),
+        (_, i) => new PollChoice(`choice n°${i}`, i),
       ),
     );
     await em.persist(firstStep).flush();
@@ -289,7 +289,7 @@ describe('cta/pollAddC', () => {
             type: ComponentType.TextDisplay,
             content: expect.any(String),
           },
-          ...Array.from({ length: 4 }).map((e, i) => {
+          ...Array.from({ length: 4 }).map((_, i) => {
             const choiceOrder = stepSize + i + 1;
             return expect.objectContaining({
               label: t('poll.modal.label.choice', { order: choiceOrder }),
@@ -307,7 +307,7 @@ describe('cta/pollAddC', () => {
     const stepSize = STEP_CHOICE_LIMIT;
     firstStep.choices.add(
       Array.from({ length: stepSize }).map(
-        (e, i) => new PollChoice(`choice n°${i}`, i),
+        (_, i) => new PollChoice(`choice n°${i}`, i),
       ),
     );
     await em.persist(firstStep).flush();

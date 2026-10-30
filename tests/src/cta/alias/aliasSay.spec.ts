@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { aliasSay } from '../../../../src/commands/cta/alias/aliasSay.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -24,7 +24,7 @@ import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js
 import { MessageAliased } from '../../../../src/db/entities/MessageAliased.entity.js';
 import {
   getModalLabelComponnents,
-  PartialComponentList,
+  type PartialComponentList,
 } from '../../../helpers/getModalLabelComponnents.js';
 import {
   admin_permissions,

@@ -4,7 +4,7 @@ import { GatewaySocket } from '../../../src/gateway/GatewaySocket.js';
 import { DiscrodRESTMock, DiscrodRESTMockVerb } from '../../mocks/discordjs.js';
 import { ShardSocket } from '../../../src/gateway/ShardSocket.js';
 import * as ShardSocketModule from '../../../src/gateway/ShardSocket.js';
-import { MockInstance } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { logger } from '../../../src/logger.js';
 
 class FakeShardSocket extends ShardSocket {}

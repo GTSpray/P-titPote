@@ -4,7 +4,7 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from 'discord-api-types/v10';
-import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
+import type { CTAData, ModalHandlerDelcaration } from '../../modals.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';

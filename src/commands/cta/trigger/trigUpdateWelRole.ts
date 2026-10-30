@@ -1,9 +1,9 @@
 import {
-  ComponentSelect,
-  CTAData,
+  type ComponentSelect,
+  type CTAData,
   type CTAEnvelope,
   getInputComponnentById,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import {
   GuildTrigger,

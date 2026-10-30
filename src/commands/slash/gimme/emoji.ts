@@ -1,21 +1,20 @@
-import { CommandHandlerOptions } from '../../commands.js';
-import { Response } from 'express';
+import type { CommandHandlerOptions } from '../../commands.js';
+import type { Response } from 'express';
 import { logger } from '../../../logger.js';
-import { SlashCommandBuilder } from 'discord.js';
 import {
-  ApplicationIntegrationType,
   ComponentType,
-  InteractionContextType,
   InteractionResponseType,
   MessageFlags,
-  PermissionFlagsBits,
-  RESTGetAPIChannelMessagesResult,
+  type RESTGetAPIChannelMessagesResult,
   Routes,
 } from 'discord-api-types/v10';
 
 import { discordapi } from '../../../utils/discordapi.js';
 import { getEmojiUrl } from '../../../utils/getEmojiUrl.js';
-import { ExtractedEmoji, extractEmoji } from '../../../utils/extractEmoji.js';
+import {
+  type ExtractedEmoji,
+  extractEmoji,
+} from '../../../utils/extractEmoji.js';
 import { foundItComponnents, notFoundPayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 
@@ -24,19 +23,6 @@ export const stealemoji_msgLimit = 10;
 export const stealemoji_msgSizeLimit = 500;
 
 const emojiLimitPrefetch = 50;
-
-const builder = new SlashCommandBuilder()
-  .setDescription(t('gimme.otter.description'))
-  .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
-  .setContexts(
-    InteractionContextType.BotDM,
-    InteractionContextType.Guild,
-    InteractionContextType.PrivateChannel,
-  )
-  .setIntegrationTypes(
-    ApplicationIntegrationType.GuildInstall,
-    ApplicationIntegrationType.UserInstall,
-  );
 
 export interface gimmeEmojiCommandData {
   id: string;

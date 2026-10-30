@@ -8,11 +8,11 @@ import {
 } from 'discord-api-types/v10';
 import { SlashCommandBuilder } from 'discord.js';
 
-import { aliasSetCommandData, set } from './set.js';
-import { aliasSayCommandData, say } from './say.js';
-import { aliasRmCommandData, rm } from './rm.js';
-import { aliasLsCommandData, ls } from './ls.js';
-import { Response } from 'express';
+import { type aliasSetCommandData, set } from './set.js';
+import { type aliasSayCommandData, say } from './say.js';
+import { type aliasRmCommandData, rm } from './rm.js';
+import { type aliasLsCommandData, ls } from './ls.js';
+import type { Response } from 'express';
 import { logger } from '../../../logger.js';
 import { notAllowed } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';

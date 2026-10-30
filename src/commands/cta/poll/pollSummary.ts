@@ -1,5 +1,5 @@
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
-import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
+import type { CTAData, ModalHandlerDelcaration } from '../../modals.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';
 import { PollResp } from '../../../db/entities/PollResp.entity.js';
 import { logger } from '../../../logger.js';

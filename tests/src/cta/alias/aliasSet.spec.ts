@@ -6,7 +6,7 @@ import {
   QueryOrder,
 } from '@mikro-orm/mariadb';
 import { aliasSet } from '../../../../src/commands/cta/alias/aliasSet.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -14,10 +14,7 @@ import { initORM } from '../../../initORM.js';
 import { getInteractionModalHttpMock } from '../../../mocks/getInteractionHttpMock.js';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { expectedDiscordGuild } from '../../../epectedEntities/expectedDiscordGuild.js';
-import {
-  getRandomString,
-  randomDiscordId19,
-} from '../../../mocks/discord-api/utils.js';
+import { getRandomString } from '../../../mocks/discord-api/utils.js';
 import {
   ComponentType,
   InteractionResponseType,
@@ -28,7 +25,7 @@ import { MessageAliased } from '../../../../src/db/entities/MessageAliased.entit
 import { ALIAS_LIMIT } from '../../../../src/commands/cta/alias/aliasSet.js';
 import {
   getModalLabelComponnents,
-  PartialComponentSingle,
+  type PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 import {
   admin_permissions,

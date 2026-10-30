@@ -1,10 +1,10 @@
 import * as z from 'zod';
 import { InteractionResponseType, MessageFlags } from 'discord-api-types/v10';
 import {
-  ComponentSelect,
-  CTAData,
+  type ComponentSelect,
+  type CTAData,
   getInputComponnentById,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import { MessageAliased } from '../../../db/entities/MessageAliased.entity.js';
 import { logger } from '../../../logger.js';

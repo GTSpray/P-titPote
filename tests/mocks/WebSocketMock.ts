@@ -30,7 +30,7 @@ export class WebSocketServerMock {
       this.spy(d);
     });
 
-    this.on('wsconnection', (ws, url) => {
+    this.on('wsconnection', (ws) => {
       ws.readyState = 1; // WebSocket.OPEN;
       this.emit('open');
     });
@@ -80,7 +80,7 @@ export class WebSocketMock {
   public readyState = 0; // WebSocket.CONNECTING;
   private listeners = new Map<string, Set<(...args: any[]) => void>>();
 
-  constructor(private url: string) {
+  constructor(url: string) {
     const [domain] = url.split('?');
     this.mockedServer = WebSocketServerMock.getInstance(domain);
 

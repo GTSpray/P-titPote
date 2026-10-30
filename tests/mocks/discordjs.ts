@@ -46,7 +46,7 @@ export class DiscrodRESTMock {
   private request(
     verb: DiscrodRESTMockVerb,
     fullRoute: RouteLike,
-    options?: RequestData,
+    _options?: RequestData,
   ) {
     const key = DiscrodRESTMock.resultkey(verb, fullRoute);
     if (!DiscrodRESTMock.results.has(key)) {

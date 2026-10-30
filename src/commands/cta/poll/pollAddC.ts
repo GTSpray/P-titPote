@@ -3,7 +3,7 @@ import {
   InteractionResponseType,
   TextInputStyle,
 } from 'discord-api-types/v10';
-import { CTAData, ModalHandlerDelcaration } from '../../modals.js';
+import type { CTAData, ModalHandlerDelcaration } from '../../modals.js';
 import { PollStep } from '../../../db/entities/PollStep.entity.js';
 import { logger } from '../../../logger.js';
 import { assertInteractionUserIsModerator } from '../../assert/assertInteractionUserIsModerator.js';

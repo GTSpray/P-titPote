@@ -1,5 +1,5 @@
 export type BitFieldFlag = any;
-import { randomBytes, randomInt } from 'crypto';
+import { randomBytes } from 'crypto';
 
 function conditionnal(returnArr: boolean, str: string) {
   if (returnArr) {

@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { trigCreateWelRole } from '../../../../src/commands/cta/trigger/trigCreateWelRole.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -27,8 +27,8 @@ import { expectedGuildTrigger } from '../../../epectedEntities/expectedGuildTrig
 import { expectedTriggerRole } from '../../../epectedEntities/expectedTriggerRole.js';
 import {
   getModalLabelComponnents,
-  PartialComponentList,
-  PartialComponentSingle,
+  type PartialComponentList,
+  type PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 import {
   admin_permissions,

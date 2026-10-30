@@ -1,6 +1,6 @@
 import {
-  aliasLsCommandData,
-  aliasLsSubCommandData,
+  type aliasLsCommandData,
+  type aliasLsSubCommandData,
   ls,
 } from '../../../../../src/commands/slash/alias/ls.js';
 import {
@@ -10,7 +10,7 @@ import {
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
 import {
   SqlEntityManager,
@@ -36,17 +36,6 @@ describe('/alias ls', () => {
       flags: MessageFlags.Ephemeral,
       content: t('common.notFound'),
     },
-  };
-  const subcommand: aliasLsSubCommandData = {
-    name: 'ls',
-    options: [],
-    type: 1,
-  };
-  const data: aliasLsCommandData = {
-    id: randomDiscordId19(),
-    name: 'alias',
-    options: [subcommand],
-    type: 1,
   };
   beforeEach(async () => {
     const subcommand: aliasLsSubCommandData = {

@@ -1,8 +1,8 @@
 import {
   createRequest,
   createResponse,
-  MockRequest,
-  MockResponse,
+  type MockRequest,
+  type MockResponse,
 } from 'node-mocks-http';
 import {
   randomDiscordId19,
@@ -10,7 +10,7 @@ import {
   getRandomString,
 } from './discord-api/utils.js';
 
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import type { APIBaseInteraction } from 'discord-api-types/v10';
 import { InteractionType, Locale } from 'discord-api-types/v10';

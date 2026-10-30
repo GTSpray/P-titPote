@@ -1,6 +1,10 @@
 import type { APIMessage } from 'discord-api-types/v10';
 import { MessageType } from 'discord-api-types/v10';
-import { BitFieldFlag, getRandomString, randomDiscordId19 } from './utils.js';
+import {
+  type BitFieldFlag,
+  getRandomString,
+  randomDiscordId19,
+} from './utils.js';
 import { getApiUserData } from './getApiUserData.js';
 
 export const getApiMessageData = (

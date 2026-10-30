@@ -2,11 +2,11 @@ import type { APIBaseInteraction } from 'discord-api-types/v10';
 import { InteractionType } from 'discord-api-types/v10';
 import {
   SlashCommandBuilder,
-  SlashCommandOptionsOnlyBuilder,
-  SlashCommandSubcommandsOnlyBuilder,
+  type SlashCommandOptionsOnlyBuilder,
+  type SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { Request, Response } from 'express';
-import { DBServices } from '../db/db.js';
+import type { Request, Response } from 'express';
+import type { DBServices } from '../db/db.js';
 
 type DiscordInteractionBody<Data> = APIBaseInteraction<
   InteractionType.ApplicationCommand,

@@ -1,6 +1,6 @@
 import {
   trigger,
-  triggerCommandData,
+  type triggerCommandData,
 } from '../../../../../src/commands/slash/trigger/index.js';
 import {
   ComponentType,
@@ -9,7 +9,7 @@ import {
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
 import { t } from '../../../../../src/i18n/index.js';
 import {

@@ -6,7 +6,7 @@ import {
   NotFoundError,
 } from '@mikro-orm/mariadb';
 import { pollCreate } from '../../../../src/commands/cta/poll/pollCreate.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -25,8 +25,8 @@ import { expectedPoll } from '../../../epectedEntities/expectedPoll.js';
 import { Poll } from '../../../../src/db/entities/Poll.entity.js';
 import {
   getModalLabelComponnents,
-  PartialComponentList,
-  PartialComponentSingle,
+  type PartialComponentList,
+  type PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 import { PollStep } from '../../../../src/db/entities/PollStep.entity.js';
 import { expectedPollStep } from '../../../epectedEntities/expectedPollStep.js';

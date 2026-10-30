@@ -5,9 +5,9 @@ import {
   type RESTGetAPIGuildResult,
 } from 'discord-api-types/v10';
 import {
-  CTASelectData,
+  type CTASelectData,
   type CTAEnvelope,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import {
   GuildTrigger,

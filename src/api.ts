@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import morgan from 'morgan';
 import { v4 } from 'uuid';
 import {

@@ -4,11 +4,11 @@ import {
 } from '../../../../../src/commands/slash/gimme/index.js';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import * as otterModule from '../../../../../src/commands/slash/gimme/otter.js';
 import * as emojiModule from '../../../../../src/commands/slash/gimme/emoji.js';
 import * as versionModule from '../../../../../src/commands/slash/gimme/version.js';
-import { DBServices } from '../../../../../src/db/db.js';
+import type { DBServices } from '../../../../../src/db/db.js';
 import { initORM } from '../../../../initORM.js';
 import {
   ApplicationIntegrationType,

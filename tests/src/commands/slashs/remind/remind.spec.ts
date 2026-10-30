@@ -1,6 +1,6 @@
 import {
   remind,
-  remindCommandData,
+  type remindCommandData,
 } from '../../../../../src/commands/slash/remind/index.js';
 import {
   ApplicationIntegrationType,
@@ -14,7 +14,7 @@ import {
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { interactionBodyChannel } from '../../../../mocks/interactionBodyChannel.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
 import { t } from '../../../../../src/i18n/index.js';
 

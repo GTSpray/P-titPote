@@ -1,5 +1,5 @@
 import { trigSetType } from '../../../../src/commands/cta/trigger/trigSetType.js';
-import {
+import type {
   CTASelectData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';

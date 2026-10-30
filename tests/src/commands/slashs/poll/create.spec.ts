@@ -1,6 +1,6 @@
 import {
-  pollCreateCommandData,
-  pollCreateSubCommandData,
+  type pollCreateCommandData,
+  type pollCreateSubCommandData,
   create,
 } from '../../../../../src/commands/slash/poll/create.js';
 import {
@@ -11,14 +11,8 @@ import {
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import { initORM } from '../../../../initORM.js';
-import {
-  SqlEntityManager,
-  AbstractSqlDriver,
-  AbstractSqlConnection,
-  AbstractSqlPlatform,
-} from '@mikro-orm/mariadb';
 import {
   admin_permissions,
   default_member_permissions,
@@ -26,7 +20,6 @@ import {
 import { t } from '../../../../../src/i18n/index.js';
 
 describe('/poll create', () => {
-  let guild_id: string;
   let handlerOpts: CommandHandlerOptions<pollCreateCommandData>;
 
   const subcommand: pollCreateSubCommandData = {
@@ -42,9 +35,6 @@ describe('/poll create', () => {
     type: 1,
   };
 
-  let em: SqlEntityManager<
-    AbstractSqlDriver<AbstractSqlConnection, AbstractSqlPlatform>
-  >;
   beforeEach(async () => {
     const { req, res } = getInteractionCommandHttpMock({
       data,
@@ -56,10 +46,6 @@ describe('/poll create', () => {
       res,
       dbServices,
     };
-
-    guild_id = <string>req.body.guild_id;
-    const { orm } = await initORM();
-    em = orm.em.fork();
   });
 
   it('should respond success message', async () => {

@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { remindOn } from '../../../../src/commands/cta/remind/remindOn.js';
-import {
+import type {
   CTAData,
   ModalHandlerOptions,
 } from '../../../../src/commands/modals.js';
@@ -25,7 +25,7 @@ import { expectedDiscordGuild } from '../../../epectedEntities/expectedDiscordGu
 import { expectedRemind } from '../../../epectedEntities/expectedRemind.js';
 import {
   getModalLabelComponnents,
-  PartialComponentSingle,
+  type PartialComponentSingle,
 } from '../../../helpers/getModalLabelComponnents.js';
 
 const usePublicThread = (

@@ -1,9 +1,9 @@
 import {
-  ComponentSelect,
-  ComponentSimple,
-  CTAData,
+  type ComponentSelect,
+  type ComponentSimple,
+  type CTAData,
   getInputComponnentById,
-  ModalHandlerDelcaration,
+  type ModalHandlerDelcaration,
 } from '../../modals.js';
 import { errorPayload, notAllowed } from '../../commonMessages.js';
 import { Poll } from '../../../db/entities/Poll.entity.js';

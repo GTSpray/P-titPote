@@ -1,18 +1,13 @@
-import { CommandHandlerOptions } from '../../commands.js';
+import type { CommandHandlerOptions } from '../../commands.js';
 import {
-  ApplicationIntegrationType,
   ComponentType,
-  InteractionContextType,
   InteractionResponseType,
   MessageFlags,
-  PermissionFlagsBits,
 } from 'discord-api-types/v10';
-import { SlashCommandBuilder } from 'discord.js';
 
-import { Response } from 'express';
+import type { Response } from 'express';
 import * as z from 'zod';
 import { foundItComponnents } from '../../commonMessages.js';
-import { t } from '../../../i18n/index.js';
 import { logger } from '../../../logger.js';
 
 const OTTER_IMAGE_API_URL = 'https://api.tinyfox.dev/img.json?animal=ott';

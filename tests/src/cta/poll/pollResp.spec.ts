@@ -5,7 +5,7 @@ import {
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
 import { pollResp } from '../../../../src/commands/cta/poll/pollResp.js';
-import {
+import type {
   ModalHandlerOptions,
   CTAData,
 } from '../../../../src/commands/modals.js';

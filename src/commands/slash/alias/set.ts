@@ -1,5 +1,5 @@
-import { Response } from 'express';
-import { CommandHandlerOptions } from '../../commands.js';
+import type { Response } from 'express';
+import type { CommandHandlerOptions } from '../../commands.js';
 import {
   ComponentType,
   InteractionResponseType,

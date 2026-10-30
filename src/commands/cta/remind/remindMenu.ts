@@ -7,7 +7,7 @@ import {
 import type { Response } from 'express';
 import type { EntityManager } from '@mikro-orm/core';
 import type { Request } from 'express';
-import { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
+import type { CTASelectData, ModalHandlerDelcaration } from '../../modals.js';
 import { logger } from '../../../logger.js';
 import { updateMessagePayload } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';

@@ -2,9 +2,9 @@ import WebSocket from 'ws';
 import { GatewaySocket } from './GatewaySocket.js';
 import {
   GatewayDispatchEvents,
-  GatewayHeartbeatAck,
-  GatewayHello,
-  GatewayInvalidSession,
+  type GatewayHeartbeatAck,
+  type GatewayHello,
+  type GatewayInvalidSession,
   GatewayOpcodes,
 } from 'discord-api-types/v10';
 import { WsClosedCode, GWSEvent } from './gatewaytypes.js';

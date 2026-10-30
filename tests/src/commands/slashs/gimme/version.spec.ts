@@ -5,10 +5,10 @@ import {
 } from 'discord-api-types/v10';
 import { getInteractionCommandHttpMock } from '../../../../mocks/getInteractionHttpMock.js';
 import { randomDiscordId19 } from '../../../../mocks/discord-api/utils.js';
-import { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
+import type { CommandHandlerOptions } from '../../../../../src/commands/commands.js';
 import {
-  gimmeVersionCommandData,
-  gimmeVersionSubCommandData,
+  type gimmeVersionCommandData,
+  type gimmeVersionSubCommandData,
   version,
 } from '../../../../../src/commands/slash/gimme/version.js';
 
