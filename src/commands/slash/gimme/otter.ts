@@ -15,19 +15,6 @@ import { foundItComponnents } from '../../commonMessages.js';
 import { t } from '../../../i18n/index.js';
 import { logger } from '../../../logger.js';
 
-const builder = new SlashCommandBuilder()
-  .setDescription(t('gimme.otter.description'))
-  .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
-  .setContexts(
-    InteractionContextType.BotDM,
-    InteractionContextType.Guild,
-    InteractionContextType.PrivateChannel,
-  )
-  .setIntegrationTypes(
-    ApplicationIntegrationType.GuildInstall,
-    ApplicationIntegrationType.UserInstall,
-  );
-
 const OTTER_IMAGE_API_URL = 'https://api.tinyfox.dev/img.json?animal=ott';
 const TINYFOX_ORIGIN = 'https://api.tinyfox.dev';
 const FALLBACK_OTTER_IMAGE_URL =
