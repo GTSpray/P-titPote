@@ -1,4 +1,4 @@
-# Testing workflow
+# Testing and type-check workflow
 
 P'tit Pote tests run with Vitest and exercise command handlers, CTA/modal
 handlers, gateway sockets, shared utilities, and database services. The suite is
@@ -22,6 +22,34 @@ npm run test # vitest --config ./vitest.config.ts run
 
 Use the npm script directly only when dependencies are installed locally and a
 MariaDB server is reachable at the test config host (`dbtest`).
+
+## Lint and TypeScript checks
+
+The CI lint target combines formatting with a dedicated TypeScript check:
+
+```bash
+make lint    # Compose wrapper around npm run lint
+npm run lint # prettier . --check && tsc -p tests/tsconfig.json --pretty
+```
+
+`tests/tsconfig.json` extends the root `tsconfig.json`, disables emit, and
+includes the full `tests/` tree plus `global.d.ts`. Because specs import source
+modules directly, this catches type errors across test code and the exercised
+source paths.
+
+Important compiler constraints from the root config:
+
+- `strict` stays enabled for source and tests.
+- `noUnusedLocals` rejects unused imports, locals, and helper values. Remove
+  dead code instead of leaving unused placeholders.
+- `noUnusedParameters` rejects unused parameters unless the signature needs
+  them. Prefix intentionally unused parameters with `_`, as existing Express
+  handlers and table-driven specs do.
+- `verbatimModuleSyntax` requires type-only imports to use `import type` and
+  keeps ESM import/export syntax explicit. Continue using `.js` extensions in
+  relative source imports.
+- `noImplicitReturns`, `noFallthroughCasesInSwitch`, and `noImplicitOverride`
+  turn common control-flow mistakes into build failures.
 
 ## Vitest configuration
 
@@ -102,3 +130,9 @@ Use the existing fixtures before adding new test infrastructure:
   the REST call.
 - **Database tests pass but migration checks fail:** update or add a migration
   under `src/migrations/`, rebuild compiled files, then run `make db-check`.
+- **`tsc` reports unused symbols:** remove the unused value, convert the import
+  to `import type` when it is type-only, or underscore-prefix a required but
+  intentionally unused parameter.
+- **`tsc` reports that a type must be imported with a type-only import:** split
+  mixed imports so values stay in a normal `import` and types move to
+  `import type`.
