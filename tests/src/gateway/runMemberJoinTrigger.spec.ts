@@ -42,7 +42,7 @@ describe('runMemberJoinTrigger', () => {
     const msg = new GuildTrigger('welcome', GuildTriggerKind.WelcomeMessage);
     const messageConfig = new TriggerMessage(
       channel_id,
-      'Bienvenue {user} sur {server}',
+      'Bienvenue {user} sur {server} @everyone',
     );
     messageConfig.trigger = msg;
     msg.messageConfig = messageConfig;
@@ -99,7 +99,10 @@ describe('runMemberJoinTrigger', () => {
       Routes.guildMemberRole(guild_id, user_id, role_id),
     );
     expect(postSpy).toHaveBeenCalledWith(Routes.channelMessages(channel_id), {
-      body: { content: `Bienvenue <@${user_id}> sur Serveur Test` },
+      body: {
+        content: `Bienvenue <@${user_id}> sur Serveur Test @everyone`,
+        allowed_mentions: { parse: [], users: [user_id] },
+      },
     });
   });
 
