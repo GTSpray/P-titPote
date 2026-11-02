@@ -11,6 +11,7 @@ import {
 import { discordapi } from '../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../shared/trigger/interpolateTriggerMessage.js';
 import { logger } from '../logger.js';
+import { buildWelcomeAllowedMentions } from '../shared/trigger/welMsgShared.js';
 
 type TriggerRunContext = {
   guildId: string;
@@ -45,7 +46,10 @@ const runWelcomeMessage = async (
     serverName,
   });
   await discordapi.post(Routes.channelMessages(channelId), {
-    body: { content },
+    body: {
+      content,
+      allowed_mentions: buildWelcomeAllowedMentions(userId),
+    },
   });
 };
 
