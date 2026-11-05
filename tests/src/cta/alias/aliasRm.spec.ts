@@ -244,15 +244,15 @@ describe('cta/aliasRm', () => {
       permissions: admin_permissions,
     });
 
-    const response = await aliasRm.handler({
-      ...handlerOpts,
-      req,
-      res,
-      additionalData: JSON.parse(badData.custom_id),
-    });
-
-    expect(response).toMeetApiResponse(400, {
-      error: t('errors.invalidSubcommandPayload'),
+    await expect(
+      aliasRm.handler({
+        ...handlerOpts,
+        req,
+        res,
+        additionalData: JSON.parse(badData.custom_id),
+      }),
+    ).rejects.toMatchObject({
+      name: 'InvalidCommand',
       issues: expect.arrayContaining([
         {
           code,
