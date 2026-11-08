@@ -200,6 +200,7 @@ These guides describe architecture, services, and implementation details:
 - [`docs/testing.md`](docs/testing.md) — Vitest setup, TypeScript lint gate, database isolation, mocks, and troubleshooting
 - [`docs/logging.md`](docs/logging.md) — Winston log format, transports, correlation, and troubleshooting
 - [`docs/release.md`](docs/release.md) — semantic-release, dependency updates, GHCR image publishing, and container runbook
+- [`docs/documentation.md`](docs/documentation.md) — user docs source, media captures, VitePress build, and GitHub Pages deployment
 
 Contributor conventions for agents and maintainers live in [`AGENTS.md`](AGENTS.md).
 
@@ -245,7 +246,8 @@ P-titPote/
 │   ├── database.md              # Database and migration runbook
 │   ├── testing.md               # Vitest, lint, and test infrastructure guide
 │   ├── logging.md               # Logging and observability guide
-│   └── release.md               # Release, dependency update, and container image runbook
+│   ├── release.md               # Release, dependency update, and container image runbook
+│   └── documentation.md         # User docs site and publishing workflow
 ├── site/                        # VitePress user docs (GitHub Pages)
 ├── tests/                       # Vitest tests
 ├── docker/                      # Docker config/scripts

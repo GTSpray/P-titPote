@@ -5,7 +5,8 @@ runtime image to GitHub Container Registry when a new release is cut.
 
 ## Release pipeline
 
-`.github/workflows/release.yml` runs on pushes to `main`:
+`.github/workflows/release.yml` runs on pushes to `main` and can be started
+manually with `workflow_dispatch`:
 
 1. `actions/checkout` fetches full history so semantic-release can inspect tags.
 2. `actions/setup-node` installs Node.js 22.

@@ -23,6 +23,21 @@ npm run test # vitest --config ./vitest.config.ts run
 Use the npm script directly only when dependencies are installed locally and a
 MariaDB server is reachable at the test config host (`dbtest`).
 
+## CI quality gate
+
+`.github/workflows/qa.yml` runs on every push and can also be started manually
+with `workflow_dispatch`. The job:
+
+1. Copies `.env.sample` to `.env`.
+2. Runs `make ci` to install dependencies, build TypeScript, and start the CI
+   Compose stack.
+3. Runs `make test`.
+4. Runs `make lint`.
+5. Builds the production Docker image once with `docker/ptitpote/Dockerfile`.
+
+Keep local commands aligned with these Makefile targets so failures reproduce
+the same path CI uses.
+
 ## Lint and TypeScript checks
 
 The CI lint target combines formatting with a dedicated TypeScript check:
