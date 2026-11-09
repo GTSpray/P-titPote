@@ -1,3 +1,9 @@
+## [1.15.6](https://github.com/GTSpray/P-titPote/compare/v1.15.5...v1.15.6) (2026-11-09)
+
+### :repeat: Chore
+
+* **deps:** bump discord.js from 14.27.0 to 14.28.1 ([#343](https://github.com/GTSpray/P-titPote/issues/343)) ([53c3f20](https://github.com/GTSpray/P-titPote/commit/53c3f20676317175589287e765abbd1d636dfd47))
+
 ## [1.15.5](https://github.com/GTSpray/P-titPote/compare/v1.15.4...v1.15.5) (2026-11-09)
 
 ### :repeat: Chore
