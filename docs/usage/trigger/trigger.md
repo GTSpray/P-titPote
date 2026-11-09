@@ -60,6 +60,10 @@ Click again after further edits to preview the latest text.
 - `{username}` — display username
 - `{server}` — server name
 
+Only the member inserted with `{user}` is mentionable by the bot. Raw
+`@everyone`, role, or user mentions in the configured text are displayed as text
+without sending notifications.
+
 **Requirements:** the bot must **see** the target channel and have **Send
 Messages** there. Otherwise setup fails with an ephemeral error (instead of
 failing silently on join).

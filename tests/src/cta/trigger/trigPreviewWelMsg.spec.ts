@@ -72,14 +72,15 @@ describe('cta/trigPreviewWelMsg', () => {
   };
 
   it('should post an interpolated preview when the user is a moderator', async () => {
-    const opts = await setupTrigger('Bienvenue {user} sur {server}');
+    const opts = await setupTrigger('Bienvenue {user} sur {server} @everyone');
 
     const response = await trigPreviewWelMsg.handler(opts);
 
     expect(response).toMeetApiResponse(200, {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        content: `Bienvenue <@${userId}> sur Serveur de démo`,
+        content: `Bienvenue <@${userId}> sur Serveur de démo @everyone`,
+        allowed_mentions: { parse: [], users: [userId] },
       },
     });
   });
