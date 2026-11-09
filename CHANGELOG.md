@@ -1,3 +1,14 @@
+## [1.15.3](https://github.com/GTSpray/P-titPote/compare/v1.15.2...v1.15.3) (2026-11-09)
+
+### :memo: Documentation
+
+* document TypeScript lint gate ([#337](https://github.com/GTSpray/P-titPote/issues/337)) ([923db2e](https://github.com/GTSpray/P-titPote/commit/923db2e6a8c71337a2c390504b738fa2d80de4e2))
+* document user docs workflow ([#340](https://github.com/GTSpray/P-titPote/issues/340)) ([e17c7cf](https://github.com/GTSpray/P-titPote/commit/e17c7cf7eb5c60861bd8e7803e0b81c4206c67a1))
+
+### :repeat: Chore
+
+* **deps:** bump ws from 8.22.0 to 8.22.1 ([#342](https://github.com/GTSpray/P-titPote/issues/342)) ([2d451f8](https://github.com/GTSpray/P-titPote/commit/2d451f89ed62942a61a49ff0639646f014fd089a))
+
 ## [1.15.2](https://github.com/GTSpray/P-titPote/compare/v1.15.1...v1.15.2) (2026-11-02)
 
 ### :repeat: Chore
