@@ -142,10 +142,22 @@ export async function runRemindTick(
 }
 
 export function startRemindLoop(getEm: () => EntityManager): NodeJS.Timeout {
+  let running = false;
+
   const tick = () => {
-    void runRemindTick(getEm()).catch((error) => {
-      logger.error('remind tick failed', { error });
-    });
+    if (running) {
+      logger.warn('remind tick skipped: previous tick still running');
+      return;
+    }
+
+    running = true;
+    void runRemindTick(getEm())
+      .catch((error) => {
+        logger.error('remind tick failed', { error });
+      })
+      .finally(() => {
+        running = false;
+      });
   };
 
   tick();

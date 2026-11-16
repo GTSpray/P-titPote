@@ -4,6 +4,7 @@ import {
   AbstractSqlConnection,
   AbstractSqlPlatform,
 } from '@mikro-orm/mariadb';
+import type { EntityManager } from '@mikro-orm/core';
 import { initORM } from '../../../initORM.js';
 import { DiscordGuild } from '../../../../src/db/entities/DiscordGuild.entity.js';
 import { ThreadRemind } from '../../../../src/db/entities/ThreadRemind.entity.js';
@@ -13,10 +14,14 @@ import {
   DiscrodRESTMockVerb,
 } from '../../../mocks/discordjs.js';
 import { RESTJSONErrorCodes, Routes } from 'discord-api-types/v10';
-import { runRemindTick } from '../../../../src/shared/remind/remindLoop.js';
+import {
+  runRemindTick,
+  startRemindLoop,
+} from '../../../../src/shared/remind/remindLoop.js';
 import { t } from '../../../../src/i18n/index.js';
 import { REST } from 'discord.js';
 import { computeNextTickAt } from '../../../../src/shared/remind/computeNextTickAt.js';
+import { REMIND_INTERVAL_MS } from '../../../../src/shared/remind/constants.js';
 
 describe('remindLoop', () => {
   let em: SqlEntityManager<
@@ -38,6 +43,38 @@ describe('remindLoop', () => {
     remind = new ThreadRemind(thread_id, randomDiscordId19(), 2, now);
     remind.server = guild;
     await em.persist([guild, remind]).flush();
+  });
+
+  it('should skip scheduled ticks while the previous tick is still running', async () => {
+    vi.useFakeTimers();
+    let releaseTick: (reminds: ThreadRemind[]) => void = () => {};
+    const pendingTick = new Promise<ThreadRemind[]>((resolve) => {
+      releaseTick = resolve;
+    });
+    const loopEm = {
+      find: vi.fn().mockReturnValue(pendingTick),
+    } as unknown as EntityManager;
+    const getEm = vi.fn(() => loopEm);
+
+    const interval = startRemindLoop(getEm);
+
+    try {
+      expect(getEm).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(REMIND_INTERVAL_MS);
+
+      expect(getEm).toHaveBeenCalledTimes(1);
+
+      releaseTick([]);
+      await Promise.resolve();
+      await Promise.resolve();
+      await vi.advanceTimersByTimeAsync(REMIND_INTERVAL_MS);
+
+      expect(getEm).toHaveBeenCalledTimes(2);
+    } finally {
+      clearInterval(interval);
+      vi.useRealTimers();
+    }
   });
 
   it('should soft-delete all guild reminds when the bot left the guild', async () => {
