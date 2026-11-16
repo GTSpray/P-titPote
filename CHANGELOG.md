@@ -1,3 +1,9 @@
+## [1.15.12](https://github.com/GTSpray/P-titPote/compare/v1.15.11...v1.15.12) (2026-11-16)
+
+### :bug: Fixes
+
+* **remind:** prevent overlapping reminder ticks ([#351](https://github.com/GTSpray/P-titPote/issues/351)) ([1628930](https://github.com/GTSpray/P-titPote/commit/1628930053484e959f948dae01b29801da6630e2))
+
 ## [1.15.11](https://github.com/GTSpray/P-titPote/compare/v1.15.10...v1.15.11) (2026-11-16)
 
 ### :repeat: Chore
