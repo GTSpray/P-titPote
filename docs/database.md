@@ -1,8 +1,8 @@
 # Database and migration workflow
 
 P'tit Pote stores guild-scoped command state in MariaDB through MikroORM. The
-database is used by the alias command family, the poll workflow, and the
-gateway `GuildCreate` handler (which ensures a `DiscordGuild` row exists).
+database is used by aliases, polls, triggers, thread reminders, and the gateway
+`GuildCreate` handler (which ensures a `DiscordGuild` row exists).
 
 ## Runtime architecture
 
@@ -17,8 +17,8 @@ gateway `GuildCreate` handler (which ensures a `DiscordGuild` row exists).
   that init before listening. HTTP interaction handlers and the gateway
   `GuildCreate` handler fork an entity manager for scoped work.
 - `src/db/services/discordGuild.service.ts` exposes `findOrCreateGuild` used by
-  gateway `GuildCreate` and by CTA handlers that need a guild row
-  (`aliasSet`, `pollCreate`).
+  gateway `GuildCreate` and by CTA handlers that need a guild row before they
+  persist guild-scoped state.
 - Production and development Compose files run MariaDB `12.0.2-noble` as the
   `database` service. Data is persisted in the `mysqldbdata` volume.
 - The app connects with the `.env` database variables:
@@ -42,33 +42,54 @@ All persisted entities extend `EntityBase`, which adds:
 - `createdAt` and `updatedAt` timestamps;
 - `deletedAt` with the default `excludeDeleted` filter.
 
-The `deletedAt` field is part of uniqueness constraints for guilds, aliases, and
-poll responses. This lets soft-deleted records keep historical values while
-active rows still enforce uniqueness.
+The `deletedAt` field is part of uniqueness constraints for guilds, aliases,
+poll responses, and thread reminders. This lets soft-deleted records keep
+historical values while active rows still enforce uniqueness.
 
-| Entity           | Purpose                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| `DiscordGuild`   | One row per Discord guild, owning aliases, polls, and triggers.                      |
-| `MessageAliased` | Reusable alias text scoped to a guild and alias name.                                |
-| `GuildTrigger`   | Named trigger header (`kind`, `enabled`, soft-delete). Max 10 non-deleted per guild. |
-| `TriggerMessage` | Welcome-message config (`channelId`, `message`) OneToOne with `GuildTrigger`.        |
-| `TriggerRole`    | Welcome-role config (`roleId`) OneToOne with `GuildTrigger`.                         |
-| `Poll`           | Poll title, optional voting role, publication date, and close date.                  |
-| `PollStep`       | Ordered poll questions and optional descriptions.                                    |
-| `PollChoice`     | Ordered selectable answers for a poll question.                                      |
-| `PollResp`       | One member's answer for one poll step, either a choice or free text.                 |
+| Entity           | Purpose                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| `DiscordGuild`   | One row per Discord guild, owning aliases, polls, triggers, and reminders.             |
+| `MessageAliased` | Reusable alias text scoped to a guild and alias name.                                  |
+| `GuildTrigger`   | Named trigger header (`kind`, `enabled`, soft-delete). Max 10 non-deleted per guild.   |
+| `TriggerMessage` | Welcome-message config (`channelId`, `message`) OneToOne with `GuildTrigger`.          |
+| `TriggerRole`    | Welcome-role config (`roleId`) OneToOne with `GuildTrigger`.                           |
+| `Poll`           | Poll title, optional voting role, publication date, and close date.                    |
+| `PollStep`       | Ordered poll questions and optional descriptions.                                      |
+| `PollChoice`     | Ordered selectable answers for a poll question.                                        |
+| `PollResp`       | One member's answer for one poll step, either a choice or free text.                   |
+| `ThreadRemind`   | One idle-bump reminder for a Discord thread, with owner, threshold, and next due time. |
 
 Command handlers must keep lookups guild-scoped. Prefer
 `findOrCreateGuild` from `discordGuild.service.ts` when a handler needs an
-existing-or-new `DiscordGuild`. Alias handlers and poll CTA handlers use
-`em.fork()` and query through `DiscordGuild.guildId` before reading or
-mutating records.
+existing-or-new `DiscordGuild`. CTA handlers that create aliases, polls,
+triggers, or reminders use `em.fork()` and query through `DiscordGuild.guildId`
+before reading or mutating records.
 
 `findOrCreateGuild` is intentionally a small entity-manager helper: it looks up
 an active `DiscordGuild` by `guildId`, persists a new managed entity when none
 exists, and leaves `flush()` to the caller. This lets CTA handlers flush the
 guild row with the rest of their command state, while the gateway `GuildCreate`
 handler flushes immediately after the backfill row is created.
+
+### Thread reminder records
+
+`ThreadRemind` rows are owned by `DiscordGuild.threadReminds` and are created by
+the `/remind` CTA flow. Important columns and constraints:
+
+- `server_id` references `discord_guild.id`, keeping reminders guild-scoped.
+- `thread_id`, `owner_user_id`, and `last_bump_message_id` store Discord snowflakes
+  as `varchar(50)`.
+- `idle_days` stores the validated 1-30 day threshold.
+- `next_tick_at` is indexed because the API-side reminder loop queries due rows
+  with `nextTickAt <= now` once per hour.
+- Unique `(thread_id, deleted_at)` enforces one active reminder per thread while
+  still allowing a moderator or owner to turn a reminder off and create a new one
+  later.
+
+When the loop finds that the bot left a guild, a thread disappeared, or a thread
+was archived, it soft-deletes the matching reminders instead of deleting rows.
+See [`docs/remind.md`](remind.md) for the full runtime workflow and Discord REST
+checks.
 
 ## Migration workflow
 
