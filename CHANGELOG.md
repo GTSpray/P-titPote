@@ -1,3 +1,9 @@
+## [1.15.10](https://github.com/GTSpray/P-titPote/compare/v1.15.9...v1.15.10) (2026-11-16)
+
+### :repeat: Chore
+
+* **deps:** bump bufferutil from 4.1.0 to 4.2.0 ([#350](https://github.com/GTSpray/P-titPote/issues/350)) ([d11edcd](https://github.com/GTSpray/P-titPote/commit/d11edcd2d041f0af5a421798febe20a36aa78d1d))
+
 ## [1.15.9](https://github.com/GTSpray/P-titPote/compare/v1.15.8...v1.15.9) (2026-11-16)
 
 ### :repeat: Chore
