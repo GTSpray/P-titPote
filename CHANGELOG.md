@@ -1,3 +1,13 @@
+## [1.15.7](https://github.com/GTSpray/P-titPote/compare/v1.15.6...v1.15.7) (2026-11-16)
+
+### :memo: Documentation
+
+* document reminder database records ([#345](https://github.com/GTSpray/P-titPote/issues/345)) ([f55c278](https://github.com/GTSpray/P-titPote/commit/f55c278794df808ff298688fa9f5cbba45d5fafe))
+
+### :repeat: Chore
+
+* **deps:** bump @semantic-release/github from 12.0.10 to 12.0.11 ([#349](https://github.com/GTSpray/P-titPote/issues/349)) ([f2fe038](https://github.com/GTSpray/P-titPote/commit/f2fe0382c0e296b5e9ca08696de81ebf06318de6))
+
 ## [1.15.6](https://github.com/GTSpray/P-titPote/compare/v1.15.5...v1.15.6) (2026-11-09)
 
 ### :repeat: Chore
