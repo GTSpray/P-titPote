@@ -1,3 +1,9 @@
+## [1.15.9](https://github.com/GTSpray/P-titPote/compare/v1.15.8...v1.15.9) (2026-11-16)
+
+### :repeat: Chore
+
+* **deps:** bump ws from 8.22.1 to 8.23.0 ([#346](https://github.com/GTSpray/P-titPote/issues/346)) ([149dac5](https://github.com/GTSpray/P-titPote/commit/149dac51bfeb976e41e7a5c73e11047c87397fb7))
+
 ## [1.15.8](https://github.com/GTSpray/P-titPote/compare/v1.15.7...v1.15.8) (2026-11-16)
 
 ### :repeat: Chore
