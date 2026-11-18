@@ -80,7 +80,9 @@ Operational constraints:
 
 Handlers that branch on subcommands should validate `req.body.data` before using
 it. Existing commands use Zod and return `errors.invalidCommandPayload` or
-`errors.invalidSubcommand` for malformed payloads.
+`errors.invalidSubcommand` for malformed payloads. Query constructors that fail
+Zod validation throw `InvalidCommand`; `src/api.ts` catches it and responds with
+HTTP 400, `errors.invalidCommandPayload`, and the Zod issues.
 
 Slash and subcommand option values must be resolved **by name**, never by array
 index: Discord does not guarantee option order, and omitted optional options are
