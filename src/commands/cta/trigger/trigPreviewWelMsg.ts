@@ -20,6 +20,7 @@ import { t } from '../../../i18n/index.js';
 import { discordapi } from '../../../utils/discordapi.js';
 import { interpolateTriggerMessage } from '../../../shared/trigger/interpolateTriggerMessage.js';
 import { triggerNameSchema } from '../../../shared/trigger/triggerName.js';
+import { buildWelcomeAllowedMentions } from '../../../shared/trigger/welMsgShared.js';
 
 const ValidPreview = z.object({
   name: triggerNameSchema,
@@ -95,7 +96,10 @@ export const trigPreviewWelMsg: ModalHandlerDelcaration<CTASelectData> = {
 
     return res.json({
       type: InteractionResponseType.ChannelMessageWithSource,
-      data: { content },
+      data: {
+        content,
+        allowed_mentions: buildWelcomeAllowedMentions(userId),
+      },
     });
   },
 };

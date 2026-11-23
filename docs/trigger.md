@@ -119,7 +119,9 @@ Each loaded trigger then runs sequentially:
 
 - `welcome_role` calls `PUT /guilds/{guild.id}/members/{user.id}/roles/{role.id}`;
 - `welcome_message` interpolates `{user}`, `{username}`, and `{server}`, then
-  calls `POST /channels/{channel.id}/messages`.
+  calls `POST /channels/{channel.id}/messages` with `allowed_mentions` limited
+  to the joining user. This preserves the `{user}` ping while preventing raw
+  `@everyone`, role, or user mentions from escalating through the bot.
 
 Per-trigger runtime failures are isolated. A failed role assignment or message
 post logs `trigger execution failed` with guild, user, trigger ID, trigger name,

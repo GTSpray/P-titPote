@@ -24,6 +24,11 @@ export const ValidWelMsg = z.object({
 
 export type WelMsgInput = z.infer<typeof ValidWelMsg>;
 
+export const buildWelcomeAllowedMentions = (userId: string) => ({
+  parse: [],
+  users: [userId],
+});
+
 export const ensurePostableChannel = async (
   guildId: string,
   channelId: string,
