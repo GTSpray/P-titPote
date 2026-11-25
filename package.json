@@ -6,7 +6,7 @@
   "main": "api.js",
   "type": "module",
   "engines": {
-    "node": ">=22.x"
+    "node": ">=26.x"
   },
   "scripts": {
     "start:api": "node dist/src/api.js",

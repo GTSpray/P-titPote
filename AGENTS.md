@@ -21,7 +21,7 @@ When reporting results, prefer this compact order:
 
 ## Project summary
 
-P'tit Pote is a Discord bot built with TypeScript, Express, Discord.js, MikroORM, MariaDB, Winston, Docker Compose, and Vitest. The codebase is ESM/NodeNext and targets Node.js 22+.
+P'tit Pote is a Discord bot built with TypeScript, Express, Discord.js, MikroORM, MariaDB, Winston, Docker Compose, and Vitest. The codebase is ESM/NodeNext and targets Node.js 26+.
 
 These instructions apply to the whole repository unless a more specific `AGENTS.md` exists in a subdirectory.
 
@@ -41,7 +41,7 @@ These instructions apply to the whole repository unless a more specific `AGENTS.
 
 Required tools:
 
-- Node.js `>=22.x`
+- Node.js `>=26.x`
 - Docker Compose, or Docker/Podman according to the local setup
 - A `.env` file created from `.env.sample` for real local runs
 

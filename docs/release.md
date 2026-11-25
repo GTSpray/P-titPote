@@ -9,7 +9,7 @@ runtime image to GitHub Container Registry when a new release is cut.
 manually with `workflow_dispatch`:
 
 1. `actions/checkout` fetches full history so semantic-release can inspect tags.
-2. `actions/setup-node` installs Node.js 22.
+2. `actions/setup-node` installs Node.js 26.
 3. `.env.sample` is copied to `.env` for Docker-based build commands.
 4. `make bundle` builds TypeScript in the CI Compose stack using the
    `ptitpotebuilder` Dockerfile target and creates `ptitpote.tar.gz` from
@@ -76,9 +76,9 @@ Review dependency updates as operational changes:
   do not broaden workflow permissions just to satisfy an update.
 
 Node version drift is the most common local pitfall. The app declares
-`"node": ">=22.x"`, CI workflows request Node.js 22, and the runtime image uses
-`node:26-slim`. `actions/setup-node` resolves the latest matching 22.x release,
-but a developer's older local 22.x can still trigger npm engine warnings from
+`"node": ">=26.x"`, CI workflows request Node.js 26, and the runtime image uses
+`node:26-slim`. `actions/setup-node` resolves the latest matching 26.x release,
+but a developer's older local Node can still trigger npm engine warnings from
 newer dev tools. Prefer upgrading local Node or using the Docker Makefile
 targets instead of bypassing engine checks.
 

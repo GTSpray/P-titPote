@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-≥22.x-green.svg"></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-≥26.x-green.svg"></a>
   <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-ready-blue.svg"></a>
 </p>
 
@@ -59,7 +59,7 @@ The site home is sourced from [`docs/usage/README.md`](docs/usage/README.md).
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/download/) (v22 or newer)
+- [Node.js](https://nodejs.org/en/download/) (v26 or newer)
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/)
 - A [Discord application](https://discord.com/developers/applications) (with bot + commands enabled)
 
