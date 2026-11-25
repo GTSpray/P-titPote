@@ -1,3 +1,9 @@
+## [1.15.15](https://github.com/GTSpray/P-titPote/compare/v1.15.14...v1.15.15) (2026-11-25)
+
+### :repeat: Chore
+
+* **deps:** bump dotenv from 18.0.9 to 18.0.10 ([#354](https://github.com/GTSpray/P-titPote/issues/354)) ([57476ee](https://github.com/GTSpray/P-titPote/commit/57476ee86f0717bf6e3a1f560049a45d158c6475))
+
 ## [1.15.14](https://github.com/GTSpray/P-titPote/compare/v1.15.13...v1.15.14) (2026-11-25)
 
 ### :repeat: Chore
