@@ -1,3 +1,11 @@
+## [1.15.16](https://github.com/GTSpray/P-titPote/compare/v1.15.15...v1.15.16) (2026-11-25)
+
+### :repeat: Chore
+
+* bump project to Node.js 26 ([#357](https://github.com/GTSpray/P-titPote/issues/357)) ([52a509e](https://github.com/GTSpray/P-titPote/commit/52a509e34c8ba790d5fe6e5bbe9faa05edd244b8))
+* **deps:** bump discord-api-types from 0.38.57 to 0.38.59 ([#356](https://github.com/GTSpray/P-titPote/issues/356)) ([0eff086](https://github.com/GTSpray/P-titPote/commit/0eff0868b38d9d8b92c55ab46928eb21309bb3f6))
+* **deps:** bump semantic-release from 25.0.9 to 26.0.1 ([#355](https://github.com/GTSpray/P-titPote/issues/355)) ([bd7d742](https://github.com/GTSpray/P-titPote/commit/bd7d742596d6b5c4534ae4cdce83cf42ab3a1ffb))
+
 ## [1.15.15](https://github.com/GTSpray/P-titPote/compare/v1.15.14...v1.15.15) (2026-11-25)
 
 ### :repeat: Chore
